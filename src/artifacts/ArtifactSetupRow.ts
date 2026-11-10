@@ -18,6 +18,7 @@ export class ArtifactSetupRow {
   private alive = true;
   private point: Raw;
   private wheelSignal: Raw | null = null;
+  private buttonPositions = new Map<Raw, { x: number; y: number }>();
 
   constructor(
     private api: API,
@@ -61,6 +62,7 @@ export class ArtifactSetupRow {
     view.addChild(this.root);
     if (read(this.root, 'stage')) this.attachWheel();
     for (const button of view.setups) {
+      this.buttonPositions.set(button, { x: read(button, 'x'), y: read(button, 'y') });
       button.set_y(0);
       this.content.addChild(button);
     }
@@ -212,7 +214,17 @@ export class ArtifactSetupRow {
     this.detachWheel();
     this.root.removeEventListener('addedToStage', this.attachWheel);
     this.root.removeEventListener('removedFromStage', this.detachWheel);
-    if (preserveButtons) for (const button of this.view.setups) this.view.addChild(button);
+    if (preserveButtons) {
+      for (const button of this.view.setups) {
+        const position = this.buttonPositions.get(button);
+        this.view.addChild(button);
+        if (position) {
+          button.set_x(position.x);
+          button.set_y(position.y);
+        }
+      }
+    }
+    this.buttonPositions.clear();
     this.root.removeFromParent(true);
     this.mask.dispose();
   }

@@ -144,7 +144,7 @@ test('native setup row scrolls by thumb, track and wheel and restores buttons on
   };
   const view: any = Object.assign(new Node(), {
     setups: Array.from({ length: 30 }, (_, index) =>
-      Object.assign(new Node(), { x: index * 38, width: 32 }),
+      Object.assign(new Node(), { x: index * 38, y: 70, width: 32 }),
     ),
     activeSlots: [],
     cargoContainer: new Node(),
@@ -196,6 +196,8 @@ test('native setup row scrolls by thumb, track and wheel and restores buttons on
   for (const button of view.setups) {
     assert.equal(button.parent, view);
     assert.equal(button.disposed, false);
+    assert.equal(button.y, 70, 'unloading must not leave setup controls over active slots');
+    assert.equal(button.x, view.setups.indexOf(button) * 38);
   }
 });
 

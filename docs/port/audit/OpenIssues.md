@@ -2305,3 +2305,21 @@ accessor tightening. Tests cover exact menu dimensions, eligibility/cancelled
 presses, marker geometry, pending/stale toggles, pruning and close-before-draft.
 No live favorite, recycle, or chat action was performed. Browser visual comparison
 is still pending; this does not establish whole artifact-screen parity.
+
+### Recycle panel text and login hint boundary — 2026-11-10
+
+Ported the source overview's recycle/supporter text stack: Russo/Verdana bitmap
+fonts, 200px classic width, explicit description wrapping, favorite-protection
+notice, and control positions computed after text measurement. Expanded widths
+are supported by this helper but the expanded overview itself remains unported.
+Setup-row unload now restores saved button coordinates instead of leaving y=0
+over the active slots. Regression coverage checks both supporter states, classic
+and expanded text widths, wrapping-dependent heights, and restored positions.
+
+A local reload rendered and connected. The screenshot at room loading exposed a
+stale Ctrl hint: upstream ConnectStatus.set_subText ignores empty strings. The
+login adapter now explicitly clears connectSubText. This does not add room-join
+cancellation; Ctrl applies to countdown/site authentication. The live key arrived
+after authentication, so live cancellation is still unverified. No further
+reload was performed once active gameplay was visible. Recycle screen visual
+comparison remains pending. Full suite: 523 passes; TypeScript passes.

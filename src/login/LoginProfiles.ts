@@ -57,6 +57,12 @@ export function siteProfile(
     removable: true,
   };
 }
+/** Haxe ConnectStatus ignores empty subText; clear its actual label explicitly. */
+export function setLoginStatusHint(status: Raw, text: string): void {
+  if (text === '') status.connectSubText.set_text('');
+  else status.set_subText(text);
+}
+
 export function loginProfiles(api: API, login: Raw) {
   const ui = new NativeUI(api),
     { resolve } = portedClasses(api),
@@ -125,7 +131,7 @@ export function loginProfiles(api: API, login: Raw) {
     countdown = 0;
     if (timer) clearInterval(timer);
     timer = undefined;
-    login.connectStatus.set_subText('');
+    setLoginStatusHint(login.connectStatus, '');
     login.connectStatus.set_visible(false);
   };
   const hide = () => {
@@ -176,7 +182,7 @@ export function loginProfiles(api: API, login: Raw) {
       login.connectSteam();
       return;
     }
-    login.connectStatus.set_subText('(press CTRL to cancel...)');
+    setLoginStatusHint(login.connectStatus, '(press CTRL to cancel...)');
     const attempt = attempts.start(() => {
       fail('The server did not answer in time. Please try again.');
     });
@@ -405,7 +411,7 @@ export function loginProfiles(api: API, login: Raw) {
     api.before(login, 'handleConnect', () => {
       attempts.cancel();
       inFlight = false;
-      login.connectStatus.set_subText('');
+      setLoginStatusHint(login.connectStatus, '');
       hide();
       if (pending) {
         state.selected = pending.id;
@@ -452,7 +458,7 @@ export function loginProfiles(api: API, login: Raw) {
       Login.currentState = 'qolaf-autologin';
       countdown = 3;
       login.updateStatus('Auto-login in 3...');
-      login.connectStatus.set_subText('(press CTRL to cancel...)');
+      setLoginStatusHint(login.connectStatus, '(press CTRL to cancel...)');
       timer = setInterval(() => {
         if (Rymden.controlKeyDown || loginControl.startupOverride) {
           show();
