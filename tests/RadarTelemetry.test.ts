@@ -1,0 +1,65 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { RadarTelemetry } from '../src/UI/RadarTelemetry';
+import { defaults } from '../src/Settings/Settings';
+
+class Node {
+  children: Node[] = [];
+  text = '';
+  x = 0;
+  y = 0;
+  visible = true;
+  set_touchable() {}
+  set_alpha() {}
+  addChild(node: Node) {
+    this.children.push(node);
+  }
+  set_text(text: string) {
+    this.text = text;
+  }
+  set_x(x: number) {
+    this.x = x;
+  }
+  set_y(y: number) {
+    this.y = y;
+  }
+  set_visible(visible: boolean) {
+    this.visible = visible;
+  }
+}
+
+test('radar source wording, placement, timing, service room and ship lifecycle', () => {
+  const ui: any = { sprite: () => new Node(), text: () => new Node(), dispose() {} };
+  const ship = { alive: true, landed: false, lifecycleId: 1, course: { speed: { x: 10, y: 0 } } };
+  const game = {
+    me: { ship },
+    clock: { latency: 21.6 },
+    hud: { radar: { x: 8, y: 600, visible: true } },
+    serviceConnection: { get_connected: () => true, get_roomId: () => 'service-test' },
+  };
+  const config = { ...defaults };
+  const telemetry = new RadarTelemetry(ui, game, config);
+  telemetry.update(0.1);
+  const node = telemetry.node as Node;
+  assert.deepEqual(
+    node.children.map((label) => label.text),
+    ['Frames/sec: --', 'Latency: 22 ms', 'Current speed: 360 km/h', 'Service: service-test'],
+  );
+  assert.equal(node.x, 8);
+  assert.equal(node.y, 600 - 60 - 18);
+  ship.course.speed.x = 0;
+  ship.lifecycleId++;
+  telemetry.update(0.1);
+  assert.equal(
+    node.children[2].text,
+    'Current speed: 0 km/h',
+    'new lifecycle cannot inherit the old speed average',
+  );
+  config.show_radar_latency = false;
+  telemetry.update(0.1);
+  assert.equal(node.y, 600 - 45 - 18);
+  assert.equal(node.children[3].visible, false);
+  game.hud.radar.visible = false;
+  telemetry.update(0.1);
+  assert.equal(node.visible, false);
+});

@@ -7,7 +7,9 @@ export class RadarTelemetry {
   readonly node: Raw;
   private labels: Raw[] = [];
   private metrics = new Telemetry();
-  private elapsed = 0.25;
+  private elapsed = 0.1;
+  private sampledShip: Raw | undefined;
+  private sampledLifecycle: number | undefined;
   constructor(
     private ui: NativeUI,
     private game: Raw,
@@ -25,6 +27,11 @@ export class RadarTelemetry {
   update(dt: number) {
     const ship = read(this.game, 'me')?.ship,
       speed = read(ship, 'course')?.speed;
+    if (ship !== this.sampledShip || ship?.lifecycleId !== this.sampledLifecycle) {
+      this.sampledShip = ship;
+      this.sampledLifecycle = ship?.lifecycleId;
+      this.metrics.resetMotion();
+    }
     this.metrics.advance(
       dt,
       ship?.landed ? 0 : speed?.x,
@@ -32,29 +39,31 @@ export class RadarTelemetry {
       !!ship?.alive && !!speed,
     );
     this.elapsed += dt;
-    if (this.elapsed < 0.25) return;
-    this.elapsed = 0;
-    const format = (value: number) => (Number.isFinite(value) ? String(Math.round(value)) : '—');
+    if (this.elapsed < 0.1) return;
+    this.elapsed %= 0.1;
+    const format = (value: number) =>
+      Number.isFinite(value) && value >= 0 ? String(Math.round(value)) : '--';
     const lines: string[] = [];
-    if (this.config.show_radar_fps) lines.push(`FPS: ${format(this.metrics.fps)}`);
+    if (this.config.show_radar_fps) lines.push(`Frames/sec: ${format(this.metrics.fps)}`);
     if (this.config.show_radar_latency)
       lines.push(`Latency: ${format(this.game.clock?.latency)} ms`);
     if (this.config.show_radar_speed)
       lines.push(
-        `Speed: ${format(this.metrics.displaySpeed(this.config.radar_speed_in_mph))} ${this.config.radar_speed_in_mph ? 'mph' : 'km/h'}`,
+        `Current speed: ${format(this.metrics.displaySpeed(this.config.radar_speed_in_mph))} ${this.config.radar_speed_in_mph ? 'mph' : 'km/h'}`,
       );
     if (this.config.show_radar_service)
       lines.push(
-        `Service: ${read(this.game.serviceConnection, 'connected', false) ? 'Connected' : 'Disconnected'}`,
+        `Service: ${read(this.game.serviceConnection, 'connected', false) ? read(this.game.serviceConnection, 'roomId', this.game.serviceRoomId) : 'disconnected'}`,
       );
     this.labels.forEach((label, i) => {
-      label.set_text(lines[i] ?? '');
+      const text = lines[i] ?? '';
+      if (read(label, 'text') !== text) label.set_text(text);
       label.set_y(i * 15);
       label.set_visible(i < lines.length);
     });
     const radar = this.game.hud.radar;
     this.node.set_x(read(radar, 'x'));
-    this.node.set_y(Math.max(0, read(radar, 'y') - lines.length * 15 - 6));
+    this.node.set_y(Math.max(0, read(radar, 'y') - lines.length * 15 - 18));
     this.node.set_visible(read(radar, 'visible') && lines.length > 0);
   }
   dispose() {

@@ -1,4 +1,4 @@
-import type { API, Raw } from '../Api/Types';
+import { read, type API, type Raw } from '../Api/Types';
 import { isBoundMethod } from '../Runtime/As3';
 import { portedClasses } from '../Ported/Registry';
 import { createSettingsState } from '../Ported/SettingsState';
@@ -25,6 +25,15 @@ export function installNativeSettings(api: API, preferences?: DeviceSettings): v
       });
     }
     api.before(settings, 'save', () => preferences.flush());
+    const originalStarling = api.cls('starling.core.Starling')?.get_current();
+    const originalStage = read(originalStarling, 'nativeStage');
+    const originalFrameRate = read(originalStage, 'frameRate');
+    const originalSkipFrames = read(originalStarling, 'skipUnchangedFrames');
+    api.defer(() => {
+      if (originalFrameRate !== undefined) originalStage.set_frameRate(originalFrameRate);
+      if (originalSkipFrames !== undefined)
+        originalStarling.set_skipUnchangedFrames(originalSkipFrames);
+    });
     const applyFrameRate = () => {
       const starling = api.cls('starling.core.Starling')?.get_current();
       if (!starling) return;

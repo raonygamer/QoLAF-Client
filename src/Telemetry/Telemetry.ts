@@ -21,6 +21,9 @@ export class Telemetry {
       ? this.speed + (speed - this.speed) * (1 - Math.exp(-dt / 0.12))
       : speed;
   }
+  resetMotion(): void {
+    this.speed = NaN;
+  }
   displaySpeed(mph: boolean) {
     return (this.speed * 36) / (mph ? 1.609344 : 1);
   }

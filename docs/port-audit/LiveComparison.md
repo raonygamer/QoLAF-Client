@@ -57,3 +57,23 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   changes, unchanged text writes, readiness/manual respawn, survival/PvP prompts,
   and preservation of damage totals/particle properties. Live visual matching of
   these new changes is still pending; these checks do not certify full parity.
+
+### Radar source audit and two live reloads
+
+- Reloaded the local port twice. Both reached gameplay; first capture
+  `/tmp/QoLAF-GameplayReady.png` confirms compact native HUD health/shield values.
+- Compared RadarTelemetry.as and RadarTelemetryMetrics.as with the port:
+  corrected `Frames/sec:` and `Current speed:`, unavailable marker `--`, 18px
+  radar gap, 100ms refresh with retained remainder, and actual service room ID.
+  Ship/lifecycle changes now reset the speed average. Unchanged labels no longer
+  rewrite text on every refresh.
+- Second capture `/tmp/QoLAF-RadarReady.png` shows corrected radar text/placement
+  and `Service: Service-1409_0`. Some sale-dialog labels are missing in this
+  capture; this is not a claim of complete visual parity. The previously deferred
+  bitmap/cache issue was not investigated in this pass.
+- Added focused radar regression coverage for wording, layout, lifecycle reset,
+  toggle reflow and visibility. TypeScript, build and 63 tests pass.
+- Fixed frame-rate preference cleanup to restore the previous native stage rate
+  and skipUnchangedFrames value on plugin unload.
+- Remaining radar gaps explicitly include DPS observation, emperor coordination,
+  boss timers, service pooling/IPC and desktop radio integration.
