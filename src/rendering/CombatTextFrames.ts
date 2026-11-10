@@ -142,6 +142,26 @@ export function installCombatTextFrames(api: API): void {
   const unit = api.cls('core.unit.Unit')?.prototype;
   if (!handler || !manager || !particle || !unit) return;
   const frames = new CombatTextFrames();
+  api.after(
+    handler,
+    'add',
+    function (
+      particle: Raw,
+      _text: string,
+      _position: Raw,
+      _speed: Raw,
+      _ttl: number,
+      _color: number,
+      _size: number,
+      _fixed: boolean,
+      alignment = 'center',
+    ) {
+      // TextHandler pools particles. Native add leaves the previous pivot in place
+      // for left alignment; TextParticle.sizeToCurrentText resets every branch.
+      const width = read(particle, 'width');
+      particle.set_pivotX(alignment === 'center' ? width / 2 : alignment === 'right' ? width : 0);
+    },
+  );
   api.around(handler, 'update', function (_next, seconds = 1 / 60) {
     frames.update(this, seconds);
   });

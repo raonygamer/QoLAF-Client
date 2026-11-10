@@ -1,6 +1,15 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { CombatTextFrames, combatTextAnchor } from '../src/rendering/CombatTextFrames';
+import {
+  CombatTextFrames,
+  combatTextAnchor,
+  installCombatTextFrames,
+} from '../src/rendering/CombatTextFrames';
+// @ts-expect-error inspected upstream implementation
+import makeTextHandler from './fixtures/UpstreamTextHandler.js';
+// @ts-expect-error actual host hooks
+import { Hooks } from './fixtures/HostCore.js';
+import { Text } from './fixtures/NativeGame';
 import type { Raw } from '../src/api/Types';
 
 function fixture() {
@@ -150,4 +159,63 @@ test('replacement damage numbers stop following without losing their rise limit 
   }
   near(particle.y, 75);
   near(heal.y, 175);
+});
+
+test('native particle pooling resets left alignment after right and center messages', () => {
+  const Handler = makeTextHandler();
+  const particle = new Text() as Raw;
+  particle.set_pivotX = function (value: number) {
+    this.pivotX = value;
+  };
+  particle.get_pivotX = function () {
+    return this.pivotX;
+  };
+  particle.reset = function () {
+    this.alive = false;
+  };
+  const game = {
+    textManager: { inactiveTexts: [particle] },
+    addChild() {},
+    canvasTexts: { addChild() {} },
+  };
+  const handler = new Handler(game);
+  const add = (alignment?: string) =>
+    handler.add('message', { x: 40, y: 50 }, { x: 0, y: -10 }, 1000, 0xffffff, 15, true, alignment);
+  add('right');
+  const oldPivot = particle.get_pivotX();
+  add('left');
+  assert.equal(particle.get_pivotX(), oldPivot, 'unpatched native pool retains the wrong pivot');
+
+  const hooks = new Hooks();
+  const cleanups: Array<() => void> = [];
+  installCombatTextFrames({
+    cls: (name: string) =>
+      name === 'core.text.TextHandler'
+        ? Handler
+        : { prototype: { createDmgText() {}, reset() {} } },
+    after: (target: Raw, key: string, fn: Function) =>
+      cleanups.push(hooks.add(target, key, 'after', fn)),
+    before: (target: Raw, key: string, fn: Function) =>
+      cleanups.push(hooks.add(target, key, 'before', fn)),
+    around: (target: Raw, key: string, fn: Function) =>
+      cleanups.push(hooks.add(target, key, 'around', fn)),
+  } as any);
+  try {
+    for (const alignment of ['right', 'left', 'center', 'left', undefined]) {
+      assert.equal(add(alignment), particle);
+      assert.equal(
+        particle.get_pivotX(),
+        alignment === 'right'
+          ? particle.get_width()
+          : alignment === 'left'
+            ? 0
+            : particle.get_width() / 2,
+      );
+      assert.equal(particle.get_x(), 40);
+      assert.equal(particle.get_y(), 50);
+      assert.equal(handler.texts.length, 1);
+    }
+  } finally {
+    cleanups.reverse().forEach((cleanup) => cleanup());
+  }
 });

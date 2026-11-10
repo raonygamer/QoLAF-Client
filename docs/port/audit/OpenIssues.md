@@ -1117,3 +1117,21 @@ matching the actual group relationships and original HUD capture. Screenshot
 /tmp/QoLAF-TargetGroupFixed.png. No account/group membership was changed. The boss
 filter and held-row presentation are regression-tested; an actual boss encounter
 and live held-row comparison remain additional visual checks.
+
+## Pooled floating-text alignment audit (2026-11-10)
+
+Compared current TextParticle.sizeToCurrentText/TextHandler.add with the inspected
+Haxe implementation. The original always assigns pivotX for center, right and
+left alignment. Native add assigns only center/right, so a pooled right-aligned
+message retains its old horizontal pivot when reused for left alignment.
+CombatTextFrames now restores all three source branches after native add, using
+the final native measured width. Message position, pool selection, newer zoom
+behavior and timing remain native.
+
+Added the inspected upstream TextHandler as a fixture. The regression first
+reproduces the unpatched right-to-left failure, then exercises repeated reuse
+through the actual host hooks (right/left/center/left/default), checking identity,
+position and pool length. Typecheck and all 315 tests pass. Preview remained
+connected with runtimeErrors=0 before reload; this change is built but has not
+been visually verified in the running browser. This does not resolve or explain
+the separate intermittent bitmap corruption or establish full animation parity.
