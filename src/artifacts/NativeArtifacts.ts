@@ -38,10 +38,11 @@ export function installArtifactUI(api: API) {
     this.p.artifacts.sort(
       (a: Raw, b: Raw) =>
         Number(b.revealed) - Number(a.revealed) ||
-        (a.revealed ? direction * (artifactFitness(a as any) - artifactFitness(b as any)) : 0),
+        direction * (artifactFitness(a as any) - artifactFitness(b as any)),
     );
     this.cargoContainer.removeChildren(0, -1, true);
     this.cargoBoxes.length = 0;
     this.drawArtifactsInCargo();
+    this.cargoContainer.scrollToPosition(0, 0);
   });
 }

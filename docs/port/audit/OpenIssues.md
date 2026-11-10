@@ -1998,3 +1998,8 @@ Artifact screen mismatches confirmed from the refreshed diff (still open):
 `NativeArtifacts.ts` currently supplies fitness tooltip/sorting additions only;
 it is not a port of the full artifact overview. Preserve the current Haxe gameplay
 and server-operation contracts while implementing the original UI around them.
+
+The same artifact diff review also corrected fitness sort ordering among
+unrevealed entries and restored `onSort`'s scroll-to-top after rebuilding cargo
+rows. A native-hook regression checks both directions, revealed-first grouping,
+row disposal/rebuild order and delegation of unrelated sort types.
