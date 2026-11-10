@@ -772,8 +772,11 @@ than treating the overlay display check as full rendering parity.
 
 Reopened the sale popup: its text initially rendered fully, then prefixes vanished
 again without the debug overlay being enabled. This rules out treating the debug
-panel as the necessary trigger. Painter.cacheEnabled was already false; explicitly
-setting false did not resolve it (CacheBefore/CacheDisabled screenshots).
+panel as the necessary trigger. Painter.cacheEnabled read false between frames;
+setting false once did not resolve it (CacheBefore/CacheDisabled screenshots).
+This was not a valid cache-disable experiment: finishFrame selects the speculative
+processor and nextFrame re-enables the regular processor. See the corrected
+per-frame experiment below.
 Temporarily setting 193 existing TextField mesh batches to separate draws restored
 the description and stat labels (TextSeparateDraw screenshot). Restoring their
 original batching values brought corruption back; a later sample recovered again
@@ -1501,3 +1504,56 @@ Intermittent UI text corruption reproduced again on the sale panel before the
 retest probe (/tmp/QoLAF-DamageRetestBefore.png) and recovered by the next capture.
 This is still unresolved; the damage-layout fix does not establish a cause or
 a fix for missing UI glyphs.
+
+## Missing-label capture investigation (2026-11-10)
+
+Further live checks narrow the missing-label symptom without establishing a
+production fix. All temporary draw wrappers, copied meshes, and CSS overrides
+were restored. No gameplay or transport operations were invoked.
+
+- Front and back stencil functions both reported ALWAYS with KEEP operations;
+  the sampled faces did not disagree. Shader observation checked 1,000 effect
+  draws and 2,120 uniform values/maps without program, uniform or texture-binding
+  mismatches. Depth function and all four blend factors matched requested state
+  across another 2,000 effect draws; equations were FUNC_ADD and all color writes
+  enabled. These are bounded observations, not proof about every draw.
+- Native mesh copies of Health:, Base stats: and Special Weapon: remained
+  complete in a screen capture where the original labels disappeared. Source
+  indices and positions were valid. Copies were removed and disposed.
+- Corrected cache isolation disabled caching after every Painter.nextFrame for
+  20 seconds (3,569 frames). Screen captures still lost labels. During that test,
+  targeted label observation found 504 copies, 100 audited draws, 70,968 index
+  bytes and 473,120 vertex bytes with no copy, buffer or capacity mismatches.
+  Do not ship global cache disabling or speculative buffer reuploads.
+
+The next observation changes which layer needs investigation. A small region
+covering Health: was read after draws. The native offscreen framebuffer uses the
+opposite vertical orientation from the default framebuffer. With that accounted
+for, two traced frames accumulated the label pixels in the native framebuffer,
+then retained them through the final canvas draw. Subsequent five-second sampling
+of the default framebuffer returned exactly 227 bright pixels on all 1,796 draw
+samples, while a desktop capture during sampling showed the label missing.
+A second five-second sample returned 227 bright pixels, all opaque (alpha sum
+57,885 = 227 * 255), on all 1,794 samples; its desktop capture also lost text.
+
+A direct PNG export of the canvas after its default-framebuffer draws contains
+the complete sale description and stat labels. DOM inspection found one canvas,
+which is the inspected GL context's canvas, with no DOM overlay at the sampled
+point. This suggests a discrepancy after the observed canvas rendering, such as
+browser compositing or desktop capture. It does not identify a browser/driver
+defect, establish exact same-frame correspondence for the export, or prove every
+text issue has that cause. Distinguish these missing-glyph captures from the
+user-reported wrapping/alignment and moving-text defects when assessing parity.
+
+Removing canvas translateZ(0px) for 15 seconds did not eliminate the desktop
+capture symptom; the original transform was restored. No production rendering
+change is justified by these experiments. Use direct canvas evidence alongside
+desktop captures for subsequent UI comparisons; keep this issue open until the
+post-render discrepancy is isolated.
+
+Local evidence: /tmp/QoLAF-GlyphGeometryLater.png,
+/tmp/QoLAF-FrameCacheRestored.png, /tmp/QoLAF-DepthBlend.png,
+/tmp/QoLAF-PixelTraceFlip.png, /tmp/QoLAF-FinalPixelsDuring.png,
+/tmp/QoLAF-FinalPixelsAfter.png, /tmp/QoLAF-FinalAlphaDuring.png,
+/tmp/QoLAF-FinalAlphaAfter.png, /tmp/QoLAF-CanvasLayers.png,
+/tmp/QoLAF-CanvasExport.png and /tmp/QoLAF-NoTransformLater.png.
