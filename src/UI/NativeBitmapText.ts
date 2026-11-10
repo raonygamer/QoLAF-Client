@@ -1,3 +1,4 @@
+import { installWrapTextMeasurement } from './NativeWrapTextMeasurement';
 import { installBitmapCompositionQueue } from './BitmapCompositionQueue';
 import { fontAssets } from './FontAssets';
 import { read } from '../Api/Types';
@@ -12,6 +13,7 @@ export function installNativeBitmapText(api: API): void {
   const Text = bitmap.resolve('core.hud.components.Text');
   bridgeNativeBitmapText(api, Text);
   installBitmapCompositionQueue(api);
+  installWrapTextMeasurement(api);
   const Compositor = bitmap.resolve('core.text.RichBitmapFontCompositor');
   const TextField = api.cls('starling.text.TextField')!;
   for (const asset of fontAssets) {
