@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { TargetAimIndicator, loadTargetAimIndicator } from '../src/UI/TargetAimIndicator';
-import { Display } from './Fixtures/NativeGame';
+import { TargetAimIndicator, loadTargetAimIndicator } from '../src/ui/TargetAimIndicator';
+import { Display } from './fixtures/NativeGame';
 
 test('original three-arrow marker follows render pose and settings without changing the target', () => {
   class Arrow extends Display {

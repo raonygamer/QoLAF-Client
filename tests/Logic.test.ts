@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ChatHistory } from '../src/Chat/ChatHistory';
-import { parseCommand } from '../src/Chat/ChatCommandParser';
-import { Telemetry } from '../src/Telemetry/Telemetry';
-import { settings } from '../src/Settings/Settings';
-import { TargetSystem } from '../src/Target/TargetSystem';
-import { lineFitness, artifactFitness } from '../src/Artifacts/Fitness';
+import { ChatHistory } from '../src/chat/ChatHistory';
+import { parseCommand } from '../src/chat/ChatCommandParser';
+import { Telemetry } from '../src/telemetry/Telemetry';
+import { settings } from '../src/settings/Settings';
+import { TargetSystem } from '../src/target/TargetSystem';
+import { lineFitness, artifactFitness } from '../src/artifacts/Fitness';
 
 test('history preserves drafts, deduplicates, caps and clamps traversal', () => {
   const h = new ChatHistory(2);

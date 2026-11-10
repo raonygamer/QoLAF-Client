@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { installProjectileContacts } from '../src/Telemetry/ProjectileContacts';
-import { DamageObserver } from '../src/Telemetry/DamageObserver';
-import { defaults } from '../src/Settings/Settings';
+import { installProjectileContacts } from '../src/telemetry/ProjectileContacts';
+import { DamageObserver } from '../src/telemetry/DamageObserver';
+import { defaults } from '../src/settings/Settings';
 import {
   createProjectileBulletExecute,
   createBouncingExecute,
-} from './Fixtures/NativeProjectileContacts.js';
+} from './fixtures/NativeProjectileContacts.js';
 
 function setup(family = 'bullet', hits = 1, bomb = false, positions = [5]) {
   class Unit {

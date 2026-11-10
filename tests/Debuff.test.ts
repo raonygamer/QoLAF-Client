@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { DebuffTracker, installDebuffTracker } from '../src/Debuff/DebuffTracker';
-import { DebuffDisplay, debuffTooltip } from '../src/UI/DebuffDisplay';
-import { Display, Image, ToolTip } from './Fixtures/NativeGame';
+import { DebuffTracker, installDebuffTracker } from '../src/debuff/DebuffTracker';
+import { DebuffDisplay, debuffTooltip } from '../src/ui/DebuffDisplay';
+import { Display, Image, ToolTip } from './fixtures/NativeGame';
 
 test('debuff observations preserve native shield/healing behavior and arguments', () => {
   const hooks = new Map<string, Function>();

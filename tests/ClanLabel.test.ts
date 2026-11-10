@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ClanLabel } from '../src/UI/ClanLabel';
-import { Display } from './Fixtures/NativeGame';
+import { ClanLabel } from '../src/ui/ClanLabel';
+import { Display } from './fixtures/NativeGame';
 
 class Text extends Display {
   text = '';

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createRichBitmapFontCompositor } from '../src/Ported/RichBitmapFontCompositor';
-import { bitmapRendererFixture } from './Fixtures/BitmapRenderer';
+import { createRichBitmapFontCompositor } from '../src/ported/RichBitmapFontCompositor';
+import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
 
 test('Starling HTML uses bitmap glyph colors while plain text retains the native compositor', (t) => {
   const fixture = bitmapRendererFixture();

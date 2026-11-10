@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ChatCommandRegistry } from '../src/Chat/ChatCommandRegistry';
+import { ChatCommandRegistry } from '../src/chat/ChatCommandRegistry';
 import {
   clearLocalChat,
   customCommandHelp,
   installLocalClientCommands,
-} from '../src/Chat/LocalClientCommands';
-import type { Raw } from '../src/Api/Types';
+} from '../src/chat/LocalClientCommands';
+import type { Raw } from '../src/api/Types';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 
 function fixture() {
   const messages: unknown[][] = [],

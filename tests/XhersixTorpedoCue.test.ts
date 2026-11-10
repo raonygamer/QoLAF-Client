@@ -1,22 +1,22 @@
 import { test } from 'node:test';
-import { XhersixTorpedoCueClock } from '../src/Projectile/XhersixTorpedoCueClock';
+import { XhersixTorpedoCueClock } from '../src/projectile/XhersixTorpedoCueClock';
 // @ts-expect-error original JavaScript contract cases
-import { runClockContract } from './Fixtures/XhersixTorpedoCueClockContract.js';
+import { runClockContract } from './fixtures/XhersixTorpedoCueClockContract.js';
 test('original Xhersix rhythm clock cadence, drift, expiry and wrap contracts', () =>
   runClockContract(() => new XhersixTorpedoCueClock()));
 
 import assert from 'node:assert/strict';
-import { Display } from './Fixtures/NativeGame';
-import { EnemyTargetObservations } from '../src/Projectile/EnemyTargetObservations';
+import { Display } from './fixtures/NativeGame';
+import { EnemyTargetObservations } from '../src/projectile/EnemyTargetObservations';
 import {
   XhersixTorpedoCue,
   xhersixTorpedoWeaponKey,
   installTorpedoCue,
   installTorpedoCueHooks,
-} from '../src/Projectile/XhersixTorpedoCue';
-import { XhersixTorpedoCueView } from '../src/Projectile/XhersixTorpedoCueView';
+} from '../src/projectile/XhersixTorpedoCue';
+import { XhersixTorpedoCueView } from '../src/projectile/XhersixTorpedoCueView';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 
 function cueFixture() {
   class Roaming {}
@@ -238,9 +238,9 @@ test('early packet hooks survive cached handlers and observe before native facto
   assert.equal('setTorpedoCueEnabled' in game.projectileManager, false);
 });
 
-import { observeEnemyTargets } from '../src/Projectile/EnemyTargetObservations';
+import { observeEnemyTargets } from '../src/projectile/EnemyTargetObservations';
 // @ts-expect-error actual Haxe parser fixture
-import { createReader } from './Fixtures/NativeEnemyEntry.js';
+import { createReader } from './fixtures/NativeEnemyEntry.js';
 
 test('target observation follows native packet masks, preserves aggro across weapon stop and resets on pooled reuse', () => {
   const observations = new EnemyTargetObservations(),

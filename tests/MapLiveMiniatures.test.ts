@@ -1,13 +1,13 @@
-import { installMapTextureKeys } from '../src/Map/MapTextureKeys';
+import { installMapTextureKeys } from '../src/map/MapTextureKeys';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { Display } from './Fixtures/NativeGame';
-import { NativeUI } from '../src/UI/NativeUI';
-import { MapLiveMiniature } from '../src/Map/MapLiveMiniature';
-import { MapLiveMiniatures, installMapLiveMiniatures } from '../src/Map/NativeMapLiveMiniatures';
-import { NexarEnemyIdentification } from '../src/Ship/NexarEnemyIdentification';
+import { Display } from './fixtures/NativeGame';
+import { NativeUI } from '../src/ui/NativeUI';
+import { MapLiveMiniature } from '../src/map/MapLiveMiniature';
+import { MapLiveMiniatures, installMapLiveMiniatures } from '../src/map/NativeMapLiveMiniatures';
+import { NexarEnemyIdentification } from '../src/ship/NexarEnemyIdentification';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 
 test('Nexar classification uses the original exact named-Emperor exception', () => {
   for (const name of ['Emperor Xhersix', 'Emperor Yhgvis', 'Emperor Zharix']) {

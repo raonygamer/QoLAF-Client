@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createSettingsKeybind } from '../src/Ported/SettingsKeybind';
-import { aliasProperties } from '../src/Runtime/As3';
-import { Display, Stage } from './Fixtures/NativeGame';
+import { createSettingsKeybind } from '../src/ported/SettingsKeybind';
+import { aliasProperties } from '../src/runtime/As3';
+import { Display, Stage } from './fixtures/NativeGame';
 
 test('source keybinding rows cancel, bind mouse buttons, and detach capture listeners after removal', (t) => {
   const cleanup: (() => void)[] = [];

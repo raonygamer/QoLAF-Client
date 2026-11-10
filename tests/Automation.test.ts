@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { AutomationEvent } from '../src/Automation/AutomationEvent';
-import { AutomationInfo } from '../src/Automation/AutomationInfo';
-import { AutomationRuntime } from '../src/Automation/AutomationRuntime';
-import { EventBus, type AutomationCommands } from '../src/Automation/EventBus';
+import { AutomationEvent } from '../src/automation/AutomationEvent';
+import { AutomationInfo } from '../src/automation/AutomationInfo';
+import { AutomationRuntime } from '../src/automation/AutomationRuntime';
+import { EventBus, type AutomationCommands } from '../src/automation/EventBus';
 
 function registry() {
   const calls: unknown[][] = [];

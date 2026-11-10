@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { installNativeChatPreferences } from '../src/Chat/NativeChatPreferences';
-import { DeviceSettings } from '../src/Settings/DeviceSettings';
-import { Display } from './Fixtures/NativeGame';
+import { installNativeChatPreferences } from '../src/chat/NativeChatPreferences';
+import { DeviceSettings } from '../src/settings/DeviceSettings';
+import { Display } from './fixtures/NativeGame';
 
 test('native composer font, DPI placement, narrow window and cleanup preserve input contents', () => {
   class Input extends Display {

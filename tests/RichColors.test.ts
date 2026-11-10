@@ -2,11 +2,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 // @ts-expect-error original AS3 method execution fixture
-import { install } from './Fixtures/As3Methods.js';
-import { createClientDeveloperTagColor } from '../src/Ported/ClientDeveloperTagColor';
-import { createEchoPulseColor } from '../src/Ported/EchoPulseColor';
-import { createRoomInvitePulseColor } from '../src/Ported/RoomInvitePulseColor';
-import { createPodRewardPulseColor } from '../src/Ported/PodRewardPulseColor';
+import { install } from './fixtures/As3Methods.js';
+import { createClientDeveloperTagColor } from '../src/ported/ClientDeveloperTagColor';
+import { createEchoPulseColor } from '../src/ported/EchoPulseColor';
+import { createRoomInvitePulseColor } from '../src/ported/RoomInvitePulseColor';
+import { createPodRewardPulseColor } from '../src/ported/PodRewardPulseColor';
 
 for (const [name, factory] of Object.entries({
   ClientDeveloperTagColor: createClientDeveloperTagColor,
@@ -34,7 +34,7 @@ for (const [name, factory] of Object.entries({
         return leaving;
       },
     };
-    const source = readFileSync(new URL(`./Fixtures/Colors/${name}.as`, import.meta.url), 'utf8');
+    const source = readFileSync(new URL(`./fixtures/colors/${name}.as`, import.meta.url), 'utf8');
     const scope: any = {
       Game: { instance: originalGame },
       uint: (v: number) => v >>> 0,

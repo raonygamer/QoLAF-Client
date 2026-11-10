@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { installRespawn } from '../src/Runtime/Respawn';
-import { installDamageText } from '../src/Hud/DamageText';
+import { installRespawn } from '../src/runtime/Respawn';
+import { installDamageText } from '../src/hud/DamageText';
 
 function fixture() {
   const settings = { disableSpaceToRespawn: false, formatDamageText: true };

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
-import { installInactivityPreference } from '../src/Runtime/Inactivity';
+import { Hooks } from './fixtures/HostCore.js';
+import { installInactivityPreference } from '../src/runtime/Inactivity';
 
 test('persistent inactivity setting and transient owners retain native timeout when disabled', () => {
   const hooks = new Hooks(),

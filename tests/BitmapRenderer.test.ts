@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { bitmapRendererFixture } from './Fixtures/BitmapRenderer';
+import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
 
 test('source bitmap layout wraps words, drops trailing newline phantom lines, and retains per-glyph color', (t) => {
   const fixture = bitmapRendererFixture();

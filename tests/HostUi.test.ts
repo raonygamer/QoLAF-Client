@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 // @ts-expect-error actual host JavaScript module
-import { nativeManager } from './Fixtures/NativeManager.js';
+import { nativeManager } from './fixtures/NativeManager.js';
 // @ts-expect-error actual host JavaScript module
-import { PluginHost } from './Fixtures/HostCore.js';
-import { registry, Stage, Game } from './Fixtures/NativeGame';
+import { PluginHost } from './fixtures/HostCore.js';
+import { registry, Stage, Game } from './fixtures/NativeGame';
 test('Plugins stays on login, moves into Settings, and never floats over play', () => {
   const errors: any[] = [];
   const host = new PluginHost({

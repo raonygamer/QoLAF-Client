@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { RadarTelemetry } from '../src/UI/RadarTelemetry';
-import { defaults } from '../src/Settings/Settings';
+import { RadarTelemetry } from '../src/ui/RadarTelemetry';
+import { defaults } from '../src/settings/Settings';
 
 class Node {
   children: Node[] = [];

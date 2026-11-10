@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { DeviceSettings } from '../src/Settings/DeviceSettings';
-import { installBackgroundLayers } from '../src/Rendering/BackgroundLayers';
-import { Display, Game, registry } from './Fixtures/NativeGame';
+import { DeviceSettings } from '../src/settings/DeviceSettings';
+import { installBackgroundLayers } from '../src/rendering/BackgroundLayers';
+import { Display, Game, registry } from './fixtures/NativeGame';
 // @ts-expect-error actual host loader
-import { PluginHost } from './Fixtures/HostCore.js';
+import { PluginHost } from './fixtures/HostCore.js';
 // @ts-expect-error extracted upstream refresh/clear implementation
-import methods from './Fixtures/UpstreamParallax.js';
+import methods from './fixtures/UpstreamParallax.js';
 
 test('device settings retain original defaults, star migration, validation and local persistence', () => {
   let saved: any = { backgroundOpacity: 0.7, autoRespawn: false, dpiScale: 5, cameraZoom: 10 };

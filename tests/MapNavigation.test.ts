@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { MapNavigation } from '../src/Map/MapNavigation';
-import { installMapNavigation, mapHeatViewport } from '../src/Map/NativeMapNavigation';
-import { Display } from './Fixtures/NativeGame';
+import { MapNavigation } from '../src/map/MapNavigation';
+import { installMapNavigation, mapHeatViewport } from '../src/map/NativeMapNavigation';
+import { Display } from './fixtures/NativeGame';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 
 const close = (a: number, b: number) => assert.ok(Math.abs(a - b) < 1e-8, `${a} versus ${b}`);
 test('original map navigation preserves pointer anchor, drag threshold and zoom on recenter', () => {

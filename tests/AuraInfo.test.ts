@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { AuraInfo, auraTooltip } from '../src/UI/AuraInfo';
-import { NativeUI } from '../src/UI/NativeUI';
-import { registry, EnemyShip, ToolTip } from './Fixtures/NativeGame';
+import { AuraInfo, auraTooltip } from '../src/ui/AuraInfo';
+import { NativeUI } from '../src/ui/NativeUI';
+import { registry, EnemyShip, ToolTip } from './fixtures/NativeGame';
 
 test('aura information matches original descriptions using native rare-type constants', () => {
   const native = {

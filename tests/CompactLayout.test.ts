@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { compactLayout } from '../src/Map/CompactLayout';
+import { compactLayout } from '../src/map/CompactLayout';
 
 test('compact map reproduces original progression, branch lanes and independent systems', () => {
   const layout = compactLayout(540, 240);

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { automationStatus, dispatchAutomationChat } from '../src/Chat/AutomationCommands';
+import { automationStatus, dispatchAutomationChat } from '../src/chat/AutomationCommands';
 
 test('legacy automation commands preserve status, whitespace parsing and original errors', () => {
   const messages: any[] = [],

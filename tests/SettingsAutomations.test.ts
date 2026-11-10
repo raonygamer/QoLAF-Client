@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createSettingsAutomations } from '../src/Ported/SettingsAutomations';
-import { AutomationManager } from '../src/Automation/AutomationManager';
-import { Display } from './Fixtures/NativeGame';
-import { aliasProperties } from '../src/Runtime/As3';
+import { createSettingsAutomations } from '../src/ported/SettingsAutomations';
+import { AutomationManager } from '../src/automation/AutomationManager';
+import { Display } from './fixtures/NativeGame';
+import { aliasProperties } from '../src/runtime/As3';
 
 test('source automation page selects, starts, stops, confirms removal and detaches asynchronous UI', async (t) => {
   const cleanups: Function[] = [];

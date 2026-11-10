@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createJapaneseGlyphCache } from '../src/Ported/JapaneseGlyphCache';
-import { createJapaneseGlyphPage } from '../src/Ported/JapaneseGlyphPage';
-import { createJapaneseCachedGlyph } from '../src/Ported/JapaneseCachedGlyph';
+import { createJapaneseGlyphCache } from '../src/ported/JapaneseGlyphCache';
+import { createJapaneseGlyphPage } from '../src/ported/JapaneseGlyphPage';
+import { createJapaneseCachedGlyph } from '../src/ported/JapaneseCachedGlyph';
 
 test('Japanese cache preserves active glyphs, evicts only released entries, and batches page uploads', (t) => {
   const oldDocument = globalThis.document;

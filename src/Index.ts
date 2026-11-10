@@ -1,23 +1,23 @@
-import { installLocalClientCommands } from './Chat/LocalClientCommands';
-import { installBossSpawnTimerHooks } from './Boss/NativeBossSpawnTimers';
-import { installMapTextureKeys } from './Map/MapTextureKeys';
-import { installNetherBlobBeamHooks } from './Ship/NetherBlobBeamCountdown';
-import { installTorpedoCueHooks } from './Projectile/XhersixTorpedoCue';
-import { installNativeAutomations } from './Automation/NativeAutomations';
-import targetIcon from './Assets/Images/TargetIcon.png';
-import { read, type API } from './Api/Types';
-import { installGameSession } from './Runtime/GameSession';
-import { ChatHistory } from './Chat/ChatHistory';
-import { installNativeBitmapText } from './UI/NativeBitmapText';
-import { loadFonts } from './UI/Fonts';
-import { loginIdentity, PORT_VERSION } from './Login/LoginIdentity';
-import { loginProfiles } from './Login/LoginProfiles';
-import { installArtifactUI } from './Artifacts/NativeArtifacts';
-import { installInterpolation } from './Rendering/Interpolation';
-import { installDisplayScale } from './Rendering/DisplayScale';
-import { installCompactStarMap } from './Map/CompactStarMap';
-import { DeviceSettings } from './Settings/DeviceSettings';
-import { installBackgroundLayers } from './Rendering/BackgroundLayers';
+import { installLocalClientCommands } from './chat/LocalClientCommands';
+import { installBossSpawnTimerHooks } from './boss/NativeBossSpawnTimers';
+import { installMapTextureKeys } from './map/MapTextureKeys';
+import { installNetherBlobBeamHooks } from './ship/NetherBlobBeamCountdown';
+import { installTorpedoCueHooks } from './projectile/XhersixTorpedoCue';
+import { installNativeAutomations } from './automation/NativeAutomations';
+import targetIcon from './assets/images/TargetIcon.png';
+import { read, type API } from './api/Types';
+import { installGameSession } from './runtime/GameSession';
+import { ChatHistory } from './chat/ChatHistory';
+import { installNativeBitmapText } from './ui/NativeBitmapText';
+import { loadFonts } from './ui/Fonts';
+import { loginIdentity, PORT_VERSION } from './login/LoginIdentity';
+import { loginProfiles } from './login/LoginProfiles';
+import { installArtifactUI } from './artifacts/NativeArtifacts';
+import { installInterpolation } from './rendering/Interpolation';
+import { installDisplayScale } from './rendering/DisplayScale';
+import { installCompactStarMap } from './map/CompactStarMap';
+import { DeviceSettings } from './settings/DeviceSettings';
+import { installBackgroundLayers } from './rendering/BackgroundLayers';
 
 export default {
   id: 'qolaf.client',

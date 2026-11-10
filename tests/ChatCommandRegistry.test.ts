@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ChatCommandRegistry } from '../src/Chat/ChatCommandRegistry';
-import { ChatCommandInvocation } from '../src/Chat/ChatCommandInvocation';
-import { AutomationManager } from '../src/Automation/AutomationManager';
-import { AutomationInfo } from '../src/Automation/AutomationInfo';
-import { EventBus } from '../src/Automation/EventBus';
-import { AutomationStopError } from '../src/Automation/AutomationStopError';
+import { ChatCommandRegistry } from '../src/chat/ChatCommandRegistry';
+import { ChatCommandInvocation } from '../src/chat/ChatCommandInvocation';
+import { AutomationManager } from '../src/automation/AutomationManager';
+import { AutomationInfo } from '../src/automation/AutomationInfo';
+import { EventBus } from '../src/automation/EventBus';
+import { AutomationStopError } from '../src/automation/AutomationStopError';
 
 test('oldest surviving bare-name registration wins while native commands remain reserved', () => {
   const registry = new ChatCommandRegistry(),

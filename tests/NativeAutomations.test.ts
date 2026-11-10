@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 import {
   installNativeAutomations,
   reserveNativeCommands,
-} from '../src/Automation/NativeAutomations';
-import { ChatCommandRegistry } from '../src/Chat/ChatCommandRegistry';
-import type { EventBus } from '../src/Automation/EventBus';
-import type { AutomationEvent } from '../src/Automation/AutomationEvent';
+} from '../src/automation/NativeAutomations';
+import { ChatCommandRegistry } from '../src/chat/ChatCommandRegistry';
+import type { EventBus } from '../src/automation/EventBus';
+import type { AutomationEvent } from '../src/automation/AutomationEvent';
 
 test('native automation integration preserves chat routing, uses millisecond clocks and cleans up rooms', async () => {
   const calls: string[] = [],

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HealthAndShield, formatAmount } from '../src/Hud/HealthAndShield';
+import { HealthAndShield, formatAmount } from '../src/hud/HealthAndShield';
 
 test('amount formatting preserves original rollover boundaries and signs', () => {
   for (const [value, expected] of [

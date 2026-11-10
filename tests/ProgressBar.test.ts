@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ProgressBar } from '../src/UI/ProgressBar';
-import { Display } from './Fixtures/NativeGame';
+import { ProgressBar } from '../src/ui/ProgressBar';
+import { Display } from './fixtures/NativeGame';
 
 test('target bars toggle original compact formatting while retaining hidden values', () => {
   class Node extends Display {

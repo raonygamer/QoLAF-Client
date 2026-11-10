@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createSettingsQoLAF } from '../src/Ported/SettingsQoLAF';
-import { createClientSettings } from '../src/Ported/ClientSettings';
-import { Display } from './Fixtures/NativeGame';
-import { aliasProperties } from '../src/Runtime/As3';
+import { createSettingsQoLAF } from '../src/ported/SettingsQoLAF';
+import { createClientSettings } from '../src/ported/ClientSettings';
+import { Display } from './fixtures/NativeGame';
+import { aliasProperties } from '../src/runtime/As3';
 
 // Exercise the original page's controls/callbacks through real Starling event
 // invocation. This checks source behavior and teardown, not visual rendering.
@@ -79,10 +79,10 @@ test('original Aim Assist page updates source settings and removes every owned l
 });
 
 test('settings slider retains upstream drag behavior with original skin geometry', async () => {
-  const { settingsControls } = await import('../src/Settings/NativeControls');
-  const { Quad } = await import('./Fixtures/NativeGame');
+  const { settingsControls } = await import('../src/settings/NativeControls');
+  const { Quad } = await import('./fixtures/NativeGame');
   // @ts-expect-error extracted upstream JavaScript
-  const { default: makeSlider } = await import('./Fixtures/UpstreamSlider.js');
+  const { default: makeSlider } = await import('./fixtures/UpstreamSlider.js');
   function NativeSprite(this: any) {
     Object.assign(this, new Display());
   }

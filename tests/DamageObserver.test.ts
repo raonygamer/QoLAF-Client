@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { DamageObserver, installDamageObserver } from '../src/Telemetry/DamageObserver';
-import { RollingDamageEstimate } from '../src/Telemetry/RollingDamageEstimate';
-import { segmentCircle } from '../src/Telemetry/LocalHitGeometry';
-import { defaults } from '../src/Settings/Settings';
+import { DamageObserver, installDamageObserver } from '../src/telemetry/DamageObserver';
+import { RollingDamageEstimate } from '../src/telemetry/RollingDamageEstimate';
+import { segmentCircle } from '../src/telemetry/LocalHitGeometry';
+import { defaults } from '../src/settings/Settings';
 
 test('original rolling estimate averages full five seconds and expires buckets/partial flags', () => {
   const estimate = new RollingDamageEstimate();

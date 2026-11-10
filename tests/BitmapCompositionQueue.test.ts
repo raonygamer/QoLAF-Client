@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 // @ts-expect-error actual host JavaScript fixture
-import { Hooks } from './Fixtures/HostCore.js';
-import { installBitmapCompositionQueue } from '../src/UI/BitmapCompositionQueue';
+import { Hooks } from './fixtures/HostCore.js';
+import { installBitmapCompositionQueue } from '../src/ui/BitmapCompositionQueue';
 
 test('HTML composition stays outside cached traversal and cancels deferred work on disposal', () => {
   const order: string[] = [];

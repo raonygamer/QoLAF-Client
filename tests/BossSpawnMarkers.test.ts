@@ -1,15 +1,15 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { Display } from './Fixtures/NativeGame';
-import { BossSpawnCatalog } from '../src/Map/BossSpawnCatalog';
-import { BossSpawnLocation } from '../src/Map/BossSpawnLocation';
-import { BossSpawnAreaRing } from '../src/Map/BossSpawnAreaRing';
-import { BossSpawnMarker } from '../src/Map/BossSpawnMarker';
-import { BossSpawnMarkerManager, installBossSpawnMarkers } from '../src/Map/BossSpawnMarkerManager';
-import { MinibossSpawnHeat } from '../src/Map/MinibossSpawnHeat';
-import { NativeUI } from '../src/UI/NativeUI';
+import { Display } from './fixtures/NativeGame';
+import { BossSpawnCatalog } from '../src/map/BossSpawnCatalog';
+import { BossSpawnLocation } from '../src/map/BossSpawnLocation';
+import { BossSpawnAreaRing } from '../src/map/BossSpawnAreaRing';
+import { BossSpawnMarker } from '../src/map/BossSpawnMarker';
+import { BossSpawnMarkerManager, installBossSpawnMarkers } from '../src/map/BossSpawnMarkerManager';
+import { MinibossSpawnHeat } from '../src/map/MinibossSpawnHeat';
+import { NativeUI } from '../src/ui/NativeUI';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 
 const description = {
   name: 'Hidden boss',

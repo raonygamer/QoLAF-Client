@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { Display } from './Fixtures/NativeGame';
+import { Display } from './fixtures/NativeGame';
 import {
   XhersixTorpedoWarningBatch,
   installTorpedoWarnings,
-} from '../src/Projectile/XhersixTorpedoWarningBatch';
-import { xhersixTorpedoWeaponKey } from '../src/Projectile/XhersixTorpedoCue';
+} from '../src/projectile/XhersixTorpedoWarningBatch';
+import { xhersixTorpedoWeaponKey } from '../src/projectile/XhersixTorpedoCue';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 
 test('source torpedo collision mesh uses contact radius, separate opacity edges and bounded batching', () => {
   let mesh: Mesh;

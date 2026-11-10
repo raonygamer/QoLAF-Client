@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { RemoteRotationBuffer } from '../src/Rendering/RemoteRotationBuffer';
-import { RemoteShips } from '../src/Rendering/RemoteShips';
+import { RemoteRotationBuffer } from '../src/rendering/RemoteRotationBuffer';
+import { RemoteShips } from '../src/rendering/RemoteShips';
 
 const heading = (time: number, rotation = 0, rotateRight = true) => ({
   time,

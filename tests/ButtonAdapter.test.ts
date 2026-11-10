@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createButtonAdapter } from '../src/UI/ButtonAdapter';
+import { createButtonAdapter } from '../src/ui/ButtonAdapter';
 
 test('source button height resizes its surfaces without stretching glyphs and selects the sized atlas', () => {
   class Surface {

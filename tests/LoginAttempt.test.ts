@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { LoginAttempt } from '../src/Login/LoginAttempt';
+import { LoginAttempt } from '../src/login/LoginAttempt';
 
 test('login timeout allows retry without accepting late callbacks from the previous account', (context) => {
   context.mock.timers.enable({ apis: ['setTimeout'] });

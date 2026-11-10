@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { parseHTML } from 'linkedom';
-import { pickAutomationFile } from '../src/Automation/AutomationFilePicker';
+import { pickAutomationFile } from '../src/automation/AutomationFilePicker';
 
 test('browser automation file dialog resolves selection or cancellation and removes its input', async (t) => {
   const { document, Event } = parseHTML('<html><body></body></html>');

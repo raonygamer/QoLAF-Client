@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { BossTimerRadarTelemetry } from '../src/UI/BossTimerRadarTelemetry';
-import { Display } from './Fixtures/NativeGame';
+import { BossTimerRadarTelemetry } from '../src/ui/BossTimerRadarTelemetry';
+import { Display } from './fixtures/NativeGame';
 
 test('boss rows wrap to 15px multiples, update colors, reuse slots and release unused height', () => {
   class Label extends Display {

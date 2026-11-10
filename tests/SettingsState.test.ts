@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createSettingsState } from '../src/Ported/SettingsState';
-import { aliasProperties } from '../src/Runtime/As3';
-import { Display } from './Fixtures/NativeGame';
+import { createSettingsState } from '../src/ported/SettingsState';
+import { aliasProperties } from '../src/runtime/As3';
+import { Display } from './fixtures/NativeGame';
 
 test('source Settings window switches all available categories, saves, and disposes pages', (t) => {
   const cleanups: Function[] = [];

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createClientSettings } from '../src/Ported/ClientSettings';
+import { createClientSettings } from '../src/ported/ClientSettings';
 test('complete ClientSettings source port preserves per-player defaults, clamping and serialization', () => {
   const saved: any = { data: {}, flush() {} };
   const game: any = { instance: { me: { id: 'player-one' } } };
@@ -38,7 +38,7 @@ test('complete ClientSettings source port preserves per-player defaults, clampin
 });
 
 test('runtime settings migrate the old subset once and share live values with source pages', async () => {
-  const { sessionSettings } = await import('../src/Settings/RuntimeSettings');
+  const { sessionSettings } = await import('../src/settings/RuntimeSettings');
   const data = new Map<string, any>([
     ['settings.p1', { auto_target: false, target_info_x: 0.3, target_search_distance: 90000 }],
   ]);

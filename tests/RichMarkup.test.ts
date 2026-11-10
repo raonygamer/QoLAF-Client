@@ -1,18 +1,18 @@
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 // @ts-expect-error test-only execution of original AS3 method bodies
-import { install } from './Fixtures/As3Methods.js';
-import { ChatArtifactToken } from '../src/Chat/Rich/ChatArtifactToken';
-import { ChatArtifactTokenRegistry } from '../src/Chat/Rich/ChatArtifactTokenRegistry';
-import { RichBitmapMarkup } from '../src/Chat/Rich/RichBitmapMarkup';
-import { RichBitmapMarkupParser } from '../src/Chat/Rich/RichBitmapMarkupParser';
-import { RichBitmapMarkupSerializer } from '../src/Chat/Rich/RichBitmapMarkupSerializer';
+import { install } from './fixtures/As3Methods.js';
+import { ChatArtifactToken } from '../src/chat/rich/ChatArtifactToken';
+import { ChatArtifactTokenRegistry } from '../src/chat/rich/ChatArtifactTokenRegistry';
+import { RichBitmapMarkup } from '../src/chat/rich/RichBitmapMarkup';
+import { RichBitmapMarkupParser } from '../src/chat/rich/RichBitmapMarkupParser';
+import { RichBitmapMarkupSerializer } from '../src/chat/rich/RichBitmapMarkupSerializer';
 
 // Run the original assertions against the TypeScript classes. The helper only
 // strips AS3 type syntax. The fixture documents one corrected entity-length
 // typo, verified against the original parser itself; formatting assertions are unchanged.
 const original = readFileSync(
-  new URL('./Fixtures/OriginalMarkupContract.as', import.meta.url),
+  new URL('./fixtures/OriginalMarkupContract.as', import.meta.url),
   'utf8',
 );
 const methods = [...original.matchAll(/private (?:static )?function (\w+)\(/g)]

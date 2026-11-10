@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { AutomationManager } from '../src/Automation/AutomationManager';
-import { AutomationInfo } from '../src/Automation/AutomationInfo';
-import { EventBus, type AutomationCommands } from '../src/Automation/EventBus';
+import { AutomationManager } from '../src/automation/AutomationManager';
+import { AutomationInfo } from '../src/automation/AutomationInfo';
+import { EventBus, type AutomationCommands } from '../src/automation/EventBus';
 import {
   BrowserAutomationStorage,
   type StoredAutomation,
-} from '../src/Automation/AutomationStorage';
+} from '../src/automation/AutomationStorage';
 
 function fixture() {
   let records: StoredAutomation[] = [],

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { sampleShipPose, updateSimulation, updateCamera } from '../src/Rendering/Interpolation';
+import { sampleShipPose, updateSimulation, updateCamera } from '../src/rendering/Interpolation';
 
 test('ship render interpolation matches local prediction, remote angle wrap and landing ownership', () => {
   const course = {
@@ -87,8 +87,8 @@ test('camera easing has the same result at 30 Hz and 180 Hz', () => {
 
 test('camera follows the cached game listener using the render delta and disables original shake', async () => {
   // @ts-expect-error actual host JavaScript fixture
-  const { Hooks } = await import('./Fixtures/HostCore.js');
-  const { installInterpolation } = await import('../src/Rendering/Interpolation');
+  const { Hooks } = await import('./fixtures/HostCore.js');
+  const { installInterpolation } = await import('../src/rendering/Interpolation');
   const errors: unknown[] = [];
   const hooks = new Hooks((error: unknown) => errors.push(error));
   const cleanups: (() => void)[] = [];

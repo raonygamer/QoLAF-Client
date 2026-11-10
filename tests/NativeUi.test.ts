@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { portedClasses } from '../src/Ported/Registry';
-import { registry, Stage, Display } from './Fixtures/NativeGame';
-import { providerFor, validCredentials } from '../src/Login/LoginProfiles';
-import { ProgressBar } from '../src/UI/ProgressBar';
-import { NativeUI } from '../src/UI/NativeUI';
-import type { API } from '../src/Api/Types';
+import { portedClasses } from '../src/ported/Registry';
+import { registry, Stage, Display } from './fixtures/NativeGame';
+import { providerFor, validCredentials } from '../src/login/LoginProfiles';
+import { ProgressBar } from '../src/ui/ProgressBar';
+import { NativeUI } from '../src/ui/NativeUI';
+import type { API } from '../src/api/Types';
 function context() {
   const classes = registry(),
     cleanups: Function[] = [];

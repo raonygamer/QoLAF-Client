@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { installDisplayScale, scaledStageSize } from '../src/Rendering/DisplayScale';
-import { DeviceSettings } from '../src/Settings/DeviceSettings';
+import { installDisplayScale, scaledStageSize } from '../src/rendering/DisplayScale';
+import { DeviceSettings } from '../src/settings/DeviceSettings';
 
 test('DPI uses original even physical and logical sizes', () => {
   assert.equal(scaledStageSize(1879, 1), 1878);

@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { installWrapTextMeasurement } from '../src/UI/NativeWrapTextMeasurement';
-import type { Raw } from '../src/Api/Types';
+import { installWrapTextMeasurement } from '../src/ui/NativeWrapTextMeasurement';
+import type { Raw } from '../src/api/Types';
 // @ts-expect-error actual host hook implementation
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 
 test('tooltip layout uses rendered bitmap metrics and retains native extraction, fallback, and cleanup', () => {
   const fields: Field[] = [];

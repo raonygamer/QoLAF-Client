@@ -1,6 +1,6 @@
 # Verification and source attribution
 
-The target is the original AstrofluxClient, repository revision `b7a4f5cba87c8af9c484339de4ecf0dec0d4d890`. The full port is still in progress on `port/full-client`. See `port-audit/README.md` for the baseline and remaining systems.
+The target is the original AstrofluxClient, repository revision `b7a4f5cba87c8af9c484339de4ecf0dec0d4d890`. The full port is still in progress on `port/full-client`. See `port/audit/README.md` for the baseline and remaining systems.
 
 The earlier DOM-panel implementation has been replaced on this branch with native Starling display objects. Login panels, settings classes, progress bars and target presentation use the original AS3 source as their reference. Haxe property adapters and Feathers-to-native control adapters bridge runtime differences. The obsolete corrosive-percent/all-damage workaround is explicitly excluded.
 
@@ -15,7 +15,7 @@ Current checks:
 
 Display-list fixtures are test doubles, not a browser/WebGL renderer. These checks do not establish visual parity or authenticated gameplay. The user confirmed that the deployed host's frame-event fix restored game rendering. The local native branch has now been exercised in the authenticated browser through reload/auto-login, play, Settings and Plugins. These observations do not establish full parity; the remaining integrations and screen-by-screen comparisons are still required.
 
-`src/Ported` preserves original source class boundaries. `src/Settings/RuntimeSettings.ts` adapts original SharedObject persistence to plugin-scoped storage; it does not upload settings. `src/Runtime/GameSession.ts` owns per-game hooks and native HUD objects. The host's upstream snapshot/update workflow remains separate from this client module.
+`src/ported` preserves original source class boundaries. `src/settings/RuntimeSettings.ts` adapts original SharedObject persistence to plugin-scoped storage; it does not upload settings. `src/runtime/GameSession.ts` owns per-game hooks and native HUD objects. The host's upstream snapshot/update workflow remains separate from this client module.
 
 Additional checks during desktop comparison:
 

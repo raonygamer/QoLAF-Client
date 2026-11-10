@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 // @ts-expect-error actual host JavaScript fixture
-import { PluginHost } from './Fixtures/HostCore.js';
-import { registry, Game } from './Fixtures/NativeGame';
+import { PluginHost } from './fixtures/HostCore.js';
+import { registry, Game } from './fixtures/NativeGame';
 const plugin = (await import(pathToFileURL(process.cwd() + '/dist/qolaf-client.js').href)).default;
 
 test('compiled native client: real Starling event dispatch, HUD ownership and session cleanup', async (t) => {

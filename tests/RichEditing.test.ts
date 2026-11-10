@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { RichBitmapTextNavigation as Navigation } from '../src/Chat/Rich/RichBitmapTextNavigation';
-import { RichBitmapEmojiResolver as Emoji } from '../src/Chat/Rich/RichBitmapEmojiResolver';
-import { RichBitmapMarkupParser as Parser } from '../src/Chat/Rich/RichBitmapMarkupParser';
-import { RichBitmapTypedMarkup as TypedMarkup } from '../src/Chat/Rich/RichBitmapTypedMarkup';
-import { ChatDiscordImageLink } from '../src/Chat/Rich/ChatDiscordImageLink';
+import { RichBitmapTextNavigation as Navigation } from '../src/chat/rich/RichBitmapTextNavigation';
+import { RichBitmapEmojiResolver as Emoji } from '../src/chat/rich/RichBitmapEmojiResolver';
+import { RichBitmapMarkupParser as Parser } from '../src/chat/rich/RichBitmapMarkupParser';
+import { RichBitmapTypedMarkup as TypedMarkup } from '../src/chat/rich/RichBitmapTypedMarkup';
+import { ChatDiscordImageLink } from '../src/chat/rich/ChatDiscordImageLink';
 
 const plain = (value: string) =>
   Parser.parse(

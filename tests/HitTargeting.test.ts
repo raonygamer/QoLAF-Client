@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { DamageObserver } from '../src/Telemetry/DamageObserver';
-import { TargetSystem } from '../src/Target/TargetSystem';
-import { defaults } from '../src/Settings/Settings';
+import { DamageObserver } from '../src/telemetry/DamageObserver';
+import { TargetSystem } from '../src/target/TargetSystem';
+import { defaults } from '../src/settings/Settings';
 
 function setup() {
   const ship = { alive: true, pos: { x: 0, y: 0 } };

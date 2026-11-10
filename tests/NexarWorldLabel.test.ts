@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { Display } from './Fixtures/NativeGame';
-import { NativeUI } from '../src/UI/NativeUI';
-import { NexarWorldLabel, installNexarWorldLabels } from '../src/Ship/NexarWorldLabel';
+import { Display } from './fixtures/NativeGame';
+import { NativeUI } from '../src/ui/NativeUI';
+import { NexarWorldLabel, installNexarWorldLabels } from '../src/ship/NexarWorldLabel';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 
 function fixture() {
   class Quad extends Display {

@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { Display } from './Fixtures/NativeGame';
+import { Display } from './fixtures/NativeGame';
 import {
   NetherBlobBeamCountdown,
   installNetherBlobBeamHooks,
   installNetherBlobBeamCountdown,
-} from '../src/Ship/NetherBlobBeamCountdown';
+} from '../src/ship/NetherBlobBeamCountdown';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 
 function fixture() {
   let fallback = 2000,

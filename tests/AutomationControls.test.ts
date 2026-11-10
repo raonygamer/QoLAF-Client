@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
-import { installAutomationControls } from '../src/Automation/AutomationControls';
+import { Hooks } from './fixtures/HostCore.js';
+import { installAutomationControls } from '../src/automation/AutomationControls';
 
 test('automation ownership gates physical input and routes source steering through native commands', () => {
   const calls: any[] = [];

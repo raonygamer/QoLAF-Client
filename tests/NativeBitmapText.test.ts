@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { bitmapRendererFixture } from './Fixtures/BitmapRenderer';
-import { bridgeNativeBitmapText } from '../src/UI/NativeTextBridge';
-import { Format } from './Fixtures/NativeGame';
+import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
+import { bridgeNativeBitmapText } from '../src/ui/NativeTextBridge';
+import { Format } from './fixtures/NativeGame';
 
 test('native Text retains identity, renders HTML colors, and restores its upstream path on unload', (t) => {
   const fixture = bitmapRendererFixture();

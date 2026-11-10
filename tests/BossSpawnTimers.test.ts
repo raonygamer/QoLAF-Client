@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { BossSpawnTimerCatalog } from '../src/Boss/BossSpawnTimerCatalog';
-import { BossSpawnTimers } from '../src/Boss/BossSpawnTimers';
-import { installBossSpawnTimerHooks, bossSpawnTimers } from '../src/Boss/NativeBossSpawnTimers';
-import type { Raw } from '../src/Api/Types';
+import { BossSpawnTimerCatalog } from '../src/boss/BossSpawnTimerCatalog';
+import { BossSpawnTimers } from '../src/boss/BossSpawnTimers';
+import { installBossSpawnTimerHooks, bossSpawnTimers } from '../src/boss/NativeBossSpawnTimers';
+import type { Raw } from '../src/api/Types';
 // @ts-expect-error actual host hooks
-import { Hooks } from './Fixtures/HostCore.js';
+import { Hooks } from './fixtures/HostCore.js';
 
 function fixture() {
   let local = 1000;
