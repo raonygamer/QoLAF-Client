@@ -845,3 +845,19 @@ presentation cadence.
   `/tmp/QoLAF-TimedText.png`. Daily mission XP rows also render horizontally:
   `/tmp/QoLAF-MissionText.png`. No mission was skipped or claimed.
 - Temporary probe file removed, local game HTML restored, clean reload requested.
+
+
+## Replacement combat numbers and multiline tooltips — 2026-11-10
+
+- Unit.followAttachedCombatTextAt only updates lastDmgText/lastHealText.
+  CombatTextFrames now observes those independent slots: a replaced number
+  stops following the owner, keeps rising independently and retains its rise
+  cap. Losing an owner no longer drops the cap; pooled lifecycle protection
+  remains. Added regression with replacement damage and concurrent healing.
+- TypeScript check and all 169 tests pass.
+- Opened Artifacts without revealing, equipping, upgrading or recycling any
+  artifact. Armorlock Protocol tooltip displays full stats, wrapped orange
+  damage-reduction effect and Fitness; Recycle Generator displays its two-line
+  recycling effect and Fitness without clipping. Screenshots:
+  `/tmp/QoLAF-ArtifactTooltip2.png`, `/tmp/QoLAF-ArtifactTooltip3.png`.
+  Exact Phase Nullifier tooltip and broader DPI/image cases remain unverified.

@@ -126,3 +126,28 @@ test('source anchor offsets survive subclassing and sustained hits stop rising a
   near(particle.y, 170); // initial 190 + owner movement 100 - maximum rise 120
   near(particle.x, 125);
 });
+
+test('replacement damage numbers stop following without losing their rise limit or healing attachment', () => {
+  const { frames, owner, particle, handler } = fixture();
+  const heal: Raw = { ...particle, speed: { x: 0, y: -40 } };
+  owner.lastDmgText = particle;
+  owner.lastHealText = heal;
+  handler.texts.push(heal);
+  frames.attach(particle, owner, -15, 'lastDmgText');
+  frames.attach(heal, owner, -15, 'lastHealText');
+  frames.update(handler, 0.01);
+  owner.lastDmgText = {}; // A later hit starts another number outside the merge window.
+  owner._mc.x += 100;
+  owner._mc.y += 100;
+  frames.update(handler, 0.01);
+  near(particle.x, 105.1);
+  near(particle.y, 194.2);
+  near(heal.x, 205);
+  near(heal.y, 294.2);
+  for (let step = 0; step < 400; step++) {
+    particle.ttl = heal.ttl = 1000;
+    frames.update(handler, 0.01);
+  }
+  near(particle.y, 75);
+  near(heal.y, 175);
+});

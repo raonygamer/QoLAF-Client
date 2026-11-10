@@ -1,7 +1,8 @@
 import { read, type API, type Raw } from '../api/Types';
 
 interface Attachment {
-  owner: Raw;
+  owner: Raw | null;
+  slot?: 'lastDmgText' | 'lastHealText';
   generation: number;
   x: number;
   y: number;
@@ -23,7 +24,12 @@ export class CombatTextFrames {
     this.attachments.delete(particle);
   }
 
-  attach(particle: Raw, owner: Raw, anchorOffset?: number): void {
+  attach(
+    particle: Raw,
+    owner: Raw,
+    anchorOffset?: number,
+    slot?: 'lastDmgText' | 'lastHealText',
+  ): void {
     if (!particle || this.attachments.has(particle)) return;
     const pose = this.pose(owner);
     const position = read(owner, 'pos');
@@ -34,6 +40,7 @@ export class CombatTextFrames {
         : pose.y + anchorOffset;
     this.attachments.set(particle, {
       owner,
+      slot,
       generation: this.generations.get(owner) ?? 0,
       x,
       y,
@@ -63,7 +70,12 @@ export class CombatTextFrames {
         x = attachment.x;
         y = attachment.y;
         const owner = attachment.owner;
-        if (owner.alive && attachment.generation === (this.generations.get(owner) ?? 0)) {
+        if (
+          owner &&
+          owner.alive &&
+          attachment.generation === (this.generations.get(owner) ?? 0) &&
+          (!attachment.slot || owner[attachment.slot] === particle)
+        ) {
           const pose = this.pose(owner);
           x += pose.x - attachment.renderX;
           y += pose.y - attachment.renderY;
@@ -71,9 +83,15 @@ export class CombatTextFrames {
           attachment.renderX = pose.x;
           attachment.renderY = pose.y;
         } else {
-          this.reset(particle);
-          // Do not let native pool cleanup clear a reused owner's text slot.
-          if (particle.owner === owner) particle.owner = null;
+          // Unit.draw follows only its latest damage/heal slot. Older numbers
+          // keep their own rise and limit, but stop following a moving owner.
+          attachment.owner = null;
+          if (
+            owner &&
+            attachment.generation !== (this.generations.get(owner) ?? 0) &&
+            particle.owner === owner
+          )
+            particle.owner = null;
         }
       }
       particle.ttl -= delta;
@@ -133,6 +151,7 @@ export function installCombatTextFrames(api: API): void {
         amount > 0 ? owner.lastDmgText : owner.lastHealText,
         owner,
         combatTextAnchor(owner, amount < 0),
+        amount > 0 ? 'lastDmgText' : 'lastHealText',
       );
   });
   api.before(particle, 'reset', function () {
