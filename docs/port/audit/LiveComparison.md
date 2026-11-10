@@ -1815,3 +1815,25 @@ Verification:
 Remaining chat work includes automatic reward event hooks, artifact sharing,
 real cross-client/warp verification, and broader context/identity comparison.
 Radio and the full visual-command family remain separate unfinished requirements.
+
+### Upstream refresh after desktop restart — 2026-11-10
+
+Fetched the official `https://astroflux.net/astroflux.js` directly through the host
+snapshot updater. Its SHA-256 is
+`aa69552bd0728c573f0fb78090a4a351d3a341563836454d2dcd6f76057cd89e`, identical
+to the user's new `/home/raony/Documentos/astroflux.js`. Matching snapshot:
+195 resources, asset version `57998382`.
+
+This release minifies local class identifiers. The previous host bridge rejected
+all three injection anchors, so host commit `a379664` (main cherry-pick `6dae617`)
+resolves symbols from retained Haxe class registrations. The new-bundle parse
+check and executable renamed-symbol startup-order fixture pass; ambiguous hooks
+still return the pristine source. Host branch: 19 tests; main: 17 tests.
+
+Restarted the local preview and restored input socket access after the PC crash.
+The new runtime connected to Service-1412_0. Screenshot
+`/tmp/QoLAF-ReviewState.png` shows the port's native Settings / Key bindings page,
+including the native Plugins entry. The user was interacting with key bindings;
+no further automated keys were sent into that capture state. Preview diagnostics
+reported a connected canvas and zero runtime errors. This is startup and Settings
+render evidence, not proof of full screen parity or every gameplay hook.
