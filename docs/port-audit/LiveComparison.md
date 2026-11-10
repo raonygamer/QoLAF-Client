@@ -258,3 +258,28 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   /tmp/QoLAF-DpsRadar.png. Closed the sale dialog afterward. This verifies idle
   rendering only; live hit estimates, pet beam timing and SWF combat comparison
   remain pending. No combat input or purchase was performed for this check.
+
+### Native bullet/bouncing contact attribution
+
+- Adapted original registerSimulatedHit observation to the current Haxe collision
+  methods without replacing them. While native ProjectileBullet/Bouncing execute
+  scans candidates, track its canBeDamage result; record only when that same
+  native branch destroys/explodes the projectile or enters ProjectileStuck.
+  Eligibility alone and subsequent lifetime/server removal are not hits.
+- Candidate consumption prevents destroy -> explode from counting twice, while
+  distinct piercing contacts still count separately. Context restores on native
+  exceptions and nested calls. Bombs count when they stick, not again on expiry.
+- Contact-family coverage is enabled only when the necessary native methods are
+  present. The branch that skips canBeDamage remains explicitly partial. Kept the
+  current unusual Bouncing aiTargetSelf/own-unit condition intact; it also exists
+  in the original source and this port does not change simulation to bypass it.
+- Regression fixture contains the exact current Haxe execute bodies. Tests run
+  those bodies with and without observation, comparing position, alive state,
+  removal/explosion counts, target and next-scan timing. Cover ordinary, piercing,
+  bomb, rejected/missed contacts, removal outside the scan, exception cleanup and
+  hook disposal. A separate check prevents the mine blast estimator from also
+  counting covered bullet explosions (caught and fixed during diff review).
+- TypeScript, single-module build and all 91 tests pass. Live combat remains to
+  be compared against the original SWF; these native-method tests establish
+  collision behavior preservation, not server damage accuracy or visual parity.
+  Splash, splitting, blastwave and other unobservable effects remain partial.

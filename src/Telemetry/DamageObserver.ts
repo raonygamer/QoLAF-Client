@@ -1,3 +1,4 @@
+import { installProjectileContacts } from './ProjectileContacts';
 import { read, type API, type Raw } from '../Api/Types';
 import type { Settings } from '../Settings/Settings';
 import { RollingDamageEstimate } from './RollingDamageEstimate';
@@ -13,6 +14,7 @@ type ProjectileState = {
 /** Local observations only. Native damage values and native simulation stay authoritative. */
 export class DamageObserver {
   readonly estimate = new RollingDamageEstimate();
+  readonly contactFamilies = new Set<string>();
   private readonly unitGenerations = new WeakMap<Raw, number>();
   private readonly projectiles = new WeakMap<Raw, ProjectileState>();
   constructor(
@@ -105,7 +107,8 @@ export class DamageObserver {
     if (
       (projectile.ai !== 'instant' &&
         projectile.ai !== 'homingMissile' &&
-        projectile.ai !== 'mine') ||
+        projectile.ai !== 'mine' &&
+        !this.contactFamilies.has(projectile.ai)) ||
       projectile.dmgRadius > 0 ||
       projectile.clusterNrOfSplits > 0 ||
       (projectile.ai === 'instant' && !state.rayChecked) ||
@@ -313,5 +316,6 @@ export function installDamageObserver(api: API, game: Raw, config: Settings): Da
         beamContext = previous;
       }
     });
+  installProjectileContacts(api, game, observer);
   return observer;
 }

@@ -180,3 +180,16 @@ test('beam adapter counts actual successful heat checks without consuming extra 
   assert.equal(observer.estimate.isPartial(observer.now()), true);
   cleanups.reverse().forEach((cleanup) => cleanup());
 });
+
+test('native bullet contact coverage never enables the separate mine blast estimator', () => {
+  const f = fixture();
+  f.observer.contactFamilies.add('bullet');
+  f.projectile.ai = 'bullet';
+  f.projectile.pos.x = 50;
+  f.observer.activate(f.projectile);
+  assert.equal(f.observer.estimate.isPartial(1000), false);
+  f.observer.explode(f.projectile);
+  assert.equal(f.observer.estimate.perSecond(1000), 0);
+  f.observer.hit(f.weapon, f.target);
+  assert.equal(f.observer.estimate.perSecond(1000), 100);
+});
