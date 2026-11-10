@@ -656,3 +656,20 @@ when the game's line pool is already absent. It does not dispose pooled geometry
 Regression verifies detachment before a pool can reuse the object, no-pool teardown
 and native return preservation using host hooks. Typecheck/build/full suite:
 270 pass; formatting/diff checks pass. Live death-line map reopening remains open.
+
+Map disposal audit: native Map.dispose clears marker arrays but omits display
+container disposal; native MapBodyBase.clean also omits detaching its borrowed
+line before returning it to the pool. MapDisposal now detaches the map container
+first so removedFromStage cleanup runs, retains native marker teardown, clears
+and disposes the mask/container, then calls the native superclass disposal.
+Repeated disposal and late updates are ignored, matching source lifecycle guards.
+Body cleanup detaches pooled lines without disposing their geometry.
+Confirmed RoamingState and Hud construct a fresh MapState on each opening.
+Regression exercises pool-return ordering, retained pooled geometry, container,
+mask and remaining child disposal, duplicate disposal and late updates.
+Typecheck/build/full suite: 271 pass; formatting/diff checks pass.
+Live local preview: one reload, open/close/reopen/close in Fulzar succeeded with
+markers and blue orbits visible; connected with zero reported runtime errors.
+Evidence: /tmp/QoLAF-MapFirstOpen.png and /tmp/QoLAF-MapReopened.png.
+Every keyboard action used separate key-down/key-up calls with finally release.
+This sample does not establish heap stability or PvP/death-line lifecycle parity.

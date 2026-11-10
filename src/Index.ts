@@ -1,3 +1,4 @@
+import { installMapDisposal } from './map/MapDisposal';
 import { installMapDeathLineLifecycle } from './map/MapDeathLineLifecycle';
 import { installMapPlayerLifecycle } from './map/MapPlayerLifecycle';
 import { installDisplayTexturePixels } from './ui/DisplayTexturePixels';
@@ -51,6 +52,7 @@ export default {
       installMapTextureKeys(api);
       installMapPlayerLifecycle(api);
       installMapDeathLineLifecycle(api);
+      installMapDisposal(api);
       installNetherBlobBeamHooks(api);
       installInterpolation(api);
       installEmitterFrames(api);
