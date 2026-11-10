@@ -249,9 +249,14 @@ export function installMapNavigation(api: API, game: Raw): void {
     drawPlayers(view);
     this.mapLastKilled.update();
   });
-  api.before(prototype, 'playerJoined', function () {
+  api.around(prototype, 'playerJoined', function (next, ...args) {
+    if (this.g !== game) return next(...args);
     const view = views.get(this);
-    if (view) activate(view);
+    // The PvP map can receive joins before its first load. That load enumerates
+    // the current players itself; do not append a marker to an unready map.
+    if (!view) return;
+    activate(view);
+    return next(...args);
   });
   api.before(prototype, 'dispose', function () {
     const view = views.get(this);

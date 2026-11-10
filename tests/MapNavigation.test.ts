@@ -116,6 +116,7 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
     }
   }
   const game: any = {};
+  const joins: unknown[][] = [];
   let nativeUpdates = 0,
     clicks = 0,
     aims = 0,
@@ -158,7 +159,10 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
       nativeUpdates++;
       return 456;
     }
-    playerJoined() {}
+    playerJoined(player: unknown) {
+      joins.push([player, MapView.SCALE]);
+      return 789;
+    }
     dispose() {}
   }
   class Body {
@@ -196,6 +200,9 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
   };
   installMapNavigation(api, game);
   const map = new MapView();
+  const joining = { id: 'joining-player' };
+  assert.equal(map.playerJoined(joining), undefined);
+  assert.equal(joins.length, 0, 'preload joins are enumerated by load, not appended early');
   assert.equal(map.load(), 123);
   const viewport = map.children[0],
     background = viewport.children[0];
@@ -300,12 +307,18 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
   assert.equal(MapView.SCALE, 0.1);
   second.update();
   assert.equal(MapView.SCALE, 0.02);
+  assert.equal(map.playerJoined(joining), 789);
+  assert.deepEqual(joins, [[joining, 0.1]], 'joins reactivate the owning map geometry');
+  assert.equal(second.playerJoined(joining), 789);
+  assert.deepEqual(joins[1], [joining, 0.02]);
   map.dispatchEventWith('removedFromStage');
   assert.equal(wheelStage.listeners('mouseWheel').length, 1);
   map.dispatchEventWith('addedToStage');
   assert.equal(wheelStage.listeners('mouseWheel').length, 2);
   const viewportMask = viewport.get_mask() as Display;
   map.dispose();
+  assert.equal(map.playerJoined(joining), undefined);
+  assert.equal(joins.length, 2, 'late joins cannot add markers after disposal');
   assert.equal(viewportMask.disposed, true);
   assert.equal(centerButton.disposed, true);
   assert.equal(wheelStage.listeners('mouseWheel').length, 1);

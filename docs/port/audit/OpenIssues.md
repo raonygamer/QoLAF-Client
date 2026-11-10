@@ -632,3 +632,16 @@ return-value preservation, disposal ordering and hook cleanup. Verified native
 TweenMax exposes killTweensOf. Typecheck/build/full suite: 269 pass; formatting
 and diff checks pass. Live death/landing/reopen verification remains open; no
 account was killed or moved for this fixture check.
+
+Map navigation audit found a missing source playerJoined readiness guard. Source
+Map.as ignores joins before viewport initialization (PvP map load enumerates the
+current roster) and after disposal. The port previously only reactivated geometry
+when a view existed, then always called native playerJoined. It now suppresses
+those unready/late joins for the owning game and preserves native behavior for
+other game instances. Valid joins activate their own map geometry before creating
+the marker, preserving independent normal/PvP scales and native return values.
+The existing map integration regression now exercises pre-load, normal/PvP and
+post-disposal joins. Source pan threshold, cancellation and wheel zoom arithmetic
+were also checked against current code without finding another mismatch there.
+Typecheck/build/full suite: 269 pass; formatting/diff checks pass. Live concurrent
+map/join lifecycle remains unverified; no synthetic server join was sent.
