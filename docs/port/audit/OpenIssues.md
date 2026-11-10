@@ -1557,3 +1557,34 @@ Local evidence: /tmp/QoLAF-GlyphGeometryLater.png,
 /tmp/QoLAF-FinalPixelsAfter.png, /tmp/QoLAF-FinalAlphaDuring.png,
 /tmp/QoLAF-FinalAlphaAfter.png, /tmp/QoLAF-CanvasLayers.png,
 /tmp/QoLAF-CanvasExport.png and /tmp/QoLAF-NoTransformLater.png.
+
+## Artifact outgoing channel policy (2026-11-10)
+
+Ported ChatArtifactChannelPolicy and the source ChatInputText command-to-channel
+mapping. The composer now checks actual parsed commands before native handling
+can clear the input. Global, Local, Group, Modchat and unrelated commands reject
+valid artifact tokens with the original restriction message. Private aliases,
+saved-private, Clan and QoLAF are permitted by policy; permitting QoLAF does not
+implement its missing transport. Separate guards protect direct sendGlobal,
+sendGroup, sendLocal and sendChatMessageMod calls, including Clan's native route
+through sendLocal(body, "clan"). Private recipient arguments remain recipients.
+Rejected artifact drafts do not enter session history. Malformed token-like
+prose remains ordinary chat; a malformed prefix cannot hide a later valid token.
+
+Typecheck and all 354 tests pass. Regression exercises actual host hook dispatch,
+the inspected native command parser behavior, every private alias, command
+redirects from an allowed tab, direct send methods, history/draft preservation,
+markup-wrapped tokens, malformed prefixes and hook cleanup. Tests use local
+recorders; no live chat message was submitted. Production session installation
+is wired, but a live reload/send test was not performed for this change.
+
+The source sharing buttons, insertArtifactLink composer action, channel-tab
+disabling/automatic destination selection, and QoLAF/floating-room transport
+remain incomplete. This change supplies the final send policy, not those UI or
+transport features.
+
+Also compared TextManager's non-damage notifications with the current Haxe
+implementation: XP, score, PvP, level, bonus XP, frag score, mission/boss/uber
+messages, drop aggregation, map entry and reputation retain source text, timing,
+position, color and size paths. They use the already-ported shared text layout.
+This source inspection does not establish live animation or full visual parity.

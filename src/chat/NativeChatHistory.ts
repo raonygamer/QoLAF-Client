@@ -1,5 +1,6 @@
 import { read, type API, type Raw } from '../api/Types';
 import { ChatHistory } from './ChatHistory';
+import { permitsArtifactDraft } from './NativeChatArtifactPolicy';
 
 /** Source input history survives room changes, but never browser/client restarts. */
 export function installNativeChatHistory(api: API, game: Raw, history = ChatHistory.session): void {
@@ -13,7 +14,7 @@ export function installNativeChatHistory(api: API, game: Raw, history = ChatHist
   api.before(chat, 'sendMessage', function () {
     // Record the complete submitted line, including local commands and channel
     // prefixes. Native sendLocal only records the message body in some channels.
-    history.record(currentText());
+    if (permitsArtifactDraft(chat, currentText())) history.record(currentText());
   });
   api.after(chat, 'toggleChatMode', function () {
     if (chat.isActive()) history.begin(currentText());

@@ -9,6 +9,7 @@ import { ChatImageCache } from '../chat/ChatImageCache';
 import { ChatRemoteImageLoader } from '../chat/ChatRemoteImageLoader';
 import { createBrowserImagePlatform } from '../chat/BrowserImagePlatform';
 import { installNativeChatHistory } from '../chat/NativeChatHistory';
+import { installNativeChatArtifactPolicy } from '../chat/NativeChatArtifactPolicy';
 import { installNativeSimpleChat } from '../chat/NativeSimpleChat';
 import { installNativeChatLayout } from '../chat/NativeChatLayout';
 import { installNativeChatMessages } from '../chat/NativeChatMessages';
@@ -101,6 +102,7 @@ export function installGameSession(
   installNativeFriendPings(session, game, () => pingSound.play());
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences);
+  installNativeChatArtifactPolicy(session, game);
   installNativeChatHistory(session, game);
   installNativeSimpleChat(
     session,
