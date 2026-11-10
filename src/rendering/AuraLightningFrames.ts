@@ -1,3 +1,5 @@
+import { createAuraOutlineLightning } from './AuraOutlineLightning';
+import { AuraTextureContours } from './AuraTextureContours';
 import { read, type API, type Raw } from '../api/Types';
 import { createAuraLightning } from './AuraLightning';
 import { AuraTextureAnchors } from './AuraTextureAnchors';
@@ -6,6 +8,7 @@ import { installAuraTextureSource } from './AuraTextureSource';
 interface LightningEntry {
   frequency: number;
   mesh: Raw | null;
+  outline: Raw | null;
   particle: Raw | null;
   alpha: number;
 }
@@ -17,6 +20,8 @@ export class AuraLightningFrames {
     private api: API,
     private Mesh: any,
     private anchors: AuraTextureAnchors,
+    private OutlineMesh?: any,
+    private contours?: AuraTextureContours,
   ) {}
 
   prepare(emitter: Raw, rarity: number): void {
@@ -24,6 +29,7 @@ export class AuraLightningFrames {
       this.entries.set(emitter, {
         frequency: rarity === 4 || rarity === 5 ? 0.3125 : 0.25,
         mesh: null,
+        outline: null,
         particle: null,
         alpha: 0,
       });
@@ -32,6 +38,7 @@ export class AuraLightningFrames {
     const entry = this.entries.get(emitter);
     if (!entry) return;
     entry.mesh?.set_visible(false);
+    entry.outline?.set_visible(false);
     entry.particle = null;
     entry.alpha = 0;
   }
@@ -80,13 +87,32 @@ export class AuraLightningFrames {
       3,
       entry.frequency,
     );
+    this.align(mesh, particle, entry.alpha, clip, owner);
+    if (this.OutlineMesh && this.contours) {
+      const outline = entry.outline ?? (entry.outline = new this.OutlineMesh());
+      if (read(outline, 'parent') !== layer) layer.addChild(outline);
+      outline.setContours(this.contours.contours(texture));
+      outline.advance(
+        elapsed,
+        (read(texture, 'width') * Math.abs(read(particle, 'scaleX'))) / 2,
+        (read(texture, 'height') * Math.abs(read(particle, 'scaleY'))) / 2,
+        read(particle, 'color'),
+        8,
+        3,
+        entry.frequency / 16,
+      );
+      this.align(outline, particle, entry.alpha, clip, owner);
+    }
+  }
+
+  private align(mesh: Raw, particle: Raw, particleAlpha: number, clip: Raw, owner: Raw): void {
     mesh.set_x(read(particle, 'x'));
     mesh.set_y(read(particle, 'y'));
     mesh.set_rotation(read(particle, 'rotation'));
     mesh.set_scaleX(read(particle, 'scaleX') < 0 ? -1 : 1);
     mesh.set_scaleY(read(particle, 'scaleY') < 0 ? -1 : 1);
     let alpha =
-      read(mesh, 'alpha') * Math.min(1, entry.alpha / Math.max(0.001, particle.startAlpha));
+      read(mesh, 'alpha') * Math.min(1, particleAlpha / Math.max(0.001, particle.startAlpha));
     for (let node = clip; node && node !== owner; node = read(node, 'parent')) {
       alpha *= read(node, 'alpha');
       if (!read(node, 'visible')) mesh.set_visible(false);
@@ -98,6 +124,7 @@ export class AuraLightningFrames {
     if (!entry) return;
     this.entries.delete(emitter);
     entry.mesh?.removeFromParent(true);
+    entry.outline?.removeFromParent(true);
   }
   dispose(): void {
     for (const emitter of this.entries.keys()) this.release(emitter);
@@ -114,6 +141,8 @@ export function installAuraLightning(api: API): AuraLightningFrames | undefined 
     api,
     createAuraLightning(api),
     new AuraTextureAnchors(source),
+    createAuraOutlineLightning(api),
+    new AuraTextureContours(source),
   );
   api.after(
     factory,

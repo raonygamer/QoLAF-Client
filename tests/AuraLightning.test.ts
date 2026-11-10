@@ -1,47 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createAuraLightning } from '../src/rendering/AuraLightning';
-import { Display } from './fixtures/NativeGame';
-
-class Vertices {
-  count = 0;
-  points: number[][] = [];
-  set_numVertices(count: number) {
-    this.count = count;
-  }
-  get_numVertices() {
-    return this.count;
-  }
-  setPoint(index: number, _key: string, x: number, y: number) {
-    this.points[index] = [x, y];
-  }
-  colorize(_key: string, _color: number, _alpha: number, _start: number, _count: number) {}
-}
-class Indices {
-  count = 0;
-  set_numIndices(count: number) {
-    this.count = count;
-  }
-  addQuad(..._indices: number[]) {
-    this.count += 6;
-  }
-}
-class Mesh extends Display {
-  constructor(
-    readonly vertices: Vertices,
-    readonly indices: Indices,
-  ) {
-    super();
-  }
-  get_vertexData() {
-    return this.vertices;
-  }
-  get_indexData() {
-    return this.indices;
-  }
-  setVertexDataChanged() {}
-  setIndexDataChanged() {}
-}
+import { Mesh, Vertices, Indices } from './fixtures/AuraMesh';
 
 test('source lightning uses bounded native geometry and endpoints from one opaque component', () => {
   const classes: any = {

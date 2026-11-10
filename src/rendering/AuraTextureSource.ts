@@ -11,6 +11,9 @@ export interface AuraTextureMapping {
   rows: number;
   filled: Uint8Array;
   point(u: number, v: number): AuraPoint;
+  uv(point: AuraPoint): AuraPoint | null;
+  pixelDelta(u: number, v: number): AuraPoint;
+  covered(u: number, v: number): boolean;
 }
 
 /** Borrow upload bitmaps already retained by Starling; never read back the GPU. */
@@ -60,19 +63,22 @@ export class AuraTextureSource {
     const resolution = Math.min(1, 96 / Math.max(nativeX, nativeY));
     const columns = Math.max(1, Math.ceil(nativeX * resolution)),
       rows = Math.max(1, Math.ceil(nativeY * resolution));
+    const covered = (u: number, v: number): boolean => {
+      if (u < 0 || u >= 1 || v < 0 || v >= 1) return false;
+      const x = Math.floor((uv0.x + (uv1.x - uv0.x) * u + (uv2.x - uv0.x) * v) * nativeWidth);
+      const y = Math.floor((uv0.y + (uv1.y - uv0.y) * u + (uv2.y - uv0.y) * v) * nativeHeight);
+      return (
+        x >= 0 &&
+        y >= 0 &&
+        x < bitmapWidth &&
+        y < bitmapHeight &&
+        bitmap.getPixel32(x, y) >>> 24 >= 48
+      );
+    };
     const filled = new Uint8Array(columns * rows);
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < columns; x++) {
-        const u = (x + 0.5) / columns,
-          v = (y + 0.5) / rows;
-        const pixelX = Math.floor(
-          (uv0.x + (uv1.x - uv0.x) * u + (uv2.x - uv0.x) * v) * nativeWidth,
-        );
-        const pixelY = Math.floor(
-          (uv0.y + (uv1.y - uv0.y) * u + (uv2.y - uv0.y) * v) * nativeHeight,
-        );
-        if (pixelX < 0 || pixelY < 0 || pixelX >= bitmapWidth || pixelY >= bitmapHeight) continue;
-        if (bitmap.getPixel32(pixelX, pixelY) >>> 24 >= 48) filled[y * columns + x] = 1;
+        if (covered((x + 0.5) / columns, (y + 0.5) / rows)) filled[y * columns + x] = 1;
       }
     }
     return {
@@ -81,6 +87,22 @@ export class AuraTextureSource {
       columns,
       rows,
       filled,
+      covered,
+      uv: (point) => {
+        const xx = p1.x - p0.x,
+          xy = p2.x - p0.x,
+          yx = p1.y - p0.y,
+          yy = p2.y - p0.y;
+        const determinant = xx * yy - xy * yx;
+        if (!Number.isFinite(determinant) || determinant === 0) return null;
+        const x = ((point.x + 1) * width) / 2 - p0.x,
+          y = ((point.y + 1) * height) / 2 - p0.y;
+        return { x: (x * yy - y * xy) / determinant, y: (y * xx - x * yx) / determinant };
+      },
+      pixelDelta: (u, v) => ({
+        x: ((uv1.x - uv0.x) * u + (uv2.x - uv0.x) * v) * nativeWidth,
+        y: ((uv1.y - uv0.y) * u + (uv2.y - uv0.y) * v) * nativeHeight,
+      }),
       point: (u, v) => ({
         x: (p0.x + (p1.x - p0.x) * u + (p2.x - p0.x) * v - width / 2) / (width / 2),
         y: (p0.y + (p1.y - p0.y) * u + (p2.y - p0.y) * v - height / 2) / (height / 2),

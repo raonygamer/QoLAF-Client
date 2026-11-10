@@ -1352,3 +1352,35 @@ Remaining: AuraTextureContours and AuraOutlineLightning's occasional crawling
 accent, mirrored/multipart targets, actual context-restoration checks and broad
 visual comparison. Interior lightning is implemented; the entire aura family and
 full port are not declared complete.
+
+## Outline aura lightning and closed contours (2026-11-10)
+
+Ported the original AuraOutlineLightning onto native Starling meshes, sharing
+the strongest rendered aura particle with interior lightning. Retains fourteen
+segments per arc, glow/core geometry, arc-length contour sampling, travel/jitter,
+720ms bursts and the original /16 frequency scale with quiet-gap compensation.
+Both meshes share visibility, opacity ancestry and emitter disposal handling.
+
+AuraTextureContours traces closed boundaries including holes from captured
+texture coverage. Rotated atlas mapping is preserved. Segment coverage is checked
+against native pixels, including the closing edge; open/truncated paths and
+transparent shortcuts are rejected. Work is bounded to 32 loops, 768 points per
+loop and a 32768-sample validation budget. Unreadable/unsupported coverage yields
+no outline, rather than a fabricated ellipse.
+
+Typecheck and all 345 tests pass. Added native-resolution narrow-gap checks,
+concave/diagonal boundary cases, holes, rotated textures, cache invalidation,
+work bounds, wrapped contour sampling, original burst timing and frame lifecycle
+assertions for both meshes.
+
+Remaining: mirrored/multipart targets, actual context restoration, and full
+side-by-side appearance comparison across ships and rarity types. Bitmap text
+corruption remains a separate unresolved issue.
+
+Live reload/autologin succeeded with one F5 press/release. An 80-second local
+blue-aura probe produced eight contours (544 points) and an 896-vertex outline
+mesh. At unchanged source timing, 106 of 1592 samples were visible. The timer
+removed its one created emitter and sampling interval, observed in
+/tmp/QoLAF-OutlineCleanup.png. Preview remained connected=true, runtimeErrors=0.
+No transport sends or account changes. This verifies native contour/outline
+integration and cleanup, not complete visual parity.

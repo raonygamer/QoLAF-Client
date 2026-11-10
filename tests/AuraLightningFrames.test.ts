@@ -20,6 +20,12 @@ class Lightning extends Display {
   }
 }
 
+class Outline extends Lightning {
+  setContours(points: unknown) {
+    this.anchors = points;
+  }
+}
+
 test('lightning follows the strongest rendered pulse and hides on disabled, stopped or offscreen frames', () => {
   const settings = { disableRemasteredAuras: false };
   const points = [
@@ -32,6 +38,8 @@ test('lightning follows the strongest rendered pulse and hides on disabled, stop
     { cls: () => ({ clientSettings: settings }) } as any,
     Lightning,
     { points: () => points } as any,
+    Outline,
+    { contours: () => points } as any,
   );
   const parent = new Display();
   const owner = parent.addChild(new Display());
@@ -62,6 +70,11 @@ test('lightning follows the strongest rendered pulse and hides on disabled, stop
   frames.observe(emitter, { ...particle, x: 200 }, 0.3);
   frames.finish(emitter, 5.5);
   const mesh = layer.children[0] as Lightning;
+  const outline = layer.children[1] as Outline;
+  assert.equal(outline.anchors, points);
+  assert.deepEqual(outline.calls[0], [5.5, 80, 60, 0x4488ff, 8, 3, 0.3125 / 16]);
+  assert.equal(outline.get_x(), 12);
+  assert.ok(Math.abs(outline.get_alpha() - 0.35) < 1e-10);
   assert.equal(mesh.anchors, points);
   assert.deepEqual(mesh.calls[0], [5.5, 80, 60, 0x4488ff, 8, 3, 0.3125]);
   assert.equal(mesh.get_x(), 12);
@@ -78,11 +91,14 @@ test('lightning follows the strongest rendered pulse and hides on disabled, stop
     frames.begin(emitter);
     if (condition !== 'noParticle') frames.observe(emitter, particle, 0.7);
     frames.finish(emitter, 5.5);
+    assert.equal(outline.get_visible(), false, condition);
+    assert.equal(outline.calls.length, 1, condition);
     assert.equal(mesh.get_visible(), false, condition);
     assert.equal(mesh.calls.length, 1, condition);
   }
   frames.release(emitter);
   frames.release(emitter);
   assert.equal(mesh.disposed, true);
+  assert.equal(outline.disposed, true);
   assert.equal(layer.children.length, 0);
 });
