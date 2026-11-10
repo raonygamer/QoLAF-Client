@@ -679,3 +679,28 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   render; /tmp/QoLAF-MiniaturesReopened.png records close/reopen. Original reference
   remains /tmp/QoLAF-OriginalSpawnMap.png. Real death/reuse timing and exact
   cross-renderer glow parity remain unverified; full-client parity is incomplete.
+
+### Important Nexar world labels
+
+- Ported NexarWorldLabel's original faction diamond/inset, bitmap name, native
+  shield/health quads and numeric values. All four existing Cosmetics/HUD
+  preferences now control their original display pieces. Fixed text viewports,
+  source font sizes/colors, bar dimensions and all 16 option layouts are retained.
+- Eligible unowned Nexar ships use the original exact-name rules, excluding the
+  ordinary elite families. Eligibility is cached per pooled life and cleared on
+  reset/destruction. Labels hide when removed from canvas, invisible, transparent
+  or disabled, and are disposed with their session.
+- Labels follow the drawn hull and counter-scale against the current canvas zoom.
+  Headroom reads collision radius and transformed pivots. Bars read the current
+  Haxe hp/shield fields directly; values update at most every 100ms and only
+  rewrite changed text. Empty bars hide without setting zero width. No shield
+  calculation or native ship state is changed.
+- TypeScript, formatting and 146 tests pass. Added all-option layouts, unchanged
+  native state, fill/clamping, throttle, zoom/headroom, visibility, cached
+  eligibility, settings reuse and pooled/session cleanup coverage.
+- Live synthetic native label: /tmp/QoLAF-NexarLabelVisible.png. The faction badge,
+  name, changing shield value/fill and health value/fill rendered in the browser.
+  This is a display probe, not a real Emperor encounter or complete parity proof.
+- Probe disposed cleanly after 5389 frames
+  (/tmp/QoLAF-NexarLabelDisposed.png). Temporary HTML/script injection removed
+  and clean local preview reloaded.

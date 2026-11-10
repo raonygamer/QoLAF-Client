@@ -1,3 +1,4 @@
+import { installNexarWorldLabels } from '../Ship/NexarWorldLabel';
 import { installMapLiveMiniatures } from '../Map/NativeMapLiveMiniatures';
 import { installMapNavigation } from '../Map/NativeMapNavigation';
 import { installBossSpawnMarkers } from '../Map/BossSpawnMarkerManager';
@@ -39,6 +40,7 @@ export function installGameSession(
   installMapNavigation(session, game);
   installBossSpawnMarkers(session, game);
   installMapLiveMiniatures(session, game);
+  installNexarWorldLabels(session, game);
   installNativeSettings(session, preferences);
   installHealthAndShield(session, game);
   installRespawn(session, game);
