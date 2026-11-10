@@ -8,6 +8,7 @@ import { loginProfiles } from './Login/LoginProfiles';
 import { installArtifactUI } from './Artifacts/NativeArtifacts';
 import { installInterpolation } from './Rendering/Interpolation';
 import { installDisplayScale } from './Rendering/DisplayScale';
+import { installCompactStarMap } from './Map/CompactStarMap';
 import { DeviceSettings } from './Settings/DeviceSettings';
 import { installBackgroundLayers } from './Rendering/BackgroundLayers';
 
@@ -62,6 +63,7 @@ export default {
         return result;
       });
       installArtifactUI(api);
+      installCompactStarMap(api);
     });
     api.onGame((game, session) => {
       installBackgroundLayers(game, session, deviceSettings);

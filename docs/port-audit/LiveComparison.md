@@ -118,3 +118,32 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   `/tmp/QoLAF-ClanReload.png`; real clan-label visual parity is still pending.
   Identity caching in upstream Player objects and live clan changes also remain
   to be compared with the original beyond the callback/lifecycle unit coverage.
+
+### Compact warp-gate map
+
+- Connected compactWarpGateUI at native map creation, following the original
+  construction-time preference semantics. Native route data, selection, transit
+  events, licenses and purchase handlers remain upstream-owned.
+- Ported the 20 named system positions/branch lanes, 8px node radius, label
+  backgrounds/anchors, 2px routes and vertical quads, faction texture regions,
+  per-node nebulas, background dimming and stationary compact viewport.
+- Added restoration of node geometry/fonts, route drawing and background on
+  plugin unload; normal map cleanup releases added display resources and texture
+  views without creating a new recenter animation during disposal.
+- Live temporary native StarMap preview used allowBuy=false. First capture
+  `/tmp/QoLAF-CompactMap.png` shows the compact graph and regions. Selecting
+  Mitrilion updated the native galaxy title, selected ring and unavailable-warp
+  notice without panning (`/tmp/QoLAF-CompactMapSelected.png`).
+- That selection capture also contains missing cached labels, consistent with
+  the previously deferred bitmap issue; this pass does not claim to fix it.
+- Audited against original StarMap, SolarSystem and WarpPath, then current Haxe
+  methods. Source layout regression covers named lanes, diamond branches, label
+  anchors and resizing. TypeScript, build and 68 tests pass.
+- Full original-SWF visual comparison and actual landed warp-gate integration
+  remain to be verified; a native no-purchase preview is narrower evidence.
+- A second font audit/render exposed native TextBitmap auto-width measurement
+  under an existing scale, creating excessive name/percentage gaps. Measuring at
+  scale 1 before applying the source 10/16 label scale fixed it; verified in
+  `/tmp/QoLAF-CompactMapFinal.png`. Native labels now use the original Russo24 atlas.
+- Closed the temporary map preview and removed its script/HTML injection. It is
+  not part of the bundle or published host.
