@@ -1631,3 +1631,31 @@ Public delivery audit: GitHub Pages still served the initial 77c3c55 client whil
 SHA matches the locally verified Service-1410 bundle. Publishing 0.3.0-dev makes
 already-implemented native Help, Changelog, Music, Inspector, welcome/login and
 settings work available publicly; it does not imply full original-client parity.
+
+## Scaled input hit areas and original Music colors — 2026-11-10
+
+With the hull editor fitted to a 415px-high stage, native TextEntry placed each
+159×26 input's DOM box at its scaled origin but retained unscaled dimensions.
+The actual rendered field was 100.421×16.421; the oversized click boxes overlapped.
+NativeInputPlacement now uses the complete rendered stage bounds and the existing
+DomOverlay conversion, including font/padding scaling. Bitmap-backed inputs use
+it after successful native placement; RadioInput uses the same adapter. Hidden
+inputs stay hidden and bitmap input disposal restores the original CSS.
+
+After one browser reload, live measurements were 100.4167×16.4167 versus expected
+100.4211×16.4211 (browser pixel rounding). A physical click on the enabled Color B
+field reported first=false, second=true. Closing the console restored both inputs
+to exactly 159×26. The gradient was a popup draft and was cancelled without Apply.
+Evidence: /tmp/QoLAF-ScaledInputFixed.png and /tmp/QoLAF-ScaledInputFull.png.
+
+The dark Music checkbox label is source-correct. Decompiled the local original
+AeonDesktopTheme.swc (SHA256 d51d9ffe6d5df3bfd75040c1942120c691b41161592ae3f3b5e5491e05ce6a33):
+BaseAeonDesktopTheme uses 734012 (0x0b333c), 11px _sans, and disabled 5990256
+(0x5b6770). Original RichBitmapFontTextRenderer resolves _sans to Russo. Preserved
+the enabled appearance; corrected the port's disabled label from 0x666666 to
+0x5b6770. The running original was on its loading screen during this comparison,
+so this color finding relies on the shipped library and renderer source.
+
+Typecheck, formatting and all 441 tests pass. Added coverage verifies scaled bounds,
+repeated placement without compounding scale, CSS canvas scaling, hidden-input
+handling and disposal restoration. This does not establish full screen parity.

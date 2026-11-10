@@ -1,3 +1,4 @@
+import { placeNativeInput } from '../../ui/NativeInputPlacement';
 import { read, type API, type Raw } from '../../api/Types';
 import type { Resolve } from '../../runtime/As3';
 import { RichBitmapEditorModel } from './RichBitmapEditorModel';
@@ -56,6 +57,11 @@ export function bindNativeBitmapInput(
   view.node.set_name('QoLAF.RichComposer');
   input.addChild(view.node);
   const opacity = element.style.opacity;
+  const placementStyles = Object.fromEntries(
+    (['fontSize', 'paddingLeft', 'paddingRight', 'paddingTop', 'paddingBottom'] as const).map(
+      (key) => [key, element.style[key]],
+    ),
+  );
   const maxLength = element.getAttribute('maxlength');
   const originalRestrict = input.restrict;
   const binding = new RichBitmapInputBinding(
@@ -128,7 +134,10 @@ export function bindNativeBitmapInput(
     element.removeAttribute('maxlength');
     return count;
   });
-  api.after(input, 'updatePlacement', layout);
+  api.after(input, 'updatePlacement', (shown: boolean) => {
+    if (shown) placeNativeInput(input, api.cls?.('core.hud.components.ui.DomOverlay'));
+    layout();
+  });
   api.after(input, 'set_textFormat', layout);
   listen(element, 'focus', layout);
   listen(element, 'blur', layout);
@@ -185,6 +194,7 @@ export function bindNativeBitmapInput(
     binding.dispose();
     view.dispose();
     element.style.opacity = opacity;
+    Object.assign(element.style, placementStyles);
     if (maxLength === null) element.removeAttribute('maxlength');
     else element.setAttribute('maxlength', maxLength);
     input.set_restrict(originalRestrict);

@@ -1903,3 +1903,12 @@ get_passedTime accessor. Long labels now clip and animate in the browser.
 Four added tests cover bitmap clipping across revalidation, marquee motion,
 native slider interaction boundaries, changed-track seek cancellation, listener
 request routing and queue mode coupling. Full suite: 438 passing tests.
+
+### Scaled native inputs — corrected
+
+Small-viewport hull-editor DOM inputs overlapped because upstream placement ignored
+ancestor scale in width/height. Corrected for bitmap inputs and the Radio input
+adapter; verified small and full viewport sizes and physical Color B focus. Full
+suite now 441 tests. Remaining screen/backend work is unchanged. The original Music
+checkbox's low-contrast enabled color is intentional in the shipped Aeon theme;
+only its disabled-color mismatch was corrected.

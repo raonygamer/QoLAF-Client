@@ -271,7 +271,7 @@ export function createMusicPlayerPopup(resolve: Resolve, MusicPlayer: MusicPlaye
       this.manualControls.touchable = manual;
       // isEnabled also prevents keyboard/focus activation while automatic.
       this.scroll.isEnabled = this.loopTrack.isEnabled = this.volume.isEnabled = manual;
-      this.loopTrack.textField.get_format().set_color(manual ? 734012 : 0x666666);
+      this.loopTrack.textField.get_format().set_color(manual ? 734012 : 0x5b6770);
       this.playButton.enabled =
         this.previousButton.enabled =
         this.nextButton.enabled =

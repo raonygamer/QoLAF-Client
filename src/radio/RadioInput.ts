@@ -1,3 +1,4 @@
+import { placeNativeInput } from '../ui/NativeInputPlacement';
 import { bound, type Resolve } from '../runtime/As3';
 
 /** Original RadioQueryInput presentation; native editor retains the complete query and selection. */
@@ -6,6 +7,7 @@ export function createRadioInput(resolve: Resolve) {
   const Text = resolve('core.hud.components.Text');
   const Quad = resolve('starling.display.Quad');
   const Format = resolve('openfl.text.TextFormat');
+  const Overlay = resolve('core.hud.components.ui.DomOverlay');
   class RadioInput extends Entry {
     private preview: any;
     private surface: any;
@@ -31,6 +33,12 @@ export function createRadioInput(resolve: Resolve) {
       this.addEventListener('focusIn', this.refreshPreview);
       this.addEventListener('focusOut', this.refreshPreview);
       this.refreshPreview();
+    }
+
+    updatePlacement(): boolean {
+      const shown = super.updatePlacement();
+      if (shown) placeNativeInput(this, Overlay);
+      return shown;
     }
 
     get prompt(): string {

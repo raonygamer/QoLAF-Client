@@ -10,7 +10,14 @@ import { Hooks } from './fixtures/HostCore.js';
 
 class Element extends EventTarget {
   value = '';
-  style = { opacity: '1' };
+  style = {
+    opacity: '1',
+    fontSize: '14px',
+    paddingLeft: '8px',
+    paddingRight: '0px',
+    paddingTop: '3px',
+    paddingBottom: '0px',
+  };
   disabled = false;
   readOnly = false;
   selectionStart = 0;
@@ -43,7 +50,7 @@ class Element extends EventTarget {
   }
 }
 
-function fixture(artifacts?: Parameters<typeof installNativeRichChatInput>[4]) {
+function fixture(artifacts?: Parameters<typeof installNativeRichChatInput>[4], overlay?: any) {
   const bitmap = bitmapRendererFixture('verdana48_bitmap');
   bitmap.resolve('starling.text.TextField').getBitmapFont = (name: string) =>
     name === 'verdana48_bitmap' ? bitmap.font : null;
@@ -78,8 +85,9 @@ function fixture(artifacts?: Parameters<typeof installNativeRichChatInput>[4]) {
     selectRange(begin: number, end: number) {
       element.setSelectionRange(begin, end);
     },
+    placementVisible: true,
     updatePlacement() {
-      return true;
+      return this.placementVisible;
     },
     set_textFormat(format: { size: number; color: number }) {
       this.textFormat = format;
@@ -99,6 +107,7 @@ function fixture(artifacts?: Parameters<typeof installNativeRichChatInput>[4]) {
     },
   };
   const api = {
+    cls: (name: string) => (name === 'core.hud.components.ui.DomOverlay' ? overlay : undefined),
     before: (object: any, key: string, fn: Function) => {
       const off = hooks.add(object, key, 'before', fn);
       cleanups.push(off);
@@ -302,4 +311,27 @@ test('live composer resolves artifact labels without changing wire tokens or sel
     'disposed composer unsubscribes from lookup completion',
   );
   resolver.dispose();
+});
+
+test('native bitmap input corrects scaled placement only while shown and restores CSS on disposal', () => {
+  const placements: any[] = [];
+  const bounds = { x: 10, y: 20, width: 200, height: 12 };
+  const overlay = {
+    globalRect: () => bounds,
+    toCss: (rect: any) => ({ ...rect }),
+    place: (...args: any[]) => placements.push(args),
+  };
+  const f = fixture(undefined, overlay);
+  const original = { ...f.element.style };
+  f.input.updatePlacement();
+  assert.deepEqual(placements, [[f.element, bounds, true]]);
+  assert.equal(f.element.style.fontSize, '7px');
+  assert.equal(f.element.style.paddingLeft, '4px');
+  f.input.placementVisible = false;
+  f.input.updatePlacement();
+  assert.equal(placements.length, 1);
+  f.cleanup();
+  assert.equal(f.element.style.fontSize, original.fontSize);
+  assert.equal(f.element.style.paddingLeft, original.paddingLeft);
+  assert.equal(f.element.style.opacity, '1');
 });
