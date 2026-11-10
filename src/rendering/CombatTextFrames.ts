@@ -2,6 +2,7 @@ import { read, type API, type Raw } from '../api/Types';
 
 interface Attachment {
   owner: Raw | null;
+  sourceOwner: Raw;
   slot?: 'lastDmgText' | 'lastHealText';
   generation: number;
   x: number;
@@ -21,6 +22,22 @@ export class CombatTextFrames {
   }
 
   reset(particle: Raw): void {
+    const attachment = this.attachments.get(particle);
+    if (attachment?.slot) {
+      const owner = attachment.sourceOwner;
+      if (
+        attachment.generation === (this.generations.get(owner) ?? 0) &&
+        owner[attachment.slot] === particle
+      ) {
+        owner[attachment.slot] = null;
+        owner[attachment.slot + 'Offset'] = 0;
+      }
+    }
+    if (attachment && particle.owner === attachment.sourceOwner) {
+      // Native reset clears slots without a lifecycle check. We have handled
+      // the valid slot above; do not let it touch a recycled owner's new life.
+      particle.owner = null;
+    }
     this.attachments.delete(particle);
   }
 
@@ -40,6 +57,7 @@ export class CombatTextFrames {
         : pose.y + anchorOffset;
     this.attachments.set(particle, {
       owner,
+      sourceOwner: owner,
       slot,
       generation: this.generations.get(owner) ?? 0,
       x,
@@ -177,6 +195,11 @@ export function installCombatTextFrames(api: API): void {
   api.before(particle, 'reset', function () {
     frames.reset(this);
   });
+  if (typeof particle.dispose === 'function') {
+    api.before(particle, 'dispose', function () {
+      frames.reset(this);
+    });
+  }
   api.before(unit, 'reset', function () {
     frames.resetOwner(this);
   });

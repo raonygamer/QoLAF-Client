@@ -7,6 +7,8 @@ import {
 } from '../src/rendering/CombatTextFrames';
 // @ts-expect-error inspected upstream implementation
 import makeTextHandler from './fixtures/UpstreamTextHandler.js';
+// @ts-expect-error inspected upstream implementation
+import { reset as nativeParticleReset } from './fixtures/UpstreamTextParticle.js';
 // @ts-expect-error actual host hooks
 import { Hooks } from './fixtures/HostCore.js';
 import { Text } from './fixtures/NativeGame';
@@ -58,6 +60,41 @@ function fixture() {
 function near(actual: number, expected: number) {
   assert.ok(Math.abs(actual - expected) < 1e-8, `${actual} != ${expected}`);
 }
+
+test('recycled combat text releases only its own damage or healing slot', () => {
+  for (const slot of ['lastDmgText', 'lastHealText'] as const) {
+    const { frames, owner, particle, handler } = fixture();
+    particle.set_text = () => {};
+    particle.autoWidth = () => {};
+    owner[slot] = particle;
+    owner[slot + 'Offset'] = -15;
+    frames.attach(particle, owner, -15, slot);
+    // Losing the live movement attachment must not lose the source for cleanup.
+    owner.alive = false;
+    frames.update(handler, 0.01);
+    frames.reset(particle);
+    assert.equal(owner[slot], null);
+    assert.equal(owner[slot + 'Offset'], 0);
+
+    owner.alive = true;
+    owner[slot] = particle;
+    frames.attach(particle, owner, -15, slot);
+    const replacement = {};
+    owner[slot] = replacement;
+    owner[slot + 'Offset'] = -30;
+    frames.reset(particle);
+    assert.equal(owner[slot], replacement);
+    assert.equal(owner[slot + 'Offset'], -30);
+
+    owner[slot] = particle;
+    frames.attach(particle, owner, -15, slot);
+    particle.owner = owner;
+    frames.resetOwner(owner);
+    frames.reset(particle);
+    nativeParticleReset.call(particle);
+    assert.equal(owner[slot], particle, 'old lifecycle cleanup cannot alter the new lifecycle');
+  }
+});
 
 test('combat text follows every rendered pose and retains rise despite tick coordinate writes', () => {
   const { frames, owner, particle, handler } = fixture();

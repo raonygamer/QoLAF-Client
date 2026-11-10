@@ -1,0 +1,2 @@
+// Inspected native reset, including its unguarded owner-slot cleanup.
+export const reset = function(){this.set_alpha(1),this.set_text("reset"),this.speed.x=0,this.speed.y=0,this.ttl=0,this.alive=!1,null!=this.owner&&(this.owner.lastDmgText==this&&(this.owner.lastDmgText=null,this.owner.lastDmgTextOffset=0),this.owner.lastHealText==this&&(this.owner.lastHealText=null,this.owner.lastHealTextOffset=0),this.owner=null),this.autoWidth()};

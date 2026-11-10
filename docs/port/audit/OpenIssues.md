@@ -1410,3 +1410,28 @@ it is not a full visual comparison of multipart ships.
 MultipartAuraTarget and PlayerShip's experimental multipart/aura lifecycle still
 need porting as a complete feature; generic mirroring support does not close that
 remaining scope.
+
+## Combat text ownership cleanup (2026-11-10)
+
+Compared source TextParticle.releaseSourceOwner with the native Haxe reset.
+Native reset already clears ordinary damage/healing slots, but does so without
+a lifecycle guard; native disposal does not release them. CombatTextFrames now
+retains the source owner separately from its active movement attachment and
+releases only the matching slot from the same owner generation, including when
+the owner died or the particle was disposed. It nulls the native owner reference
+after this check so native reset cannot subsequently clear a new lifecycle's
+slot. Replacement particles are not cleared.
+
+Typecheck and all 347 tests pass. Regression includes both damage/healing slots,
+dead-owner motion detachment, replacement slots, and the inspected native reset
+function to verify that its unguarded cleanup cannot undo the lifecycle check.
+Live standalone native TextManager/TextHandler/particle probe confirmed reset
+and disposal both release the owner slot and zero its offset. Its detached
+canvas and entire private particle pool were disposed in finally; no real unit,
+transport or gameplay state was changed. Evidence: /tmp/QoLAF-TextRelease.png.
+
+Also inspected the current timed mission panel: Mandrom Terror description,
+reward rows and XP are horizontal/readable (/tmp/QoLAF-TextMission.png). This
+case does not reproduce the previously reported vertical XP text. Other tooltip
+and intermittent bitmap corruption cases remain open. Ownership cleanup does
+not claim to fix bitmap rasterization or establish full visual parity.
