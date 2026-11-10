@@ -29,7 +29,19 @@ export function installArtifactSetupSelection(
   const owned = new WeakSet<Raw>();
   const rows = new Map<Raw, ArtifactSetupRow>();
   const sync = (view: Raw) => {
-    for (const button of view.setups) owned.add(button);
+    for (const button of view.setups) {
+      if (owned.has(button)) continue;
+      owned.add(button);
+      if (button.textField) {
+        // AstroTheme selects the 16px Russo atlas for its 10px setup labels.
+        // Native setup controls otherwise downsample the primary 56px sheet.
+        button.labelFont = 'DAIDRR_16';
+        button.labelSize = 10;
+        button.textField.get_format().set_font(button.labelFont);
+        button.textField.get_format().set_size(10);
+        button.textField.set_pixelSnapping(false);
+      }
+    }
     syncArtifactSetupSelection(view, localize.t('Setup'));
     rows.get(view)?.layout();
   };

@@ -114,7 +114,8 @@ test('source setup row reserves the scrollbar only on overflow and clamps thumb 
   assert.equal(setupRowLayout(650, 100000, 70, 480).thumbWidth, 52);
 });
 
-test('native setup row scrolls by thumb, track and wheel and restores buttons on rebuild', async () => {
+test('native setup row scrolls by thumb, track and wheel and restores buttons on rebuild', async (context) => {
+  context.mock.timers.enable({ apis: ['setInterval'] });
   const wheel = new Set<Function>();
   let hit: Node | null = null;
   const starling = {
@@ -183,7 +184,22 @@ test('native setup row scrolls by thumb, track and wheel and restores buttons on
   touch('ended', thumb.children[0], 650);
   assert.equal(thumb.children[0].texture, skins.up);
   touch('began', track, 0);
-  assert.equal(Math.abs(content.x), 0);
+  assert.equal(content.x, -190, 'source page fraction snaps to the 38px scroll step');
+  context.mock.timers.tick(249);
+  assert.equal(content.x, -190);
+  context.mock.timers.tick(1);
+  assert.equal(Math.abs(content.x), 0, 'holding the track repeats after 250ms');
+  touch('ended', track, 0);
+  row.scrollTo(0);
+  touch('began', thumb.children[0], 0);
+  touch('moved', thumb.children[0], 20);
+  assert.equal(content.x, -38, 'thumb movement uses source step rounding');
+  touch('ended', thumb.children[0], 20);
+  touch('began', track, 650);
+  const heldPosition = content.x;
+  touch('ended', track, 650);
+  context.mock.timers.tick(1000);
+  assert.equal(content.x, heldPosition, 'release stops repeat scrolling');
   row.scrollTo(10000);
   view.setups.splice(2);
   row.layout();
@@ -191,6 +207,7 @@ test('native setup row scrolls by thumb, track and wheel and restores buttons on
   assert.equal(thumb.visible, false);
   assert.equal(view.cargoContainer.y, 106);
   row.dispose(true);
+  context.mock.timers.tick(1000);
   assert.equal(wheel.size, 0);
   assert.equal(root.disposed, true);
   for (const button of view.setups) {

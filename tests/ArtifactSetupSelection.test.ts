@@ -12,6 +12,25 @@ test('setup selection uses native setters, compact labels, and authoritative pla
     selected = false;
     skinSelected = false;
     label = '';
+    labelFont = 'DAIDRR';
+    labelSize = 12;
+    format = {
+      font: 'DAIDRR',
+      size: 12,
+      set_font(value: string) {
+        this.font = value;
+      },
+      set_size(value: number) {
+        this.size = value;
+      },
+    };
+    textField = {
+      get_format: () => this.format,
+      pixelSnapping: true,
+      set_pixelSnapping(value: boolean) {
+        this.pixelSnapping = value;
+      },
+    };
     width = 0;
     height = 0;
     x = 0;
@@ -76,6 +95,11 @@ test('setup selection uses native setters, compact labels, and authoritative pla
   installArtifactSetupSelection(api);
   const view = new Overview();
   view.drawArtifactSetups();
+  for (const button of view.setups) {
+    assert.equal(button.format.font, 'DAIDRR_16');
+    assert.equal(button.format.size, 10);
+    assert.equal(button.textField.pixelSnapping, false);
+  }
   assert.deepEqual(
     view.setups.map((button) => button.label),
     ['Setup 1', '2', '3', ''],
@@ -111,6 +135,7 @@ test('setup selection uses native setters, compact labels, and authoritative pla
   const unrelated = new Toggle();
   unrelated.onTriggered();
   assert.equal(unrelated.selected, true, 'other native toggle controls retain self-toggling');
+  assert.equal(unrelated.format.font, 'DAIDRR');
   assert.deepEqual(errors, []);
   cleanup.reverse().forEach((fn) => fn());
 });

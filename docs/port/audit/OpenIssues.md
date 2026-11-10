@@ -2395,3 +2395,24 @@ RPC, failed/successful responses, maximum capacity, late failure and retained gr
 identity. All 533 tests, TypeScript and formatting pass. Transactions were simulated
 only. Current desktop capture shows other apps in use; no keys, clicks or reloads
 were issued. Browser visual comparison remains pending.
+
+### Setup scrollbar interaction and label atlas — 2026-11-10
+
+Resolved the earlier uncertainty about setup-row content dragging: current
+AstroTheme.setScrollerStyles explicitly selects mouse interaction. The inherited
+Feathers desktop scroller does not enable content-drag inertia here; adding it
+would diverge from the original. Compared the decompiled baseline Scroller and
+SimpleScrollBar against the current setup row settings.
+
+Ported the actual remaining differences: thumb values snap to the source 38px
+step; track paging uses range × viewport/content rather than a whole viewport;
+holding the track waits 250ms, then repeats every 50ms, approaching the pressed
+location. Release, stage removal, disposal and loss of overflow stop the timer.
+Setup labels now use the source 16px Russo atlas at size 10 with pixel snapping
+disabled, rather than shrinking the native primary 56px atlas. Unrelated native
+toggles keep their fonts and behavior.
+
+Tests check exact page distance, initial repeat delay, continued hold, release,
+thumb snapping, lifecycle cleanup, original label atlas and unchanged unrelated
+controls. All 533 tests, TypeScript and formatting pass. No browser inputs or
+reloads were issued; live visual/input comparison remains open.

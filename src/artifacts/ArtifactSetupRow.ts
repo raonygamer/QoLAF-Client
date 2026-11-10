@@ -15,6 +15,8 @@ export class ArtifactSetupRow {
   private width = 650;
   private thumbWidth = 52;
   private drag: { id: number; x: number; position: number } | null = null;
+  private pageTarget: { id: number; value: number } | null = null;
+  private repeatTimer: ReturnType<typeof setInterval> | undefined;
   private alive = true;
   private point: Raw;
   private wheelSignal: Raw | null = null;
@@ -96,6 +98,7 @@ export class ArtifactSetupRow {
     const contentWidth = last ? read(last, 'x') + read(last, 'width') : 0;
     const layout = setupRowLayout(this.width, contentWidth, rowY, view.actionY ?? 480);
     this.maximum = layout.maximum;
+    if (!this.maximum) this.stopPaging();
     this.thumbWidth = layout.thumbWidth;
     this.root.set_x(view.expandedView ? 14 : 0);
     this.root.set_y(rowY);
@@ -157,6 +160,8 @@ export class ArtifactSetupRow {
   };
 
   private detachWheel = (): void => {
+    this.stopPaging();
+    this.drag = null;
     this.wheelSignal?.remove(this.onWheel);
     this.wheelSignal = null;
   };
@@ -185,9 +190,11 @@ export class ArtifactSetupRow {
   };
 
   private onTouch = (event: Raw): void => {
-    const touch = this.drag
-      ? event.getTouch(this.root, null, this.drag.id)
-      : event.getTouch(this.root);
+    const activeId = this.drag?.id ?? this.pageTarget?.id;
+    const touch =
+      activeId === undefined
+        ? event.getTouch(this.root)
+        : event.getTouch(this.root, null, activeId);
     if (!touch) {
       this.thumbImage?.set_texture(this.textures.up);
       return;
@@ -201,13 +208,25 @@ export class ArtifactSetupRow {
         this.drag = { id: read(touch, 'id'), x, position: this.position };
         this.thumbImage?.set_texture(this.textures.down);
       } else if (target === this.track) {
-        this.scrollTo(this.position + (x < read(this.thumb, 'x', 0) ? -this.width : this.width));
+        this.stopPaging();
+        const travel = this.width - this.thumbWidth;
+        this.pageTarget = {
+          id: read(touch, 'id'),
+          value: travel > 0 ? Math.max(0, Math.min(1, x / travel)) * this.maximum : 0,
+        };
+        this.adjustPage();
+        let ticks = 0;
+        this.repeatTimer = setInterval(() => {
+          // Feathers SimpleScrollBar skips the first four 50ms timer events.
+          if (++ticks >= 5) this.adjustPage();
+        }, 50);
       }
     } else if (phase === 'moved' && this.drag) {
       const travel = this.width - this.thumbWidth;
       if (travel > 0)
-        this.scrollTo(this.drag.position + ((x - this.drag.x) * this.maximum) / travel);
+        this.scrollTo(this.snap(this.drag.position + ((x - this.drag.x) * this.maximum) / travel));
     } else if (phase === 'ended') {
+      this.stopPaging();
       this.drag = null;
       this.thumbImage?.set_texture(this.textures.up);
     } else if (phase === 'hover') {
@@ -216,6 +235,28 @@ export class ArtifactSetupRow {
       );
     }
   };
+
+  private snap(value: number): number {
+    value = Math.max(0, Math.min(value, this.maximum));
+    return value === 0 || value === this.maximum ? value : Math.round(value / 38) * 38;
+  }
+
+  private adjustPage(): void {
+    if (!this.pageTarget || !this.maximum) return;
+    const target = this.pageTarget.value;
+    const page = (this.maximum * this.width) / (this.width + this.maximum);
+    const value =
+      target < this.position
+        ? Math.max(target, this.position - page)
+        : Math.min(target, this.position + page);
+    this.scrollTo(this.snap(value));
+  }
+
+  private stopPaging(): void {
+    if (this.repeatTimer !== undefined) clearInterval(this.repeatTimer);
+    this.repeatTimer = undefined;
+    this.pageTarget = null;
+  }
 
   dispose(preserveButtons = false): void {
     if (!this.alive) return;
