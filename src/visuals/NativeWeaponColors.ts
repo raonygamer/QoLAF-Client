@@ -4,6 +4,7 @@ import { installBeamEmitterTint } from './BeamEmitterTint';
 import { createGrayscaleTintStyle } from './GrayscaleTintStyle';
 import { WeaponColors, type WeaponColor } from './WeaponColors';
 import { ClientDevVisual } from './ClientDevVisual';
+import { installInstantWeaponColors } from './InstantWeaponColors';
 
 /** Presentation only: the native factory, simulation, collision and damage still run. */
 export function installNativeWeaponColors(
@@ -34,6 +35,7 @@ export function installNativeWeaponColors(
     read(read(weapon.unit, 'movieClip'), 'style')?.__class__?.__name__ ===
       'qolaf.visuals.ClientDevVisualStyle';
 
+  const instantColor = installInstantWeaponColors(api, game, selected);
   let beamColor: WeaponColor | null = null;
   const beamStyles = new WeakMap<Raw, Raw>();
   const Beam = api.cls('core.weapon.Beam')?.prototype;
@@ -62,7 +64,7 @@ export function installNativeWeaponColors(
       }
     });
     api.around(BeamLine, 'addMesh', function (next, segment, ...args) {
-      if (!beamColor?.grayscale) return next(segment, ...args);
+      if (!(instantColor(this) ?? beamColor)?.grayscale) return next(segment, ...args);
       let style = beamStyles.get(segment);
       if (!style) {
         style = makeStyle(segment);

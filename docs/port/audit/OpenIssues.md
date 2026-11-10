@@ -2205,3 +2205,17 @@ exercise native Instant callbacks, 180 Hz geometry changes without simulation
 aging, unused-geometry collapse, invalid-frame hiding, eligibility and disposal.
 Live visual comparison remains outstanding. This does not implement the separate
 room-owned NetherBlobAttackVisuals controller or full beam grayscale/color parity.
+
+### Instant and splitting ray color selection — 2026-11-10
+
+Connected selected weapon colors to native Instant/InstantSplitting entry before
+pooled BeamLine initialization. Inner/core and glow colors now follow the source
+selected RGB, and line ownership enables the existing grayscale mesh style for
+these rays. The projectile exposes determinedColor/determinedGrayscale for the
+orbit effect; original properties are restored on reset and unload. Line reuse
+clears tint ownership on every init. No damage or gameplay fields are changed.
+
+Verified actual extracted native enter methods for both ray types, core/glow
+values, grayscale routing, unselected pooled reuse, unrelated lines/rooms, and
+restoration. All 506 tests and TypeScript checks pass. Browser visual verification
+of the shader remains outstanding.
