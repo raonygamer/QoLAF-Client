@@ -10,7 +10,7 @@ import { installNativeClientChangelog } from '../dialogs/NativeClientChangelog';
 import pingSoundUrl from '../assets/sounds/Ping.mp3';
 import { ChatPingSound } from '../chat/ChatPingSound';
 import { installNativeChatPingPreview } from '../chat/NativeChatPingPreview';
-import { installNativeFriendPings } from '../chat/NativeFriendPings';
+import { installNativeChatPresentation } from '../chat/NativeChatPresentation';
 import { installNativeAimAssist } from '../aim/NativeAimAssist';
 import { installTargetPicking } from '../target/TargetPicking';
 import { installNativeChatImageViewer } from '../chat/NativeChatImageViewer';
@@ -117,7 +117,7 @@ export function installGameSession(
   if (messages) installNativeChatPingPreview(session, game, bitmap.resolve, messages);
   const pingSound = new ChatPingSound(session, pingSoundUrl);
   session.defer(() => pingSound.dispose());
-  installNativeFriendPings(session, game, () => pingSound.play());
+  installNativeChatPresentation(session, game, () => pingSound.play());
   installNativeQolafChat(session, game);
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences, artifacts);

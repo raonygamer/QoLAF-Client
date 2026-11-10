@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { ChatFriendPingFormatter as Formatter } from '../src/chat/ChatFriendPingFormatter';
 import { RichBitmapMarkupParser as Parser } from '../src/chat/rich/RichBitmapMarkupParser';
 import { friendPingTargets, snapshotFriendPings } from '../src/chat/ChatFriendPingTargets';
-import { installNativeFriendPings } from '../src/chat/NativeFriendPings';
+import { installNativeChatPresentation } from '../src/chat/NativeChatPresentation';
 // @ts-expect-error actual host hooks
 import { Hooks } from './fixtures/HostCore.js';
 
@@ -92,6 +92,7 @@ test('native pings run after length/filter checks, preserve supporter/sender/rol
   };
   const log: any = {
     g: game,
+    profanities: { profanity: true },
     colorRights: (rights: string, text: string) => (rights ? '[mod] ' + text : text),
     writeChatMsg(
       channel: string,
@@ -118,7 +119,7 @@ test('native pings run after length/filter checks, preserve supporter/sender/rol
       cleanup.push(hooks.add(object, key, 'around', fn)),
   };
   let notifications = 0;
-  installNativeFriendPings(api, game, () => {
+  installNativeChatPresentation(api, game, () => {
     notifications++;
   });
   log.writeChatMsg('local', '@Pilot profanity', 'sender', '@Pilot', 'mod', true);

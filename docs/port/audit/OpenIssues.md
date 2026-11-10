@@ -1953,3 +1953,12 @@ Remaining: trusted-relay/role tags, automatic reward/purchase event hooks, artif
 sharing transport, real warp/reconnect delivery checks, and Radio integration.
 The visual emitter ownership transition between hull palettes and explicit weapon
 colors was also corrected with a two-direction regression.
+
+### Chat role/relay presentation installed — 2026-11-10
+
+Original exact-ID cosmetic badges, client-developer labeling, trusted Discord/
+announcement projection and rich visible-text profanity filtering are now active
+on the native receive path. Source Unicode boundaries are preserved. Native length
+and PvP checks remain in place. Local rendering and physical role-card hover were
+verified; all 462 tests pass. See LiveComparison.md for evidence and remaining
+chat work. No production relay or cross-client send was performed in this pass.

@@ -1774,3 +1774,44 @@ ownership transfer, restoring the native state before the next hook acquires it.
 The regression exercises both transition directions, stale-owner cleanup, native
 particle style restoration and exactly one original-batch membership. This is a
 verified regression fix, not additional equipped-combat comparison evidence.
+
+## Native chat roles, relays and rich profanity filtering — 2026-11-10
+
+Ported TrustedMessengerPresentation and the original ChatProfanityFilter, including
+ChatWordBoundary's pinned Unicode 17.0 ranges. The filter operates on decoded
+visible text, preserves markup and whitespace/entity spellings, keeps artifact
+IDs opaque, handles words split across inline tags, and treats dictionary entries
+as literals. It does not censor substrings inside longer Unicode words.
+
+NativeChatPresentation replaces the narrower NativeFriendPings adapter. Native
+writeChatMsg still owns raw length validation, PvP team filtering, queue limits
+and delivery. Its raw-markup profanity pass is bypassed only during the synchronous
+call, with restoration in finally (including nested delivery). The source visible
+filter and badge/relay/ping projection run before native role styling. Existing
+staff rights take priority over the client-developer badge. Cosmetic player tags
+use the original exact account-ID mapping already ported in ChatRoleTags.
+
+Trusted relay recognition uses only the exact authenticated wire ID. Discord and
+announcement content is escaped; recognized global relays omit only the redundant
+global label, retain the actual global channel metadata and bot identity, and
+keep non-global labels. Announcement mentions retain the original pink color.
+No display-name fallback authorizes badges or relay presentation. No automatic
+outgoing echo behavior was added.
+
+Verification:
+- All 462 tests, typecheck, format and diff checks pass. Tests execute the extracted
+  current Haxe writeChatMsg, covering length rejection before markup expansion,
+  PvP rejection, exact-ID authorization, role precedence, metadata, pings, nested
+  calls, exceptions, dictionary restoration and source filter edge cases.
+- Local-only rows rendered the client-developer badge, Discord relay, announcement
+  and a word split across two colored text spans. Screenshot:
+  `/tmp/QoLAF-ChatPresentation.png`.
+- Physical pointer hover over the badge opened the original role explanation:
+  `/tmp/QoLAF-RoleHover.png`.
+- All fixture rows were removed and the composer cleared. No chat message was sent
+  over the network. This is source/native-runtime evidence, not a newly observed
+  incoming production relay or a fresh side-by-side SWF screenshot.
+
+Remaining chat work includes automatic reward event hooks, artifact sharing,
+real cross-client/warp verification, and broader context/identity comparison.
+Radio and the full visual-command family remain separate unfinished requirements.
