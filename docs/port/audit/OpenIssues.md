@@ -1912,3 +1912,7 @@ adapter; verified small and full viewport sizes and physical Color B focus. Full
 suite now 441 tests. Remaining screen/backend work is unchanged. The original Music
 checkbox's low-contrast enabled color is intentional in the shipped Aeon theme;
 only its disabled-color mismatch was corrected.
+
+The input-placement follow-up also excludes masked/offscreen glyphs from DOM
+bounds. Live long-draft content measured 1040px while its input remained 508px;
+the draft was discarded without sending. Full suite: 442 passing tests.

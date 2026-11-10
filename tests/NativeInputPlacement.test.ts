@@ -47,3 +47,28 @@ test('input placement leaves invalid/zero-size controls and absent native bridge
   placeNativeInput({}, overlay);
   assert.deepEqual(input.element.style, {});
 });
+
+test('long masked or scrolled text cannot enlarge or shift the input rectangle', () => {
+  const stage = {};
+  const element = { style: {} as Record<string, string> };
+  const input = {
+    element,
+    width: 400,
+    height: 24,
+    stage,
+    textFormat: { size: 14 },
+    getTransformationMatrix: (target: any) => {
+      assert.equal(target, stage);
+      return { a: 0.5, b: 0, c: 0, d: 0.5, tx: 100, ty: 200 };
+    },
+  };
+  const placed: any[] = [];
+  const overlay = {
+    globalRect: () => assert.fail('must not measure masked glyph descendants'),
+    toCss: (rect: any) => ({ ...rect }),
+    place: (_element: any, rect: any) => placed.push(rect),
+  };
+  placeNativeInput(input, overlay);
+  assert.deepEqual(placed, [{ x: 100, y: 200, width: 200, height: 12 }]);
+  assert.equal(element.style.fontSize, '7px');
+});

@@ -1659,3 +1659,11 @@ so this color finding relies on the shipped library and renderer source.
 Typecheck, formatting and all 441 tests pass. Added coverage verifies scaled bounds,
 repeated placement without compounding scale, CSS canvas scaling, hidden-input
 handling and disposal restoration. This does not establish full screen parity.
+
+Masked-text follow-up: inspection of the actual Starling Container.getBounds
+implementation showed that it includes clipped glyph descendants. The final
+placement adapter therefore transforms the input's declared local rectangle
+with getTransformationMatrix(stage), rather than using descendant bounds.
+Live unsent chat draft verification measured content bounds of 1040.117px while
+the actual DOM input correctly stayed 508×39. The draft was cleared with closeChat;
+nothing was sent. Added regression covers this case; all 442 tests pass.
