@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installNativeRichChatInput } from '../src/chat/NativeRichChatInput';
 import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
+import { GlobalChatSanitizer } from '../src/chat/GlobalChatSanitizer';
 // @ts-expect-error actual host hook dispatcher
 import { Hooks } from './fixtures/HostCore.js';
 
@@ -84,15 +85,30 @@ function fixture() {
     chatMode: 'local',
     isActive: () => true,
     toggleChatMode() {},
+    submitted: [] as string[],
+    sendGlobal(value: string) {
+      this.submitted.push(value);
+    },
   };
   const api = {
-    around: (object: any, key: string, fn: Function) =>
-      cleanups.push(hooks.add(object, key, 'around', fn)),
-    after: (object: any, key: string, fn: Function) =>
-      cleanups.push(hooks.add(object, key, 'after', fn)),
+    before: (object: any, key: string, fn: Function) => {
+      const off = hooks.add(object, key, 'before', fn);
+      cleanups.push(off);
+      return off;
+    },
+    around: (object: any, key: string, fn: Function) => {
+      const off = hooks.add(object, key, 'around', fn);
+      cleanups.push(off);
+      return off;
+    },
+    after: (object: any, key: string, fn: Function) => {
+      const off = hooks.add(object, key, 'after', fn);
+      cleanups.push(off);
+      return off;
+    },
     defer: (fn: () => void) => cleanups.push(fn),
   };
-  installNativeRichChatInput(api as any, { chatInput: chat }, bitmap.resolve);
+  installNativeRichChatInput(Object.freeze(api) as any, { chatInput: chat }, bitmap.resolve);
   return {
     input,
     element,
@@ -162,4 +178,21 @@ test('unloading restores native hooks, DOM appearance, limits and restrictions',
   assert.equal(input.get_text(), 'hello');
   element.emit('beforeinput', { inputType: 'insertText', data: 'ignored' });
   assert.equal(input.get_text(), 'hello');
+});
+
+test('switching Global preserves the rich draft and sanitizes only the outbound global payload', (t) => {
+  const { input, element, chat, cleanup } = fixture();
+  t.after(cleanup);
+  const source = "<font color='#ff6600'>draft</font>";
+  input.set_text(source);
+  chat.chatMode = 'global';
+  chat.tabs.dispatchEventWith('change');
+  assert.equal(input.get_text(), source);
+  assert.equal(element.value, 'draft');
+  chat.sendGlobal(input.get_text());
+  assert.deepEqual(chat.submitted, ['draft']);
+  chat.sendGlobal('<b></b>');
+  assert.equal(chat.submitted.length, 1);
+  assert.equal(GlobalChatSanitizer.stripHTML('<scr<script>ipt>safe'), 'safe');
+  assert.equal(GlobalChatSanitizer.stripHTML('broken<tag'), 'brokentag');
 });

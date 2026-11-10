@@ -206,7 +206,7 @@ export class ChatCommandAutocompletePopup {
   }
 }
 
-export function installCommandAutocomplete(api: API, game: Raw): void {
+export function installCommandAutocomplete(api: API, game: Raw, isFormatting = () => false): void {
   const chat = game.chatInput,
     input = chat?.input;
   if (!input?.element) return;
@@ -226,6 +226,11 @@ export function installCommandAutocomplete(api: API, game: Raw): void {
   chat.addChild(popup.node);
   const refresh = () => {
     lastText = read(input, 'text', '');
+    if (isFormatting()) {
+      model.dismiss();
+      popup.node.set_visible(false);
+      return;
+    }
     popup.update(lastText);
     place();
   };
@@ -252,6 +257,7 @@ export function installCommandAutocomplete(api: API, game: Raw): void {
     if (
       event.target !== input.element ||
       !chat.isActive() ||
+      isFormatting() ||
       event.isComposing ||
       event.ctrlKey ||
       event.altKey ||
@@ -291,7 +297,7 @@ export function installCommandAutocomplete(api: API, game: Raw): void {
   };
   window.addEventListener('wheel', wheel, { capture: true, passive: false });
   api.on('frame', () => {
-    if (!chat.isActive()) {
+    if (!chat.isActive() || isFormatting()) {
       if (model.active) {
         model.dismiss();
         popup.node.set_visible(false);

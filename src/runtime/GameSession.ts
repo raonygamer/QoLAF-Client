@@ -1,5 +1,6 @@
 import { installNativeChatHistory } from '../chat/NativeChatHistory';
 import { installNativeRichChatInput } from '../chat/NativeRichChatInput';
+import { installNativeChatFormatting } from '../chat/NativeChatFormatting';
 import { portedClasses } from '../ported/Registry';
 import { createBitmapClasses } from '../ui/BitmapClasses';
 import { installCommandAutocomplete } from '../chat/ChatCommandAutocompletePopup';
@@ -52,13 +53,13 @@ export function installGameSession(
   installDamageText(session, game);
   installClanLabels(session, game);
   installNativeChatPreferences(session, game, preferences);
-  installNativeRichChatInput(
-    session,
-    game,
-    createBitmapClasses(portedClasses(session).resolve).resolve,
-  );
+  const bitmap = createBitmapClasses(portedClasses(session).resolve);
+  const editor = installNativeRichChatInput(session, game, bitmap.resolve);
   installNativeChatHistory(session, game);
-  installCommandAutocomplete(session, game);
+  const formatting = editor
+    ? installNativeChatFormatting(session, game, editor, bitmap.resolve, preferences)
+    : undefined;
+  installCommandAutocomplete(session, game, () => formatting?.isOpen ?? false);
   const target = new TargetSystem(game, config, session.cls('core.ship.PlayerShip'));
   let indicator: TargetAimIndicator | undefined;
   if (targetIcon)

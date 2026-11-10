@@ -1055,3 +1055,42 @@ presentation cadence.
 - Native hex-field integration and toolbar wiring remain next. The new controls
   are not registered or activated in the live composer yet; CHAT-01 stays open.
 - Validation: TypeScript, formatting and all 205 tests pass.
+
+
+## Live Color/Size formatting — 2026-11-10
+
+- Extracted NativeBitmapInput as a per-field document/view/browser binding with
+  explicit disposal. Added BitmapInputAdapter for the source Feathers input
+  contract: native focus/keyboard bridge, bitmap drawing, six-character hex
+  restriction, source padding, 0x191919/0x292929 backgrounds and alpha 0.86.
+- Activated source Color/Size buttons and selection popup. Toolbar selects the
+  whole draft when no range is selected; format events restore/save the range,
+  update preview and publish change. Popup shifts the composer upward to leave
+  room below, restores position on close, disables Global formatting and hides
+  autocomplete while open. Clipboard paste rejects a changed draft/selection
+  while awaiting browser clipboard permission/results.
+- First live reload exposed frozen host API inheritance: assigning scoped hooks
+  over Object.create(owner) failed, interrupting later HUD initialization. Fixed
+  with own properties on a fresh wrapper and changed hook tests to freeze their
+  host API. A subsequent reload restored the HUD and activated the toolbar.
+  The preview runtimeErrors counter does not catch this caught initialization
+  error; the Firefox console and missing HUD supplied the decisive evidence.
+- Verified unsent `Formatting preview`: Color opens the original panel; entering
+  FF6600 changes draft, preview, swatch and RGB values; Size opens its panel and
+  setting its slider to 24 px enlarges the draft and preview while preserving
+  orange. Closing restores the bottom position. Explicitly refocused the main
+  field and cleared the draft; no player-facing message was sent.
+- Screenshots: /tmp/QoLAF-ColorPanel.png, /tmp/QoLAF-ColorApplied.png,
+  /tmp/QoLAF-SizePanel.png, /tmp/QoLAF-SizeApplied.png,
+  /tmp/QoLAF-FormattingCleared2.png. Opened original color panel without changing
+  its draft: /tmp/QoLAF-OriginalColorPanel.png. Panel dimensions, label/hex/swatch
+  and slider layout visually agree. Original left integrated chat still differs
+  from this bottom composer; full chat parity remains open.
+- Source audit corrected restriction semantics: changing Global must preserve
+  an existing rich draft; only new input is filtered. Ported GlobalChatSanitizer
+  and wrapped sendGlobal so plain-text conversion happens at the outbound
+  boundary, retaining native ban/mute/rate-limit behavior. Verified via hook
+  tests only, without sending an actual Global message.
+- Validation: TypeScript, formatting and all 206 tests pass. Live IME, clipboard
+  menu, resize while open, right-click menu and remaining integrated controls
+  require additional work/verification.

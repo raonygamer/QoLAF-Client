@@ -13,9 +13,6 @@ export function createChatSelectionFormatPopup(resolve: Resolve): any {
     'core.hud.components.chat.rich.RichBitmapChatTextInput',
   );
   type RichBitmapChatTextInput = any;
-  const RichBitmapFontTextEditor: any = resolve(
-    'core.hud.components.chat.rich.RichBitmapFontTextEditor',
-  );
   type RichBitmapFontTextEditor = any;
   const RichBitmapMarkup: any = resolve('core.hud.components.chat.rich.RichBitmapMarkup');
   type RichBitmapMarkup = any;
