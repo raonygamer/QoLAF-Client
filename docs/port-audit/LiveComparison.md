@@ -147,3 +147,26 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   `/tmp/QoLAF-CompactMapFinal.png`. Native labels now use the original Russo24 atlas.
 - Closed the temporary map preview and removed its script/HTML injection. It is
   not part of the bundle or published host.
+
+### Legacy chat input preferences
+
+- BodyManager's original DISTORTION_EFFECTS_AVAILABLE is explicitly false; body
+  black-hole distortion remains disabled as in the source rather than inventing
+  an effect behind its unavailable control.
+- Connected legacyChatFontSize to the current native TextEntry composer. Uses
+  the game's DOM overlay coordinate conversion for font size under DPI/browser
+  zoom, fits legacy input/tabs to narrow stages, and applies original legacy
+  bottom/center placement and bounds clamping.
+- Keeps current input text, selection, focus ownership, restrictions and message
+  sending unchanged. Restores previous formatting/layout and removes listeners
+  on session disposal. Rich bitmap editor/integrated chat remains unported.
+- Automated checks cover default/changed font size, DPI conversion, narrow-stage
+  layout, unchanged drafts/selections and cleanup. All 69 tests pass.
+- Live reload reached gameplay; opened the empty native composer and verified
+  its centered placement in `/tmp/QoLAF-ChatOpen.png`, then closed it with Escape.
+  No message was entered or sent. Numeric font/DPI behavior is covered by tests;
+  an empty input alone is not visual proof of glyph sizing or rich-editor parity.
+- The same capture now provides live evidence of the earlier clan-label port:
+  a nearby remote player displays clan name, rank and logo above the native name.
+  Original-SWF pixel comparison of that label is still pending.
+- TypeScript check and build pass after correcting a missing type import.

@@ -7,6 +7,7 @@ import { TargetSystem } from '../Target/TargetSystem';
 import { NativeUI } from '../UI/NativeUI';
 import { TargetInfo } from '../UI/TargetInfo';
 import { installHealthAndShield } from '../Hud/HealthAndShield';
+import { installNativeChatPreferences } from '../Chat/NativeChatPreferences';
 import { installClanLabels } from '../UI/ClanLabel';
 import { installDamageText } from '../Hud/DamageText';
 import { installRespawn } from './Respawn';
@@ -21,6 +22,7 @@ export function installGameSession(game: Raw, session: API, preferences?: Device
   installRespawn(session, game);
   installDamageText(session, game);
   installClanLabels(session, game);
+  installNativeChatPreferences(session, game, preferences);
   const target = new TargetSystem(game, config, session.cls('core.ship.PlayerShip'));
   const panel = new TargetInfo(ui, game, target, config, save);
   session.defer(() => panel.dispose());
