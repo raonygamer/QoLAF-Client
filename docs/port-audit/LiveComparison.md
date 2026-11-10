@@ -97,3 +97,24 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   Preview diagnostic reported zero uncaught runtime errors after reload.
 - TypeScript check, build, and all 65 tests pass. This verifies DPI behavior,
   not overall completion of the client port.
+
+### Clan identity and target-bar formatting
+
+- Connected the existing formatTargetBarValues preference to CustomProgressBar's
+  source floor/clamp + Util.formatAmount behavior. Hidden targets retain ???.
+  Unchanged value/multiplier strings no longer rebuild their text fields.
+- Ported PlayerShip clan name/rank/icon layout above the native name: source
+  13px/11px combat bitmap fonts, 20% logo scale, clan color and role offset.
+  Uses native ClanState.getMemberRankName and DataLocator Clans lookup.
+- Bounded 10/20/40/60 second retries and request/player/clan/lifecycle guards
+  reject late responses. Removal, reset, destruction and plugin cleanup dispose
+  labels. Native name visibility and the Settings checkbox gate display.
+- Haxe TextBitmap has no font constructor argument; explicitly apply the registered
+  DAIDRR_COMBAT alias, retaining native auto-width behavior.
+- Tests cover stale responses, retry, clan changes, missing logo, visibility,
+  layout, disposal and target formatting toggles/hidden values. Check/build and
+  67 tests pass. Local reload reached gameplay with zero uncaught runtime errors.
+- No visible remote clan-bearing player was captured in the live reload screenshot
+  `/tmp/QoLAF-ClanReload.png`; real clan-label visual parity is still pending.
+  Identity caching in upstream Player objects and live clan changes also remain
+  to be compared with the original beyond the callback/lifecycle unit coverage.

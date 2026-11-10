@@ -1,6 +1,7 @@
 // Port of qolaf/ui/elements/CustomProgressBar.as. Geometry, palette and math
 // are preserved; Haxe properties use their generated accessors.
-import type { Raw } from '../Api/Types';
+import { read, type Raw } from '../Api/Types';
+import { formatAmount } from '../Hud/HealthAndShield';
 import { NativeUI } from './NativeUI';
 export const MULTIBAR_COLORS = [
   0xe74c3c, 0xf39c12, 0xf1c40f, 0x2ecc71, 0x1abc9c, 0x3498db, 0x9b59b6, 0xe84393, 0xff6b6b,
@@ -86,7 +87,12 @@ export class ProgressBar {
   }
   update(
     dt: number,
-    format: (value: number) => string = (v) => String(Math.max(0, Math.floor(v))),
+    format: (value: number) => string = (value) => {
+      const rounded = Math.max(0, Math.floor(value));
+      return this.ui.api.cls('core.scene.SceneBase')?.settings?.formatTargetBarValues
+        ? formatAmount(rounded)
+        : String(rounded);
+    },
   ) {
     this.lerped += (this.value - this.lerped) * Math.min(1, 8 * Math.max(0, dt));
     if (this.obscured) {
@@ -97,9 +103,9 @@ export class ProgressBar {
         fill.set_color(0x777777);
         fill.set_width(this.width);
       }
-      this.valueText.set_text('??? / ???');
+      this.setText(this.valueText, '??? / ???');
       this.valueText.get_format().set_color(0xffffff);
-      this.multiplierText.set_text(this.multibar ? '???x' : '');
+      this.setText(this.multiplierText, this.multibar ? '???x' : '');
       return;
     }
     let color = this.color,
@@ -131,11 +137,14 @@ export class ProgressBar {
     this.tip.set_color(color);
     this.tip.set_alpha(0.95 * Math.min(1, delta / Math.max(1, capacity * 0.45)));
     this.tip.set_x(Math.max(-14, Math.min(this.width - 14, w - 14)));
-    this.valueText.set_text(`${format(this.value)} / ${format(this.maximum)}`);
+    this.setText(this.valueText, `${format(this.value)} / ${format(this.maximum)}`);
     this.valueText
       .get_format()
       .set_color(this.maximum > 0 && this.value <= this.maximum * 0.1 ? 0xff3030 : 0xffffff);
-    this.multiplierText.set_text(this.multibar ? `${layer}x` : '');
+    this.setText(this.multiplierText, this.multibar ? `${layer}x` : '');
+  }
+  private setText(field: Raw, value: string): void {
+    if (read(field, 'text') !== value) field.set_text(value);
   }
   dispose() {
     this.node.set_mask(null);
