@@ -1193,3 +1193,32 @@ it: `/tmp/QoLAF-PromptDraft.png` and `/tmp/QoLAF-PromptRestored.png` verify
 hide/restore behavior. No message sent. All 218 tests, typecheck and build pass.
 The missing Img control and QoLAF channel remain visible differences; full
 chat parity is not claimed.
+
+
+Browser image loader and source picker now wired into NativeChatFormatting.
+Uses browser fetch with streamed 20 MiB cap, per-candidate 20s timeout,
+AbortController cancellation, candidate fallback, createImageBitmap -> native
+BitmapData.fromCanvas for static images, source incremental GIF decoding and
+one Starling frame per upload. Texture.fromBitmapData retains restoration pixels.
+Cache disposal cancels pending loads and rejects late delivery on plugin unload.
+The Img control keeps source width/spacing and Clan/private/QoLAF gating.
+Opening it closes emoji/format controls and suppresses command autocomplete.
+
+Live: one F5 down/up reload reconnected. /tmp/QoLAF-ImgLocal.png shows disabled
+Local Img; /tmp/QoLAF-ImgPickerLive.png shows enabled Clan panel. Compared with
+/tmp/QoLAF-OriginalImgPicker.png: identical local panel bounds x232,y384,430x236,
+input widths/prompts, Save/status/paging geometry. /tmp/QoLAF-ImgField.png verifies
+bitmap input focus and one typed character; cleared it without saving/sending.
+Returned both clients to Local. No player message or image request was sent.
+
+NEW rendering issue requiring investigation: after clearing the shortcut field
+and closing by selecting Local, the Global tab label, emoji glyph and safe-zone
+banner were absent in /tmp/QoLAF-ImgClosed.png and ImgClosedSettled.png. Switching
+Global then Local restored them (/tmp/QoLAF-ImgRepaint.png). No window runtime
+errors; possible render-cache invalidation, root cause not proven. Do not claim
+picker runtime parity until this is fixed and rechecked.
+
+241 tests and typecheck/build pass. Network/decode tests use injected platform
+boundaries; actual successful browser texture upload is still unverified. Still
+missing: received image thumbnails/viewer, shared cache across message views,
+:alias: expansion, save/reload/insertion live checks and runtime cleanup audit.

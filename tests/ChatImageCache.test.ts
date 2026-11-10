@@ -172,3 +172,32 @@ test('LRU eviction respects live references, entry count and refreshed last-use 
   assert.equal(images[0].frames[0].disposed, 0);
   assert.equal(images[3].frames[0].disposed, 1);
 });
+
+test('plugin unload cancels pending loads and disposes late assets without notifying removed views', () => {
+  let complete!: (asset: ChatImageAsset) => void;
+  let cancelled = 0,
+    callbacks = 0;
+  const cache = new ChatImageCache(() => ({
+    loadCandidates(_urls, ok) {
+      complete = ok;
+    },
+    cancel() {
+      cancelled++;
+    },
+  }));
+  cache.acquire(
+    link('pending'),
+    () => callbacks++,
+    () => callbacks++,
+  );
+  cache.dispose();
+  cache.dispose();
+  assert.equal(cancelled, 1);
+  const late = asset();
+  complete(late.value);
+  assert.equal(late.frames[0].disposed, 1);
+  assert.equal(callbacks, 0);
+  let reason = '';
+  cache.acquire(link('next'), null, (value) => (reason = value));
+  assert.equal(reason, 'Image cache is disposed.');
+});

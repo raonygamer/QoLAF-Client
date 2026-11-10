@@ -5,6 +5,7 @@ type Complete = (asset: ChatImageAsset) => void;
 type Failed = (reason: string) => void;
 
 export interface ChatImageLoader {
+  cancel?(): void;
   loadCandidates(urls: string[], onComplete: Complete, onFailed: Failed): void;
 }
 interface Waiter {
@@ -21,6 +22,7 @@ interface Entry {
 export class ChatImageCache {
   private static readonly maxEntries = 24;
   private static readonly maxTextureBytes = 96 * 1024 * 1024;
+  private disposed = false;
   private readonly entries = new Map<string, Entry>();
 
   constructor(
@@ -33,6 +35,10 @@ export class ChatImageCache {
     onComplete: Complete | null,
     onFailed: Failed | null,
   ): void {
+    if (this.disposed) {
+      onFailed?.('Image cache is disposed.');
+      return;
+    }
     if (!link?.rawUrl) {
       onFailed?.('Invalid image URL.');
       return;
@@ -104,6 +110,19 @@ export class ChatImageCache {
     asset.refCount = Math.max(0, asset.refCount - 1);
     asset.lastUse = this.now();
     this.trim();
+  }
+
+  /** Called after image views release their references when the plugin unloads. */
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    const entries = [...this.entries.values()];
+    this.entries.clear();
+    for (const entry of entries) {
+      entry.loader?.cancel?.();
+      entry.asset?.dispose();
+      entry.waiters.length = 0;
+    }
   }
 
   private keyFor(link: ChatDiscordImageLink): string {
