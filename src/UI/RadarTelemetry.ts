@@ -1,3 +1,5 @@
+import { bossSpawnTimers } from '../Boss/NativeBossSpawnTimers';
+import { BossTimerRadarTelemetry } from './BossTimerRadarTelemetry';
 import type { DamageObserver } from '../Telemetry/DamageObserver';
 import { read, type Raw } from '../Api/Types';
 import { NativeUI } from './NativeUI';
@@ -7,6 +9,7 @@ import type { Settings } from '../Settings/Settings';
 export class RadarTelemetry {
   readonly node: Raw;
   private labels: Raw[] = [];
+  private bossTimers: BossTimerRadarTelemetry;
   private metrics = new Telemetry();
   private elapsed = 0.1;
   private sampledShip: Raw | undefined;
@@ -19,12 +22,14 @@ export class RadarTelemetry {
   ) {
     this.node = ui.sprite();
     this.node.set_touchable(false);
+    this.bossTimers = new BossTimerRadarTelemetry(ui);
     for (let i = 0; i < 5; i++) {
       const label = ui.text(i >= 4 ? 420 : 200, 15, '', 10, 0xbfc4cc, 'left', 'QoLAF_Verdana16');
       label.set_alpha(0.85);
       this.node.addChild(label);
       this.labels.push(label);
     }
+    this.node.addChild(this.bossTimers.node);
   }
   update(dt: number) {
     const ship = read(this.game, 'me')?.ship,
@@ -70,9 +75,18 @@ export class RadarTelemetry {
       label.set_visible(i < lines.length);
     });
     const radar = this.game.hud.radar;
+    const secondary =
+      this.ui.api.cls('core.scene.SceneBase')?.clientSettings?.showSecondaryBossTimers === true;
+    const stage = read(this.game, 'stage');
+    this.bossTimers.refresh(
+      bossSpawnTimers(this.game).rows(secondary),
+      stage ? read(stage, 'stageWidth') - read(radar, 'x') - 8 : 420,
+    );
+    this.bossTimers.node.set_y(lines.length * 15);
+    const height = lines.length * 15 + this.bossTimers.blockHeight;
     this.node.set_x(read(radar, 'x'));
-    this.node.set_y(Math.max(0, read(radar, 'y') - lines.length * 15 - 18));
-    this.node.set_visible(read(radar, 'visible') && lines.length > 0);
+    this.node.set_y(Math.max(0, read(radar, 'y') - height - 18));
+    this.node.set_visible(read(radar, 'visible') && height > 0);
   }
   dispose() {
     this.ui.dispose(this.node);

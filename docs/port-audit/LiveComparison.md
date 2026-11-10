@@ -704,3 +704,33 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
 - Probe disposed cleanly after 5389 frames
   (/tmp/QoLAF-NexarLabelDisposed.png). Temporary HTML/script injection removed
   and clean local preview reloaded.
+
+## Boss spawn timers — 2026-11-10
+
+Ported the original `BossSpawnTimerCatalog`, `BossSpawnTimers`, and
+`BossTimerRadarTelemetry` into readable TypeScript. The catalog preserves the
+anchor's zero timing, weighted/batched alternatives, secondary slots, event and
+mission gating, ordinary special-spawner slots, and source-specific estimates.
+The model uses the native clock's read-only `getServerTime()` rather than setting
+simulation time. Boss global boundaries retain the 1.5-second grace and minimum
+one-minute post-kill eligibility; miniboss timers require an observed kill and
+stay due rather than inventing repeated countdowns.
+
+Early native hooks retain definition/spawner identities in WeakMaps because the
+Haxe factory does not retain them on all enemy types. Kill observations copy
+identity before native destruction/pooling; the original handlers still execute
+with their original arguments/results. Current gameplay, shields, and corrected
+corrosive calculations remain native.
+
+Verification: typecheck and 153 tests pass, including timing boundary cases,
+ambiguous sources, seasonal sources, missing clocks, survival schedules,
+non-orbit enemy pooling, cached handlers, and wrapped/color-changing HUD rows.
+Reloaded the local browser preview and confirmed automatic login and live
+`Executor is alive.` text above the radar. Compared against the running original
+SWF: matching wording, green color, and position below the telemetry rows.
+Screenshots: `/tmp/QoLAF-BossTimersVisible.png` and
+`/tmp/QoLAF-OriginalBossTimers.png`. Preview diagnostics report connected,
+canvas/bridge present, zero uncaught runtime errors. This does not prove absence
+of caught hook errors. Actual kill-to-respawn encounter transitions and narrow
+viewport wrapping remain unverified in the live game; automated tests cover their
+model/layout contracts. Full client parity is still incomplete.

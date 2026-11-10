@@ -29,7 +29,12 @@ class Node {
 }
 
 test('radar source wording, placement, timing, service room and ship lifecycle', () => {
-  const ui: any = { sprite: () => new Node(), text: () => new Node(), dispose() {} };
+  const ui: any = {
+    api: { cls: () => undefined },
+    sprite: () => new Node(),
+    text: () => new Node(),
+    dispose() {},
+  };
   const ship = { alive: true, landed: false, lifecycleId: 1, course: { speed: { x: 10, y: 0 } } };
   const game = {
     me: { ship },
@@ -65,7 +70,12 @@ test('radar source wording, placement, timing, service room and ship lifecycle',
 });
 
 test('DPS occupies the original third radar row and responds to its source setting', () => {
-  const ui: any = { sprite: () => new Node(), text: () => new Node(), dispose() {} };
+  const ui: any = {
+    api: { cls: () => undefined },
+    sprite: () => new Node(),
+    text: () => new Node(),
+    dispose() {},
+  };
   const game = {
     me: { ship: { alive: true, course: { speed: { x: 0, y: 0 } } } },
     clock: { latency: 10 },

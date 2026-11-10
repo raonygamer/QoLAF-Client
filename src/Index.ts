@@ -1,3 +1,4 @@
+import { installBossSpawnTimerHooks } from './Boss/NativeBossSpawnTimers';
 import { installMapTextureKeys } from './Map/MapTextureKeys';
 import { installNetherBlobBeamHooks } from './Ship/NetherBlobBeamCountdown';
 import { installTorpedoCueHooks } from './Projectile/XhersixTorpedoCue';
@@ -37,6 +38,7 @@ export default {
         }
       }));
     api.on('classesReady', () => {
+      installBossSpawnTimerHooks(api);
       installTorpedoCueHooks(api);
       installMapTextureKeys(api);
       installNetherBlobBeamHooks(api);

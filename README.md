@@ -6,6 +6,8 @@ A work-in-progress TypeScript port of [AstrofluxClient](https://github.com/raony
 
 `port/full-client` replaces the earlier DOM-panel approximation with game-native Starling components. It includes source-based login profile panels, target information and progress bars, nearby targets, telemetry, artifact tooltip/sorting integration, and the original settings model. The settings pages and native-control adapters are still being integrated; additional original systems remain pending. See the [port audit](docs/port-audit/README.md) for scope and exclusions.
 
+The current Haxe game's gameplay remains authoritative, including shield behavior, damage calculations, and other updated mechanics. Port the original client's added features and presentation around those systems; do not restore obsolete gameplay behavior to achieve parity with the old client.
+
 The obsolete corrosive-percent/all-damage workaround is excluded because that game bug has been fixed. No AFPUBLIC module is bundled here.
 
 ## Install
