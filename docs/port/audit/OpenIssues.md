@@ -22,3 +22,17 @@ screenshots are recorded in [LiveComparison.md](LiveComparison.md).
 Preserve the current Haxe game's gameplay, especially shields and corrected
 corrosive percentages. Port client features and presentation around it. Do not
 restore old gameplay workarounds to make the visuals match.
+
+## Simple chat lifecycle audit
+
+The native Haxe `ChatSimple` used `message.nextTimeout` instead of
+`message.timeout`, retained an extra eleventh row and rebuilt on every receive.
+`NativeSimpleChat` now ports the original ten-row projection, muted-row filtering,
+100 ms receive batching and earliest visible expiry (including equality at the
+expiry timestamp). Switching back from Advanced reprojects after its cached
+native stage listener. Regression tests cover those boundaries and preserve
+Advanced's native receive path. All 208 tests and type checking pass.
+
+This is lifecycle parity only. Simple still uses the native WrapText projection;
+original bitmap rich rows, image entries, role hover, clipping and panel geometry
+remain part of CHAT-01. This change has not yet been verified in the live browser.
