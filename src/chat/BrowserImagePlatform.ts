@@ -24,6 +24,15 @@ export function createBrowserImagePlatform(resolve: Resolve): ChatImagePlatform 
         context.drawImage(image, 0, 0);
         const bitmap = BitmapData.fromCanvas(canvas, true);
         if (!bitmap) throw new Error('Image could not be decoded.');
+        // Materialize Lime's canvas pixels before Starling uploads them. In
+        // this runtime the direct canvas upload swaps red/blue; reading a pixel
+        // selects the normalized data upload path (also used by GIF frames).
+        try {
+          bitmap.getPixel32(0, 0);
+        } catch (error) {
+          bitmap.dispose();
+          throw error;
+        }
         return bitmap;
       } finally {
         image.close();

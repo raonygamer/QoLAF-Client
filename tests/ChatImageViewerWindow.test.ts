@@ -1,3 +1,4 @@
+import { installNativeChatImageViewer } from '../src/chat/NativeChatImageViewer';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createChatImageViewerWindow } from '../src/ported/ChatImageViewerWindow';
@@ -52,6 +53,8 @@ function fixture() {
   };
   return {
     open,
+    resolve,
+    cache,
     stage,
     pending,
     owner,
@@ -142,4 +145,69 @@ test('source viewer keeps pointer identity while dragging and resizing', (t) => 
   assert.equal(view.panelHeight, 220);
   f.pending[0].fail('offline');
   assert.equal(view.status.text, '[Image unavailable]');
+});
+
+test('native image activation respects clipping, covered chat and session disposal', (t) => {
+  const f = fixture();
+  t.after(f.cleanup);
+  const scroll: any = {
+    touchable: true,
+    width: 680,
+    height: 500,
+    globalToLocal: (point: any) => point,
+  };
+  const advanced = { scroll, visible: true, alpha: 1 };
+  const game = Object.assign(f.owner, { messageLog: { advanced, contains: () => true } });
+  let hit: any = scroll;
+  f.stage.hitTest = () => hit;
+  let lookups = 0;
+  const cleanups: (() => void)[] = [];
+  installNativeChatImageViewer(
+    { defer: (fn: () => void) => cleanups.push(fn) } as any,
+    game,
+    (name) => {
+      // This ported class does not exist in the upstream Haxe registry.
+      assert.notEqual(name, 'core.hud.components.chat.ChatComposerFormatButton');
+      return f.resolve(name);
+    },
+    f.cache,
+    {
+      imageLinkAtStagePoint() {
+        lookups++;
+        return ChatDiscordImageLink.parseAt('https://example.test/preview.gif', 0);
+      },
+    },
+  );
+  const touch = (x: number, y: number, ended = true) =>
+    f.stage.listeners('touch')[0]({
+      getTouch: (_stage: any, phase: string) =>
+        ended && phase === 'ended' ? { getLocation: () => ({ x, y }) } : null,
+    });
+  touch(10, 10, false);
+  assert.equal(lookups, 0);
+  touch(700, 10);
+  assert.equal(lookups, 0);
+  hit = {};
+  touch(10, 10);
+  assert.equal(lookups, 0);
+  hit = scroll;
+  advanced.visible = false;
+  touch(10, 10);
+  assert.equal(lookups, 0);
+  advanced.visible = true;
+  scroll.touchable = false;
+  touch(10, 10);
+  assert.equal(lookups, 0);
+  scroll.touchable = true;
+  touch(10, 10);
+  assert.equal(lookups, 1);
+  assert.equal(f.stage.children.length, 1);
+  touch(10, 10);
+  assert.equal(f.stage.children.length, 1);
+  const view = f.stage.children[0];
+  cleanups.forEach((fn) => fn());
+  assert.equal(view.disposed, true);
+  assert.equal(f.stage.children.length, 0);
+  assert.equal(f.stage.listeners('touch').length, 0);
+  assert.equal(f.stage.listeners('resize').length, 0);
 });

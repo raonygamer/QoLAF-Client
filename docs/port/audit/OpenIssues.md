@@ -320,3 +320,33 @@ failed requests and late delivery after disposal. Typecheck/build and all 247
 tests pass. This class is not yet wired into message clicks and has not been
 visually compared live. Next integrate hit testing, session ownership and viewer
 opening with Advanced/Simple chat; preserve existing context/scroll interactions.
+
+
+Advanced chat now opens the source image viewer on native ended-touch events.
+Activation checks actual visibility, viewport clipping, topmost hit ownership,
+row bounds and thumbnail bounds. Session disposal removes the touch listener
+and closes that session's windows before releasing its cache.
+
+Live verification caught and fixed two integration defects: the viewer initially
+tried to resolve the ported ChatComposerFormatButton from the upstream registry;
+it now uses ChatFormattingClasses. The regression explicitly rejects that class
+from the supplied upstream resolver. Static PNG uploads also swapped red/blue
+when OpenFL retained a canvas-backed image. Reading getPixel32 before upload
+materializes normalized pixel data. Re-uploading the same live bitmap after this
+read changed the incorrect yellow background/cyan diagonals into the expected
+cyan background/yellow diagonals. Evidence: /tmp/QoLAF-ViewerColorProbe.png.
+
+After rebuilding and one controlled reload, the new production path rendered a
+440x280 local PNG as a correctly colored 220x140 thumbnail, then opened the native
+700x520 viewer from a real mouse click. Verified title, source placement, centered
+unscaled image, title-bar dragging (+200,+40), grip resizing (to 430x310), image
+aspect preservation and close control. Screens: ViewerCorrectedRow, ViewerOpened,
+ViewerMoved and ViewerResized under /tmp/QoLAF-*.png. Live cache references were
+1 after viewer close and 0 after row removal (ViewerCleanup.png). Probe rows and
+globals removed, temporary host dist PNG deleted, console closed. No player chat
+message was sent. Typecheck/build, all 248 tests, formatting and diff checks pass.
+
+This verifies Advanced PNG viewer integration, not full chat parity. Actual GIF
+playback visual comparison, Simple-chat image layout, alias expansion, external
+image-host CORS and comparison of this viewer against the running SWF remain
+open. Earlier upload-probe claims did not cover this canvas-backed PNG color bug.

@@ -1,3 +1,4 @@
+import { installNativeChatImageViewer } from '../chat/NativeChatImageViewer';
 import { ChatImageCache } from '../chat/ChatImageCache';
 import { ChatRemoteImageLoader } from '../chat/ChatRemoteImageLoader';
 import { createBrowserImagePlatform } from '../chat/BrowserImagePlatform';
@@ -66,7 +67,8 @@ export function installGameSession(
     () => new ChatRemoteImageLoader(createBrowserImagePlatform(bitmap.resolve)),
   );
   session.defer(() => images.dispose());
-  installNativeChatMessages(session, game, bitmap.resolve, preferences, images);
+  const messages = installNativeChatMessages(session, game, bitmap.resolve, preferences, images);
+  if (messages) installNativeChatImageViewer(session, game, bitmap.resolve, images, messages);
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences);
   installNativeChatHistory(session, game);

@@ -12,7 +12,7 @@ export function installNativeChatMessages(
   resolve: Resolve,
   preferences?: DeviceSettings,
   images?: ChatImageCache,
-): void {
+): { imageLinkAtStagePoint(point: Raw): ChatDiscordImageLink | null } | undefined {
   const log = game.messageLog;
   const WrapText = api.cls('core.hud.components.ui.WrapText');
   if (!log?.simple?.tf || !log.advanced?.scroll || !WrapText) return;
@@ -177,4 +177,37 @@ export function installNativeChatMessages(
     }
     scroll.arrange();
   });
+  return {
+    imageLinkAtStagePoint(point) {
+      for (let index = read(scroll, 'numChildren') - 1; index >= 0; index--) {
+        const row = scroll.getChildAt(index);
+        const thumbnail = rows.get(row)?.thumbnail;
+        if (
+          !thumbnail?.link ||
+          !read(row, 'visible') ||
+          read(row, 'alpha') <= 0 ||
+          !read(thumbnail, 'visible') ||
+          !read(thumbnail, 'parent')
+        )
+          continue;
+        const rowPoint = row.globalToLocal(point);
+        if (
+          rowPoint.x < 0 ||
+          rowPoint.y < 0 ||
+          rowPoint.x >= read(row, 'width') ||
+          rowPoint.y >= read(row, 'height')
+        )
+          continue;
+        const local = thumbnail.globalToLocal(point);
+        if (
+          local.x >= 0 &&
+          local.y >= 0 &&
+          local.x < thumbnail.previewWidth &&
+          local.y < thumbnail.previewHeight
+        )
+          return thumbnail.link;
+      }
+      return null;
+    },
+  };
 }

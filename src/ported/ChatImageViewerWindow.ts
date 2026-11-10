@@ -40,6 +40,11 @@ export function createChatImageViewerWindow(
   /** Movable/resizable in-client viewer for one validated remote image. */
 
   class ChatImageViewerWindow extends Sprite {
+    static closeForOwner(owner: Game): void {
+      for (const window of [...ChatImageViewerWindow.windows]) {
+        if (window.game === owner) window.removeFromParent(true);
+      }
+    }
     private static windows: ChatImageViewerWindow[] = [];
     private static TITLE_HEIGHT: number = 34;
     private static PADDING: number = 8;
