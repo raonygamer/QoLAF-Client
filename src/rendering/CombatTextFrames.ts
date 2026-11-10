@@ -72,7 +72,9 @@ export class CombatTextFrames {
   }
 
   update(handler: Raw, seconds: number): void {
-    const delta = Number.isFinite(seconds) ? Math.max(0, Math.min(0.25, seconds)) * 1000 : 0;
+    // Game.as passes the full render-frame duration to TextHandler. Clamping
+    // this independently of the frame leaves text alive and behind after stalls.
+    const delta = Number.isFinite(seconds) ? Math.max(0, seconds) * 1000 : 0;
     for (let index = handler.texts.length - 1; index >= 0; index--) {
       const particle = handler.texts[index];
       if (!particle.alive) {

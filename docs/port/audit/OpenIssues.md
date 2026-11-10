@@ -2416,3 +2416,17 @@ Tests check exact page distance, initial repeat delay, continued hold, release,
 thumb snapping, lifecycle cleanup, original label atlas and unchanged unrelated
 controls. All 533 tests, TypeScript and formatting pass. No browser inputs or
 reloads were issued; live visual/input comparison remains open.
+
+### Floating-text elapsed time — 2026-11-10
+
+Compared Game.update, TextHandler.update and TextParticle ownership with the
+current upstream frame order. The state-machine draw runs before floating-text
+updates, so attached text reads the current interpolated pose. Retained current
+upstream damage aggregation and zoom compensation.
+
+Removed the port-only 250ms text-duration cap. The original passes the full
+render-frame duration; after a stall the cap delayed both motion and expiration.
+Added coverage for a 600ms frame with a moving owner, expiration across the next
+500ms, and invalid/negative duration inputs. Existing 30/60/120/180 FPS checks
+still pass. All 535 tests, TypeScript and formatting pass. This is source and
+automated verification; live visual comparison remains open.

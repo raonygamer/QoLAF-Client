@@ -133,6 +133,31 @@ test('floating text motion and fractional lifetime agree at 30, 60, 120 and 180 
   }
 });
 
+test('stalled render frames retain elapsed motion and expire text at its original deadline', () => {
+  const { frames, owner, particle, handler } = fixture();
+  frames.attach(particle, owner);
+  owner._mc.x += 50;
+  owner._mc.y += 20;
+  frames.update(handler, 0.6);
+  near(particle.x, 158);
+  near(particle.y, 191);
+  near(particle.ttl, 400);
+  near(particle.alpha, 0.4);
+  frames.update(handler, 0.5);
+  assert.equal(particle.alive, false);
+  assert.equal(particle.alpha, 0);
+  frames.update(handler, 0);
+  assert.equal(handler.texts.length, 0);
+});
+
+test('invalid or backwards frame durations do not age or move floating text', () => {
+  const { frames, particle, handler } = fixture();
+  for (const delta of [NaN, Infinity, -Infinity, -1]) frames.update(handler, delta);
+  near(particle.x, 100);
+  near(particle.y, 185);
+  near(particle.ttl, 1000);
+});
+
 test('merged hits keep rise, owner reuse detaches and particle reuse starts a fresh attachment', () => {
   const { frames, owner, particle, handler } = fixture();
   frames.attach(particle, owner);
