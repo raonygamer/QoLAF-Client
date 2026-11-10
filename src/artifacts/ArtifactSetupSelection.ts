@@ -1,4 +1,5 @@
 import { read, type API, type Raw } from '../api/Types';
+import { ArtifactSetupRow } from './ArtifactSetupRow';
 
 /** Source syncSetupSelection: Player owns selection, not the toggle control. */
 export function syncArtifactSetupSelection(view: Raw, setupLabel: string): void {
@@ -17,18 +18,50 @@ export function syncArtifactSetupSelection(view: Raw, setupLabel: string): void 
   }
 }
 
-export function installArtifactSetupSelection(api: API): void {
+export function installArtifactSetupSelection(
+  api: API,
+  skins?: () => Promise<Record<string, Raw>>,
+): void {
   const overview = api.cls('core.artifact.ArtifactOverview')?.prototype;
   const toggle = api.cls('core.hud.components.ui.ToggleButton')?.prototype;
   const localize = api.cls('generics.Localize');
   if (!overview || !toggle || !localize) return;
   const owned = new WeakSet<Raw>();
+  const rows = new Map<Raw, ArtifactSetupRow>();
   const sync = (view: Raw) => {
     for (const button of view.setups) owned.add(button);
     syncArtifactSetupSelection(view, localize.t('Setup'));
+    rows.get(view)?.layout();
   };
+  if (skins) {
+    api.around(overview, 'drawArtifactSetups', function (next, ...args) {
+      const previous = [...this.setups];
+      rows.get(this)?.dispose(true);
+      rows.delete(this);
+      const result = next(...args);
+      for (const button of previous) if (!read(button, 'parent')) button.dispose();
+      return result;
+    });
+    if (typeof overview.drawComponents === 'function')
+      api.after(overview, 'drawComponents', function () {
+        // Haxe keeps this separator in a local variable; source gives it a field.
+        const separator = this.getChildAt(0);
+        if (read(separator, 'height') === 1 && read(separator, 'color') === 0xaaaaaa)
+          this.artifactSetupSeparator = separator;
+        rows.get(this)?.layout();
+      });
+    api.before(overview, 'dispose', function () {
+      rows.get(this)?.dispose();
+      rows.delete(this);
+    });
+    api.defer(() => {
+      for (const row of rows.values()) row.dispose(true);
+      rows.clear();
+    });
+  }
   api.after(overview, 'drawArtifactSetups', function () {
     sync(this);
+    if (skins) rows.set(this, new ArtifactSetupRow(api, this, skins));
   });
   api.around(overview, 'syncSetupButtons', function () {
     sync(this);

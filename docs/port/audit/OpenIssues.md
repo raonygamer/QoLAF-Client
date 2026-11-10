@@ -2175,3 +2175,18 @@ thumb up/hover/down/icon textures and scale9 geometry in BaseAeonDesktopTheme.
 The original AeonDesktopTheme.swc assets were extracted to /tmp/QoLAF-Aeon/export
 for the next implementation, avoiding a substitute scrollbar design. Expanded
 overview layout, row overflow and visual comparison remain open.
+
+### Artifact setup horizontal row — 2026-11-10
+
+Added native display-list clipping, horizontal wheel scrolling, thumb dragging,
+and track paging with original Aeon SWC textures and scale9 geometry. The row
+uses source dimensions and updates classic cargo/separator positions when it
+overflows. Viewport bounds exclude clipped buttons; disposal removes wheel
+listeners and supports restoring buttons on plugin unload. Atlas provenance is
+recorded beside the extracted image.
+
+Verification: TypeScript check, formatting check, and all 499 tests pass.
+Tests cover overflow, bounds, wheel/drag/page behavior, shrinking, cleanup, and
+texture loading cancelled by disposal. Live visual comparison, touch-content
+dragging/inertia, and expanded overview layout remain open; this is not full
+artifact-screen parity.

@@ -1,0 +1,9 @@
+Aeon.png is the original embedded AeonDesktopTheme atlas extracted without pixel changes
+from AstrofluxClient/libs/AeonDesktopTheme.swc using JPEXS 26.3.0.
+
+SWC SHA-256: d51d9ffe6d5df3bfd75040c1942120c691b41161592ae3f3b5e5491e05ce6a33
+PNG SHA-256: a439c27e392192afbe47f122023ed1f5b6ed3e8ceb7cbc6405e499eb73623da5
+
+Original atlas scale: 2. Scrollbar regions and scale9 geometry are recorded in
+SetupScrollbarSkin.ts and ArtifactSetupRow.ts from BaseAeonDesktopTheme.
+The existing theme artwork and third-party rights remain with their authors.
