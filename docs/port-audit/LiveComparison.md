@@ -583,3 +583,35 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   (/tmp/QoLAF-BeamDisposed.png); removed the temporary injection and reloaded.
   Actual Nether Blob encounter timing
   and full screen-by-screen original-client parity remain unverified.
+
+### Configured boss spawn markers and physical-spawner heatmap
+
+- Ported BossSpawnCatalog, BossSpawnLocation, BossSpawnAreaRing, BossSpawnMarker,
+  MinibossSpawnHeat and the world/system-map manager adapters. Hidden anchors
+  receive named diamonds; physical spawners contribute unlabeled configured heat
+  areas. Primary/secondary option identities, deduplication, finite radii and
+  the 512-entry metadata bound follow the source. No live enemy population or
+  chance values are treated as a heat prediction.
+- Original 96-segment dashed rings and 32-segment/five-band heat geometry retain
+  source colors, alpha, annulus holes and the narrow equal-radius falloff. Badges
+  counter-scale with world zoom. The Nether Blob gravity boundary follows the
+  exact parent black hole and reads its native squared physics cutoff.
+- Locations track native body/spawner orbits. Sidecar GameObject.reset counters
+  invalidate pooled anchors without adding fields to native gameplay objects.
+  An alive, activated boss suppresses only its own parent body's spawn marker.
+- Separate world/map display ownership, saved setting toggles, viewport culling
+  and session/map cleanup are wired. Native map scale is captured per map;
+  markers/heat sit below native map icons, as in the original source.
+- TypeScript, formatting and all 136 tests pass, including the final layer-order
+  adjustment. New checks cover catalog eligibility, options/radii,
+  exact polygon areas and alpha edges, cached geometry, native orbit/lifecycle,
+  boss identity, settings and separate world/map cleanup via actual host hooks.
+- Live Fulzar map captures: /tmp/QoLAF-SpawnMap.png and
+  /tmp/QoLAF-OriginalSpawnMap.png. Configured overlays and legend render in the
+  port; original SWF comparison is available in the same system.
+- Comparison contradicts full map parity: native viewport positioning shifts
+  content by roughly half the map padding and clips a top-edge marker name;
+  original Center/pan/zoom and dynamic miniboss icons remain unported. Orbit and
+  native area presentation also differ. These are open map-port tasks, not
+  accepted substitutions. World encounter/gravity-boundary visual checks remain
+  unverified away from the current safe-zone viewport.
