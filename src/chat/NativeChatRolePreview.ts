@@ -28,9 +28,13 @@ export function installNativeChatRolePreview(
   });
   let shown: (typeof cards)[number] | undefined;
   let scrollPosition = 0;
+  let hoverPoint: Raw | null = null;
+  let hoverRole: string | null = null;
   const close = () => {
     cards.forEach(({ popup }) => popup.close());
     shown = undefined;
+    hoverPoint = null;
+    hoverRole = null;
   };
   const visible = (view: Raw): boolean => {
     if (game.isLeaving || !log.contains(view)) return false;
@@ -72,6 +76,8 @@ export function installNativeChatRolePreview(
     if (!read(card.popup, 'visible')) return;
     card.view.setChildIndex(card.popup, read(card.view, 'numChildren') - 1);
     shown = card;
+    hoverPoint = point;
+    hoverRole = role;
     scrollPosition = read(scroll, 'verticalScrollPosition');
   };
   stage.addEventListener('touch', hover);
@@ -79,12 +85,23 @@ export function installNativeChatRolePreview(
   api.after(log, 'updateTexts', close);
   api.on('frame', ({ game: currentGame }) => {
     if (currentGame !== game || !shown) return;
+    const isSimple = shown.view === simple;
     if (
       !visible(shown.view) ||
-      (shown.view === advanced &&
+      !hoverPoint ||
+      Roles.isCoveredBy(stage.hitTest(hoverPoint), shown.view) ||
+      messages.roleTagAtStagePoint(hoverPoint, isSimple) !== hoverRole ||
+      (!isSimple &&
         (scrollPosition !== read(scroll, 'verticalScrollPosition') || !read(scroll, 'touchable')))
-    )
+    ) {
       close();
+      return;
+    }
+    if (!isSimple) {
+      let hit = stage.hitTest(hoverPoint);
+      while (hit && hit !== scroll) hit = read(hit, 'parent');
+      if (!hit) close();
+    }
   });
   api.defer(() => {
     stage.removeEventListener('touch', hover);

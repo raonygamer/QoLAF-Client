@@ -972,3 +972,21 @@ ownership; lifecycle tests cover delayed callbacks, scroll, covering UI and
 cleanup. Live visual comparison of this card is still pending. This does not close
 artifact sharing/outgoing channel policy, ping previews, virtualization or the
 intermittent bitmap corruption issue.
+
+## Live artifact card and stale role hover audit (2026-11-10)
+
+Verified artifact hover in the connected Haxe game using one temporary local
+Advanced-chat row for the account's revealed Armorlock Protocol. No player chat
+was sent and no database record was written. The verified card displayed its
+atlas icon, orange name, cyan owner line, fitness and native colored stats;
+390px width and 12px pointer gap match ChatArtifactPreviewPopup.as. Screenshots:
+/tmp/QoLAF-ArtifactHover.png and /tmp/QoLAF-ArtifactLeave.png. Moving off the token
+closed the card. The local row has a 90-second removal timer restoring the prior
+chat view. This validates this artifact's live rendering, not every possible
+localized stat combination or side-by-side SWF parity.
+
+Found and fixed role hover lifetime gap: previously covering UI was checked only
+on a touch event. A stationary pointer could leave a stale card after a modal
+appeared or its role label changed. Visible role cards now revalidate stage hit
+and the role under the stored pointer each frame, including Advanced scroll
+ownership. Regression tests exercise these transitions without another touch.

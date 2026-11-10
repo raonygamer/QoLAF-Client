@@ -92,10 +92,11 @@ test('both chat views show roles on hover and close for covering UI, scroll, cli
     defer: (fn: () => void) => cleanup.push(fn),
   };
   const requests: boolean[] = [];
+  let role: string | null = 'mod';
   installNativeChatRolePreview(api, game, bitmap.resolve, {
     roleTagAtStagePoint: (_point, isSimple) => {
       requests.push(isSimple);
-      return 'mod';
+      return role;
     },
   });
   const simplePopup: any = simple.getChildAt(simple.get_numChildren() - 1);
@@ -113,7 +114,7 @@ test('both chat views show roles on hover and close for covering UI, scroll, cli
   const covering = node();
   stage.addChild(covering);
   hit = covering;
-  touch();
+  frame({ game });
   assert.equal(simplePopup.get_visible(), false);
   stage.removeChild(covering);
   hit = stage;
@@ -126,9 +127,18 @@ test('both chat views show roles on hover and close for covering UI, scroll, cli
   hit = scroll;
   touch();
   assert.equal(advancedPopup.get_visible(), true);
-  assert.deepEqual(requests, [true, false]);
-  hit = advanced;
+  assert.equal(requests.at(-1), false);
+  role = null;
+  frame({ game });
+  assert.equal(
+    advancedPopup.get_visible(),
+    false,
+    'a replaced label closes without pointer motion',
+  );
+  role = 'mod';
   touch();
+  hit = advanced;
+  frame({ game });
   assert.equal(advancedPopup.get_visible(), false, 'only the scroll content can own a badge hover');
   hit = scroll;
   touch();
