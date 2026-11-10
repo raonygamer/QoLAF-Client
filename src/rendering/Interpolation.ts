@@ -1,3 +1,5 @@
+import { installProjectileFrames } from './ProjectileFrames';
+import { installRenderPosition } from './RenderPosition';
 import { installWorldLabels } from './WorldLabels';
 import { read, type API, type Raw } from '../api/Types';
 import { installRemoteShips } from './RemoteShips';
@@ -163,6 +165,8 @@ export function installInterpolation(api: API): void {
   const ship = api.cls('core.ship.Ship')?.prototype;
   const game = api.cls('core.scene.Game')?.prototype;
   if (!machine || !ship || !game) throw Error('Interpolation runtime classes are missing');
+  installRenderPosition(api);
+  installProjectileFrames(api);
   const previous = new WeakMap<Raw, RenderPose>();
   const remoteShips = installRemoteShips(api);
   installWorldLabels(api);

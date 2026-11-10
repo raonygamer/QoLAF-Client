@@ -2003,3 +2003,28 @@ The same artifact diff review also corrected fitness sort ordering among
 unrevealed entries and restored `onSort`'s scroll-to-top after rebuilding cargo
 rows. A native-hook regression checks both directions, revealed-first grouping,
 row disposal/rebuild order and delegation of unrelated sort types.
+
+### Rendering omissions found by source diff — 2026-11-10
+
+The port omitted `GameObject.hasRenderPosition` lifecycle semantics. Original
+`renderX/renderY/renderRotation` use a clip only after drawAt has positioned it;
+reset/addToCanvas invalidate that state. Port emitter targeting instead trusted
+isAddedToCanvas alone. Added the lifecycle guard and applied it to emitter and
+floating-text positions, with a regression for undrawn body anchors and reused
+clips at the origin. This is a confirmed semantic discrepancy relevant to the
+reported missing sun; the sun's actual live appearance still requires verification.
+
+`Projectile.draw` frame prediction and `ProjectileManager.draw` per-frame vertex
+copies were also missing. Native Game.draw moved projectile clips every frame,
+but native manager.update only copied them into MeshBatch on 33 ms ticks. Added
+source position/rotation prediction and a per-display-frame batch rebuild after
+the existing draw traversal. Projectile physics are untouched. Grayscale batch
+clearing now follows primary batch clearing, and torpedo warnings follow render
+frames instead of simulation updates. Regression samples copied vertices at
+60/120/180 Hz without simulation ticks, and checks pooled/dead-object handling.
+
+Full local suite: 476 passing; typecheck and formatting pass. Not a claim of
+complete rendering parity: source renderState attachments, timestamp-aligned
+server bullet drawing, ribbon-head refresh, body culling/distortion integration
+and the remaining changed rendering methods still need semantic review and live
+comparison. User specifically requires this review across ALL changed client code.

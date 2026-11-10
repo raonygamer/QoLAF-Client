@@ -22,7 +22,7 @@ export function emitterTargetPose(target: Raw): { x: number; y: number; rotation
       rotation,
     };
   }
-  const clip = target.isAddedToCanvas ? target._mc : null;
+  const clip = target.isAddedToCanvas && target.hasRenderPosition !== false ? target._mc : null;
   const position = read(target, 'pos');
   return {
     x: read(clip, 'x', position?.x ?? 0),

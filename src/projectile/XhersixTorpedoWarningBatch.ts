@@ -73,13 +73,11 @@ export function installTorpedoWarnings(
   game: Raw,
   createBatch: () => XhersixTorpedoWarningBatch = () => new XhersixTorpedoWarningBatch(api),
 ): void {
-  const manager = api.cls('core.projectile.ProjectileManager')?.prototype;
   const projectile = api.cls('core.projectile.Projectile')?.prototype;
-  if (typeof manager?.update !== 'function' || typeof projectile?.draw !== 'function') return;
+  if (typeof game.draw !== 'function' || typeof projectile?.draw !== 'function') return;
   let batch: XhersixTorpedoWarningBatch | undefined;
   let drawing = false;
-  api.around(manager, 'update', function (next, ...args) {
-    if (this !== game.projectileManager) return next(...args);
+  api.around(game, 'draw', function (next, ...args) {
     batch?.clear();
     const previous = drawing;
     drawing = !!api.cls('core.scene.SceneBase')?.clientSettings?.showXhersixTorpedoWarnings;
