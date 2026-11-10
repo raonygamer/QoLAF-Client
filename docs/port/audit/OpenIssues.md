@@ -1799,3 +1799,13 @@ remains dependent on the unfinished IPC/chat port. Welcome/credits, music/radio
 and visual-editor screens remain outstanding. The Help popup also needs its
 short-viewport layout bounded; its fixed 500px content currently exceeds a
 415px stage with a large browser console open.
+
+
+### Welcome implemented — 2026-11-10
+
+The native first-time help invitation is now ported. Live checks cover waiting
+for Sale, accepting into help, Later, and persistence after reload. Browser
+storage replaces the absent AS3 sharedObj. Login credits were already ported.
+Still missing: the automatic once-per-release changelog sequence, music/radio
+and ship-visual dialogs; short-viewport help layout remains open. Welcome
+geometry was compared to source, not a freshly reopened SWF welcome instance.

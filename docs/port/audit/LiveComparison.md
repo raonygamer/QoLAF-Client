@@ -1411,3 +1411,38 @@ QoLAF destination awaits IPC/chat integration. This pass did not test sending a
 share, remote-account authorization outcomes, friend-refresh lookup or every
 artifact record. Full-port parity is not complete. Changes are on the port
 branch/local preview, not a claim of deployment to the Pages main branch.
+
+
+## First-time help invitation — 2026-11-10
+
+Ported ClientHelpWelcomePopup and ClientHelpWelcomeState from original source.
+The native confirm popup retains the 420px text width, source markup, positive
+Open client help button and Later button. Enter uses the native confirm action.
+The welcome waits for reconnect recovery, input-blocking dialogs and visible
+native popup children (including the sale popup, which does not consistently
+set blockHotkeys). Opening help explicitly also dismisses the invitation.
+Room teardown disposes listeners without persisting dismissal.
+
+Live checks found two integration issues and corrected both: the invitation
+initially stacked over Sale, and the original AS3 sharedObj storage does not
+exist on the Haxe game session. Browser persistence now uses plugin-scoped
+`client-welcome` storage. Verified waiting behind Sale, appearing after Sale
+closes, Open client help opening the guide, Later closing the invitation, and a
+fresh page reload followed by closing Sale without the invitation returning.
+
+Evidence: `/tmp/QoLAF-WelcomeModalWait.png`, `/tmp/QoLAF-WelcomeAlone.png`,
+`/tmp/QoLAF-WelcomeAccepted.png`, `/tmp/QoLAF-WelcomeLater.png`,
+`/tmp/QoLAF-WelcomePersistenceVerified.png`. `WelcomeNotRepeated.png` is an
+intermediate failure capture despite its filename. Source geometry/text was
+compared directly with the AS3 files; this pass did not force the original
+client's already-dismissed welcome state to reopen. Login credits already exist
+in LoginIdentity.ts and were not replaced by this work.
+
+Type checking and the full 410-test suite passed before the persistence adapter
+correction; all five welcome tests pass afterward, including host-storage reload,
+modal/recovery gating, teardown without dismissal, and denied-storage behavior.
+The preview process had exited and was confirmed absent before restarting it;
+the active replacement is the Preview.mjs tool session 44684 on port 8087.
+Remaining screen work includes music/radio and ship-visual dialogs. The automatic
+once-per-release changelog sequence also still needs wiring; the source v1.1.0
+farewell is historical and not shown by the current v1.1.22 source.

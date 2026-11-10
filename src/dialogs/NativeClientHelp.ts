@@ -2,12 +2,14 @@ import { read, type API, type Raw } from '../api/Types';
 import { portedClasses } from '../ported/Registry';
 import { ClientHelpContent } from './ClientHelpContent';
 import { createClientHelpPopup } from './ClientHelpPopup';
+import { installNativeClientWelcome } from './NativeClientWelcome';
 import { installPopupKeyboard } from './NativePopupKeyboard';
 
 export function installNativeClientHelp(api: API, game: Raw): void {
   const chat = game.chatInput;
   if (!chat) return;
-  const Popup = createClientHelpPopup(portedClasses(api).resolve);
+  const resolve = portedClasses(api).resolve;
+  const Popup = createClientHelpPopup(resolve);
   const registry = api.cls('af.ChatCommandRegistry');
   let popup: Raw | null = null;
   const close = () => {
@@ -20,6 +22,7 @@ export function installNativeClientHelp(api: API, game: Raw): void {
   };
   const open = () => {
     if (popup || read(game, 'isLeaving', false)) return;
+    dismissWelcome();
     const serviceRoom = api.cls('joinRoom.JoinRoomManager')?.getServiceRoomID(0) ?? '';
     const serverVersion = /^Service-(\d+)_/.exec(serviceRoom)?.[1] ?? 'unknown';
     const pages = new ClientHelpContent(
@@ -31,6 +34,7 @@ export function installNativeClientHelp(api: API, game: Raw): void {
     popup!.addEventListener('close', close);
     game.addChildToOverlay(popup, true);
   };
+  const dismissWelcome = installNativeClientWelcome(api, game, resolve, open);
   const original = Object.getOwnPropertyDescriptor(chat, 'openClientHelp');
   chat.openClientHelp = open;
   api.defer(installPopupKeyboard(window, () => popup !== null, close));
