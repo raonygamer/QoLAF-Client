@@ -1,0 +1,5426 @@
+{
+  "baseline": {
+    "file": "Preload.swf",
+    "sha256": "8e25db7622ef68ac91f6b9fcbe6c237e2a44505c00ab2c0568f4cf1500a2757f"
+  },
+  "files": [
+    {
+      "path": "AstroTheme.as",
+      "sha256": "982006c4ae596b83bba8706c84a59ca7235ad1991d152f234c2c431883b5610f",
+      "lines": 698,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "4f2d8f713d266ec32857e83277bcc562b96f6a5a267ff38e46037655ee80b4c1"
+    },
+    {
+      "path": "Clock.as",
+      "sha256": "8e0e45ac05354e6c5a56a553993ff9c6567f58e656890a5483a6302d12811cef",
+      "lines": 427,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "EmbeddedAssets.as",
+      "sha256": "978b162e30f6b112d8c746cbef51e18e0201452f3074b65a0843300e1a2d9275",
+      "lines": 68,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d84a46fc969aed8b5d8872b05136396c31c974ed2d168170717dde110f294827"
+    },
+    {
+      "path": "IDI.as",
+      "sha256": "3d7cad65d83ca58cf8728ff9964b6dacbcc2e9a545acedc0d64923bdc063c4d8",
+      "lines": 96,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "405c46f8da943463ddff8f2911a0c35a7fd127c5836baf8855b92573afb4fd4e"
+    },
+    {
+      "path": "LoadingBar.as",
+      "sha256": "ab52f8e719b04fd8bc091550293d5498bcc26991dae65fbebcb29047b3f2f686",
+      "lines": 67,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "55764038b636b3df578597d4b5e926d8f8d328dcd58ec6b656018dff671151f3"
+    },
+    {
+      "path": "Login.as",
+      "sha256": "464ba18f3106a14e33bf0248dd027882d9fba4de2f41c92de334c087e3054291",
+      "lines": 2282,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2c484f3e7dc69abbac70a136cf38ced9b6d02070882fa5686e23d4ae0c31aee1"
+    },
+    {
+      "path": "MD5Util.as",
+      "sha256": "586fac60b63414393832a29d80e0046f9e49a4d331815482cf3e2ac2da74a64d",
+      "lines": 22,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "Minilogo.as",
+      "sha256": "11a7fc33e39911c623289ea416afb5eeff8ae393b8a83dd9f9ecdcd7afd50000",
+      "lines": 151,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "9611cdb08e1a5aef068d36b7ee4350cb856b022541144ea9fcba048d0bb3665c"
+    },
+    {
+      "path": "Preload.as",
+      "sha256": "1a5457fffecfbc28ce607cabf75d7c8686bf228cf1d5e9925d42c237bfede375",
+      "lines": 67,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "19d22faa14dd20dfc17821230ce4af4846fd2a807ca50ca3847a71151e5f1e1c"
+    },
+    {
+      "path": "RymdenRunt.as",
+      "sha256": "afc1c47c747daae6bede6b344f5703604deeaa8afa5203a5414aa91fc9649906",
+      "lines": 550,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "55a236b0138c53569437de510f388e63094294620cfe8b35ac138db4901ed001"
+    },
+    {
+      "path": "TimeDelta.as",
+      "sha256": "6dd5d5660ea65498dbbd982227952455354addac16002479765b6f0fc78ed593",
+      "lines": 13,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/AutomationEvent.as",
+      "sha256": "e517cb8afa9dc99abf09da2b168e73aa3365c4ab86a1ba9eb7ebfe8eb36cc6d2",
+      "lines": 75,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/AutomationInfo.as",
+      "sha256": "c27f763bf98b5343a9f0f0d4bf13ed72b9ad2844566d69b12f4cde71443a175d",
+      "lines": 46,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/AutomationLoadState.as",
+      "sha256": "314dd0c4dbda42c5b7dd208f1b89493fd7290d829d53eaa14a2b312a93fae317",
+      "lines": 7,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/AutomationManager.as",
+      "sha256": "62cb680efec828c81157d0c64b64f166465a6c48347531d2e80ceb8dd5911a7e",
+      "lines": 1118,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/AutomationModule.as",
+      "sha256": "569626cc1f3f72cd793b930d3746b349be3b245b699ca945522c6313c89ae4b8",
+      "lines": 146,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/AutomationServiceRoomGuard.as",
+      "sha256": "26e549621b93104789da7ecdb92b7febf7b720130c9a5b2ee5469cccd602f953",
+      "lines": 25,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/AutomationStopError.as",
+      "sha256": "f0366b05e1abea71ef7d1caab6c5caf1109a0abdda60965668735c2f75bc2f14",
+      "lines": 9,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatBuiltInCommandSuggestions.as",
+      "sha256": "68560ce393c775dfdb71cf71bda91f88b0badf1fc195e556682c7685d078e109",
+      "lines": 140,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandArgument.as",
+      "sha256": "30e18e3ebd1c6b14b0d009695edaeff81074ff7c13803b31fd893ca90c6104b6",
+      "lines": 17,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandAutocompleteModel.as",
+      "sha256": "88248436e3a6e535b3141689d856570aec22121e9ca1cff12046d8cd21592cdc",
+      "lines": 92,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandDispatchResult.as",
+      "sha256": "d091c78b91abd4748a078623e70b9b68833169f221a198efdc533fb551c37190",
+      "lines": 42,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandEntry.as",
+      "sha256": "3eaf7955a2e468f2f4397020e1cc67c7480362fdeca98fd0e808d9f8cea67680",
+      "lines": 35,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandFieldInfo.as",
+      "sha256": "d570984247df472bcda50c0185bf2b5edb5fe1f43287a767586869c11242848d",
+      "lines": 34,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandHelpEntry.as",
+      "sha256": "dac592d081237151ccef3110e998c902088b8c7dd4efb88953189308992e59a7",
+      "lines": 59,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandInvocation.as",
+      "sha256": "3e1f799823b04487f8b41d69eaf4ea0bf15480b00d5cd610c3e3da366a9cfcea",
+      "lines": 88,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandParseResult.as",
+      "sha256": "87d8b1ce6709724a7cc1afd61fd0afd289ab27b736bd6385a43c529d4460e32a",
+      "lines": 26,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandParser.as",
+      "sha256": "a544fa60fa59fcfcd98bb0123dcf7f633d968be9f4c177fca74b3849c11e8ac7",
+      "lines": 69,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandRegistry.as",
+      "sha256": "96feca5f75b23a9986253868802185258e6d4953ac563a4c4a2a5df44cd82c79",
+      "lines": 471,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandRegistrySuggestions.as",
+      "sha256": "3a3b19a28df7cac00b4a3b8c6d6861483ecd6e4dc74eede084b3738655f6bf71",
+      "lines": 23,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatCommandSuggestion.as",
+      "sha256": "26a6cb346c39c76f813bcd3585b3ba983cb967edd0bfa64a06a70e0124b08da6",
+      "lines": 71,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatInputHistory.as",
+      "sha256": "5db4c0914c05a8f1e1368f0de784cf5190b435f39cb199d416207476a710e3a6",
+      "lines": 90,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatPlayerCommandNormalizer.as",
+      "sha256": "8a1c6b9b7acdd0b886e93cff2737611b26923942c7e13344d9b31f185fe033ac",
+      "lines": 53,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/ChatPrivateDiagnostics.as",
+      "sha256": "d883e750530ad836e5058ec0d1628e0cee0e02b7820a457bf73f1b5adb88870d",
+      "lines": 370,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/EventBus.as",
+      "sha256": "321452985c165c7da0f6d9dd159a17b0f03ca55f9c2d3ed49cfd48a7c1cd7fee",
+      "lines": 141,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/IAutomationScript.as",
+      "sha256": "c164655bc1f5809fc56d41deaeba30e8e54b780d5e8d897496d058f104c074b3",
+      "lines": 5,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/IChatAutocompleteModel.as",
+      "sha256": "fbbf80c61f7744c77c5c7fd382baa604097e5d13b22e4c5d660db98d52079a73",
+      "lines": 16,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/PlayerInspectProjection.as",
+      "sha256": "efdc07aff8d3311b66982c8075699f132a3773302f2ebec7d5cccecd74cdce50",
+      "lines": 367,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "af/PlayerInspectViewModel.as",
+      "sha256": "ddb826785d76d9579410d7a00b60b3285c95ed11f0670c3e36e13ab89af6f118",
+      "lines": 398,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "camerafocus/StarlingCameraFocus.as",
+      "sha256": "46b91ba7418d6495f634f47b8375e45eccc6202160a144df5956a8bcd551452d",
+      "lines": 429,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "21147da139f58b0ffd5fcddb505c64fab8d81d6f3a43136480c4797febb902db"
+    },
+    {
+      "path": "camerafocus/events/CameraFocusEvent.as",
+      "sha256": "70d83d8b06a88c9785f36d626d6b7d688954d95da511d994d062559fc4a159a6",
+      "lines": 19,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/GameObject.as",
+      "sha256": "fd4746954a862197d0563002665ece68d3fe0283c751b9f366670bff6cf9d36c",
+      "lines": 337,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d993c0f2232181711d9bbc30dd0964e0547c9e69f8b56a219519badfa1f532e7"
+    },
+    {
+      "path": "core/artifact/Artifact.as",
+      "sha256": "c7a12e3c7d9c418a2c335b350b0b48e5eeea2b03e63aa2d33b7c7e7176de46ad",
+      "lines": 369,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ab40261f931d976b7a816dc5f3832844d69db5607e8b344ba2ebb4b39b05e5c5"
+    },
+    {
+      "path": "core/artifact/ArtifactBox.as",
+      "sha256": "cd2c6b91fec1d6af8011335ec00af2d2ed83cce1101586a874096d3f77bf7997",
+      "lines": 203,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1cf7226d017d86bfebe2ba3f6d8101253d362c7e94fa081a5d0e040add117c78"
+    },
+    {
+      "path": "core/artifact/ArtifactCargoBox.as",
+      "sha256": "1bcfc15e5a29949fca506a12ef9501d983300193163bcc7edf5d55137531348d",
+      "lines": 439,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cff7f0031f726ba9e4661368c79979c8e3d48d5748c58357788c6f3fdd374e6f"
+    },
+    {
+      "path": "core/artifact/ArtifactFactory.as",
+      "sha256": "587a55db89fa586bb7b066883b5ea9df3cb90dbca64080b08e1b691889c02d35",
+      "lines": 72,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "eca0f2adf78dd42f3f649dd55f478c4b42756be09b5687f0e31175dd752c88cf"
+    },
+    {
+      "path": "core/artifact/ArtifactFavoriteMarker.as",
+      "sha256": "c7b57699fcc536091ea7816f5844641bd03a0c9fce05ca6801b7ff9e440cff1a",
+      "lines": 33,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/artifact/ArtifactFavorites.as",
+      "sha256": "cd52a4b3b02d6082634ead7421dacb5b2578d6aaf657ba2ff3fbc34058d1ea89",
+      "lines": 91,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/artifact/ArtifactOverview.as",
+      "sha256": "f3245e01edfd4498f3c930c979b9d069690037aed9906b62a92e273cf4f50d0c",
+      "lines": 2420,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0d4474a45c21e57f586d44a5b16a2a9eb421619d60cd4ed1053f78e5e240cc63"
+    },
+    {
+      "path": "core/artifact/ArtifactShareContextPopup.as",
+      "sha256": "59d56e0031cd6ba8ecaff8f3f364000038ba1cae4ca1a3eb9ac83dc679d52dc6",
+      "lines": 254,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/artifact/ArtifactSorting.as",
+      "sha256": "bb84ed8ee61d64b983f3b3caea20acfe9024e671a9d0062727ce5d45cc8eb505",
+      "lines": 282,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d66d6aa70a612622caf2fdd73fcf47dd8b822f484cd32bdccf03634446b33b57"
+    },
+    {
+      "path": "core/artifact/ArtifactStat.as",
+      "sha256": "51ec59ababd2184bdee0ea67781ec47242f6731c149b2f592e55a31ee6cdd834",
+      "lines": 513,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1ae207b34ba5f6b1c6094af8912adf516191fd00db859dd30111da1253d1fa50"
+    },
+    {
+      "path": "core/artifact/ArtifactStatModifiers.as",
+      "sha256": "df4a895da9e347eeac80681343e65eca61991c7d822b1bcbb96ab32ed6800e6a",
+      "lines": 39,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/boss/Boss.as",
+      "sha256": "eb1624dd4e271b1955db87500d27491c680f8737f10d42d57271627200489ef7",
+      "lines": 518,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "5a53a5df6dbab536ee801fc1f69636aeaba2569ea7d25a02e294e410f93f46b3"
+    },
+    {
+      "path": "core/boss/BossComponent.as",
+      "sha256": "2cb70438a07a79308f4198df10b61f79c6e09e6467d8c9fea34ca7291d4f3173",
+      "lines": 116,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "45d21339e95368ce8af0485209d455fb88d78e1e9c65d8f9b201c15f20ab4187"
+    },
+    {
+      "path": "core/boss/BossFactory.as",
+      "sha256": "2ca1ca8c5ea2dcb96910dc2df3f9613b8c42fbecad16e4ebaac0564a05e00726",
+      "lines": 323,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b3fd42ae0c7662a3ae970681e53231377aaff5882611b7e54ea3de94b5e9fa52"
+    },
+    {
+      "path": "core/boss/BossManager.as",
+      "sha256": "88a609975909372e4c8dd4a26a19de9ea3260dd9d442eb81bd88cbed498c1c0d",
+      "lines": 327,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "20f810bc7d741d1356104c45a52761c5b0bf12b80337f20a34c4a0b8ab2ee695"
+    },
+    {
+      "path": "core/boss/BossSpawnTimerCatalog.as",
+      "sha256": "2f1db8b65eb5cde34b82909fc98b0d2c9a94433205d36ef6571b0e847fff41d5",
+      "lines": 143,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/boss/BossSpawnTimers.as",
+      "sha256": "a3cda957e7b70ad1e55ac901b3df4437a9839b8306cb6e4e5c2889f4871c8905",
+      "lines": 237,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/boss/Trigger.as",
+      "sha256": "2cc6b321b76387b8cf1f2d7c011ed79a415b4a97800bc3002b35509f146701db",
+      "lines": 127,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "dbe3cbebbe5b2a6dfd07444e1c07d1cbdffce5b27192664e870281ba17630c4e"
+    },
+    {
+      "path": "core/boss/Waypoint.as",
+      "sha256": "0928b121eb3c3af19b379dcc3bcc174962a0346008fcee331a8d2f0ca1b8527c",
+      "lines": 31,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/clan/ClanApplicationCheck.as",
+      "sha256": "3aacad4d141c8f5ee05a9ee7932ccf2d49c01346c60d2e086ecd6825fbd427f3",
+      "lines": 103,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e57d4f50cfde8041df6b65ebee06fac2147346971eb064deb52310999b09e2eb"
+    },
+    {
+      "path": "core/clan/PlayerClanLogo.as",
+      "sha256": "2e6dc664a12eee526c562bd5a767267f6e365b6455a5b9ca1f88a4b056a2f7ea",
+      "lines": 104,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0e68b41b3c30a1285edf595fdae6d5135cbfff62a68a878ef593f22308871476"
+    },
+    {
+      "path": "core/controlZones/ControlZone.as",
+      "sha256": "2a881044296870ceb998d00764a41ee0b0c588b4da336ba3a3bc83971f38680b",
+      "lines": 19,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/controlZones/ControlZoneManager.as",
+      "sha256": "0b62adfc513f620d6772e7cc33090ddeabf90fdc4b6332975a0f8237956f6408",
+      "lines": 163,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "21375f4f2dd2090ad37ba40ca74ceb764096cc1c5d5d4f2b9bba3084850d9389"
+    },
+    {
+      "path": "core/credits/CreditManager.as",
+      "sha256": "945afba33ba38c62a5cafdcd313850c5c2049c4bfda649a23a9f299ba28456bb",
+      "lines": 285,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "48e75f5152addc640c168a772e8ce1222a0d469330249b9695a44dfdefc8b570"
+    },
+    {
+      "path": "core/credits/Sale.as",
+      "sha256": "b9c02ba592012cb3c4f39ca228b3e28ba18332d40efba4356266fa48aaa13dcd",
+      "lines": 29,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/credits/SaleEvent.as",
+      "sha256": "f7a5982c531574ae7db7723808e5822d4c71f51067d6e7cabefd369ab954ce52",
+      "lines": 22,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e23be2340b405add3a435fc74ce84dbd8e5fe1d14c75d052f6b90b310f0e21d2"
+    },
+    {
+      "path": "core/credits/SalesManager.as",
+      "sha256": "a89d8ef75ba1dadc6890f087e26c36aa2de033038a384d6742f6c64f3975b6b5",
+      "lines": 171,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "71ff9dc113edeeba133b287df2192b1e94704d80aded6dac4827c5a46dfdbecf"
+    },
+    {
+      "path": "core/deathLine/DeathLine.as",
+      "sha256": "42f56a8030afbb88c919a28b105f6bae4fcb0d6bad9c9e8bfbcbfb7b0d9a24fd",
+      "lines": 172,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "5c086fa6ebb69e05ca470b93e8e8dcb1c772767db9557a4c2f3fa241da9bad5e"
+    },
+    {
+      "path": "core/deathLine/DeathLineManager.as",
+      "sha256": "b3b4a6b3aed4a70ac7ee466f8dcc8db469aec748812d225eef08c6deb7d422af",
+      "lines": 180,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a6bf242a06b51b012a143dc4eb086cfe25724d29b6fb6e6adf6722af2b67fc5b"
+    },
+    {
+      "path": "core/drops/Drop.as",
+      "sha256": "cdf4335fe7734ec6ea18b91cb152e0addbb227066ab94045c4cec920ff2c2820",
+      "lines": 260,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "9ac69885117979a91c13eda93b35c1e29c3f1c65b1b5da0869214da6c470d5fc"
+    },
+    {
+      "path": "core/drops/DropBase.as",
+      "sha256": "6f85b614b02922f2500c4987db1172df513461d86309ab4222a1e3984a9fc30c",
+      "lines": 17,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/drops/DropFactory.as",
+      "sha256": "216076abb3dd65f2900827c77506d911f4e4734728bda677123d5fd6cf367f6c",
+      "lines": 49,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c8a80eeaa39b8601b08f1a365cd46064c2ebbc57e962d9457053c2988cbaf7f8"
+    },
+    {
+      "path": "core/drops/DropItem.as",
+      "sha256": "7458fe4dc84fb51970cf4027590f92c939d8c4c867652bae84a981f74cf68c23",
+      "lines": 15,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/drops/DropManager.as",
+      "sha256": "294b934e2c646ebf1cf118bdd19d3b7c9545f21dd86d6acdbdd7884b4e348da5",
+      "lines": 340,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "6bf8ba5b52caeb51eb97c2836b336a2f36306f1cda3be0880e98e6d1652af05f"
+    },
+    {
+      "path": "core/engine/Engine.as",
+      "sha256": "9ba50ad00e47845e306a411afc4796d681242d4a6cb5ac1bde67279a4a88e748",
+      "lines": 338,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c54df9618914a4515cdf68433d91c7cf69d7159babc1b5e38f29b66b1e002fe2"
+    },
+    {
+      "path": "core/engine/EngineFactory.as",
+      "sha256": "5be600bee4e3743dc1b5fe28632e9154a18e8011744aa97bd300f7912c696b21",
+      "lines": 47,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d3b9b64010dd87d0272f00564519417af06f742e66344c08cdbca13a415c2a03"
+    },
+    {
+      "path": "core/engine/EngineRenderPose.as",
+      "sha256": "e86b97dbcbb039de27b91e91e03ac2073409b9a992521a253c94d39053df4f25",
+      "lines": 34,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/engine/ProjectileThrustAnchor.as",
+      "sha256": "8f66399d86dcb8735f314383af4958aaed85091f4e4a93b6da8e6148e2d55582",
+      "lines": 34,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/ClientDevBeamStyle.as",
+      "sha256": "82502bc8727c852a4300871c31da57d7ddda7f91fdf8a5bf00771b9f80f9afd1",
+      "lines": 33,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/ClientDevVisualEffect.as",
+      "sha256": "f97b3256f8b59aef51593aa3cfa902dc71b80ecad97f75f9b88185185351481c",
+      "lines": 106,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/ClientDevVisualStyle.as",
+      "sha256": "ac9ff6b5de57e61f45fae3835c166eb11a9a5661562d629c92792fdb85d5dc9c",
+      "lines": 68,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/DamageFlashEffect.as",
+      "sha256": "d385a9e418be5aa51070c11a42f02f91f400a4fe7c7d1176244591e5c33c6fe4",
+      "lines": 40,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/DamageFlashStyle.as",
+      "sha256": "72ba151efab48d124ee2664635e3881f2b2a66b92fb7876fd3ad634219d7c4d2",
+      "lines": 10,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/KamikazeFlashEffect.as",
+      "sha256": "3f425902b3330e00a5ec6e012479784603ed176f6b0df7874428b98a30ba7d86",
+      "lines": 24,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/KamikazeFlashStyle.as",
+      "sha256": "bc4b0b5b7be46b2e529c63de98477f82e593899be839550988dca489f6fd5331",
+      "lines": 10,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/PhaseBladeBloomFilter.as",
+      "sha256": "53bb566b1e429f2614065e96628c303a66cc2e16223213660a7dfb3ac8e8d777",
+      "lines": 45,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/RingDistortionFilter.as",
+      "sha256": "cec15c69dc26d5d8bd1c3656335caa68af122d28a2d16cd449678a74a4a5d2bd",
+      "lines": 113,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/RingDistortionSource.as",
+      "sha256": "9f0e426f8a3e1abbc9842573c0c29da0594ff8d9f2c2aca3e2e51ececd794345",
+      "lines": 144,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/filters/ShockwaveDistortion.as",
+      "sha256": "5a9805dca0aff67ccd4fbd7089e6977cb54d3187205952a8c9275c9a154fe3b7",
+      "lines": 75,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/friend/Friend.as",
+      "sha256": "7f5d3f42d91839dfe50e24774646af9deba243278d88b2cad74a2427790f8cfb",
+      "lines": 42,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b52ce72750149551790e0c24d62933d9ba5b7971efd66640374c060067abb526"
+    },
+    {
+      "path": "core/friend/FriendManager.as",
+      "sha256": "669671ed1682f9cff3e83df66b544967066189069a21f8aeb94b7a7d931aea14",
+      "lines": 179,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "bac343db8839ab53ad81c76e3cb4320e0b934521c082adc8ffb77cd39402364d"
+    },
+    {
+      "path": "core/group/Group.as",
+      "sha256": "b5d1fd2c50d04fe246fb23536355444153fbe8889e6afb6ebc9663b2c32edb41",
+      "lines": 73,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a881632d6e9138e11912d476d4585a82e1c594f56b5bbaae0fa81b5f71ce963f"
+    },
+    {
+      "path": "core/group/GroupManager.as",
+      "sha256": "7a6d0ab70cbdbb90122d04a839a61dc7588069f43219deb8052239c02ee2c8b6",
+      "lines": 170,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2f97881bedcbe84f28247bcc270fdd8c15900f56394dab37a7dd9ffa46ecdd30"
+    },
+    {
+      "path": "core/hud/Hud.as",
+      "sha256": "c1db62a2624980b19ada6714357b47453f1b0a9c6ed60c4918eb2fcd8734e375",
+      "lines": 767,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "986c0a4e7c58b807899d887285eaa6f9cbbd9d6236867309d289fdcfe6f859bc"
+    },
+    {
+      "path": "core/hud/MenuHud.as",
+      "sha256": "2e7ffa9a78127d9ba254dbcb71ae5148d39ef13a63010099f592b61d7eab4332",
+      "lines": 147,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "136a5ea751f47d355faeaaf2483bfc3ec1e9b51755c09fa5308c489a312c9247"
+    },
+    {
+      "path": "core/hud/components/BeamLine.as",
+      "sha256": "fd46505a4f3d894afb8130913fd7ab595cf28f2796d25777f6133ddb06882fff",
+      "lines": 196,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a49c28a90ae23ab97e25fd781fb0e8dac811455f6eb8513a11a0ad2e96ee0cd2"
+    },
+    {
+      "path": "core/hud/components/BossHealth.as",
+      "sha256": "9046ed910bbd11ead3e63f95a0f3e0930607f4aab39b400a912659733168c877",
+      "lines": 113,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "98f8c8a89bb22ce1a660883850ed8cb8c1c8e72f0d6ee102f1b2ec3a9a35ba53"
+    },
+    {
+      "path": "core/hud/components/Box.as",
+      "sha256": "37aacc7b35108281dfd92bbc37952ae295d1d41054ec73bfd1fa4e162b6c84d4",
+      "lines": 110,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "17bc10142eca997e1b0eaeb27d5b8ad2bd92b9bf82271e6da8b4a21a1addcfb0"
+    },
+    {
+      "path": "core/hud/components/Button.as",
+      "sha256": "89a048b83189a0f736832944c47a65f11dbaecdfa39f6d3b247ecefc6ad69aa0",
+      "lines": 229,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "12615c49ec8d037830af8f2293e84ea3b76e84591ada5bb3b65261b8f93da0cf"
+    },
+    {
+      "path": "core/hud/components/ButtonCargo.as",
+      "sha256": "618cd37529467515a6caeb099956f37fbbde3a50e6b9d41c3b58536a953e5188",
+      "lines": 83,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/ButtonClan.as",
+      "sha256": "59a8c21285799e99b2764445e979759b29b992955ab7c34f7f1197940979cd6e",
+      "lines": 78,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "84578c3c815d48bcfaf475fcfb55e32f63ba2d9c269852b842996db5f236fc4f"
+    },
+    {
+      "path": "core/hud/components/ButtonExpandableHud.as",
+      "sha256": "1b665397b86b1dfe9a5b4744aa3e5e6e01ab669bfc1af4052d47fde1a939c8dd",
+      "lines": 143,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "70c838548ec829ed521b67dc0fffa85df3157b5820851a0c589c3b065d79792c"
+    },
+    {
+      "path": "core/hud/components/ButtonHud.as",
+      "sha256": "c57fe8b0dcea126e0b4ff23a6509277a4eb984c498f067c5d401905e955d970a",
+      "lines": 136,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "9c0b120e1d96195c5a57eb5ec2ba42eeef7c0228758f31c037c879f8144f570c"
+    },
+    {
+      "path": "core/hud/components/ButtonMissions.as",
+      "sha256": "d04fb7d73cf3256c0ff00c75579836044a78011a1218a9354db73da952fa9539",
+      "lines": 55,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/ButtonNewMission.as",
+      "sha256": "65923fee55718619034b4d3f1a91f741679339e425dde0770c6ddf1efda719d6",
+      "lines": 87,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/ButtonPlayers.as",
+      "sha256": "ef5756de08bc852ddedb97992a29ebbd82bd7d50e0e4fc5076892bb03f0ffcec",
+      "lines": 27,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "95814db9b7fccee0df4b03f59a77f89557595f7eea0b7389c0036eefca3e6f99"
+    },
+    {
+      "path": "core/hud/components/ButtonPvP.as",
+      "sha256": "aa416e3fedd8638f01ac802e07834244214ba66e180d4da4f9343e854dd4ea28",
+      "lines": 46,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/ButtonPvPMenu.as",
+      "sha256": "a3a957680abfc61a9d6eb06e4c2e1c0590ec08ca30f06d82ff29c9b13ab26235",
+      "lines": 26,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "dd9aefb4f2fcd3f072aafc522c087cd8e7b88809cbf930a2d9a721727231342b"
+    },
+    {
+      "path": "core/hud/components/ButtonPvPQuickMatch.as",
+      "sha256": "bf374f047e0fbb8e428215fc6cc9b50b39972bbe7f4d3b1b93a4ff5209a280ff",
+      "lines": 142,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "385fecc8eee9115313891ab4714fb2014796398432d6b910bf152e1c71667431"
+    },
+    {
+      "path": "core/hud/components/ButtonQueue.as",
+      "sha256": "813c178e9fb401dec0d9ab81b1242ed1c07fe451c6385d17c42626817ab7bcd4",
+      "lines": 151,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "690f577e0c8620bef816a9424327d6592bc94dd57681f74462a3811359a4ff45"
+    },
+    {
+      "path": "core/hud/components/BuyFluxButton.as",
+      "sha256": "fc48d43733aecb38bd6e1d451e204444e70da62ce1eb33047488fa25df4d23c8",
+      "lines": 82,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "427f02aac54b8947e4e8589f7dd030f42efeb28b8d8c7623176347943d93a83f"
+    },
+    {
+      "path": "core/hud/components/ClientDeveloperTagColor.as",
+      "sha256": "b29242a2485521f5f0a5caf857085e6122c16dd4643f51e2f18f18b116ed9c52",
+      "lines": 41,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/CrewBuySlot.as",
+      "sha256": "3acf497dfd2c84a6b3a60f644a5678897beb195eb3741a70d63d3abd8be9d57c",
+      "lines": 113,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "114c64fdc4c10be32107adbc3ad8f636bc0a2dcdb44d1d52fbc9565e5d656d40"
+    },
+    {
+      "path": "core/hud/components/CrewDetails.as",
+      "sha256": "0bacb85823fe3e8ea5ef7ef9a7494404f52618a6051cc97699e6cfa61256bb76",
+      "lines": 791,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "136ddbfdfdd934206e1361972fe81a6c33509369d5e6ac3e4cff19f1a5ee4fd8"
+    },
+    {
+      "path": "core/hud/components/CrewDisplayBox.as",
+      "sha256": "8dd8cc05abdb89e88be41ddf14d37ee365291569bbbb7c3d46fa16851396693c",
+      "lines": 486,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "4331e3b1371cdd8643adfb8a3094a4b2f301ca4340c22dc30533cd1cd7cfe0fe"
+    },
+    {
+      "path": "core/hud/components/CrewDisplayBoxNew.as",
+      "sha256": "05265e0f3cf2274fd17c2d66dac3d3d9d13ebfc058d1f0ac12a2ffedcb2f55be",
+      "lines": 444,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3cc95ec0b285d0ce14fbb4ea136b54f713dd8f592410b5f80abc2fac71f3591c"
+    },
+    {
+      "path": "core/hud/components/EchoPulseColor.as",
+      "sha256": "056dbf4f6a413493e9ab63f5bab669b4fe8ee8e7d8b2aa46dd79b95349b801e0",
+      "lines": 42,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/Experience.as",
+      "sha256": "67c9309df1de69246bce2d2372fd6a00bc384d75994950b8726689ec60d1095c",
+      "lines": 126,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1a816bff0e532ef6ebcd3f6e4fa8270ab428009d8fcc9f88b6149c4b56131768"
+    },
+    {
+      "path": "core/hud/components/FadeScreen.as",
+      "sha256": "af2590755bcf970cfc1e3a2096e2dc9244579a733c1f71af863b938e6a4aefc7",
+      "lines": 588,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c224ec5c68c1e163e0ce083e0efda08e43afe7bda8cbe70d10310371ccb2af1d"
+    },
+    {
+      "path": "core/hud/components/FullScreenButton.as",
+      "sha256": "51b8977a095f26741a85c571fd375bbb4291b36c78abfd335695b449be1097d6",
+      "lines": 72,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8090e0e64e24cdbea2a1cd9a9d42ba55fe987cbc6d91753c37137a798efc7367"
+    },
+    {
+      "path": "core/hud/components/GradientBox.as",
+      "sha256": "d9c4aff7b1e03d6dddfb6cf791ea11d9e2432541a75c4c863673fc310334694a",
+      "lines": 112,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b1153beab42c611bf5ede5859a8c70fabfba5f4e90de668ad1daec3b10585ccf"
+    },
+    {
+      "path": "core/hud/components/Hangar.as",
+      "sha256": "b496b8da3d8a0822385c5bd7ed035fdf558f3f9eae3a25c45c6513c9d55c6a9e",
+      "lines": 311,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "f9891b1b11d9d4247379754ae52aae80eca18f6b2acea0b4040b4f4cd2b8464e"
+    },
+    {
+      "path": "core/hud/components/HealthAndShield.as",
+      "sha256": "5603c8920f8536924bb0957b71b213bdce038c11bd924198d53550bde17d87dd",
+      "lines": 247,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2053246102810263b3eea321e7fafc66ebc10d78023fad493abe8889ed15d88e"
+    },
+    {
+      "path": "core/hud/components/HudTimer.as",
+      "sha256": "e8d655aa1e470297fd399c29b7413a768d3de16aa0198cfc37d7c4b6b3e975ae",
+      "lines": 60,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "21bdf96c62d9e8c6f397e3a1a2cef5d8427c176b26088f76fc34733e02a2e4eb"
+    },
+    {
+      "path": "core/hud/components/ImageButton.as",
+      "sha256": "1aabc2c8c8fc81dfc9782db2feec661eea3a668768b7eb97f9de0fe20bbb3cdf",
+      "lines": 66,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0e81a331ee09c2a777ea544a000646e43909a219b43e8a8444270b725671ae46"
+    },
+    {
+      "path": "core/hud/components/InputText.as",
+      "sha256": "968ec5d354eb780b82057fce852f55563e7ef25ff0a50450d3ba2ac6f60835ea",
+      "lines": 52,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "25d7fe8490c2d391b91a7f94ad84a2e0b51f78616e45950b083f0540e25545ac"
+    },
+    {
+      "path": "core/hud/components/InteractiveImage.as",
+      "sha256": "cfce75cfb675bfebb98d48475c50bbaaa75d871c9561c127bff26eee0b29b1b4",
+      "lines": 150,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/Line.as",
+      "sha256": "7037a4286d5a8a92a887fb04cfddfd8b6e9ce963d9f05622d5da788f605864f9",
+      "lines": 83,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d7253ad57f3c355ceb1c74468bc35fe5700bc3451373f5ac3ba835f28867095c"
+    },
+    {
+      "path": "core/hud/components/LoginAccountTypePanel.as",
+      "sha256": "4fb67b0a1406dc7901a938550ebcd6f7098908bbb68c20257ac137db0338a678",
+      "lines": 135,
+      "change": "added",
+      "status": "source-translated; integration and visual verification pending",
+      "typescript": "src/ported/LoginAccountTypePanel.ts"
+    },
+    {
+      "path": "core/hud/components/LoginButton.as",
+      "sha256": "01e0059918be56191e8550da5b1b0e02bc42954efa1421544d1b2337975be47d",
+      "lines": 66,
+      "change": "changed",
+      "status": "source-translated; integration and visual verification pending",
+      "vanillaSha256": "ab6445987a4328efd64e27590b3899223d0e9e7f26c3d9b4f1a3f39980114e8d",
+      "typescript": "src/ported/LoginButton.ts"
+    },
+    {
+      "path": "core/hud/components/LoginInput.as",
+      "sha256": "3620dde720387ca9f9b5df0fab76ac4e20a331679eb5874e51819c9f2337edd8",
+      "lines": 96,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ad250189e6fba27feb925ce60eeb35b12cfdd2cccceeba264b36aa64ec4b4d84"
+    },
+    {
+      "path": "core/hud/components/LoginProfilePanel.as",
+      "sha256": "2b03a7be658b3f7d604544cc93ce39e3a8cfc683055c217972bc5a0e77cf6636",
+      "lines": 875,
+      "change": "added",
+      "status": "source-translated; integration and visual verification pending",
+      "typescript": "src/ported/LoginProfilePanel.ts"
+    },
+    {
+      "path": "core/hud/components/LootItem.as",
+      "sha256": "b52163f6f29e99fe63aeef45f9df013b3a801c9d3e2b18a656ea65eac4ef1a56",
+      "lines": 61,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "542d830749cefa9a732625400594f2b494b1af3da1827b861a4a230a4fa096b9"
+    },
+    {
+      "path": "core/hud/components/NativeImageButton.as",
+      "sha256": "07e28759aea96f514b56f89a48a3311c3e0a17480b87dff27bfc917f15c7bade",
+      "lines": 49,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/PodButton.as",
+      "sha256": "efcc973576ae78c2143c47c91313c0c5c3a026ec98fd20d171656006791bbaf1",
+      "lines": 208,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d6005e8d7edacfe5dd0a1c26a4f29962b00c3580fede8e0c547650613a793497"
+    },
+    {
+      "path": "core/hud/components/PodRewardPulseColor.as",
+      "sha256": "54a42cf8c3fd8a63774cde2a1e2bd6c7c545b29a92f0c57bf9145634309dd02d",
+      "lines": 57,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/Position.as",
+      "sha256": "122416eb02c3f9d39195c9c3159b068d01b72eba90f4f032f28a30443594bfd8",
+      "lines": 20,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/PowerBar.as",
+      "sha256": "b2e11b874838de3ce14e1800079f6b841c010e9be04c510bcb86584134d8ccf8",
+      "lines": 123,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d5b0ed97028603f65ee4db35f91c68638c742ceff37e9f77858b4e5504978695"
+    },
+    {
+      "path": "core/hud/components/PriceCommodities.as",
+      "sha256": "401a5fdb666860b05e3c8c78450ae6d814412e9d34ebe87b68a0d2a198d019c6",
+      "lines": 79,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2646dc58a442b4f483ac4c3ee31d217071b3a69c8c381f88cd04d3ea60e0c6b3"
+    },
+    {
+      "path": "core/hud/components/ProjectorWarning.as",
+      "sha256": "b6a5788313ce47479a6ad4891de088986c7619a1703d07851d8570f57dcb1568",
+      "lines": 54,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/PvPIcon.as",
+      "sha256": "f795d9636905f6292e62732894394a62069de65f2c18eb28fe4e75b037149d61",
+      "lines": 30,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d41ec8f860ce17b3af4889ad19da91fbfef7a8b79207e49b71c607d91f32d160"
+    },
+    {
+      "path": "core/hud/components/ResourceBox.as",
+      "sha256": "336f26a75d20165a7f32f9e3dde4e69c463b920e1c437db6ede33ec32ae934e8",
+      "lines": 28,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d5d0ab4061b880d007632bd52a9dfd3cbec2bbe0e4aa11ccbf75ffa989119653"
+    },
+    {
+      "path": "core/hud/components/RoomInvitePulseColor.as",
+      "sha256": "4aefb7d1d9819972bf5495519229cad4a1812046f36a1fe24bcd0547652e8991",
+      "lines": 52,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/SaleSpinner.as",
+      "sha256": "3f7f90443022e7d598786d236ff270ec80b03f4a70e41ba57b4592d7169b9715",
+      "lines": 276,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b7b44da1f25e8fd6cdfd2246b287c4fd63f3f42741a271c0b27abe6ad8d702c5"
+    },
+    {
+      "path": "core/hud/components/SaleSticker.as",
+      "sha256": "cbae28247a6e3501b44b0f1425155e436c7a624686fd6b5f120434bbf214ccbd",
+      "lines": 47,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3c4b65fe6942cf0759497ad26f1fa101d8f497dd2f99bcfde9caadd73b3c8fe0"
+    },
+    {
+      "path": "core/hud/components/SaleTimer.as",
+      "sha256": "6380de3b8403db28955586abd751d9aec14fa2390a4eac277b863e02bca486a1",
+      "lines": 40,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/ScaleImage.as",
+      "sha256": "df600f9050862a4314dca3f9582ef13bf91c705a469effffabe690af8ed1892b",
+      "lines": 17,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "108a2ac06aa7be8284f014291bc52ada6bf54f73d1ff83ad03127e9a096e5577"
+    },
+    {
+      "path": "core/hud/components/ScreenTextField.as",
+      "sha256": "dfe990090998b68490bc6d4f12d8eafabee5bb23daff8d2b42c92dfa810c6a5e",
+      "lines": 503,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cf9f2fc4690d9c7769a1309869a681a269ca4760f82df1c01e0b0b88e944573f"
+    },
+    {
+      "path": "core/hud/components/SettingsKeybind.as",
+      "sha256": "1703391c509956cc2e99c99768c690f30b954f04b705824f14ce8d03ec8ccb21",
+      "lines": 142,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2960baf127dee8c8b0ffbaf94ae7333dd916fa9a96b4babb6aeb745b0c41f9b0"
+    },
+    {
+      "path": "core/hud/components/SettingsPageStyle.as",
+      "sha256": "b104b2930ccfaf47452dc4dce841c19476b9a340140a967b957dd1f70328bfa0",
+      "lines": 54,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/SettingsWindowChrome.as",
+      "sha256": "2faed7922115fa9095f4cb25ab77029b9cd1835db42d8db38fb2708ff92f2f1a",
+      "lines": 55,
+      "change": "added",
+      "status": "source-translated; integration and visual verification pending",
+      "typescript": "src/ported/SettingsWindowChrome.ts"
+    },
+    {
+      "path": "core/hud/components/ShopIcons.as",
+      "sha256": "ae9db2a05c4c72a25e25b66e64efe6b2eabba6641e2a7169078bb2a00b085041",
+      "lines": 122,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/ShopItemBar.as",
+      "sha256": "67d714f635e76069b1a82a65236c78c75cb4135f5c8de4014b8f21665453d217",
+      "lines": 345,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "5b965a201d081169ded59120c2c0d9e5214d5f98148d4ac18e549365b8db9801"
+    },
+    {
+      "path": "core/hud/components/ShopItemBarStats.as",
+      "sha256": "56d02bba3f5cdb8d3fbbbff62fc0f52bfa7de432487140d3e58c6d80444ffc9d",
+      "lines": 84,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "64ae51859511714e67a3e5cf9b333758e72ef15f23b25399955e533123682cac"
+    },
+    {
+      "path": "core/hud/components/Style.as",
+      "sha256": "6c5381a8a5dd6e25ad61e1933c80313e9d6d352e113c49d6ddd953cfdf989114",
+      "lines": 34,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8383c918db64da1facd16191cf738cea340f1a20072adbc1aba25b68da184b5a"
+    },
+    {
+      "path": "core/hud/components/Text.as",
+      "sha256": "92986729903803be4a4614410016fd3922f1d3cb34fa1686382f2816934f2595",
+      "lines": 430,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "f719a281f890544bc7cd43dde8561870d9ef5d4fc5a9494c1366b69837c514fb"
+    },
+    {
+      "path": "core/hud/components/TextBitmap.as",
+      "sha256": "2e2ec0a22a7438638ba77e972ef44e6e41283331cf4a035aa355131b99cb7718",
+      "lines": 97,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "31f68106464fdcfe22e00fa44cdff8ce55db0a2d11d2310ee13d17d24cb7f4cb"
+    },
+    {
+      "path": "core/hud/components/TextBitmapNumberAnimation.as",
+      "sha256": "e327a6b1c66d64d4edf48609df8ecb6dc6bc1ae6320586680229cb02e42fcdb0",
+      "lines": 50,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "722a5f748ff719906e9416a0edb5cd1b5e7a22514f65b9280ab9da51f382c5b3"
+    },
+    {
+      "path": "core/hud/components/ToolTip.as",
+      "sha256": "d77fe8eed961248d56f57b88af18f103088402df8808e2d6f158b2bef324f339",
+      "lines": 222,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2135db46dec6b23a9a6420c2159f1147dbdaaae2cee5b7fa30d8f32d66da97d8"
+    },
+    {
+      "path": "core/hud/components/TopPvPPlayersList.as",
+      "sha256": "d39230170299a1fb0cce48b007e3144067c45c57ff881cea2e7bfaf976c5a1ae",
+      "lines": 103,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "4b4c5d0d1cb773c83a40a0b879bc8d1dc6fec2490282a825914ce0c57e281446"
+    },
+    {
+      "path": "core/hud/components/UberStats.as",
+      "sha256": "efd143c85b3accac08431420b4562323cec46c4a0c1b2113e5ba5d62f2efa8bc",
+      "lines": 263,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "78259358f75e495e1fa41c70871d17b3eb7dbca8e061dc8526222e1a2608e45a"
+    },
+    {
+      "path": "core/hud/components/WarpGateFriendLocationSelector.as",
+      "sha256": "6c1e8778a215b82b979cff96579187c125522803f3a92e8356a77385830208d5",
+      "lines": 180,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1dee1fe9c5007391fff6aaad9e9c2772ba03a9bc7f14e03ba358bd7f5d8458be"
+    },
+    {
+      "path": "core/hud/components/cargo/Cargo.as",
+      "sha256": "6a27c974a1cacf6a5fa066585d2e42b19d0c647625c082a02a9b61684e5ea525",
+      "lines": 492,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "21176a298bd92d48f5478ef50878fbe5430dd493a66a172567109e872cdd7a29"
+    },
+    {
+      "path": "core/hud/components/cargo/CargoItem.as",
+      "sha256": "c4607bb10a3593515e2bccb14e2ce187885d4ef50415a558fed652a43c628ea8",
+      "lines": 96,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8d14d19fede14a854f5cb5520476889de63d30cff3879ec68f6c673c6f11bb07"
+    },
+    {
+      "path": "core/hud/components/cargo/CargoReadQueue.as",
+      "sha256": "9a0b8ad5272cd8afaeab8bfbaa22c742f4694a0027d4de385632d3cf1f6e6ddf",
+      "lines": 37,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/cargo/CargoReadQueueState.as",
+      "sha256": "c544fb89d127e9bc6ffa45fff2b1d96630ade1f17a88b2804fda0d60cad7330e",
+      "lines": 120,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/AureusDeathMessages.as",
+      "sha256": "dc2596ac0546fd89c71940547b1da1709404d67ce7de59093dd4b2188b64a4d4",
+      "lines": 151,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatAdvanced.as",
+      "sha256": "4e89fba8f612559b235ebd4cde30a792e337a1933cd310ea39fb6324b979a4ca",
+      "lines": 1207,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "69cf0660233c56f1fb391f48a0a6f6d1799818fc7f7ee4d5a4225974cce93744"
+    },
+    {
+      "path": "core/hud/components/chat/ChatArtifactChannelPolicy.as",
+      "sha256": "cd873f75bf7e2b6966511e0a00775b202e71d886642d95ee0bf95e82030dd748",
+      "lines": 19,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatArtifactLinkData.as",
+      "sha256": "018f0a59ffe4bbb9c284ff230e10875408cff682919ee602c6ae50ea85b71c8a",
+      "lines": 41,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatArtifactLinkResolver.as",
+      "sha256": "97d9c7fba201b08c1229a90d689bcf52b488ac1c359b2174c9a0ac942df5b31d",
+      "lines": 492,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatArtifactPreviewPopup.as",
+      "sha256": "c649635e423da67295a1c031f8cdb7ec97aed1a530c16d60c647b4ab495df097",
+      "lines": 220,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatArtifactToken.as",
+      "sha256": "4f02c05f07ae06f94921a4e2f337358893b3f5bd4750eb25b0a736ce35028fbd",
+      "lines": 98,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatArtifactTokenRegistry.as",
+      "sha256": "b59ee2822b1d70c924682e63debc6b91c016f404fa70b55f80ffe24c776c899c",
+      "lines": 88,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatCommandAutocompleteAction.as",
+      "sha256": "d2e85e7dd9448718d752354266d2c3cece4e0643cfd7125707f59cc339c32419",
+      "lines": 17,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatCommandAutocompletePopup.as",
+      "sha256": "1b2af26a40626b43274dae85d270fe7ca747d9c350e0ff942cdf92dfb071bf70",
+      "lines": 730,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatComposerFormatButton.as",
+      "sha256": "7c05d58e2d9f4cdaf94b847f91b20328b14262cd058d0a9cf1e8efc0c58ff9d4",
+      "lines": 86,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatDiscordImageLink.as",
+      "sha256": "58280db197e9c2e5ddec35241b8a1f50a9392af4fb028ee4d7e637528f5a820e",
+      "lines": 209,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatEmojiAutocompleteModel.as",
+      "sha256": "4405edd9e1c3a9f9e50e36626728cc17f66e049cff9995c18f87cea287107829",
+      "lines": 129,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatEmojiAutocompleteParser.as",
+      "sha256": "b99f9e118077fa9f265021e9bcf9ffee199bdf570400ebaccb4a76f7aea65b1e",
+      "lines": 67,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatEmojiAutocompleteToken.as",
+      "sha256": "1d93d405cce4e736dd5e3cdbadc41a511d214f5d584ee3af023514a0ea511c0a",
+      "lines": 20,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatEmojiPicker.as",
+      "sha256": "45f79955c056c76fdcc8ef4fd90281a0c9a7101c6f65e13c1f8c078ae6f851da",
+      "lines": 583,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatEmojiPickerModel.as",
+      "sha256": "e319b808e9c06d8d2ea81480a6fdd6e1f45e5b7174f750a09ab629da4d01a039",
+      "lines": 101,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatFriendAutocompleteModel.as",
+      "sha256": "1554ebc297a9d6f083a6136317ee7cf08ea013b8f3404077ff658430e68d2e79",
+      "lines": 236,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatFriendAutocompleteParser.as",
+      "sha256": "94defa40b2c8e4d4b0f837278423dacceea3601f5f74c4758eedf678b4d7bfee",
+      "lines": 54,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatFriendAutocompleteToken.as",
+      "sha256": "f452f5155d7d7af78144760ffaaf0612d15a7ac310e1b0f29b7d3ef8c0272a3d",
+      "lines": 17,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatFriendPingData.as",
+      "sha256": "4a0119620a33778bb5a094175583628c3d8c9e7612480635cef25e4985ede751",
+      "lines": 53,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatFriendPingFormatter.as",
+      "sha256": "221961e1314e6233f8ccbd5ab45836a73027b014b1ad42ab1acc12dc124d4d23",
+      "lines": 192,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatFriendPingPreviewPopup.as",
+      "sha256": "8a0218c426e77732cd7e9bab8f97441fa847bdb48a83c1b46b2e7188a29be425",
+      "lines": 233,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatGifDecodeTask.as",
+      "sha256": "627232c59706368f69414f92b41e3feb1352826c174cea946b4ad268b95fe11e",
+      "lines": 350,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatGifDecoder.as",
+      "sha256": "4477095f077e158517d194c51ee6e21cefd6f4f355d1639ed0ecd252b220b049",
+      "lines": 45,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatImageAsset.as",
+      "sha256": "27dc637569ab42b0a46e79df1137b396cadbf8cf3252536e2b232ce21a3c9c69",
+      "lines": 57,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatImageCache.as",
+      "sha256": "d0f4dcca1a61b6c777f453d78a1e4a1ce9100fd9af968be93a4f6a0d971c4e80",
+      "lines": 169,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatImageShortcutPicker.as",
+      "sha256": "1115e550077ccc676d181bd9dfdcf10abe8464012a794b5865cbfa497fd73a0b",
+      "lines": 325,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatImageShortcutStore.as",
+      "sha256": "97920faaf26e6807e3b799fa360a29076b442435f5f63065d7f6ee7f324ad06a",
+      "lines": 111,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatImageThumbnail.as",
+      "sha256": "0b2cf356b908fd7873f9c735f6e8b98a598cd9ef4710d6c115b8abe06baa4a9c",
+      "lines": 206,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatImageViewerWindow.as",
+      "sha256": "cfffe6a5a1ce3928c6f2cc6fff3513e0502c287b251ba6d1aa3cca8a214b589d",
+      "lines": 316,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatInputText.as",
+      "sha256": "c2f31145fe9d8644b28341a9c62db46296f50164d93fa12938eb0d58043e08b5",
+      "lines": 5115,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "626f542fd4bf4a82db11139d74a3803ae746ba0a986e0beada6aa219f258d029"
+    },
+    {
+      "path": "core/hud/components/chat/ChatLayout.as",
+      "sha256": "74b1007b286dee2a8da55caf05c7912870a0f3b4a93cf46b173c20d6e5a6221e",
+      "lines": 30,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatMessageContextData.as",
+      "sha256": "746d6300b1f548f9f179e0926a4d0f31510d4611eb544fa5cfb7877d6467e10e",
+      "lines": 113,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatMessageContextPopup.as",
+      "sha256": "d5fbf951afd884defba7b702286945b79e357649fefc377cc85732ca41ebd6a2",
+      "lines": 312,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatPerformanceProfiler.as",
+      "sha256": "45c81afe51540992703c4a1ae9d07aa35a28f4c37de37c2509bbfa0df9c44bd8",
+      "lines": 187,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatProfanityFilter.as",
+      "sha256": "5a46fe0009c7af78d3bc0d0a99b236ae320dd65d6ce706090637b1577394f15a",
+      "lines": 118,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatRemoteImageLoader.as",
+      "sha256": "ba4caa6fff19017592dad423e87e929606a1633f2d6a2665996d1f3f4830121c",
+      "lines": 469,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatRolePreviewPopup.as",
+      "sha256": "0ab089e1fe9fd5df2d5fc26aa11edca9089bb7206cb11dc0bfa7c76b9cedc7db",
+      "lines": 77,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatRoleTags.as",
+      "sha256": "52cc8c7a6943bb3824f44fc557208b657353a28d3ff0cb7eedb0699dddd13bc2",
+      "lines": 109,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatSelectionFormatPopup.as",
+      "sha256": "02a4b6f54c3ff60d7e85b12dc93b2e52b296a55c30a6dd225ee65fb560f5efa4",
+      "lines": 978,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatSelectionValueSlider.as",
+      "sha256": "29971c411aee3a90f71a9e98e7a40d978eccf3169109a4fe8fc3fa74168f4602",
+      "lines": 147,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ChatSimple.as",
+      "sha256": "7c3a0dc8d90377b835e78a077f174898949cbd28ff561f414d65cc50e1326c5c",
+      "lines": 414,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "bd1c2c055d69e0be607b6408b583c6ae53fad0af04faade2e6d6f136a3b0b923"
+    },
+    {
+      "path": "core/hud/components/chat/ChatWordBoundary.as",
+      "sha256": "b97b350fc41de642f71f7674de07d8d14251f4b5dbc860b57c6a64edff6996b7",
+      "lines": 191,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ClientEchoCommand.as",
+      "sha256": "986f75c5f473f6bec063777066ad3b21829389bf12596d35c4ed3030c8c9bd23",
+      "lines": 32,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ClientLoginNotices.as",
+      "sha256": "057e0fe6069500bf9b18821f1e2a19513af3dbe1d6a6448f8d34b573a53f9902",
+      "lines": 72,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ClientQolafChat.as",
+      "sha256": "be9e31f8fed5305ef4e16929ba217d50bf2b8d7fe308570e51e4f6322d91b34e",
+      "lines": 410,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ClientRoomControl.as",
+      "sha256": "15dee3de8e63f3de4654f3bc624eaeade77d0eaef85403b5f7d13fe393fba5e3",
+      "lines": 725,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/DeathMessageSelection.as",
+      "sha256": "d234c9a6847d4afe627001985764a91ae4cde7ece0ecbcd6b7bfdfac62d9ee4b",
+      "lines": 67,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/DeathMessageVariants.as",
+      "sha256": "5f876a52f5bcc748f2bf0dfe1044be89f8201414afc711e3ebcbb3f7635d144d",
+      "lines": 111,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/EmojiPickerCatalog.as",
+      "sha256": "d067e35ef7b5bb168ffdfc660c264444172a41b7ce79ca82f88a6a1028b25b8e",
+      "lines": 215,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/EmojiShortcodeCatalog.as",
+      "sha256": "3730a5a3d5ba51db9d6659a509be05780c16a99c5b76866e1590e33cc1c68f5a",
+      "lines": 4342,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/EmperorDeathMessages.as",
+      "sha256": "f61e922c3892ca17c69137ecc19786454473601f2969384b9f01e28f47739bd1",
+      "lines": 75,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/FactionDeathMessages.as",
+      "sha256": "53445647fdd712ce42ad02b677338b147abe3664c06256266042f9fee0797255",
+      "lines": 352,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/FloatingChatConnection.as",
+      "sha256": "50af3d306daf8a9c8b4ba5e07883f8e83ccd6334a7e8e0f7581670a3776ada27",
+      "lines": 299,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/FloatingChatWindow.as",
+      "sha256": "4d08f5cded6f5a228a138af3b1967fa27b42af456558151b8b2ae3b8a46ceecb",
+      "lines": 344,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/GlobalChatSanitizer.as",
+      "sha256": "e27fa45f3f20ebd7401965580c8f64f2c8b0f71a9e5d4573d5bf12cdc66df5bc",
+      "lines": 24,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/MessageLog.as",
+      "sha256": "284f0d0edf3696390690a3fda3d183fcb314eee09553aabdabaa5cf714537771",
+      "lines": 1599,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "284f28dc562fa2447393f07a4c82a915ccc48110019f780b1c087e8e6c28612e"
+    },
+    {
+      "path": "core/hud/components/chat/MessageRandom.as",
+      "sha256": "b37000c27435a553133fd544d767897cc5e1662680c622897cb2c26d7c4a28bf",
+      "lines": 37,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/NetherDeathMessages.as",
+      "sha256": "b8b73ab1f747b68c1a0335a4e6f40022d5d7d5573c5ff9f02fb13c7407cc68e5",
+      "lines": 51,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/PlayerChatOptions.as",
+      "sha256": "56ba5dc1d796bf4d9ce2207e0a080c5732f4a9c83ebd2a29d5aab73aed9cd47e",
+      "lines": 81,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "75aafd8f26b793066767a6421d2678d60102a49e0d65f69f2dd2ec9e8e0e623b"
+    },
+    {
+      "path": "core/hud/components/chat/PodRewardNotice.as",
+      "sha256": "ea5d29de37289ea11af410b1a87c899a56a7632de56e4176da7e12f995f58ac7",
+      "lines": 49,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ProfiledChatItemRenderer.as",
+      "sha256": "ba8339bd771c0e9998f224a39a9a2bc9bf8cc697d3fef1b9bb129eabbb3d789d",
+      "lines": 212,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ProfiledChatLabel.as",
+      "sha256": "f20f30eacafd5bce594e0aef57289c980b44b0149306b30a8d13809237e83e26",
+      "lines": 80,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ProfiledChatList.as",
+      "sha256": "897e8554e456f0d1cf1a384e4c89242ca8362324c3b9ef635970495b2bfa7f78",
+      "lines": 33,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/PurchaseNotice.as",
+      "sha256": "d9cce8314d48f951d77af6edea030fdcfb39dad5c701db455763597cda1b1865",
+      "lines": 29,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/RareArtifactNotice.as",
+      "sha256": "5e049d357eb3657d32ef84ac094beb8e9fa95a8d9970c02cd12b60f439db801b",
+      "lines": 29,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ServiceConnectionLease.as",
+      "sha256": "3cfc52bc5077aee04fb64f536a01c145d73b6641bcd4bde98813ecc5a70d9b9a",
+      "lines": 51,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/ServiceConnectionPool.as",
+      "sha256": "809a43fa0f439dc668aba9a9f7911c1be0fc3758e568d9dce4e5694b67cb0b13",
+      "lines": 410,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/StableChatListDataViewPort.as",
+      "sha256": "0a7d1f5cfffebb415e7ebdddec32aa6726cbebf601a3f6fc4ea9b7b5b57c7dc8",
+      "lines": 39,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/TrustedMessengerPresentation.as",
+      "sha256": "fd6157bf2d01120b24e9d25a700e07e7645f1effb82de1ea687a9fb58fb0b74d",
+      "lines": 41,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/VisualShareControlCommand.as",
+      "sha256": "2b68a7f807a0087553eb9a6480e849b0cd73b641b9a69e4ef4a58fa6861c5bb0",
+      "lines": 58,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/EmojiGlyphLookup.as",
+      "sha256": "485045228881a6ebc85666e0e4e1735129f5fd1973e095d0d26ddcf2ee4f4936",
+      "lines": 158,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/JapaneseCachedGlyph.as",
+      "sha256": "bb614ba74fa5cc76df1e4cd049c756f11a06f76f4711c050811c187c7c8550a4",
+      "lines": 13,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/JapaneseGlyphCache.as",
+      "sha256": "ee5ba9d3f3ad6f63800a3e2d33fe78160226c76d791c985e5259dff835d602f0",
+      "lines": 288,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/JapaneseGlyphPage.as",
+      "sha256": "5ffadec95b8260b622da187965504279c9d1e751270e2e37d5c144efcdc5e159",
+      "lines": 52,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/JapaneseRuntimeFontLoader.as",
+      "sha256": "786e1a3ebf7321262b2ee2377df3ba4501cf69564a2e38546e273228974c8bba",
+      "lines": 140,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapChatTextInput.as",
+      "sha256": "6e5467b2aee9cb351238b412f99b3a62a49df9332986319cf859b74debed5b8f",
+      "lines": 33,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapEmojiMatch.as",
+      "sha256": "ed522696ecdaaf8361ac3f8752917ec6dbb8fd30af9c05bbae62762cf679b76e",
+      "lines": 19,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapEmojiResolver.as",
+      "sha256": "8fa97ae26b09761abbc29728826db191f8c26273c485b0ae32a3689249f2308f",
+      "lines": 96,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapFontTextEditor.as",
+      "sha256": "7b1862312aa34beb70c69e2cd280c2acf9ce874478a4f7b44fb8dfc15d94c5cd",
+      "lines": 1672,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapFontTextRenderer.as",
+      "sha256": "0ddd32bf5c5128f02e37a5b45b14fb7ba288cb5f72f7c040e541d2b3763b4f38",
+      "lines": 1387,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapGlyph.as",
+      "sha256": "222f5f72e8d363ae13b411a9e495485e65a0a359d40f4e2654d5d64fbb8192ce",
+      "lines": 38,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapIMEClient.as",
+      "sha256": "27592eeb30472e8d999b082d0b34bc01e9832cec754cd5c92ae9a4c4a6a6f0c2",
+      "lines": 67,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapInlineAtom.as",
+      "sha256": "ebe726f0ba5a87af68c31d8a6497803bcdbdae23e8d9332ee01bdfcc0282187c",
+      "lines": 37,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapLine.as",
+      "sha256": "821d1deda0ed8681e9ecab119d5436131834b56ca38e49a2e9fc09c4ea48b52c",
+      "lines": 27,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapMarkup.as",
+      "sha256": "652f599e7d82263fd2ea83b13987d822e92814955f95f1e6b89bb423e7409c50",
+      "lines": 216,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapMarkupParser.as",
+      "sha256": "59bc9441b92350078afe98446b35dec1ee1cea512494849c0af03900ec802c62",
+      "lines": 376,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapMarkupSerializer.as",
+      "sha256": "02ea66fc35485d01ee9fab139478c1a6813b5ba776ea3cfce68446126b2945e6",
+      "lines": 139,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapTextMetrics.as",
+      "sha256": "0b0f884e8851a008a19f5ffded80496d45cf6f176f715cffae1b626f4c50077c",
+      "lines": 208,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapTextNavigation.as",
+      "sha256": "e93de16ab453d4ffefc3dd583ccd07fcddf83f2ebcfc477359d3a4dd7c28c066",
+      "lines": 171,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichBitmapTypedMarkup.as",
+      "sha256": "460e90e9be35437ada78bcfecfa5aafbbca9bd72d6256d07a6638f00429acdd9",
+      "lines": 277,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/chat/rich/RichChatMarkupValidator.as",
+      "sha256": "aac550b90f98394ca1569d5384b2b0665a140805ef998ee11fc7dd58ccfae1a3",
+      "lines": 128,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/credits/BuyFlux.as",
+      "sha256": "7ab9d8f9b69efa47c266c692b9a933515ba95def6d46264244fe277e46d40086",
+      "lines": 693,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3b67e005f3f6f42ba6a4b20d1a3dec711e6c1a142f7e4b06c7c63ff5c20c6794"
+    },
+    {
+      "path": "core/hud/components/credits/CreditBaseItem.as",
+      "sha256": "e0bc0373cc69a217730da9027cb70123d3c07e81396512a2c4950094805a8cf4",
+      "lines": 142,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "89f21436703d03e8e2063add173ef6eb3755b9b05035ad82a773031ebbefc2ec"
+    },
+    {
+      "path": "core/hud/components/credits/CreditBeginnerPackage.as",
+      "sha256": "c06957e380db3613e50e560dfc8beae2610eb390067ba0381e38e46d90cf73ea",
+      "lines": 104,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a688cbdf983f052f426510ee9f1aba5ff69285794fc54710ab77ef8421a70de5"
+    },
+    {
+      "path": "core/hud/components/credits/CreditCargoProtection.as",
+      "sha256": "a3b2d71ffe1e2f127c195433708a524e3810c4dda517bdc6069baa891cbe00e0",
+      "lines": 69,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/credits/CreditDayItem.as",
+      "sha256": "6fd4e142a7926948b5daea4d2ce448b6a4b323ccaa98397db3f8579133bb213a",
+      "lines": 169,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "7723315a630fa8376eea16d736a99e5e06f3216c3295676b7d3f7e9e9d7955a2"
+    },
+    {
+      "path": "core/hud/components/credits/CreditExpBoost.as",
+      "sha256": "83d5978649accd7694fd8206bcea0105a747454f560f9a078aa5f739f660ca97",
+      "lines": 70,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/credits/CreditLabel.as",
+      "sha256": "231a00c676700eddbe4a59df02abf7d2a77fad5a329f1335a7cbedc90e963d7a",
+      "lines": 37,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "7359aae56258e598ae69904a408bd421c7b702e3f3d4ae9f7022ba76d1869da1"
+    },
+    {
+      "path": "core/hud/components/credits/CreditMegaPackage.as",
+      "sha256": "ff5fb70087e8d0a325fd8658d89308289999e3e21ef6da95a8bfdc7c60682332",
+      "lines": 128,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8ff7c25ed911ee9ad29861c3bb940ac55314f9eef083609144f8a16919577706"
+    },
+    {
+      "path": "core/hud/components/credits/CreditPackageItem.as",
+      "sha256": "95d9810adfdb57a22dcc060b06a28a394c9c4fb2dfd82180ae6b15a9ab9fbfdb",
+      "lines": 373,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "261d2162a90de4f5859ba59e16e8264c3d5cc4ca9d65845af5ce5d3e6315b0c1"
+    },
+    {
+      "path": "core/hud/components/credits/CreditPods.as",
+      "sha256": "fd60735963fb63f692f2faad60c46bb90c1f9b52a39f800fea1fd8904e0e7749",
+      "lines": 43,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "018a3b100d1cba5c8982aab0153bfbaa740b6f45a543c44fbf402cf9f59796cb"
+    },
+    {
+      "path": "core/hud/components/credits/CreditPowerPackage.as",
+      "sha256": "ea32528ff05ab70e811a7feeb57aac76587faa94a8eaf1f814eda9605d77b49e",
+      "lines": 115,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ce31c9294df135d3a26576034e0ca817e2be5cb6e617626dcf6558d3d6f822e7"
+    },
+    {
+      "path": "core/hud/components/credits/CreditSupporterItem.as",
+      "sha256": "33e17f40b172f54a3d2af4d578269e5b222d7ebcc6201ca6ce2b54b11590b701",
+      "lines": 383,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "5c388b58a72f9b362a92834e76b8b35a3c4cc3fe9854837d37b761e372a16560"
+    },
+    {
+      "path": "core/hud/components/credits/CreditTractorBeam.as",
+      "sha256": "e758160bb9ce20b72d6f27eed681dffee538e4ba1cf7b8d0f7c5f6915ffee441",
+      "lines": 70,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/credits/CreditXpProtection.as",
+      "sha256": "fa895a037b1fcba1e964d30239dcfdb7765956d82159df221fee0250780e24f3",
+      "lines": 76,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/credits/FBInvite.as",
+      "sha256": "78eccd89b19baaab258217f8514ab808dedadc71581ab322a7908429d4378bf3",
+      "lines": 52,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b64324ed5cea626e9e3432ea288e0d7578f97498a66086203be2e06b4ebd2376"
+    },
+    {
+      "path": "core/hud/components/credits/FBInviteUnlock.as",
+      "sha256": "1ba241d4c54754af2591cd9ada44072d51aeb73be3effd9d9777ec6b0f80cddd",
+      "lines": 53,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "7ee7d84a8da33cabff07f64b3b77f74ba34171b201c5797b39d19bcbba43655a"
+    },
+    {
+      "path": "core/hud/components/credits/ICreditItem.as",
+      "sha256": "5f5861a6c18892b008bc91dc63ea80ba4776cd82016a79b7083c46f251d5b097",
+      "lines": 12,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/credits/KongInvite.as",
+      "sha256": "cc89cdae242784a169ee2bd39563cc31cf4a6dd49875d73cab3eebcc6eb27470",
+      "lines": 24,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/credits/Redeem.as",
+      "sha256": "c585ce0ab6d4aa9a39554343d8828eb906784785fcf87f600ff00c5b2b7f1c70",
+      "lines": 140,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "34f1d8327ac52fe8acd6c6bf87243c1c5abf497eddb09f6958ea6202fcf76aa4"
+    },
+    {
+      "path": "core/hud/components/credits/RedeemSuccess.as",
+      "sha256": "a9472db210092103a634900cd0d234a9e2431eef551498d8b25a21e0bacae056",
+      "lines": 97,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2ae5562c2149ce15c16cc18ee4127adcb3a4d2898125c52039f9b4e2e2cae608"
+    },
+    {
+      "path": "core/hud/components/dialogs/ClientChangelogPopup.as",
+      "sha256": "bc7b3d4ee6992bcbb7a711114a05188b5a7dabebb3ce5b629f4a6487c3cdf688",
+      "lines": 746,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/ClientChangelogTextChunks.as",
+      "sha256": "942e1265cdc33c54fcc3cc5974c68fe75318aef56ddd025a288a5424bef41e42",
+      "lines": 57,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/ClientDevVisualPopup.as",
+      "sha256": "4290b8be5f613a1b19d533f29d5b9ee52e8f1d7d41f3fb3cd621812521148a4b",
+      "lines": 238,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/ClientHelpPopup.as",
+      "sha256": "919c931e89f20498a43372bc6d9adc52a42dcc2b20d21a2b9c390e4a80894880",
+      "lines": 495,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/ClientHelpWelcomePopup.as",
+      "sha256": "f841d10f60c0d9567bf2b6cba4e58e1b3b2a2a61e38b19dc36db307202476ca1",
+      "lines": 43,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/ClientHelpWelcomeState.as",
+      "sha256": "5eb4bfa567b8e7768fdfb4e3f2bd674b1eca93f72d9f6de94c0b85994f1f1036",
+      "lines": 52,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/ClientThankYouPopup.as",
+      "sha256": "ac0c8e6f11cc00b41f264207347c5e06ce9364d0cff79b1dec5026eed3898dc5",
+      "lines": 175,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/CreditBuyBox.as",
+      "sha256": "3aeaae76df261bf7468964c3ba4fba289bb5ad8d73a2acdcbfdcad8dddd9a32c",
+      "lines": 152,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1ed9e318e9a78b9888ff7189e556ccf6f1ac2b2c14c53add70ee607bfc38e78c"
+    },
+    {
+      "path": "core/hud/components/dialogs/CreditGainBox.as",
+      "sha256": "163138881d4a256fc0bc4de562e550392b18992185d92aa2d10c45801097eafe",
+      "lines": 118,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "84b40694a40d557163f8110b1eaeadb4fcbb37bfa1c5414f3b5a654b66405f69"
+    },
+    {
+      "path": "core/hud/components/dialogs/CrewDialogBox.as",
+      "sha256": "3e3bd17c78a4740aebd30deb3695b53586f4073c2a1237893cc2ca0be43aea83",
+      "lines": 194,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c9c9b2bcd5265603345de327867e6071ba47421918c5fca2687a3253d842bfdd"
+    },
+    {
+      "path": "core/hud/components/dialogs/CrewJoinOffer.as",
+      "sha256": "52f93e203e64f9e32603cc049430ee2dc1071a439c67ba910e89de09efd3d36b",
+      "lines": 348,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d38ce5976c6d3a9cb37dbd6f82757d61acdd35622ebd6da92f17a630082597fa"
+    },
+    {
+      "path": "core/hud/components/dialogs/DailyRewardMessage.as",
+      "sha256": "54941b961f1dedc7fa168713ffe6d659c8932ee937674494f27be52ecdbaa498",
+      "lines": 164,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "4d53021a18d2ffc53af899d00b7aebe3c6ff6030b4a15b936ef5990389dd9d8f"
+    },
+    {
+      "path": "core/hud/components/dialogs/LootPopupConfirmMessage.as",
+      "sha256": "9f8d39f709c767ac6e0df23d253482aeb28dffd3c204c42f7f2112e503913757",
+      "lines": 36,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a51afa8538e77539fa4cbfc396bffbfaab4951882171c611325242f3c1a5bb53"
+    },
+    {
+      "path": "core/hud/components/dialogs/LootPopupMessage.as",
+      "sha256": "6788f34c71d86a0df1f38b7186c5edbabf3fb8768828931b0599546f110258b2",
+      "lines": 39,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "5a46589d3db40c81d0a21c6d16c4d20ab595b71df965e0f2484a67086caf484c"
+    },
+    {
+      "path": "core/hud/components/dialogs/MusicPlayerPopup.as",
+      "sha256": "6108e6d60d37ec9f57278c244841c2f225429fe36c49fb9e5c9e8bfd769678de",
+      "lines": 331,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/PlayerInspectCard.as",
+      "sha256": "382674ad89487b89f64c6596d74af7aaa70cb507cb23ec886d81062ea3b4ec75",
+      "lines": 263,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/PlayerInspectPopup.as",
+      "sha256": "c00793d6ef83455c2b5cab7d55cb5b6353465377ecb4902e0d2e489cf1fdcd07",
+      "lines": 815,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/PopupBuyMessage.as",
+      "sha256": "da6a2a7a604af10fa4e48d294715681dd76283ecf36adef6701b355a90fadeae",
+      "lines": 145,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a34cb034bdfdc1a3fa20480d1bf1580e72a6e4504d0afafcfcebac9f3ef106ce"
+    },
+    {
+      "path": "core/hud/components/dialogs/PopupConfirmMessage.as",
+      "sha256": "ca4cae677dfcc91474a52d7b469a63bba742c2543dcd844a6c19665cb7dc9bbe",
+      "lines": 41,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3bd31e24293e5911d57f0371952aa29293dba195d72013b028c2694ed356f5ba"
+    },
+    {
+      "path": "core/hud/components/dialogs/PopupEvent.as",
+      "sha256": "e7f80c9e94833f8b52eadc355269dd4cbe861c825eaf0a874f18b7cffc56254e",
+      "lines": 13,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/dialogs/PopupInputMessage.as",
+      "sha256": "0257caca3803e95084f272cc45c11cbf67bfacb6e7113316481a26396734873c",
+      "lines": 24,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/dialogs/PopupMessage.as",
+      "sha256": "d3cd1287cc34a394d9dc30d9a398675404ff4096ab11c613aab12f75f1084214",
+      "lines": 103,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "7b88f5f642b38baa0cc3257418af799e274b17b61bee13c794b64fba1ecd0ff9"
+    },
+    {
+      "path": "core/hud/components/dialogs/QueuePopupMessage.as",
+      "sha256": "2e0c292b3b7780dc4cfa3031c39ebe64d51f0ff29dd61d7131b48d3421d74ac9",
+      "lines": 86,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/dialogs/RadioMarqueeTextRenderer.as",
+      "sha256": "1a10fa5421a79ebf24a1490b9dc75170451f2b97ee7994da5294472891b51d64",
+      "lines": 114,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/RadioPopup.as",
+      "sha256": "1ff51810c43615b1a16c72231694673d73ccc6af16c410cb920750e1d48d974b",
+      "lines": 628,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/RadioQueryInput.as",
+      "sha256": "2cd254178f3f6c6ac7ad000adbfc8238a1891e179bce8c51620f5e6f623d2fcb",
+      "lines": 91,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/dialogs/TOSPopup.as",
+      "sha256": "a580ee2a4b83567d1a468ec8f9fffaa5ad91776d274bfca3310e9d21ad0cef92",
+      "lines": 103,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c158f782113f1690c6ae97afec51e814277804ed8986bb5c29308ac59d4ae577"
+    },
+    {
+      "path": "core/hud/components/dialogs/WeaponColorPopup.as",
+      "sha256": "d52aff5bea1b3be895f8be582795853056dee6265e69d6aaca357c3626d33302",
+      "lines": 220,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/explore/ExploreArea.as",
+      "sha256": "7851cdc1e548241a6c1190277cc42caea11f0fb5d7b6d757be0dc04990a6ddb2",
+      "lines": 496,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b81103af80eba6d555f4e4ffd51d5696f016b43ad39b572d182ca006ab8d7ee9"
+    },
+    {
+      "path": "core/hud/components/explore/ExploreMap.as",
+      "sha256": "a72dad2d4ff3a5b75f2dbd89f277a59ef2d1169cc4e883cec2df39d819a62393",
+      "lines": 953,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ee3154f3cc2f34d0c924940bf69f3f3623727118530b4f71305629eac4ac3c8c"
+    },
+    {
+      "path": "core/hud/components/explore/ExploreMapArea.as",
+      "sha256": "29101192d7d66a9d73ab02934598ace3e288fafc9a13bacb5943b89cb929a6d5",
+      "lines": 331,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "adfa09174ab097e98389d1344ea20c6885916ff6f700d1202ca22d92ca6e470e"
+    },
+    {
+      "path": "core/hud/components/explore/ExploreProgressBar.as",
+      "sha256": "5339d79b0d3d89f80bf962defd7effa1be3d3b0be9317dd890b6f7491bec9f62",
+      "lines": 251,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "fa9fa3ec88c67c533f17a847cb222e0e8f41a2c05460cb3495d9dd3429bfd7dc"
+    },
+    {
+      "path": "core/hud/components/friends/FriendDisplayBox.as",
+      "sha256": "e0e1e1ef6262d0589c9d9baacd4db2b140b489ca1145a77d3a637f885f0cade2",
+      "lines": 88,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "48e794e5bdef0ca7d29d5e4e6a48dfd83e399e6a8a6f5522b8093bba9bd696be"
+    },
+    {
+      "path": "core/hud/components/hangar/SkinItem.as",
+      "sha256": "addd21916b368a740f981869afb702d0ff2ec9668b43f62bb4b0121d7765b45c",
+      "lines": 464,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "626016a53739aef75621a753f5a01ffdb5c32c06b49d98fd09669698bd654b07"
+    },
+    {
+      "path": "core/hud/components/hangar/SkinItemBaseStats.as",
+      "sha256": "d3c2d38e777ad74b4ac26bdb9426ac9b434cacc33158a3e3b2b4e717c67429e3",
+      "lines": 52,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "958fc8029fba455eda4eaa07eaef3e4d510eb1033bbeeb1eadf21e7d7c4cb2fc"
+    },
+    {
+      "path": "core/hud/components/hotkeys/Abilities.as",
+      "sha256": "bd0c317d5816279477d2fd81f02fc040364ce2a62188fdd3d6e4ea6789c6d4b4",
+      "lines": 154,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "9c9d255de224536b15eb3d86d5e5bbbf2c2581ffd836918ef5378e8e4059b482"
+    },
+    {
+      "path": "core/hud/components/hotkeys/AbilityHotkey.as",
+      "sha256": "3ff5f311938dc4b5982900692b4c62352af2d6f0c75a7f1ab9bfbf29e8f054c9",
+      "lines": 93,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "dd05be1a995eb9380b70207eb399ecac0b75daaf7468f78e16d2c6f3c25af77b"
+    },
+    {
+      "path": "core/hud/components/hotkeys/WeaponHotkey.as",
+      "sha256": "bb23faf0a5501c2f1a1360575769221ff6e1c825c0d9177faf7b7cabdca053d4",
+      "lines": 51,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/hotkeys/WeaponHotkeys.as",
+      "sha256": "74f8de3449bc3d93707160d50e62f52257f6e93b9801c611df3b83b008bbfd80",
+      "lines": 101,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "4b6fdb3d336ea3580b783e17fc32e659724644d69fb64508d31182586556a769"
+    },
+    {
+      "path": "core/hud/components/map/BossSpawnAreaRing.as",
+      "sha256": "b5a7079160b352d5d5e9f3b10395cb5fc21f7b8d09bc1225bc6f156da52e2ed0",
+      "lines": 47,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/map/BossSpawnCatalog.as",
+      "sha256": "65d8b7f6f7e31ca3801e7024b7f5ecb39dc9cc06089c08d0e0fdbf27e9a1a6f7",
+      "lines": 125,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/map/BossSpawnLocation.as",
+      "sha256": "712fcc4c3b2a91589b5379435f80b99c80c66f49dd9b7a5a3a90278ff47febf6",
+      "lines": 93,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/map/BossSpawnMarker.as",
+      "sha256": "64d9546a7a96f27dcddf570b52e073c3a2fc2a5bd2aec6e8d9b003aaea89a25a",
+      "lines": 120,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/map/BossSpawnMarkerManager.as",
+      "sha256": "f64a00937895aad07b437686ab91787e825c4d02e4a5bfef4f4e134aee9a3f36",
+      "lines": 140,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/map/Map.as",
+      "sha256": "1d7cc016d395fa49f20469f1efc6c210e69c5ba0dbfa2f2e194f722a24586353",
+      "lines": 647,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3d8ff0b1e07f30ee4d88b37fba9fd1f97ea90ed9780ea79475842d6b7784107b"
+    },
+    {
+      "path": "core/hud/components/map/MapBodyBase.as",
+      "sha256": "ed9766f7c1ebaa4a5b941b1c0685e6af04ab5ae673dfce6a386dcae0f308dab0",
+      "lines": 163,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "235488e39af408d68eb2ce1910908a7806963dc26ca2a666f88014f5ea628fe1"
+    },
+    {
+      "path": "core/hud/components/map/MapBoss.as",
+      "sha256": "a1bf58cf789455cc902d7d118c9aa0fdafcf07d84042f5db02ce8e24d357fa5b",
+      "lines": 11,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b2b0855fe8a04d0894b49dcd9cf9609c234c7c096d1645f5e038224f6db21bf3"
+    },
+    {
+      "path": "core/hud/components/map/MapDeathLine.as",
+      "sha256": "55edaff55c9e14c40e5cc3918f57c5633cf02022dbbefe4b33c1d24fad5dbf18",
+      "lines": 37,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "18e02d5ca6591d12712e0ffdfcc9e167b30df6f6cbd580cf0c4c5c7cd263efb7"
+    },
+    {
+      "path": "core/hud/components/map/MapEliteArea.as",
+      "sha256": "191b70f1b2e4a324f42a74d01531f209c46a51fa4bc35e8c186b2834e4ab91d7",
+      "lines": 54,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "38a7a35cfff4e298c23697e47d1b196e28737867d4bae059f0d73d480ec21a6e"
+    },
+    {
+      "path": "core/hud/components/map/MapHidden.as",
+      "sha256": "7aba0ee1ba339efa7ad3b2d1179dc236e1fec9221ef10371e72a1b3dd27dd710",
+      "lines": 14,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/map/MapKilled.as",
+      "sha256": "9abc88b46d609df7816b3183cc6cabc45cda7ac0841c6cfec545a2cd16b45183",
+      "lines": 88,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2e7f7580858521d319fe7f91bf7050a8ef4ae0319959f070ffdcf0372aa75cb0"
+    },
+    {
+      "path": "core/hud/components/map/MapLiveMiniature.as",
+      "sha256": "4af65ee6daff3c1ac330b9ba0d54f5c8ac5057d8f5e9541dc43643bad4244e84",
+      "lines": 187,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/map/MapMiniboss.as",
+      "sha256": "44d499e092dc5f03ef8a311b4475f04e91e16c3c46c0a0acde3577421ae91ed2",
+      "lines": 15,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/map/MapPlanet.as",
+      "sha256": "aabc15ba0a64053d5dc2406df7369434a6c23a6ed315582ce66ad9df3f3028ec",
+      "lines": 170,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "7d99d7ef841662a16f294801e9d66969c36766c38e09c0e24fecae81cf107c03"
+    },
+    {
+      "path": "core/hud/components/map/MapPlayer.as",
+      "sha256": "f215c6863068773fbf84649f21dfcc6f07ee4541b1ebf76782e9096337ca8f16",
+      "lines": 174,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "50049da01c3d60f9d138744c3cdce3fd7ba054a5bb1b154f3e62578d8dea3cb7"
+    },
+    {
+      "path": "core/hud/components/map/MapPvpZone.as",
+      "sha256": "36e3b01436be6ef76273767b930565c945a10b5e1feb8f51b99dd352253b8bd4",
+      "lines": 71,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "9a3ea6d19f9d6370a6675285d10802db6c7d4625d59bb9940fa2b0aea9d189ab"
+    },
+    {
+      "path": "core/hud/components/map/MapSpawner.as",
+      "sha256": "c77200129a08e5d364d4097c89fa446df8a10f03f583a023f914097bf57339a1",
+      "lines": 37,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3d45f36c55dd3db97d87c1d03488f81451b31d6d5a846f4e21fb913b6ec7f650"
+    },
+    {
+      "path": "core/hud/components/map/MapStation.as",
+      "sha256": "97e49d068e8b2614d818485694639aeb5727bca2ac7e8b6a448a115a439aab6b",
+      "lines": 37,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0bea33563ccab2928b5e1425f95d172159a2a6f37143b744d32b1250a7166912"
+    },
+    {
+      "path": "core/hud/components/map/MapSun.as",
+      "sha256": "3d07650c7381bc5d3aba08c3197225542dc80852beb6601782271f8b8e00571b",
+      "lines": 30,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8d14d19ee0246e76a4bf8b231b99280f3e4c1e1fb9493ddec35808d8fece0b44"
+    },
+    {
+      "path": "core/hud/components/map/MinibossSpawnHeat.as",
+      "sha256": "377c0f50c89616e168e3d9fe6c86dcb6c71bd81fdc3294ca2f65dc1315842a0f",
+      "lines": 106,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/playerList/GroupListItem.as",
+      "sha256": "2683da4917da138b582c3fc2a98d928c98679f5a9369e06a21b8a50fc17f9bb8",
+      "lines": 54,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "66bc0dfe80a1f9f4c393dfede0583c7ef374c2e0c680fa625a19497754869402"
+    },
+    {
+      "path": "core/hud/components/playerList/PlayerList.as",
+      "sha256": "3706f6e203b168be749e4cf2455c57e6ef5de9b947dfc62d262b9a3fd194f7e0",
+      "lines": 172,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "4e9b23497c4bfaee2c396be9719418f5a6022fd4de6eced03823ba83815d74fa"
+    },
+    {
+      "path": "core/hud/components/playerList/PlayerListItem.as",
+      "sha256": "5a3fcf64dd80de05e65c9d7f294aa54de28b42c745393c516f6279b528691f5d",
+      "lines": 381,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ec5864b1312bfdd8da8d28cb2873e1f2d39103fb50692e8ef000fd8b4b3ac63c"
+    },
+    {
+      "path": "core/hud/components/pvp/DominationManager.as",
+      "sha256": "45be073b809c8af01bc8d28c94e8e4db4dac294c6956c30f8090846b84783613",
+      "lines": 357,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "7ef0a7230dfa5cfcba53fea7755725281e2569e3c3c944fd79db456841295549"
+    },
+    {
+      "path": "core/hud/components/pvp/DominationZone.as",
+      "sha256": "10a1fdc4bf68ed19262897cbe02a2b2486edf49cb48198311cd2984bfd3391ec",
+      "lines": 191,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3b927fb59fdec3e4a8a2656996f4378f12136c0c465b78d589a5833ada031398"
+    },
+    {
+      "path": "core/hud/components/pvp/PvpManager.as",
+      "sha256": "20aec0218a19ba830a401ed18ba779f381008c5a08318fb7d1c2c799ef279622",
+      "lines": 454,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "639ee247b6c69f99f745cb0d696480825ee9c30fd404f7ce8adac12b6f92072d"
+    },
+    {
+      "path": "core/hud/components/pvp/PvpQueueScreen.as",
+      "sha256": "2e475e57bb76f07c864c42578dad8ad6a1fa2506736ccc7f0a798c50b986e035",
+      "lines": 148,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "271d14c3ff84a6d7ee3867e0f6610d285654988be8ff3cadb14619539b5b2203"
+    },
+    {
+      "path": "core/hud/components/pvp/PvpScoreHolder.as",
+      "sha256": "17b7a9f472aeedb4067364b6613d6fa0cba6271d9fe113b55e909316361b5c6a",
+      "lines": 220,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3328b4c22f5cfdfe6ff2bfe22428d7e8973592b29cddc8441a7f8d1ddcb87939"
+    },
+    {
+      "path": "core/hud/components/pvp/PvpScoreScreen.as",
+      "sha256": "a8be97f61d6fdbacd5d97a330c1e2c64c784b472c6e3471abcc1e799e3af5937",
+      "lines": 601,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0604f919ded63e6aeec03643ee57650e1d7dfa0c06ae0f963b032ebf51762e22"
+    },
+    {
+      "path": "core/hud/components/pvp/PvpScreen.as",
+      "sha256": "9e3107043316406ddb1ec37622337ab4534aed7ff3f5b2fa4e1bd14dd230655d",
+      "lines": 43,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/hud/components/pvp/TeamSafeZone.as",
+      "sha256": "565e4020438bd398b21cccc6b4c704b101a971b80de812798b9d0f250b35e773",
+      "lines": 95,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "205e0373f91c6ed3fbfe01b8ea5e1c6ad8c2cda34ec6d41bd57885286e2ccd50"
+    },
+    {
+      "path": "core/hud/components/radar/BossTimerRadarTelemetry.as",
+      "sha256": "cf166911a662b02b14f89190f0935c8c8c2e5a9ab2bc4b652d51a31c13b20f27",
+      "lines": 93,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/radar/Compas.as",
+      "sha256": "2f1dd1ebb52a6b9eff18cbf8a310d7f8f48f012cee6fe264bec2d77d8e6233af",
+      "lines": 103,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "6436aa4cbbcadaa5a43c8036550818a1d47e1c50d588b5ea9911f11f3427db35"
+    },
+    {
+      "path": "core/hud/components/radar/Radar.as",
+      "sha256": "7cf67dc528b67b07c0c044d2e0b0898147404ae6435152c0b1445378b9086b1f",
+      "lines": 695,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "96e167c72a2a2e0f46c4f847673a06e1037eae7cf22508baefb16121eb113a75"
+    },
+    {
+      "path": "core/hud/components/radar/RadarTelemetry.as",
+      "sha256": "5ddd83f1afd31a9fe6d5006666009e2ab346b25fd7f389f2ae11573e80d3cf16",
+      "lines": 427,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/radar/RadarTelemetryMetrics.as",
+      "sha256": "da97c636d2a6c743b65216f60ce52e5f13a7fd4647af53a63ea561b3ad3416f3",
+      "lines": 60,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/radar/RadioRadarTelemetry.as",
+      "sha256": "ff7c9e91cbde406e39f6a53256621524a11757fb175b9e1601d819c757de5daf",
+      "lines": 188,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/radar/RollingDamageEstimate.as",
+      "sha256": "8b02ac955ee3e703eb7fc6fed20a10a1cc6e5a31b55d872f0be34c6feda2aa4d",
+      "lines": 67,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/hud/components/radar/TargetArrow.as",
+      "sha256": "24f8f700f0cab082e518ed639c88c7c3edb05239c81c36cdc0e90a992ebc8890",
+      "lines": 68,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "52223b5d08872afe7851e80096143120e35bcddff8f98c5438ac8b0a7816762f"
+    },
+    {
+      "path": "core/hud/components/shipMenu/ArtifactSelector.as",
+      "sha256": "a348072460924a74ec6e831d4aa15470153f995433dfe924f79f17657e814999",
+      "lines": 143,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b5afccb669aed2ec336666435e77e339bbe6de3d903af20911a1f8ac54d1ec14"
+    },
+    {
+      "path": "core/hud/components/shipMenu/CrewSelector.as",
+      "sha256": "e2ef3c26ce2599bb6a391d911fb85ca80e8af0f764860fdf959e4da96ca08ae2",
+      "lines": 144,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3abda34c95106da4a9ba651eda999282cddca64c5fd97aab523b54260ed6af43"
+    },
+    {
+      "path": "core/hud/components/shipMenu/MenuSelectIcon.as",
+      "sha256": "93ae359b745aaafa60a77d2c29f9edb4215cf8810729f98720d46c3f152fc6f7",
+      "lines": 156,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "388d04b06f699b6341c48345f5bd5473e874adc99de77dd5d4348e6e1169076c"
+    },
+    {
+      "path": "core/hud/components/shipMenu/WeaponSelector.as",
+      "sha256": "2e8ef0cffc80dca0268e5c0aa7e65d056c84b8db1da69232462ff30f294f00d0",
+      "lines": 150,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2ad69e60314d9a68ac3abc2819ac5f97236c5b8995176860154b54645ae3ef18"
+    },
+    {
+      "path": "core/hud/components/starMap/SolarSystem.as",
+      "sha256": "a760092f158b937b396d80dd936038ec06eb877fc2dc421f4d4805f7d5e0ac9e",
+      "lines": 374,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8ab6137fe94ccb463d151c247087fb1726b53c0be4abc3e3efa8f2ded0604066"
+    },
+    {
+      "path": "core/hud/components/starMap/StarMap.as",
+      "sha256": "d204036bf51d69162a940269ed1dcace3c1825676ef32bb449f96f006a1f3971",
+      "lines": 904,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "53d06184026b9e660c067260233517141a5bc958b6b0b1c33107959f2e99b1ea"
+    },
+    {
+      "path": "core/hud/components/starMap/TransitButton.as",
+      "sha256": "52a32d026dd504063c50ed53bdb84f9066a169ea70aade7c08a10fe06d3dea44",
+      "lines": 81,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2835fe49d38834226e5e31da7e5f483cc02095dc6aa8095f23174e8b8c565b8a"
+    },
+    {
+      "path": "core/hud/components/starMap/WarpPath.as",
+      "sha256": "ebb0dcf7ae8d02fd5a8f24fbd826da79ed8b12e04db517bc1d4ff3e5e77a2a95",
+      "lines": 187,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cee52ae2a81a6af724c2819138732a9e42e0abfdbe675d09c84bbad9d784e7aa"
+    },
+    {
+      "path": "core/hud/components/techTree/EliteTechBar.as",
+      "sha256": "2f5c8730376eab2b04febb5a49b20e4606d7e8c7da8bef5966c0bf72d3673307",
+      "lines": 132,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "6d16cfbd69173071e0d4c2021dfe72d27c1d164bff74c2a7cf633c56331987df"
+    },
+    {
+      "path": "core/hud/components/techTree/EliteTechIcon.as",
+      "sha256": "309c5c36a06181028231e64ffededd5f4a65c0ef6982a6ac8366ebc056741314",
+      "lines": 423,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "75827f41e075cee948ce56a30dadc53162c67f9be6d90716ae80b79e2dcc5e75"
+    },
+    {
+      "path": "core/hud/components/techTree/EliteTechPopupMenu.as",
+      "sha256": "426b85e0d59d14f9b4a099c6c9e84b4c470501cded540f61d2169d8631891ccd",
+      "lines": 119,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "902ea378475c78c505e2a455a1d6d20377fad6c6362a3f12c0534ca46cd7a860"
+    },
+    {
+      "path": "core/hud/components/techTree/TechBar.as",
+      "sha256": "acd5f3063d195578ab86bf508450f6a5e66135438de88fef378af450dfbe9a85",
+      "lines": 161,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d939c5e9678a14c4728a7795fce72160954560e793c41564724b62d677139a1d"
+    },
+    {
+      "path": "core/hud/components/techTree/TechLevelIcon.as",
+      "sha256": "3d852b8630210e500ef87f0ea928c4c841c5d1589f795065cd63bc9a774b6058",
+      "lines": 240,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "62f9bd3ca6fc661ed897c16a9f67da8966e125829cc86869b45b87fc7ae1c50e"
+    },
+    {
+      "path": "core/hud/components/techTree/TechTree.as",
+      "sha256": "7dd83f1d967e656deb1263aa0033ad033bfe9e7bb8fa166a78923fa7f4038f54",
+      "lines": 1139,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1e2e8b7fb7a50c2542d8b08e5aa78bb10561039692dafc9b1b8c88115f3c847d"
+    },
+    {
+      "path": "core/ipc/ClientIpcAssembler.as",
+      "sha256": "45d51f3af736150d9c5f39b1304de47ea17dd1f009b09276525bbbba575e3f2f",
+      "lines": 148,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ipc/ClientIpcCodec.as",
+      "sha256": "7f2626e0c2cfd26adf12b93d3bac53583701e90c648f0f706e003ba71de41a68",
+      "lines": 273,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ipc/ClientIpcEcho.as",
+      "sha256": "164af3b2798f762c89ebe1cb02e4444aa68c39df7b41175c24ab1fcb9def37df",
+      "lines": 243,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ipc/ClientIpcMessagePack.as",
+      "sha256": "378b9b4eaacc9579d53d0bee602882199447a35f7bcc33aaadf96119ee91aa2d",
+      "lines": 72,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ipc/ClientIpcService.as",
+      "sha256": "b1bc65839525021235574c809367ced39bdf848e56f4c522bcdd1d96237b5368",
+      "lines": 1306,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ipc/EmperorReadyNotifier.as",
+      "sha256": "ca2e612cf1bfbba4465d7e841f5b1e3e6c5643f965dc1bca6a5e35c5762c46fb",
+      "lines": 658,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ipc/VisualShareHandshake.as",
+      "sha256": "62cfcf6cf7c9617e27440618513ef02d88f1a0ac23a56dbfb81c104a0b1664b9",
+      "lines": 529,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ipc/VisualShareWire.as",
+      "sha256": "76c051a5106624010052b72a7d70ab34813d718b07e21653ced8518e70283cfd",
+      "lines": 143,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/login/ConnectEvent.as",
+      "sha256": "ad1ba8a6c87e0306b10c3260825b7ebef43e983a51d884bfc3650674a7bfbd77",
+      "lines": 20,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/login/ConnectStatus.as",
+      "sha256": "0caaf95aa0fbf35b7dbc3ec1c45d3b5f1688d981eb493e4920d6b313f1b9bf8f",
+      "lines": 65,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "757f1bb83f05824c1d8e7a808549fdda216f9ffb4ddc8545252ac35350511c31"
+    },
+    {
+      "path": "core/login/GuestName.as",
+      "sha256": "5e9dd53e3b3be4311b877971a8249e7824a928c4a304a2a29f1be137843af747",
+      "lines": 68,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a450ee1e345e20aac5afe61a435ef9986da48268cb041ee6fd1a94383e4aa4a3"
+    },
+    {
+      "path": "core/login/RecoverDialog.as",
+      "sha256": "3845709c0a8960c141e09ead3845ea3fe61afce10d327f6b7d75d389675697e9",
+      "lines": 75,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "23ce5b8619ad23b8f681a96fd9f854ca491560d3ad4eb8c844aa3e5fb565edcb"
+    },
+    {
+      "path": "core/login/RegisterDialog2.as",
+      "sha256": "887154be5ea320748bdeb803e00974ae1291abae7806573a11ed6391b3d0c8ab",
+      "lines": 160,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "7c089e7f3032cbcd7466ab27caff1d988499d19d4c572bfbb202f0ba4535e862"
+    },
+    {
+      "path": "core/login/ServiceRoomPreview.as",
+      "sha256": "bff5ebd64e942e82b593d555da22eaec2977914733c7eee397342e44bf1bb4e7",
+      "lines": 379,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "bb6518a519f4337a9c7da379d3c14f9427eabdd9dbeff4255892ad8288c1a80a"
+    },
+    {
+      "path": "core/login/ServiceRoomSelector.as",
+      "sha256": "a70070db32326edc16d42229caeb522128abf2064852f5cba318991fcef71d25",
+      "lines": 211,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "214559d422baf9e7e0ba83284c3c25af876ab5a243a2d7e8ce3ecd72c6b666c8"
+    },
+    {
+      "path": "core/login/Username.as",
+      "sha256": "db42ce067ba3fac62e751d6e5be3e04e6859b95ca86563ffd4719cf281c1049d",
+      "lines": 23,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ce67d0ab005f2becc9e1f6b7f03214e3f7519eceffab1732278500f3f18b1911"
+    },
+    {
+      "path": "core/missions/DailyManager.as",
+      "sha256": "06092189a3c212dc6d3413570ea0b1e664961fd29d114e6b63602560e01c598b",
+      "lines": 114,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "7c3d18b5b183572d608ff3e569d65619781860301c0a5bc667f8c987c6f3d206"
+    },
+    {
+      "path": "core/network/ConnectionHealthMonitor.as",
+      "sha256": "3ac571735787eaffb3f9ad2f1126b6573d0a4b2703d06e1ba483549e63151976",
+      "lines": 158,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/network/DisposeDebugWindow.as",
+      "sha256": "c06f5522b72f4fef41d6febe4dd8ac6c9613d71a745cb6ad56492de25c6ee859",
+      "lines": 414,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/network/NetworkMonitor.as",
+      "sha256": "c22410575bca797388f3f4e3073e70218de84e203c75fd7f73e2113dfecd8e51",
+      "lines": 191,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/network/PacketDebugWindow.as",
+      "sha256": "932dbf5247f368dd8771364a6a6535a0d4a98c12cfbba4dbabf3b3eabcc56f27",
+      "lines": 1276,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/network/ProfilerWindow.as",
+      "sha256": "bf70c2952f384b074ba125e16921a3ac347c7bfcf8928ea6c2c944ccc03783f2",
+      "lines": 506,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/network/RuntimeProfiler.as",
+      "sha256": "0f9e0d68a1d0f1b4e1c4472ac052c3e9204d4fdd4ae49e7ef389e6e1f02c4ed6",
+      "lines": 127,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/parallax/ParallaxManager.as",
+      "sha256": "e70e3eaeaed200f47a6905e9b5d9c20a066d24a6cd41a0c1a9a9f78bd15f51a6",
+      "lines": 859,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "677ea4e541452bae6cd636d74ab5404bf3e739ccf72a84bcdd38ff00f64f5677"
+    },
+    {
+      "path": "core/particle/AuraLightning.as",
+      "sha256": "1834a73733356c9e2b64eed8969bc6b41c9ecf54ffb768b5e5c818af9f1c3041",
+      "lines": 232,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/particle/AuraOutlineLightning.as",
+      "sha256": "5a12dfad1300f76ae79f791b7084b18b9778ab9fe511e8f41096ee9b4f75cf40",
+      "lines": 268,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/particle/AuraRenderLayer.as",
+      "sha256": "8eb67c1d8ec9cd6208707aa0309f840a3fc29ae611cf091156102550ed8eff2c",
+      "lines": 46,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/particle/BeamOrbitLightning.as",
+      "sha256": "9cbf48e4035563f7edecfc3dd3c6618800d7403cc69223a3e39c9d187c04279e",
+      "lines": 103,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/particle/CollectiveMeshBatch.as",
+      "sha256": "de7e8bf3b37c97ae72540fa15536bfd7141c72adbfbeb20b72e7dc93c43e84a8",
+      "lines": 165,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "62e6853b27a843f56e30da18f9386d4c33eb9f8c82fed9889fc97262334e4970"
+    },
+    {
+      "path": "core/particle/EffectConst.as",
+      "sha256": "a3bfe1d74690c28f0f7d9a9eca1a60ca1765f125e668607a6cae9fbf5a857d05",
+      "lines": 11,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/particle/Emitter.as",
+      "sha256": "fc85a5037da4536733b50704aec24384714a518d35db671fcbb4a761faf03098",
+      "lines": 899,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8930a7c9ab3249998e433c09d5679a79fc2c6714287fc3fced92975da8ef9038"
+    },
+    {
+      "path": "core/particle/EmitterFactory.as",
+      "sha256": "90ab80e90dbb806478f896fe38bcb1eda16885d6ff142fd2034c8df501f8a47b",
+      "lines": 275,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1fadbea573280d4bce635c459f5601c347786aaf4351884a34d3a5c0f25ef793"
+    },
+    {
+      "path": "core/particle/EmitterManager.as",
+      "sha256": "c1077788debded71507fb61b0bcb446a9fd699bd3c95746bcdf1b8ac8e3ed664",
+      "lines": 151,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a560a268081da193118ff374b40da38b2c84817aceca7c60e85b012d3c2c83e6"
+    },
+    {
+      "path": "core/particle/GrayscaleAuraEffect.as",
+      "sha256": "009cf72b01b8070ab1818b22bef330bf010d1e036b31dde086ae2e097cff195b",
+      "lines": 159,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/particle/GrayscaleAuraStyle.as",
+      "sha256": "3ea02fddb6009f4b559b0fcb3cfb49cedf6970ff9dc6d7a7a1813201dbadc913",
+      "lines": 62,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/particle/GrayscaleTintEffect.as",
+      "sha256": "9b8ae93f3699f52b5b5e4d334a1419493ba5a69ed1779ccc8152df7b0567437e",
+      "lines": 38,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/particle/GrayscaleTintStyle.as",
+      "sha256": "564515fe79b32828d2367bd0aad15643cd13defe6dee7a7d2729debf674eed58",
+      "lines": 11,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/particle/Particle.as",
+      "sha256": "58006119f2df42301cdab2acfd012081d663c5cdc1ff5234d85ff0350dbf35ab",
+      "lines": 51,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "296c630522c9e66754731c92a77c5e6103febd0250f7589d7cd6b35f6ff16397"
+    },
+    {
+      "path": "core/player/CrewMember.as",
+      "sha256": "928d20c72b7b6c973ee6c620830dff7c1a6d6950ad7e98abf5c63a7a80e88a43",
+      "lines": 252,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e682958d1f466f9cbdc7da6e1f5795aadea7bcadf0274101c68cc47f0495ece1"
+    },
+    {
+      "path": "core/player/EliteTechSkill.as",
+      "sha256": "d5177f3052147b1380c20836d736231ca813035549f388c2993ac95ee0367e6f",
+      "lines": 13,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/player/EliteTechs.as",
+      "sha256": "52d1a4e5a94d5d2db83f72f47ddc822054274c8decb9cecaa233f52f36749c30",
+      "lines": 880,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "17fab686f62d5d3bc8d2648df92a736eebd5283e0fad6e9d2e4c4293c1cd9927"
+    },
+    {
+      "path": "core/player/Explore.as",
+      "sha256": "aa33fd7c60d4fa3fb70fc2e82856d1239764e428a7d60f0d40dab98baf3cebfd",
+      "lines": 21,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/player/FleetObj.as",
+      "sha256": "208544f43f63417b8c56ba51a3340345c050e390140dda2d31a518c869454878",
+      "lines": 126,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "21a1687dd63b783ef406e1981539fe949c31f39b146e748db02bb1a66f7076c3"
+    },
+    {
+      "path": "core/player/IncomingWeaponHistory.as",
+      "sha256": "65e2088782800840a72b7458bd589679d7607a450811efa049b7fd42316d8028",
+      "lines": 128,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/player/Invite.as",
+      "sha256": "daad887a61ea6377915e2a1e68b96d6713438c7924a6bba32bd53cd959d4bf6a",
+      "lines": 50,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/player/LandedBody.as",
+      "sha256": "2d509e9e0aa8799c1f4fbaf3d669f8284b0cbd9bdf699e7477c38a603d9dd4db",
+      "lines": 13,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/player/Mission.as",
+      "sha256": "a4db75b7f267e2151954860ec968a37777f9f59e366468ad2e9e64b37b1c9416",
+      "lines": 30,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/player/Player.as",
+      "sha256": "321a31fd0e11d10dc091350130fbd498e89ba8ede849cd5259ac37f1f9debb7e",
+      "lines": 2417,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "5dcea390140b5ee18fd6fc663a797ce8e925bb5f631e0c49b8e56ccc2f2c6ca6"
+    },
+    {
+      "path": "core/player/PlayerManager.as",
+      "sha256": "80b2f8762bbc056f2e6ce03daf60edfad695f43966c2895310ff8416a7c4d1e2",
+      "lines": 1406,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "10a3c5d4609155599aa7cf224192447940cdcd597bca5a8ea418e020e4b8a463"
+    },
+    {
+      "path": "core/player/TechSkill.as",
+      "sha256": "c48130e979bfd7eabc5e6fc1cc8f04b3b8a8aa33bb79cf2834a5265fee2ad758",
+      "lines": 42,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d3304376be5ca137afc32be32184fbe34f0a4b85181b6aa15dfdcd267649b971"
+    },
+    {
+      "path": "core/pools/BeamLinePool.as",
+      "sha256": "f84c6b0caa36748de1afb3fdf6e515421e0eca390898543d5d456f4a0f942853",
+      "lines": 66,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "f2f8e1ec5e83481e432935a23612e9d05af62b61eb4681f217fa1d065c2a46db"
+    },
+    {
+      "path": "core/pools/LinePool.as",
+      "sha256": "15f1f3bfd32d5b9d1636f9661f74a15e2c8e4bc4afed6218830edc92689f59ca",
+      "lines": 57,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cb0d3ba8ad85aa5b8a72cb6601c6bbc7eb2298ba3603ac58ab7d67831363b534"
+    },
+    {
+      "path": "core/pools/RibbonTrailPool.as",
+      "sha256": "818f53f76cd25c8e44326a1835c4222cd3ea8ac87ec315ca855a4bfe784393f1",
+      "lines": 95,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cbd482c805e4dfac5e5590dbfae5f517722a06590030de3043f91bc871382188"
+    },
+    {
+      "path": "core/projectile/IProjectileRenderState.as",
+      "sha256": "464a0087028e248c4112812c9109ead99358953d2dff0e7886f925c9bdc2e171",
+      "lines": 6,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/LocalHitGeometry.as",
+      "sha256": "490321739712aea54aa820bcf78b91b5628297cba65829c4fe0ebb8ce38e2194",
+      "lines": 26,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/NetherBlobAttackVisuals.as",
+      "sha256": "6ab837bf715dc84f3ef4d15ca01c7a605d0564a5182ca203c17a6fe2f48da56a",
+      "lines": 30,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/NetherTentacleVisuals.as",
+      "sha256": "9115ba50c5593559b10b913317aaec4200a6ecc8dbefced9cf734d2438af706d",
+      "lines": 195,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/Projectile.as",
+      "sha256": "dac9a4f2e4e4a06409a6ddac11f091ceecabe2e55b105cda6cf196f1e98ff2eb",
+      "lines": 651,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "024b2b7559acb8915b1cdf14f2ab72d2ec4fd3a398b9b54381caadc5bac90418"
+    },
+    {
+      "path": "core/projectile/ProjectileDamageObserver.as",
+      "sha256": "61a432e677ff4633c949e6e7cd83f711f4c902774fd68a080e702634490c5db0",
+      "lines": 109,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/ProjectileFactory.as",
+      "sha256": "bf7a18f3d926e70cd6bee3c3e7401cad23bb279e7ee3b3389fea1c8a9dae2072",
+      "lines": 219,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "29bb18e38433072535c25da069e9cdd05044e8ac05574c682612c0534ad07444"
+    },
+    {
+      "path": "core/projectile/ProjectileManager.as",
+      "sha256": "5345e7685dc8a4dfa07fba19f1ae66723f6e98f4bf223e77080c1fdf5569142c",
+      "lines": 571,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "525cfea16b68750c64d3d73e06ea918efec20b8557b7cd3962e3bda8f42302e5"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoCue.as",
+      "sha256": "3c2d783d36231fa5b0c7de1a6ea8fc1b86ae32459a9c1319cf9850bf34de2463",
+      "lines": 125,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoCueClock.as",
+      "sha256": "89e86ae511305de47fe55664477a108e19fefa9e80cceaee40065da5f165db1a",
+      "lines": 111,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoCueView.as",
+      "sha256": "6866a28a6f3654ca504c7d9eaff40dc5f3ff0dbf7428a9c1f6910f6c3ba2bc5e",
+      "lines": 104,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoDebug.as",
+      "sha256": "07df4b7ae72be1a40ab0c361585a99172a3a6083b95b255a7522de94cb14a761",
+      "lines": 743,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoDebugDetails.as",
+      "sha256": "fd1e28e88f63b815d9eeb757b5f6a773aea85ba3c3e650a856399b57f045c625",
+      "lines": 160,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoDebugLog.as",
+      "sha256": "26aabcd073145d33c52ae145299b0871d7a1e7d5542b6f2cfc62b9dad450720f",
+      "lines": 179,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoDebugOverlay.as",
+      "sha256": "7891c7509e84f25ed75b3a7f20de78ae3d98aa28c6cebab85273d4ae814e1096",
+      "lines": 317,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoDebugProjection.as",
+      "sha256": "7505e23335695ec067718bce1534d9756097472faa5a4a5382d0d28d4ed7aef5",
+      "lines": 110,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoSpawnTiming.as",
+      "sha256": "09258c2e2ea3ad88621ab19792b5bed6ff25634b9cda9a8c31a33ae91a49b633",
+      "lines": 90,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoSpawnTimingReporter.as",
+      "sha256": "4cd9224614f327a30ebb89bea0b8922fa175d185e8d22ebf0950965c4be9e8a2",
+      "lines": 101,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoTimeline.as",
+      "sha256": "19a6170cf7284c899cbb356c6722a10d72236b17517cdc5478803acf273a0da9",
+      "lines": 83,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/projectile/XhersixTorpedoWarningBatch.as",
+      "sha256": "a60890357948b54a2639241066e241e7fdf7dcd0e5e50cd624af90af9e5be2d4",
+      "lines": 79,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/queue/QueueInfoHolder.as",
+      "sha256": "c929bd4a1201210e7147d00d62671db7bc590c619033410f24ad3c8cb22a6ed0",
+      "lines": 158,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a84374ef846b64bc1c3673b5de4a7302db47ea51bfbc6c953731bd549402ef4e"
+    },
+    {
+      "path": "core/queue/QueueManager.as",
+      "sha256": "92ab49554c1981a8d6e5200fd5ec2cde68bdba630fa86fcb067407ddc88c4214",
+      "lines": 228,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "36a161a5a88ced41e20a2c8873a4e0a501cccbf4e54bf7c38c889e207e6e1155"
+    },
+    {
+      "path": "core/scene/Game.as",
+      "sha256": "83ef5ec9ba2608ffea979e4fa709869d985aaf26e0b9d62289a2ad1b71e1263e",
+      "lines": 2078,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "f6f8ebc9020b233305e4242fe1a6bc81f813cc67fd68db11d0058a977148cdcd"
+    },
+    {
+      "path": "core/scene/SceneBase.as",
+      "sha256": "85be99bdd6867390f0d142c4881aa9b8718984e8ab487b9845fa9fe1249dc27a",
+      "lines": 1601,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a69b90c379ff8aea7b360bc0370e191c5b7e5a631a3b0b45baa9f95149888e65"
+    },
+    {
+      "path": "core/ship/ClientDevVisual.as",
+      "sha256": "fef4d38327b8fc2ee61b3a35bb1d75b22733655e80da70d334321bc5068cb96e",
+      "lines": 107,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ship/EnemyCloakPresentation.as",
+      "sha256": "fd890dcb38cba4ccce660749df955dab14ae77b28b0d778425b362e41aee2e21",
+      "lines": 36,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ship/EnemyShip.as",
+      "sha256": "ebbbe51c706776a3182697774cbb0b73167f2dfb09d837b1d285ce00a55be256",
+      "lines": 555,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a73f385ddc3da51fee9e723aeef290072b68cb8f4b683654f51c27ad3492d4ac"
+    },
+    {
+      "path": "core/ship/MultipartAuraTarget.as",
+      "sha256": "4c339ba6b1dcfe7b8a31604bf1276ef594ea9b7ceb26e93c49888945f2b3d1ba",
+      "lines": 89,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ship/NetherBlobBeamCountdown.as",
+      "sha256": "6b9bd31a6f822950c221947cab04baaba5f2a8460d38e8898f27cbc61d7533ca",
+      "lines": 97,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ship/NexarEnemyIdentification.as",
+      "sha256": "06b817dcabf81908f12a9eb4775009c911b868157e2370911702172b685af2c8",
+      "lines": 51,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ship/NexarWorldLabel.as",
+      "sha256": "50864e1e12b56c28312bf1ebcf1bd8263181f0436fd07c86e1172ddfa026c9e8",
+      "lines": 210,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ship/PhaseBladeMounts.as",
+      "sha256": "0d093c6053e4bfa13c211c05acb1ca668fb77974748fd0b054f3e1c78eb154ad",
+      "lines": 42,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ship/PlayerShip.as",
+      "sha256": "9d8e9371e6131500967f7289b2398c4dcf77faf5fbddb0da819a82cdf67b9539",
+      "lines": 2081,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3143ab4da4586d0dd31a37f2ccfa32c377b739eff94c88197f4bf5a813966cca"
+    },
+    {
+      "path": "core/ship/Ship.as",
+      "sha256": "a0233fea3246975f46dd0f7ca29a55b87e187a9ce758f6a7c628f127840c5bd3",
+      "lines": 364,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3b27abc26a0d053db25113161c0e065344fe9552fefc050a2bee3aa4262feacb"
+    },
+    {
+      "path": "core/ship/ShipFactory.as",
+      "sha256": "f245fdaea7af4ae0e9b30f7668338c835059b303e004de1c7530ea74322e2263",
+      "lines": 577,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ea7c8de248e480b890db36f19c93d4f524a01d3bea1df63c86149fdbf2f48542"
+    },
+    {
+      "path": "core/ship/ShipManager.as",
+      "sha256": "32ebe1493de8255ec0c9e2a45b2fc35eeb053fff8da314166a976691c908b4c7",
+      "lines": 482,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "4fe100f1e839fb00777fd877cc78c600ec9cd6a81b7234cc20b642ebf8f23c13"
+    },
+    {
+      "path": "core/ship/ShipSync.as",
+      "sha256": "13eced2768a9e55060d4ce029957cb67363c6b5340432a7094b075132706e962",
+      "lines": 499,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "078fdeaba18a73756919d5ab8672755935696c3c38a1e9e04a377d8f102beddf"
+    },
+    {
+      "path": "core/ship/ShipVisualScale.as",
+      "sha256": "0efc6f9e22b2582f757c3002362f39bebae42f0798a724d9b6660cc82b382446",
+      "lines": 21,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ship/TeleportScaleAnimation.as",
+      "sha256": "0d656f0449a88260411e1119a54d0f7292b4889277d0b46208cdae14759d95d4",
+      "lines": 73,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/ship/WeaponRange.as",
+      "sha256": "693cc58d7a03ce7b1c94f5160a4da50c1de21d9095a248d94fb6c3ab2df09cda",
+      "lines": 13,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/solarSystem/Area.as",
+      "sha256": "18df536d467913943bdeaeb15e84294d86df52073970a1d1ea61747f6fa30689",
+      "lines": 138,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a68c45de1bd3b10addcca642f1add27e15dd21e8a67f3b6e2fb44d3de24b5273"
+    },
+    {
+      "path": "core/solarSystem/Body.as",
+      "sha256": "0e4b761704a26d224c032ed396e76d24cf304569a84581001bb12f8dcbba0051",
+      "lines": 949,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c693c25307c3786e3141cd228ba5aeefa6455eed97d7628284f7d1015f6fb52c"
+    },
+    {
+      "path": "core/solarSystem/BodyFactory.as",
+      "sha256": "445a03b9b4341abb1493a520156febed13f363aaadd1c587c2203508118f689e",
+      "lines": 231,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1e49f3cb1850f5398e96a9bde21d1b494554bb469e96fa27960638da67b3f711"
+    },
+    {
+      "path": "core/solarSystem/BodyHeading.as",
+      "sha256": "ab5acb45c8b8531a22ac40ed7b3d77348258ce2aee0893e5c63245f6b0a3d07a",
+      "lines": 66,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "07bf85ce837ca0e20cc6a8efedd0d18e5c689f32b688e16d0230bcc4187650d5"
+    },
+    {
+      "path": "core/solarSystem/BodyManager.as",
+      "sha256": "49bcbd2b09bc068482124f550067baed0893cc7d75848a3b3bfaa1b02a8e363f",
+      "lines": 305,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "84a97e49e6647dbecdf2e3d1848cc23105246c98b961fc6bb5e93f30eb739ace"
+    },
+    {
+      "path": "core/spawner/OrganicSpawner.as",
+      "sha256": "47d310a180785a6208a0b70ea574e55bf83a8c4deb3b807084c1ca44e634efe1",
+      "lines": 67,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a3527e082f74d666ccd7ec0b2ea5d6643643e9f40264e809db5f0f0e1577e721"
+    },
+    {
+      "path": "core/spawner/SpawnFactory.as",
+      "sha256": "afe52ea8b233b569e45e73326e6346c510ad4e8b8d87e159e649a557a5fc3218",
+      "lines": 58,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "72ac24f42f2ffd5529060e88095f02aef1b908cbd110d2a8a1bccfb9c9faeb95"
+    },
+    {
+      "path": "core/spawner/SpawnManager.as",
+      "sha256": "1a13142f49945633189c2c765d70e7bfdd44137f52f3f9036603735961e0e8af",
+      "lines": 200,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3d1bb3ac4ca615acbab401cf68b341e08f35fc9b662c4137c16f05131371c296"
+    },
+    {
+      "path": "core/spawner/Spawner.as",
+      "sha256": "e256307427928bfa2154793365864983502db0763c6d6bcd2d878875a30378ff",
+      "lines": 276,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d748206518578738d757bcbe09476747fd0e43f1d43762f89e9c07616a01aa7b"
+    },
+    {
+      "path": "core/states/AIStates/AIBoss.as",
+      "sha256": "28c2192dad45b1614ca17171071c2d084df5fea531917fc008a6b0e5dd262e96",
+      "lines": 113,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0bb45c5c356739a4bd0a3594f32bade490a71e85a538fdc8d70675f6684a50c3"
+    },
+    {
+      "path": "core/states/AIStates/AIChase.as",
+      "sha256": "dbbd81e036896ab0d11dd4946d96689b81efc2c0011067487219e651b2d35661",
+      "lines": 162,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e91e2efe90382f75384519bbbd645a5243f52c5997d938af9016fdf23d657091"
+    },
+    {
+      "path": "core/states/AIStates/AIExit.as",
+      "sha256": "c94671d3a46712dcc5021f0dad360933513f2acbc051405f2683423da2c4d54d",
+      "lines": 48,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/AIStates/AIFlee.as",
+      "sha256": "cb2226524de9d0932d2a440b17f59be9fb173dae60ed69d1e556cca920eacb65",
+      "lines": 63,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/AIStates/AIFollow.as",
+      "sha256": "017600ff6d985258d23585603af6645f9d55c858399aea0f7c05702210e368b0",
+      "lines": 74,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1e7ef25a862217aeb1a9091561548c65d473e6e939a9bebf1f6cabc76bfb981d"
+    },
+    {
+      "path": "core/states/AIStates/AIIdle.as",
+      "sha256": "4e67da5602528d54d7f7c61d35a5c3b9a44a7d2e46b77bedc4e8471321bf5dfb",
+      "lines": 54,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/AIStates/AIKamikaze.as",
+      "sha256": "9c67bc31247c44519007cfa56626eb8362d155d3bc07fbcdf5974bfef21037c9",
+      "lines": 62,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/AIStates/AIMelee.as",
+      "sha256": "e2d852d354c49b7f855704afae178ab552dd9270046d85ba0784b0c6111c6a81",
+      "lines": 190,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cbdc3c9d53b84d37789931f66ef88daf3c1597edcd6463554db9033789291e50"
+    },
+    {
+      "path": "core/states/AIStates/AIObserve.as",
+      "sha256": "2bafd483f9b55815d5fe2daa8c24fd42797abc1cde19f5a13262495a72b33a86",
+      "lines": 62,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0feab0ac3fd45f9c3370f1ff258f8d93feafd466a44a45ff2cc2641d854ca484"
+    },
+    {
+      "path": "core/states/AIStates/AIOrbit.as",
+      "sha256": "55ed53eddbe62339f56242d9e66f073bd41c5fa69eb72b51fd2def110ffe5ecc",
+      "lines": 127,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c0f1c9794fd4563fc346a34f5cdf1e6660f32791c12ac5162f321f4f88497c94"
+    },
+    {
+      "path": "core/states/AIStates/AIResurect.as",
+      "sha256": "192dce6ace10192a85dbad23940528f34a5e8123868d6221115471db572204d0",
+      "lines": 63,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "4462a1749b1e4e9159b049f78809cd2d05d6acd5d9903d59b5df6a21702ddab0"
+    },
+    {
+      "path": "core/states/AIStates/AIReturnOrbit.as",
+      "sha256": "66fd456db4d612fa07a2f0e2dd2b3f72b637253ef7b0bb9833c4743f892a3f1b",
+      "lines": 124,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0141f290bc8227e213190c8ebfd96da64c7468790b41552c2bc53ac58324f530"
+    },
+    {
+      "path": "core/states/AIStates/AIStateFactory.as",
+      "sha256": "74b74bf33e47e8de490ac013f87d1fec83723e7da4256d21c597e6d9e7290b3a",
+      "lines": 83,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a29e16356098a8f71946e9c06ad0eeed29a85e25ff8b9b3604514aec48f83899"
+    },
+    {
+      "path": "core/states/AIStates/AITeleport.as",
+      "sha256": "878e2458f322331128d81e9621af6f5cfa448785a060bcff3c970ff1ad903501",
+      "lines": 89,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "f05d14ebc36d4b600bc145dab04f28ca5f1432d66cc3257ba626e1ef8f7feb20"
+    },
+    {
+      "path": "core/states/AIStates/AITeleportEntry.as",
+      "sha256": "8795c1afac2f2c4898c8d1c160056e1cce0c7f1c73dd1111334e80936939cfcd",
+      "lines": 73,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "bf802e141370102654c6bcc902bdc6f6b9dde8d932e3f5a069ae79adc28a9156"
+    },
+    {
+      "path": "core/states/AIStates/AITeleportExit.as",
+      "sha256": "d14c077fb8a422f6d7f0919a153309492edbc9f7068feddda4cb677b5abd1efe",
+      "lines": 54,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2ec8d390b5fcd464aef371172319adc45a2ea61955201be634aaf181b95a5136"
+    },
+    {
+      "path": "core/states/AIStates/AITurret.as",
+      "sha256": "016df79945dd7203348d884a11f074f011f0a1245c2113204a3873197c4f849e",
+      "lines": 109,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "6e6668512ec9e8dfb45bbf599b175f15f7b3f0c997ccc281379a8c11f0c1304e"
+    },
+    {
+      "path": "core/states/AIStates/Blastwave.as",
+      "sha256": "57619efbe66919d0e7fddd8f3ebc659a46e99ac8032e72632c23518feb5e2346",
+      "lines": 55,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "7bdedd2d240de9195ffd8f9a690fae1286f369bffb022d201f26a22ef5700278"
+    },
+    {
+      "path": "core/states/AIStates/Boomerang.as",
+      "sha256": "6c275b060c38c4442297a63d2cf4621eaf482b3f732eded8405e1594c15a6616",
+      "lines": 99,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0d65bbf0547d780183a01bc3c25f9f9efccddb405611b283cdddef92570cd876"
+    },
+    {
+      "path": "core/states/AIStates/Bouncing.as",
+      "sha256": "d69d3f0976d519d15597af3b0566619b770bf0d0a99f0efdde376ded02aaef4e",
+      "lines": 247,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2a69f4eddc6850c64ba34427ea4914669281bc3c4be2fa95636c683669b5bd83"
+    },
+    {
+      "path": "core/states/AIStates/Cluster.as",
+      "sha256": "a98f963e2fd15cb50ca381407440a7e41b32a047fd301414c83fa552ca516fc9",
+      "lines": 62,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d912c87edaf1b1d245def6e3416bec884ff30bbcbd7b5e7b42104c84f3ccb371"
+    },
+    {
+      "path": "core/states/AIStates/Instant.as",
+      "sha256": "bb1363966167348a91a9aefddc354d3b21d730586f85095d5a33b44d385f6d62",
+      "lines": 178,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "692b563f77b047ed6c6f1737c8972f21f9a5bbd4f5baa91ee9988e9dbdaa67dd"
+    },
+    {
+      "path": "core/states/AIStates/InstantSplitting.as",
+      "sha256": "0e21b6bb2010a9b0226e57c2ad4a2250d65d6e68d2f85c5329107013d3df904d",
+      "lines": 106,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "34a4937c302825d673600c1097dbc6447bf2903a5281e9305c6bad816e2d1c27"
+    },
+    {
+      "path": "core/states/AIStates/Mine.as",
+      "sha256": "04ecc659ec54399f2cfb733208cd2d482f7575f4e95330b19f65c07295d323a8",
+      "lines": 50,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/AIStates/Missile.as",
+      "sha256": "e4a7ecb7cf3e46a6ef43ab9bfbc0f170893fe8300355d9cbeb4d8f6beba70e50",
+      "lines": 113,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "60f04efed901fb4f9eaa750ed96c46709fe8775ee7b94b638bfe0fdfd64693c1"
+    },
+    {
+      "path": "core/states/AIStates/MissileStuck.as",
+      "sha256": "9ff75af749d7b1d936fe5134232864a64307bbdc7b92946bd9d22a5d558f0007",
+      "lines": 128,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c50219a1999a948eda62062f96e9718c37ee568b93abddb6cf195f5527c8330d"
+    },
+    {
+      "path": "core/states/AIStates/ProjectileBullet.as",
+      "sha256": "d59791285d6a07f5dc35472acb381d0f9c62ed7223e1c67e3f482eb7792d374b",
+      "lines": 368,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "fb997ddd4a11a5c1c229919b8fdf86d326083697b5069cd83e421da674f8cbaa"
+    },
+    {
+      "path": "core/states/AIStates/ProjectileStuck.as",
+      "sha256": "dfe17242497408ec326373ba2ea849295b28a234123fa30d4721920abc26ca09",
+      "lines": 87,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2919ffa1e7a0be82a64eb146fe30f558033f6cfccdf4059649fb2d515c43923b"
+    },
+    {
+      "path": "core/states/DisplayState.as",
+      "sha256": "5228e663009bd2afb3974b654a0870f348a9cc902a629ccbf7d233fafd8b3b1a",
+      "lines": 87,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cbddd4f6d1d52df272f0b24bad895fff6b7c02338a97c129820c6ef2816a2739"
+    },
+    {
+      "path": "core/states/DisplayStateMachine.as",
+      "sha256": "00734bef14f39be50a33334dc20646f16978484caff8a385edd4dfc81f1c4032",
+      "lines": 54,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/GameStateMachine.as",
+      "sha256": "5e0e978efd255b1b93ddb5b52f68811262def484347a2a5710498f9bb2f14f91",
+      "lines": 129,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "337450d45d836493581e235d77bbc01873a5cc7b1514b80c69569e17f5b7d032"
+    },
+    {
+      "path": "core/states/IDisplayState.as",
+      "sha256": "162c794a4eb906009d373082c9a5e189c60d3eabbfd66a26bf96a80aa2168295",
+      "lines": 14,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/IGameState.as",
+      "sha256": "52c3d066036035773c811796cd9663af25a037b2438d28092285b29f65589006",
+      "lines": 22,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/ISceneState.as",
+      "sha256": "c0386d792db3e431c59120835e2901d5461043e2fc3dc217e674037ab9567f5f",
+      "lines": 12,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/IState.as",
+      "sha256": "37ffccbe584c153964992f6a2cad6241ec6721118fa5999adc5587cc75f08f50",
+      "lines": 14,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/SceneStateMachine.as",
+      "sha256": "ad929e41cb636aa66284542c8417b3bcfe1786ecf1bee60f11ca36acb473e51c",
+      "lines": 75,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ae6b6feacfc1b68716b974248f4b3535a10b74369899733ee12e423f1964fe94"
+    },
+    {
+      "path": "core/states/StateMachine.as",
+      "sha256": "37650ef2fb5d8dbb22abab1e7360cd1800c4991924fd4a7327e66aded0880c9c",
+      "lines": 58,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/exploreStates/ControlZoneState.as",
+      "sha256": "4b10236e719ac80516368d21db452a0a073010c5335c4cc821f96ff2854422f5",
+      "lines": 290,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "59bb167841aa3ac927b6f6f68912264d54adfad16b4fce4d1fc7174c3aec80ff"
+    },
+    {
+      "path": "core/states/exploreStates/ExploreState.as",
+      "sha256": "e6bebde27fd3795651387ce3d53a591c3425d1fc3d91193d91a45b604358818b",
+      "lines": 304,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8c1e5c9fabf57b81dbd8f93b95b0d53732c5ea35037b46fa9e01e0707d84bbef"
+    },
+    {
+      "path": "core/states/exploreStates/ReportState.as",
+      "sha256": "e6890639c0c003ef2d644cd9ad4b88c11304907e6f3d6a15c8a0ff552701d3a8",
+      "lines": 422,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "de57a53d79726152660ea46916e6762152fdfd450be3aa42464d292573df4fc1"
+    },
+    {
+      "path": "core/states/exploreStates/SelectTeamState.as",
+      "sha256": "8d894f38df52247ac8485d9188f0088fa4aa932b4ec63ea4ba9c9565e1b86732",
+      "lines": 360,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "259e380d22983fcd8cde25c6e44c82b2815ce944f334af000c6e5a34939b20d7"
+    },
+    {
+      "path": "core/states/gameStates/ClanState.as",
+      "sha256": "c14058695f9674bf8456e911ef7d38ef14b4754293288951d510311bd5a7b998",
+      "lines": 1222,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "005b5811ab921ed9e142c98d47e34eb6a1925cad183226466f36c767594c49de"
+    },
+    {
+      "path": "core/states/gameStates/GameState.as",
+      "sha256": "5c354ed04e5d2af1659c5d2240fadc647f0549e96a27d5df5bf4502f2dd60ed2",
+      "lines": 74,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/gameStates/GoWarpState.as",
+      "sha256": "5f49264236981fc47012e3d83fb80be915cfa8cf49b47e3fe8894fd1b0afdc84",
+      "lines": 104,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1ac78696c44d98456063c25d19649bba3a7aaad53b69a4d1db9bd4eb7a284fdd"
+    },
+    {
+      "path": "core/states/gameStates/IntroState.as",
+      "sha256": "dbb52963b8110f4a7226225acad7664c8d8832b10f068ddab0f9926e41208239",
+      "lines": 203,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "fb9f3bd0cc1f0cd367f51a640d829095d1973044c7f6302252c99cdc1cab0695"
+    },
+    {
+      "path": "core/states/gameStates/LandedCantina.as",
+      "sha256": "d5c52f4e3424ef3a153df9452eea553b83535bdd7b1dbdaea6db0a61e00d31b9",
+      "lines": 158,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3b46a645f53e358b43b45a8f190a1f2c83085439066f42747d7ba7920dea7729"
+    },
+    {
+      "path": "core/states/gameStates/LandedExplore.as",
+      "sha256": "da2af1eb8373d428cfac504a24c0ea9a0e6b4ff2f2138346b82eddaf5936ec5e",
+      "lines": 67,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "511d6addd91030852be38492281e02a3478dab2ecda6df790db97bdf3cf1c06a"
+    },
+    {
+      "path": "core/states/gameStates/LandedHangar.as",
+      "sha256": "9e6851886afc8fd195a44c8f33ad680991982cff01498665c392f04b9974e832",
+      "lines": 18,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "f57978cbb5cbe5410695c58f81a4e6d797c5b546448ea6fb0017973cef2f1b44"
+    },
+    {
+      "path": "core/states/gameStates/LandedLore.as",
+      "sha256": "a1365b515b44b4eb6bb173f5c9ec2cdd94cd87304a734439647fb59acfb1504a",
+      "lines": 70,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3f9d294b4946e6b949ed9b2918548ee834c9e4d15a28b0745bad55402db2b935"
+    },
+    {
+      "path": "core/states/gameStates/LandedPaintShop.as",
+      "sha256": "c66a908a1f38ad08a644e4da80f3b04700e5d0d56bb7446a646846095a2a5271",
+      "lines": 442,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "be65550241ab9c048867ba055d65f0e338b90bffc879640c47d9059fbe8ed499"
+    },
+    {
+      "path": "core/states/gameStates/LandedPiratebay.as",
+      "sha256": "d7ed0815202348c7a02255e42cc257b5cb3051b9e006294d4a3028bbd083c37b",
+      "lines": 137,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cacbbad5813f0bb5e4f60c83fc1bc71d8b6eeb2ba1cbbdeae9905fb17587740f"
+    },
+    {
+      "path": "core/states/gameStates/LandedRecycle.as",
+      "sha256": "6510ca6c241ee7bdc3620b2ff1cc6dd68a68f205071a683d982bd038bb643dd7",
+      "lines": 575,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ca63df9b97a9eefe08db1397b7edc231a88818e58f8854a84b801a7fdc332a96"
+    },
+    {
+      "path": "core/states/gameStates/LandedState.as",
+      "sha256": "ddeb638f11faa9e9374fbbce3146396062706283dc341d777da00ec4f78cec50",
+      "lines": 274,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0015e2272e1289e53f43d0cd62e893afa262cf2d661d52ab5f3162f3d5c8bbf2"
+    },
+    {
+      "path": "core/states/gameStates/LandedUpgrade.as",
+      "sha256": "8b551ad5992d0173238e993f8c1c1a78ae871d4e5076a2d1835238be79e5d3c8",
+      "lines": 59,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/gameStates/LandedWarpGate.as",
+      "sha256": "66bd023732de8137be7585b26ccef4aebe995d806362a9c7d7780d75d6e769b3",
+      "lines": 190,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e39e32ab5399fa6b4c9ce423832ce0953d9fb18624ed3701e088b4f1666329cc"
+    },
+    {
+      "path": "core/states/gameStates/LandedWeaponFactory.as",
+      "sha256": "ce1e2dd3ab9fd6e84f49c247e543b9eb62dfcaaecdec24d13442b7be0c0f6076",
+      "lines": 122,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8f5799bc922afc68fd9362c8852f325b2ef3382163c69b9154605429419a833f"
+    },
+    {
+      "path": "core/states/gameStates/LeaderBoardState2.as",
+      "sha256": "6a9982ec34486e01e42e253a2f74462f96f58143ed4d54d3c3ad93ef42e9750d",
+      "lines": 496,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e0277cf76f0b59ba5a6b43941f934233123072f44b60cb64e7da99a0da528590"
+    },
+    {
+      "path": "core/states/gameStates/MapState.as",
+      "sha256": "cb7b220be8758d8056a9ae263aed0440a026fb3f3c062265a33fb5cd0cdf392d",
+      "lines": 60,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/gameStates/MenuState.as",
+      "sha256": "b100295d313f74fb918b4b787a41b6db5254d4d8bd1acaef60f206c88f37e749",
+      "lines": 47,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/gameStates/PlayState.as",
+      "sha256": "1ce753b21df16f49308c769b31cb2a48e2f65a153a690b3b571012471348694c",
+      "lines": 1422,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "276ce045887491b54baf240b0e00d262929c87842f4fd9629a60459d9acb29e5"
+    },
+    {
+      "path": "core/states/gameStates/PlayerListState.as",
+      "sha256": "b4d7dd85dec14f33fe9321c06ca4e9e4c9b2345bc297f4c0c49549270c03f4ea",
+      "lines": 68,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/gameStates/PodState.as",
+      "sha256": "ae6e17549323636c983782bc90476fb37a09ec937edf4348c6af5563a0c6afb0",
+      "lines": 1187,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "5a53ba414a62b188c23e69f922e7e87edeba1d208c95415177e8688d8ac7b7ee"
+    },
+    {
+      "path": "core/states/gameStates/PortableHangarState.as",
+      "sha256": "5575eccae2875ba3dc9f68efb948918b6dba53f353ff3c3a6088b55c32bdda9b",
+      "lines": 40,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/states/gameStates/PortablePiratebayState.as",
+      "sha256": "24c2d50886db340965153c23459ae540540e6616ef9bbaf267225ab290869c9f",
+      "lines": 31,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/states/gameStates/PvpScreenState.as",
+      "sha256": "e2bdba858e696e210fff5559c10dd5f21d46eb85c53fd3ce30f896de1de456b0",
+      "lines": 62,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/gameStates/RoamingState.as",
+      "sha256": "550aec9b727f2d0833d4330aa80aa6c5b6bc6b18141647696f011c97d8ef6c77",
+      "lines": 187,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d090286334c98e5379424e418d325262524a8bb64439f619230a68223ba47adb"
+    },
+    {
+      "path": "core/states/gameStates/SettingsAutomations.as",
+      "sha256": "72d7df80caba2e2d773f00d71866e5f06489ba7aef02548d90bf24f3c696d2c3",
+      "lines": 334,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/states/gameStates/SettingsBindings.as",
+      "sha256": "e90dced118b1c54e4835527ee1dfb3b525be3292864e73e4644e146786095bb2",
+      "lines": 122,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "eafd3b9c26b9ca320d97b2eac4c8b8604534f287c5d400b93417e19b636763c1"
+    },
+    {
+      "path": "core/states/gameStates/SettingsChat.as",
+      "sha256": "f25fb3f5bdf642752274c312b27c839de6a4d7abdd969bfce719262e01af88eb",
+      "lines": 141,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "f20003ca29b91702588c25dcee1af38e552b79ff77ef5b0f0bd949f92cd55a60"
+    },
+    {
+      "path": "core/states/gameStates/SettingsGeneral.as",
+      "sha256": "c4997cf9368ce7b562f935991da02a48beca3e6ec4b951434b02ef86af2669b9",
+      "lines": 519,
+      "change": "changed",
+      "status": "source-translated; integration and visual verification pending",
+      "vanillaSha256": "f44a4bfa7150c2c046c7ab0f42fc9db03789dd6ef5e4b8cb44b7d592fff2b0d4",
+      "typescript": "src/ported/SettingsGeneral.ts"
+    },
+    {
+      "path": "core/states/gameStates/SettingsState.as",
+      "sha256": "87ac3a7b1a34afb7a3ad86a75377c95598b569714f1909f1a4bb2df9eec769b8",
+      "lines": 194,
+      "change": "changed",
+      "status": "source-translated; integration and visual verification pending",
+      "vanillaSha256": "d6920e96da9ab7c76230f9134c0d225c971b9f462b883fa98dc9ade402d0628a",
+      "typescript": "src/ported/SettingsState.ts"
+    },
+    {
+      "path": "core/states/gameStates/Shop.as",
+      "sha256": "647704491c450c55660a021c1de0277576df8bf94e0f23e9c03ba7e83feb46d8",
+      "lines": 265,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0f1c75ad3f4ed3c56ffe2886fc89db66ed7f2d57b453d8e804aa3efec15d57ed"
+    },
+    {
+      "path": "core/states/gameStates/ShopState.as",
+      "sha256": "a2602034a0746011f89d3b63e1ded9f4a076e878b4b38ae60a47e0a275e5e4cb",
+      "lines": 67,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/gameStates/WarpJumpState.as",
+      "sha256": "f55c77b98c3ddcb3812ccaad1a3a990b5bcbe80df6a479f2f45abe0c6dd5c178",
+      "lines": 133,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ff917ee42b13b727888201b2baa4c6101793971d7b032bb02e9a638d8ffbac7b"
+    },
+    {
+      "path": "core/states/gameStates/missions/Daily.as",
+      "sha256": "0167a9b7edd7b19f7bd33862ee4d25ea9a72ca1b33220a45d2b5235621b204df",
+      "lines": 49,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "25535bbbc65804a54cc22737c43fc605bda8bb9a21454587d7303d6c824bcb5c"
+    },
+    {
+      "path": "core/states/gameStates/missions/DailyList.as",
+      "sha256": "b1db7088c5975be95f059c194263c00e206d71a8272921e37afa9c6643021498",
+      "lines": 72,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0c5eef5ae3d676ecde6d8ece010cddc72bb545307fa6262482ee5ff05086b776"
+    },
+    {
+      "path": "core/states/gameStates/missions/DailyReward.as",
+      "sha256": "2101e092d2fb4d4f32c40c33f26151670617330c6d91b364a25b391d48c3b8ba",
+      "lines": 140,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e1392a0f4460cc99533fc1bc20b00e138fe9cfbcbb3038aa9c4037b431ae1f94"
+    },
+    {
+      "path": "core/states/gameStates/missions/DailyView.as",
+      "sha256": "e51c8dd148934a6d762702ea6955136bc17a6e14b672687bc1848db26d25b05f",
+      "lines": 192,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "126df971bcb192065e6275e4b82890407f8206794856a034892e4cae63a07768"
+    },
+    {
+      "path": "core/states/gameStates/missions/MissionView.as",
+      "sha256": "520b5a4c7fe8d9ebbec1c1be46a0cd9a7d17f6cd978cf406ba8294a98d1eb992",
+      "lines": 608,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "9a74ed3db01f9751d6f965f4d64798680f0178ad933552ae5749c5c01ffbd5fb"
+    },
+    {
+      "path": "core/states/gameStates/missions/MissionsDaily.as",
+      "sha256": "86a353143ac7a8c50e1ae7c5749d05f2bf9fc4538b54fa7d8bec2d1e4d82a2c3",
+      "lines": 23,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/gameStates/missions/MissionsList.as",
+      "sha256": "0d8cb13dc9650a23c828e332dc290068241f39f14602f1407c17da6d2d4501be",
+      "lines": 146,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2fd5eb92724f4ffe9fe2b77e99a66da77366769d45244635d1d0dcc21da1df30"
+    },
+    {
+      "path": "core/states/gameStates/missions/MissionsState.as",
+      "sha256": "8cb817338e2fe1ebc90b7321ff896eec761db07ceccec9a40a651c313cc14260",
+      "lines": 170,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/gameStates/missions/MissionsStory.as",
+      "sha256": "41be184d3d2a4297fe5664fc86b2c42f710dad4e13a7a3a64a7cc621b3537aac",
+      "lines": 25,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "04a87611a7add2273646ac1a59ba719842ffa64c33bbb30c9bb331e566f66394"
+    },
+    {
+      "path": "core/states/gameStates/missions/MissionsTimed.as",
+      "sha256": "9c0b1ef2fac676ebb2ede035c12fe5360c75fe51aa9971ecd061106311f03df8",
+      "lines": 32,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/gameStates/missions/Statusbar.as",
+      "sha256": "7b7b0629205c2beb254937313a824ef5fc14097a68938324592899fda816bc79",
+      "lines": 145,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "49db60ecf3aa5a38cfd84f74c597b0251da2037150bb5109c21f006a6e554045"
+    },
+    {
+      "path": "core/states/menuStates/ArtifactState2.as",
+      "sha256": "de1fb0342e2b67d174546a8efd94ebd4fb3ee88f933f53608dd24620358d86c5",
+      "lines": 145,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b011b3687746be4f67c1830ac338a9ff9876ccdc704e1f47b1401da23a3b472d"
+    },
+    {
+      "path": "core/states/menuStates/CargoState.as",
+      "sha256": "da2b08a8479ddc12df2210b4085e05cd0288ba6ac12ad9974ce1018b7d204714",
+      "lines": 41,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/menuStates/ChangeWeaponState.as",
+      "sha256": "c636e12c1f56881528af1df9a2faaad86efe74ffc2bce520ade0339e04111378",
+      "lines": 67,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "46a2e10659c072a1e1d315247e71ba3d080acd1293bea5eb810448b54ad8320e"
+    },
+    {
+      "path": "core/states/menuStates/CrewState.as",
+      "sha256": "b8ae51c0bdee5de586bf69aefa7dd1795592aff1790d7e59cd84d04cf76d59ad",
+      "lines": 81,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d8322568b89b91935351868935e4636583f427fcced8f567284acd794a8f05fe"
+    },
+    {
+      "path": "core/states/menuStates/CrewStateNew.as",
+      "sha256": "7979e97132c5386d08a0fdac6cca7080e33bfacf59a47b0d1b6142260068914d",
+      "lines": 124,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b0251c4b2bb7bffc607d10c32f8023c4d6ea20bda14d9b5220b111de42fd475e"
+    },
+    {
+      "path": "core/states/menuStates/EncounterState.as",
+      "sha256": "3d2c125dcd6faf1e9ad20fb07871fb661a34a406b6cdbe98e3d805f6edc6ddb2",
+      "lines": 208,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "390ed86db957f8437072d358184d8c5359b4d5abc1c3b1215911290020382957"
+    },
+    {
+      "path": "core/states/menuStates/FleetState.as",
+      "sha256": "7971fabf9f129ae17297f64a277402ca163f8f745e203c96e5c4ca65396648d1",
+      "lines": 22,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a435feb8ca3b4444ae891edb59a0be6111b668ce07166872ed7ccac2f6bead90"
+    },
+    {
+      "path": "core/states/menuStates/HomeState.as",
+      "sha256": "daa9acd6f7aee9b42c076fbf07f60f5a59674b11482d38b932207058b254a70c",
+      "lines": 310,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "35e4c1266359c0c052357acc3dd20c41737710021ba740e9be2eb5fbc201fc04"
+    },
+    {
+      "path": "core/states/menuStates/UpgradesState.as",
+      "sha256": "8e4910fc55cffd4697694c743f1f5fe7407ec6e7dca80c3a0c187a0baf00f3f1",
+      "lines": 37,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e1362b9638c157e087494ebfaabd1dfc39751488803aaa3259b57aae1f20115f"
+    },
+    {
+      "path": "core/states/player/Killed.as",
+      "sha256": "4e14b20d35c11c689c7137faaa1c6b4c470088daf6bbca66cb45ec7e9703f57d",
+      "lines": 346,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "239a3c122be511798629158448d32e25b1857584d116123fc6a3cdfe581f2d6a"
+    },
+    {
+      "path": "core/states/player/Landed.as",
+      "sha256": "318c20f14544fbd49cafa0bea77a0d9f10803cb04828a12f6384f79d704c6ece",
+      "lines": 53,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/player/Roaming.as",
+      "sha256": "851b4c572fcd19e1c88fa7a7ea8ff53f8184fdc68b0d8d5a423db695aedb50ac",
+      "lines": 40,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/ship/Intro.as",
+      "sha256": "533444357e4174424ac56cef2128efbef4ee127046e5416d55ac2da94b46506f",
+      "lines": 67,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1b320a025618a9ce62a393c5066f06ee681f800abf12175f9f09587de75d0fc3"
+    },
+    {
+      "path": "core/states/ship/LandedShip.as",
+      "sha256": "9f0c59b19e85f519b9462b2a0277394b1896acda4e476518745fc8f0d0e1eb30",
+      "lines": 37,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/ship/Roaming.as",
+      "sha256": "5f93b3e81b25a8187ba3c109b96407e99c7e5fb38f9d4ed04524983e4e85d206",
+      "lines": 39,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/states/ship/WarpJump.as",
+      "sha256": "b3dccff1219c6fb958b06295c310377d3cb62538d3eddd6ef05bca0ea5c83462",
+      "lines": 85,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e0c2c1e726c7e359a2fa968912084beeed760094556fe99df1855e6df805c6e2"
+    },
+    {
+      "path": "core/strings/userAgent.as",
+      "sha256": "67a14734cc49b65b9287399c445cc4331d2509cd7277b6b5973fac942eaa762c",
+      "lines": 44,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "453c14c8429998e96e89b8e0a5a07eb604af111bfe53a08fb3a5b611f70a08d0"
+    },
+    {
+      "path": "core/sync/Converger.as",
+      "sha256": "9cd194113778c9d5a3956693a2beafbdebd4bd27aeb850cff63b73529531ffa9",
+      "lines": 435,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "65a8096da8cc50687be33d1aa3b2562022b177215ec8844f7b0d7fe439495d92"
+    },
+    {
+      "path": "core/sync/MessagePackHandler.as",
+      "sha256": "d2c9a75f867effa7f8f847f7a9396c22ce3db430ed553cf5634bdaeb1398faeb",
+      "lines": 230,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "be4ed8c63da99fadd41584554b6965fd449829546dd2680f9612031f2ced7275"
+    },
+    {
+      "path": "core/text/RichBitmapFontCompositor.as",
+      "sha256": "4ac8f8444e6d17f316cf6d9eccdc690de477d91eaa770ac459fb508e5994133b",
+      "lines": 54,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/text/RussoBitmapFontRegistry.as",
+      "sha256": "e37eee991c2a97ac94f4152109925f642c00b15ed2e27eff749a849d6b00b3f7",
+      "lines": 202,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/text/TextHandler.as",
+      "sha256": "081f8c8fda23f57a64aa9262a0cc0d54a11bd2e4540f80aacaabc2ba1418690c",
+      "lines": 114,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "63fe8452de1f8e6708ef132d7403c829ac4e7ac0a32326b1c7bfaf6931006ed7"
+    },
+    {
+      "path": "core/text/TextManager.as",
+      "sha256": "c67306cf672e2b63d002bbf59ea50676edf664ea2a197fc653ae4a9444ae7cd3",
+      "lines": 478,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "07055f07cae472f92ef4425e90b3f73462b22d7d0d2d93aead8673dc1c252a43"
+    },
+    {
+      "path": "core/text/TextParticle.as",
+      "sha256": "0e4b43dad0f26f389fb41009fa496a86e14fe927a07cca801ab245a337e9bb6e",
+      "lines": 197,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "f4aab4fc2fda5b6aca46e92c0480a91fa9a9f11673eff4e9b4b20b9abbf9af57"
+    },
+    {
+      "path": "core/text/VerdanaBitmapFontRegistry.as",
+      "sha256": "6d2b466b63a3bda1ed5b78ff649cbf4e0d9073a3f0c64f6c98d9b13c3724e394",
+      "lines": 139,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "core/turret/Turret.as",
+      "sha256": "d7577e542fa608a8454dcbef20e482d139facb036bf6d06df710f3c524333253",
+      "lines": 203,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8a02aeeea62be49829ca7d85dbd824a9054ef9dac59ebd37dcbe8984ae64a744"
+    },
+    {
+      "path": "core/turret/TurretFactory.as",
+      "sha256": "8597a0e46b6014302a0c542c78d2d23d3db32c2fdebac733a9ba52e573d2ea41",
+      "lines": 72,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8acc9b537730d2444b4f00782efc22471102b1c1228ed6dd768ef7e4bab24c84"
+    },
+    {
+      "path": "core/turret/TurretManager.as",
+      "sha256": "2de88ac73a71e5d834e09211a4ec4d0cf837c8c2caad54f0f1539c49f01c3deb",
+      "lines": 249,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "d14953ed85b34eef92dcf52918bd14587ce3a52f46a2915985d0f69688157443"
+    },
+    {
+      "path": "core/tutorial/Tutorial.as",
+      "sha256": "22d8cbeb923d73b41c3a4552bfe78c358df68c5d2d37c41ec91ce1f0a85c57d4",
+      "lines": 716,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cec23337b7c78306d2f549314e631d9505e1b61b68c60a8943e435608f21502b"
+    },
+    {
+      "path": "core/unit/Unit.as",
+      "sha256": "55b380f26c02c5501cc91124fabb7f1363e4e8ee3f85e70475ec860f2c2b6f67",
+      "lines": 892,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "bb5bfc0ea78dfc4b255f03d018857d1334b3097348247b731578e54a0993fa12"
+    },
+    {
+      "path": "core/unit/UnitManager.as",
+      "sha256": "db5f41103e764f00e284cbdf848558eb8845dc8c86aab8f2990ba4c2a1d6a9fc",
+      "lines": 64,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "9d0cb33321382a04ba7b53d10318edd2128655142e9eff429e149d2beeba2040"
+    },
+    {
+      "path": "core/uri.as",
+      "sha256": "1088915de016ea1f966ab52537a6a77a4557e42e93ffa41d6f08ceaa2e657d0f",
+      "lines": 240,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ad9fbd184567664d34646b6613b84e4e9288b7cbd536c088f09f71a2008d5b66"
+    },
+    {
+      "path": "core/version.as",
+      "sha256": "8f81bee47a07a080d07ee00655eaa6bee95da65fd70cc4d59836dbad5809f537",
+      "lines": 67,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "8881a37be984916b7a1e5edd63ae4679e50f6511039b2feb5a325abaa290d561"
+    },
+    {
+      "path": "core/weapon/Beam.as",
+      "sha256": "8a299c0def9c1b51658a3ab84045b04adb9c39e6318380a6a5ec6ede359a2281",
+      "lines": 801,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "eeaaf5b6b35cd13de3e175d5af43bd0f50fb9b1a20327da0f4872791376425f9"
+    },
+    {
+      "path": "core/weapon/Blaster.as",
+      "sha256": "ebf49bf6a5af7b90119f66efd87ee1d1afba559507011828877520da3e179559",
+      "lines": 99,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "db108af8ed8b723f239de54ebc01185ab53a7c89dc9bc67bedcc9c9058f24bfc"
+    },
+    {
+      "path": "core/weapon/Cloak.as",
+      "sha256": "0ac1112978984ec03974e4ece5673a918cd0869572c00ece5751c42e33459d61",
+      "lines": 13,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/weapon/Damage.as",
+      "sha256": "35edb658274f4e7b1cd014a50c35ef24edcaff2ca1c729b70eb8755fc0f2a844",
+      "lines": 206,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "64d6248e93de8ae3a16d0783653a7d5aa3e90791f9bb5892d0b7c4aa8535fc34"
+    },
+    {
+      "path": "core/weapon/Debuff.as",
+      "sha256": "e852b19fffa4f3100627b6ecf0f84e8901039622c15e4b9d7dc1223d89b89de9",
+      "lines": 66,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "098b4a3e55ac68d6417f65c485c8b1aa27f73849c8f905aaed4bc7f2966d1804"
+    },
+    {
+      "path": "core/weapon/Heat.as",
+      "sha256": "d828840d0773242396f5d95cb622c272638db716118a55da658ec7ccd4cf9372",
+      "lines": 88,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "eae3f5881295759c80bec00af19c8708129dbd056d5e4d2ba52be5dbfcc5dd7a"
+    },
+    {
+      "path": "core/weapon/Instant.as",
+      "sha256": "c06b49d1bdfe7bf0dc109f6f7cfdeae974c078d2e9ecb04e1149d5112620212e",
+      "lines": 13,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/weapon/PetSpawner.as",
+      "sha256": "4b6dacbaaebfdc86c5c02a3b4e29b5dd24862c6f659e6ccd796e5929cd357ee4",
+      "lines": 51,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "51edcd666b1b10006ae26e87fa6a24c3040a28e64df7cc1c5b1b8cc84c075885"
+    },
+    {
+      "path": "core/weapon/ProjectileGun.as",
+      "sha256": "39083426099f97c2821bdfed5d7cb0cda728b479be066f285d0abe85b7696367",
+      "lines": 156,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "a30754d85941e8635b06a07ae9ce2de655da55b3acb557674c1147051f3a18b7"
+    },
+    {
+      "path": "core/weapon/SmartGun.as",
+      "sha256": "9a9209a1bc7d52d05dab39a559c61b0ec342f813065b0d37d1ec209f3a29bf44",
+      "lines": 110,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0f03730e27995719ff8e3fa93949dfc6c18df8bb4808afa46ba45e396aa386db"
+    },
+    {
+      "path": "core/weapon/Teleport.as",
+      "sha256": "c24e31088df5a379f07d96e2b177e0b5de5ef1d31f0586b0498c1bcd60206fc2",
+      "lines": 47,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cd2cbe379c010ba1490d99b961b5bc12ab79c858f02ce67ffa3ed53110400ecf"
+    },
+    {
+      "path": "core/weapon/Weapon.as",
+      "sha256": "68e05643de5d73d1d63e8483ed4366d64df2b8248b768df42c1243b15c5e45ad",
+      "lines": 654,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3c32d6029ae73da4ec13fb6b10fd11fcb625a844f2affbaef1dc4de0e331e91b"
+    },
+    {
+      "path": "core/weapon/WeaponDataHolder.as",
+      "sha256": "d0891e14ceee62c2306314672bb342df7bac3420de675436c7c5fef82398e2d0",
+      "lines": 13,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/weapon/WeaponDebuff.as",
+      "sha256": "c54a0c1c435431fafd41ce9da697ce736f1e90e704f155543b90f4df015f25ec",
+      "lines": 17,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "core/weapon/WeaponFactory.as",
+      "sha256": "f4ad2adcda5ab94f9e97301bb6c902c3229f72aaf6ca9052fcf1029fb152404c",
+      "lines": 81,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c05674b5a2c3190eab8918a13d5065e2f5fa06e46592c6a03e604e2af6a36694"
+    },
+    {
+      "path": "core/weapon/WeaponManager.as",
+      "sha256": "86e79cc890395b5c7438d89a1421ca92fff4216fc09053bc7d0fe4073c35f73a",
+      "lines": 103,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "103fccde7825014fb4aef0c24489f65b2c11ac9ba66d9d1acaf600126d051248"
+    },
+    {
+      "path": "data/DataLocator.as",
+      "sha256": "ea1651108a1f2e80d67d992d23d2cc549f463ec9e6b5cb27fb5cd819552c12e1",
+      "lines": 18,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "data/DataManager.as",
+      "sha256": "944dceaaba66fca3934fb3de4ee17a229c50e86c92fa6ee471ab4d8f87484ed2",
+      "lines": 190,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "461804a0a143299d5d5fe1c3a78c33a2805e8d54f327d991a9cdb23ec6a54010"
+    },
+    {
+      "path": "data/IDataManager.as",
+      "sha256": "d92efb00a206233a653a963f4da7d36c3c5be0dbe7162089043d171652b2ceaf",
+      "lines": 30,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "data/KeyBinds.as",
+      "sha256": "e8a7986efa5dbaedffe6d46d4eeab58e66f7de0e94d8f34ac2b95b19aea9abb4",
+      "lines": 286,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "60989af5d65a5ad6279ff0d1b090f42d9ed9817d3caf13a3bc532832a1d3e7aa"
+    },
+    {
+      "path": "data/Settings.as",
+      "sha256": "6826a0957a7aa39309040058dadd20c5e47a4fb81464c8b220723f3cc804c581",
+      "lines": 550,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3ca4cf1d0ef6445f9734b35bdf4305d28636514008daf51c0b28d80c6debabe4"
+    },
+    {
+      "path": "data/Table.as",
+      "sha256": "4569b71194e20c0c09c1e2b57d144d633770f85335afd47542820d91f42a93be",
+      "lines": 40,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "debug/Console.as",
+      "sha256": "341faa5353009b28d784bc5bf6b1785307ae01a3966d6a389aed995cc8317afd",
+      "lines": 39,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "embeds/qolaf/DebuffsJson.as",
+      "sha256": "1dee1eca69143b137d2794f3af0a2445814225e1522bd3024bda6b54db105c9c",
+      "lines": 7,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "embeds/qolaf/TargetIconBitmap.as",
+      "sha256": "d7c59cf2fba1a7b9d1f2510775b25c5e3876ae393165f858a3ae7699737f0cd3",
+      "lines": 7,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "extensions/PixelHitArea.as",
+      "sha256": "56d4144a0ea70e9a7ccf0dcc4efc46d4c3a3381356bacf39e7f2ea2d5747ebee",
+      "lines": 164,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "2883ba9e63cb9f4ff1004977d32b16204a6c2e5c2b49c190cb86eb361a9b6ece"
+    },
+    {
+      "path": "extensions/PixelImageTouch.as",
+      "sha256": "63f257497eadf78e366ca4f12e32a45d1d7a1403f1d9cfa8f683d5905a9a42c9",
+      "lines": 52,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "95f5cca5ab130501f5a97e24d1366734ac72c91d7a998342ffbcbc47a81961eb"
+    },
+    {
+      "path": "extensions/RibbonSegment.as",
+      "sha256": "504c8e1058a1e42737a475d13af59492871dc460a0cbe46223d0bfcc5f707399",
+      "lines": 70,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e1a99cc54f4b43bb9e0e6b859db40a1e44811e61cd46c08a87aac62f8bea620f"
+    },
+    {
+      "path": "extensions/RibbonTrail.as",
+      "sha256": "68e9e8a10f71d398ca5b8de62c67b6394f9b31b9f7872adde9f0700402f1c190",
+      "lines": 286,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "01a8af0812709c6d13e305258a0ee963723313f73143206ed710cad50f70a58a"
+    },
+    {
+      "path": "facebook/Action.as",
+      "sha256": "a176d53547336a1e128884fd780da80c7a443c97839ae109ec8212c6d0458ee6",
+      "lines": 56,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0df7fa2e15e878f89687175649beaf684d7937d2af3a56f87eb4cab8791f0737"
+    },
+    {
+      "path": "facebook/FB.as",
+      "sha256": "1baa2eb37c65ffc4365931e1e9ddebc966a3b6d0ef52c29882a04b3d7d2ffba0",
+      "lines": 522,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "392e7ae6fe62bf246c2521afdc5c3a8ddaff02591c7b0b5953bcc996d7cd9c4b"
+    },
+    {
+      "path": "facebook/FBData.as",
+      "sha256": "a2efb0a0834ded30d97b21797228bfdbbd6a325bb1aef714db377b457b24fba8",
+      "lines": 222,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "de018b88742934f3be3046a98e6e4b3da150a85755db800e34efd979dd9ed4e4"
+    },
+    {
+      "path": "facebook/FBQuery.as",
+      "sha256": "dccf28d4157f827209737cf5020942df033563755f177861db1fc0a3a2b070eb",
+      "lines": 162,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b063a141239faab64ad0a2a345eed270d49abce97cd14a10ef8345468c4f2851"
+    },
+    {
+      "path": "facebook/FBWaitable.as",
+      "sha256": "a492d63edc30484fd6ead301fa8b09a4b10200750a27aded8d60b23c4c9c6845",
+      "lines": 171,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "098b53cbee854c9b01eeda3b2d239317dcd3adb8f592584e9fac10e9fe57cbc6"
+    },
+    {
+      "path": "facebook/FacebookJSON.as",
+      "sha256": "da43aff3bcb475aabbbbd238c342861cd9d5ecabccff0703f0cdcae7bc59bf03",
+      "lines": 495,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "feathers/controls/supportClasses/ListDataViewPort.as",
+      "sha256": "347aa10c77515d62e95dd9dc6942ca120e6264553be040497b78d2b78199e46b",
+      "lines": 1574,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "3c9af932d8ff7643b98aa9065a738e307f7d0c1ba592943030b79fa1f7f26778"
+    },
+    {
+      "path": "feathers/core/FeathersControl.as",
+      "sha256": "d9f69b99914d69b53182a9ae0158e8410033cfa5788e47f49defde762c4a40af",
+      "lines": 1403,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "02322dc7e4246415f086945cba67c1deaeb0a2ceefedf8a426b9d57ee1a115a9"
+    },
+    {
+      "path": "feathers/core/ValidationQueue.as",
+      "sha256": "f426284d052a9edddf5181375574c1050b4d0a3059b36222a7eab65421e3f13f",
+      "lines": 183,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c1b4f14bccdf73921d7de16de8c224a6a79ac541b984cb1c0fbcb30229cf7f99"
+    },
+    {
+      "path": "generics/Color.as",
+      "sha256": "b5a48adb39192651da85018dbb8e0d6b67cf515f937141085f87bb9d65130023",
+      "lines": 257,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "9da4f449991193c8229b35acf074dd8ec224f42bd15351cc0a084c71a9742309"
+    },
+    {
+      "path": "generics/GUID.as",
+      "sha256": "08cbbdf895416d1e7edf50bfe17de0773ecb78e7bd72bb4c828c5c20004e0fe6",
+      "lines": 127,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "adc9d58148c417437d2e5303cea9925166f6b93bde0e2f549ba2f0ef7e62af3a"
+    },
+    {
+      "path": "generics/Localize.as",
+      "sha256": "b472524aec4b8d35b66137103c241f38b8934c7625b4eb53ac509edbb1960d60",
+      "lines": 90,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "74ceadcb3b34d3e7349d7e8257c1cd7969c0d2ae49838d20e500e135be706c57"
+    },
+    {
+      "path": "generics/ObjUtils.as",
+      "sha256": "d814d52742bd0a99dfa1cf536a6fd012e2f6a2a58dcf3f376fabe3451318183e",
+      "lines": 28,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "generics/Random.as",
+      "sha256": "4e5a4e2ab3de11cb802e8b88f40879aac70d2039275962bdc3ebc24a91ac59b8",
+      "lines": 35,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "bce662d78a28bc7f0de1c820e67cb1de12a7511e0d76d40dd9384442efb4f841"
+    },
+    {
+      "path": "generics/Util.as",
+      "sha256": "53326123e83b888ac771e5226b75f34ab74a19fd88a90df3fb1b0207ad1257c1",
+      "lines": 204,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "b17273ce68b0f06d27f12b252f96c34f42eb4fec67fd82a4e5cd278aecc6aa3d"
+    },
+    {
+      "path": "io/FcitxIMEBridge.as",
+      "sha256": "6d579dc130952e7a5fdb0ad39f635c0c6825084403094a1c5e28609a8a4daa08",
+      "lines": 24,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "io/FcitxIMEBridgeNative.as",
+      "sha256": "3c03bb112bb78c5ab1b0b8d654de45c69c39c658a81d7d521c7fb41acfd1ef61",
+      "lines": 333,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "io/IInput.as",
+      "sha256": "f150868119b13362b73ea7df45682de966675ea1e7339788219fd3b00eed5b16",
+      "lines": 28,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "io/InputLocator.as",
+      "sha256": "df9e767b70d65b613628b775f299071cd2d44bc132092dcce77b64d5ce3cd0be",
+      "lines": 20,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "io/InputManager.as",
+      "sha256": "0510506e204668450e99db5b5014d2a049f48144efea970ac36da1f7673d9003",
+      "lines": 576,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1a313e97aa0a29570392c0ead30e55a918e0b90cbbd13fa6b336919a3c01baf4"
+    },
+    {
+      "path": "joinRoom/IJoinRoomManager.as",
+      "sha256": "a8d045cfdb007007d9eb148eb3a1c5711d42620394de2de621f54866f307dde0",
+      "lines": 50,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "0adde5036dfcbc42be0d33ea7e6daf472302bcb8118118d448439fe8638aa1e6"
+    },
+    {
+      "path": "joinRoom/JoinRoomLocator.as",
+      "sha256": "efe9ab773a73af6a89ca582ab1cb85acc7151c32d448f9cb1c31224e6a8fca4b",
+      "lines": 19,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "e40199e76d6d61afa87965bcb8da2692cc78f89a1e336711f4a69d7b389735a0"
+    },
+    {
+      "path": "joinRoom/JoinRoomManager.as",
+      "sha256": "004a16f058dcdf21aab34d6e81cc408d383390874c60dde319d0afdbe34c242b",
+      "lines": 2665,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "07764cf160c7326fd747b5dc0cfb1942e6ea6cf09e3c79b51cbf2ca3c1403e1b"
+    },
+    {
+      "path": "joinRoom/Room.as",
+      "sha256": "07ca59d5ea136fddf77eca4596c120cc8fe46b69794eb282e6cf22f918ca0648",
+      "lines": 22,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "73007eda6e51e2ba76869a4ff60d5f0d4d435e4d22908cea4acae25191b8f9b6"
+    },
+    {
+      "path": "movement/Command.as",
+      "sha256": "67114a16d10c698088c60227f981aacfacad88ec2e0c8ab5cc2a381adbcf1ffd",
+      "lines": 21,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "movement/CommandManager.as",
+      "sha256": "472bc4d807320d8e309cb20b4572eedef4ef4e674f5509590e6b652dbdc8d760",
+      "lines": 326,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "dd876fcc4f0a49672284ef1a2f9dc96c3ed27b264da5d3b5aeabc338802a8d04"
+    },
+    {
+      "path": "movement/Heading.as",
+      "sha256": "ffb54a14c56073de1219d46518cdb1ff7891dcaf1a960c848bcfed0434f6e48f",
+      "lines": 135,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "9c6e737b0d1bfdc6ae0d1ea30a70e99229cef49b2896b83fbc24b2e8b493025e"
+    },
+    {
+      "path": "movement/MovementCommandWindow.as",
+      "sha256": "678e9f2267f6f039fde686ef974b8b21e31bb6922192e5a76c07ebb3652557b0",
+      "lines": 164,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "movement/RemoteMovementBuffer.as",
+      "sha256": "7fae542303c21d1148a70909543428ca82b9e006365088178666d371a6dbf97d",
+      "lines": 105,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "movement/RemoteRotationBuffer.as",
+      "sha256": "da5083eec7ee3bb931e6d9e2b5334fa7ba85f6450a49ba7c75757a140f2749ee",
+      "lines": 184,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "playerio/Connection.as",
+      "sha256": "839aa039ff3a882c96961e80a11d91905c1ff97266faed0a5c3dd5e2ed9706c9",
+      "lines": 448,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "9e40a3d0504d9070cad8afe1b1baf779ebbb081d3867e8f536926c94d71163e7"
+    },
+    {
+      "path": "playerio/WebSocketTransport.as",
+      "sha256": "d2cae2f3c8f582457bc7300a6e2eb7fc2d047ec45c965df72a16d1dacac494ab",
+      "lines": 202,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "playerio/generated/messages/CreateJoinRoomArgs.as",
+      "sha256": "158314496ddc80a93858f389ab7f806b824f052943d2227733f3c211ab0fc10e",
+      "lines": 44,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "dbb8caf7e54a34383440d165caa1f49584402e239945e4c90b562b00fd0ab1c4"
+    },
+    {
+      "path": "playerio/generated/messages/JoinRoomArgs.as",
+      "sha256": "6770722a21fa12bb12077d3d57e966636efbbf5311419c08dd7ab8a7dd57290c",
+      "lines": 30,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "71019b03e55bbb18ed1aaab7ceab2426d62f236e13535c2fc8df431242ccd618"
+    },
+    {
+      "path": "qolaf/data/ClientSettings.as",
+      "sha256": "2a21b3d1f01e3b89f48b04f2cda2b30dd869cb83c0a4cb109195ba17b94dee77",
+      "lines": 872,
+      "change": "added",
+      "status": "source-translated; integration and visual verification pending",
+      "typescript": "src/ported/ClientSettings.ts"
+    },
+    {
+      "path": "qolaf/data/ClientVersion.as",
+      "sha256": "4e86b3792eba526c3a75fd086783cdea6bff7925c050e1f6cffe649b96554718",
+      "lines": 10,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/data/DebuffInfo.as",
+      "sha256": "bcf2f1c1309ccadf1f5f5e71d9d61d9e57697cbcf45d628b1214fbf9c83c5324",
+      "lines": 32,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/debuff/DebuffEffect.as",
+      "sha256": "a2e3ad14550064c62ee523193e3373915b71fb961047de019f7e5a1ce9b62e6e",
+      "lines": 59,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/diagnostics/ClientErrorDiagnostics.as",
+      "sha256": "025b30b27e8e6c2cb7fbd2e3ba863d6069c59dccd7e8e547e682516b92647cdc",
+      "lines": 109,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/discord/DiscordActivity.as",
+      "sha256": "7ca955c36f6247cc9eacd97bf9735386d4e9c469f9e1b49cd874117a7c057448",
+      "lines": 155,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/discord/DiscordPresence.as",
+      "sha256": "25ca5a61b522d784b63fcf675b938b6540f362bde17c223917c026a7b49e64f1",
+      "lines": 301,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/discord/EmbeddedPresenceHelper.as",
+      "sha256": "696426d2a7a5f3834b48a77c0d14cc51aab0c40c46eb6755dbed178a25f53dea",
+      "lines": 156,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/events/DebuffAddedEvent.as",
+      "sha256": "50945c24a29bedcf7438907fbf06a3e6f8ddaa4ed1f9c1d3ad03f7abd861be6c",
+      "lines": 20,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/events/DebuffRemovedEvent.as",
+      "sha256": "7ea9bc5a4326bec45660203661e113d9bcfac2f5be3d185ed5443a86c9424c9d",
+      "lines": 20,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/events/DebuffStackEvent.as",
+      "sha256": "e2c821e85529b16223160582de8f1d90c7b5275af872b275632fd6b026b8ccf5",
+      "lines": 20,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/events/TargetUpdatedEvent.as",
+      "sha256": "9446035074089f8066eb9ccfe8b37717110ca2382aa0865275c944d0999e10f8",
+      "lines": 20,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/radio/EmbeddedRadioHelper.as",
+      "sha256": "be420f2ff45b66c727d6f9a361fba097b4765a66d5708ca97ca1483d99367e39",
+      "lines": 158,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/radio/RadioAudio.as",
+      "sha256": "45fa0f66ddc6617f94bf20afd99c2e9a7f91313c1a908c1d10784b0a3abcd538",
+      "lines": 218,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/radio/RadioAudioFile.as",
+      "sha256": "8e89ddbb2571543f0971f2bb130e4ba02fd8c7d402052c8c408ba78f747d36b8",
+      "lines": 25,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/radio/RadioChatBridge.as",
+      "sha256": "a4196bec318f1881eaaf8d7dbe015a90fd509968f33a1be4a25cec1e78ff81cf",
+      "lines": 113,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/radio/RadioInvites.as",
+      "sha256": "ac4fad14d76ff96f427c27c992aab64099fcd52aae839f04cdf63cfbdea21095",
+      "lines": 338,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/radio/RadioPassword.as",
+      "sha256": "0a64b7b6d3833b55053b78756bfcb708f9dd321325d9f6cbad476fe3ca8cb12c",
+      "lines": 33,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/radio/RadioRooms.as",
+      "sha256": "f46fa1f26acf758e80eb8caa868eac5978b8eecb6992017380667711cb8c95d3",
+      "lines": 1563,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/radio/RadioService.as",
+      "sha256": "a939a46ff06754e55ad7e0f2e3f24addf1754ef514b5e189e3045480fbceb3f7",
+      "lines": 600,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/radio/RadioStreamUrl.as",
+      "sha256": "362bc8652c9da661b39bc3c1c1903ffbf556b81f360070ea3fb7ce9e95963cde",
+      "lines": 10,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/radio/RadioTransport.as",
+      "sha256": "1a7601b933c76d83150860a4ad4f5d58b78caaf285c1183bb7939e2abddcc4f1",
+      "lines": 352,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/reload/ReloadCleanupRunner.as",
+      "sha256": "fc11484602982052fed742dc74e0eee1ac9d8c65081c4e7025ae77ab721476fe",
+      "lines": 34,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/states/SettingsQoLAF.as",
+      "sha256": "73b76fd9980d515f85e5a8506d5e2796613662f99805b521650ebd3f530d98c3",
+      "lines": 583,
+      "change": "added",
+      "status": "source-translated; integration and visual verification pending",
+      "typescript": "src/ported/SettingsQoLAF.ts"
+    },
+    {
+      "path": "qolaf/target/TargetSystem.as",
+      "sha256": "77dd079c16066163cbf9828fb7563bcb88bb3d1e19318632bfb312880a4a54a9",
+      "lines": 259,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/ui/RareAuraStyle.as",
+      "sha256": "4f5937418abaa8dbf1688d55dab67e97aa44eec538aceb88f94f0391d88e6c18",
+      "lines": 111,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/ui/TargetAimIndicator.as",
+      "sha256": "9ea49d3672ee5c861a292e3fe210e28b03ffcb980171be924d9500c7bb758f53",
+      "lines": 76,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/ui/TargetInfoElement.as",
+      "sha256": "97886d43e84d241f506a4e0ebae26a01833ddd1e2f451392e89dc3de08d9ac31",
+      "lines": 727,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/ui/debuff/DebuffDisplay.as",
+      "sha256": "b3679927f444e5b7cd8b79f37dc7ef23130a8aa8be778373775857021c1a4ccc",
+      "lines": 177,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/ui/elements/AuraTextRoller.as",
+      "sha256": "e68c10989f93f5d08eaaa71ffdf9bda651dd5387e7147318499809089dfecc69",
+      "lines": 181,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/ui/elements/CustomProgressBar.as",
+      "sha256": "d1e3f3e87eefdf31929a823ceec8c8363d0a05b064b8458b95ae316419c70292",
+      "lines": 353,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/ui/elements/DebuffInfoTooltip.as",
+      "sha256": "c9093075739676de5e77e070a7522e2938c83bb62bbe4081e3d6b750b81a1aa0",
+      "lines": 93,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/ui/elements/NearbyTargetBar.as",
+      "sha256": "4d0176042b9773e6b2a4c8262900578bfca2eece7b09422c5614efd2e1d7dd21",
+      "lines": 221,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/utils/ColorUtils.as",
+      "sha256": "03a703394b7b86e7ef897cbfe5ee73c909a4e459369287ee67042be3f096fa67",
+      "lines": 10,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/utils/ObjectPool.as",
+      "sha256": "af0e25e18e156652959ba0ced8e07489d7ae3cceb9c3010fef42e42df71dabd3",
+      "lines": 74,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/utils/Query.as",
+      "sha256": "9565a37d9e4f09a6c15347661fe281604ffedfa5b4ffc3e17c05766f2d227cb6",
+      "lines": 27,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/utils/StringUtils.as",
+      "sha256": "a507e7c19bc900c2c2524aee0159a0906ba59b39f4e0707d010843c01c7651d0",
+      "lines": 32,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "qolaf/utils/System.as",
+      "sha256": "ee5a6720e94b7c6104d1b6f6a448474f8a540ef4c5cb057b97afc6c4e006e5df",
+      "lines": 14,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "sound/ISound.as",
+      "sha256": "8558ac9ff1ccee3ca0c5fdac660dbe6b9cb6a534def0b44671c877db9c3d1226",
+      "lines": 40,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "030059fe7ac1abdcf88f1818facd1522aa79b204ab2a7675ebb42b4cf7069374"
+    },
+    {
+      "path": "sound/MusicPlayer.as",
+      "sha256": "a4525aebddaed2fcb37c5f086f9dc5833aadc02f19f0d5c8e517f31617deb89a",
+      "lines": 342,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "sound/MusicTrackCatalog.as",
+      "sha256": "47b3b7f0d56a407283d3c4ace1a8139f40065def587b6bd2334c68398cd35afb",
+      "lines": 114,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "sound/Playlist.as",
+      "sha256": "8e12bbe8731e2d7a3d5b704a92fc7388ea4fe9fb945720ddb512fa484a725953",
+      "lines": 128,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "1826f0f4db03a644d01f3bafcf2003a49461a7089823fb9f192087d5970400ae"
+    },
+    {
+      "path": "sound/SoundConst.as",
+      "sha256": "0aaca5dfb5002ea86e302c37b3b10e050dda331e5443b0dde1421887e95b383a",
+      "lines": 43,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "sound/SoundLocator.as",
+      "sha256": "b2ead5de6f4b76a51edf235bb85c2642b463c3efd5abad54d34ad74cbbf6357c",
+      "lines": 23,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "6655956b4668708057e59f53c22b061388d031cb56ed9e9be1819309a2cb53a6"
+    },
+    {
+      "path": "sound/SoundManager.as",
+      "sha256": "9e3c8cd243f1b3f849dfab9738b74594c66a9cb6e1de563df95c2c3902d834c5",
+      "lines": 431,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c18f8ef50b75fc13d5087edebc0d9388f732526f4ca8f416cc6e58b6e2da5afc"
+    },
+    {
+      "path": "sound/SoundObject.as",
+      "sha256": "b39c94b2ee3e1f1549ea6f9ec9d0815d899a0b0372e8bedb8241e837cea131c0",
+      "lines": 261,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "432b275c977d8e7779269683766fb4c7e8e87ee7b155e02ee86728bede5eb07a"
+    },
+    {
+      "path": "starling/extensions/HTMLBitmapFonts/BitmapFontStyle.as",
+      "sha256": "4f3e962d9f53ccbc154a27163efedd6b38596560a69de71c24f749d431315436",
+      "lines": 443,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "starling/extensions/HTMLBitmapFonts/CharLocation.as",
+      "sha256": "f88f9a52f9400c84e2ef546f0bcd006143b9c8f24e35226d537c25275bdd2db7",
+      "lines": 166,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "starling/extensions/HTMLBitmapFonts/HTMLBitmapFonts.as",
+      "sha256": "b8c148feb8c2f8177f773c2de1c4c30dcaaa3f4e7c1cd29af9e8e75aa8ab006f",
+      "lines": 1038,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "starling/extensions/HTMLBitmapFonts/HTMLTextField.as",
+      "sha256": "a54f9570ee0c7ba3d395cd743f4e52e4e7da202c4ae3d8a0fdb58d89f2bea524",
+      "lines": 1418,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "starling/extensions/HTMLBitmapFonts/deviceFonts/DeviceFontCharLocation.as",
+      "sha256": "40a010b0891d6023d03d9663109491a8cb57a332e9359882657e3a30b3ecd84a",
+      "lines": 227,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "starling/extensions/HTMLBitmapFonts/deviceFonts/DeviceFontImage.as",
+      "sha256": "75552173b9eee93c030c6708e39f75136af02c656ca295d668a7bbc80b5ed7a6",
+      "lines": 23,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "starling/extensions/HTMLBitmapFonts/deviceFonts/HTMLDeviceFonts.as",
+      "sha256": "bd18e3c916f42d4c584999dbe3ef87d10cc5f46adb82bc3ceb924efb3e76c68c",
+      "lines": 1029,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "startSetup/IStartSetup.as",
+      "sha256": "4356b63c411a0677ee16fe3f0c812c3d992c507e156ff7b22af6b4e67d5d35a7",
+      "lines": 29,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "startSetup/PickButton.as",
+      "sha256": "921c0fe1f21513d091b29922aed00eacda5ae9b91752994e1c771be59a75d0bd",
+      "lines": 94,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "76069a7194e2287f41c191806d8c1c1af9edbdf5af0f688af2a825a9b875b41a"
+    },
+    {
+      "path": "startSetup/StartSetup.as",
+      "sha256": "705e69e5e0339cc7026dc17add80e8fa0117ea8e633dae864990bf8d9a3209d1",
+      "lines": 537,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "cd8d56e4569d8f71caad1358f427b67e6f7835d2c9c99a793fb435600060d518"
+    },
+    {
+      "path": "startSetup/StartSetupE.as",
+      "sha256": "7a985cbfcd04671a9ff2b62f3d8210e5c1ecfb5fee4bbb93bc456040ba6068bf",
+      "lines": 485,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "bc48df2ddfc3a2c22e4a24076707704dfc197e70b03225dea4de87c6ad2c2356"
+    },
+    {
+      "path": "startSetup/StartSetupLocator.as",
+      "sha256": "c9a87b4e916ebb0e9535bbc3f9ad33746072ecd6231a6c0b4189a8e0fa31287e",
+      "lines": 21,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "startSetup/StartShipBaseStats.as",
+      "sha256": "336af4fbb848b1a89154961707796e5449572ff4af14c1ba7d425f4fcfdaaedd",
+      "lines": 96,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "5390cbab330ddde8727dc4b4f1b1e4d70dc6357e651b2059c0b9ff272a9aceae"
+    },
+    {
+      "path": "textures/AuraTextureAnchors.as",
+      "sha256": "da038fac08f3807b071e5b24a31faffc9fc5d7bdbab0673666b0ab983d851ff8",
+      "lines": 127,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "textures/AuraTextureContours.as",
+      "sha256": "4503315d145489bb2627bd44f774ee518bd77b6f3045843fe9a4238f46bada28",
+      "lines": 215,
+      "change": "added",
+      "status": "pending"
+    },
+    {
+      "path": "textures/ITextureManager.as",
+      "sha256": "480e54368322bc6b50557c40555a72c7319eee9ad8c36f4512cac4bae36785fd",
+      "lines": 47,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "c1c129b028de80ac98aba771dde82c27d41354ae316966470171a2d9025ff86d"
+    },
+    {
+      "path": "textures/TextureConst.as",
+      "sha256": "10e7af19ab26dec8a91169a5685bbff355c81d8c72a9737312b903bb5676d80c",
+      "lines": 47,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "120cc555c582fb26d9a8055d6ebfa293a2eb65a861a7d3ba3237299c73b1a480"
+    },
+    {
+      "path": "textures/TextureLocator.as",
+      "sha256": "fb9b76515c148de2a8a6bc7bc67dbcb4180b9ee77d3180938b6e2d5ad86b3c4b",
+      "lines": 21,
+      "change": "unchanged",
+      "status": "upstream"
+    },
+    {
+      "path": "textures/TextureManager.as",
+      "sha256": "ce14925bd433541f0506a7377ad5be82dd8a38f417689f76193a5b8d4d1cbb01",
+      "lines": 847,
+      "change": "changed",
+      "status": "pending",
+      "vanillaSha256": "ff528d75293f1fbe52199a4504c074d0f0ea794641369d78e281ac52b82869f8"
+    }
+  ]
+}

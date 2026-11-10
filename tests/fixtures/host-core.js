@@ -1,4 +1,5 @@
 export const API_VERSION = 1;
+export const DEFAULT_CLIENT_URL = 'https://raonygamer.github.io/QoLAF-Client/qolaf-client.js';
 export const CONFIG_KEY = 'qolaf.plugins.v1';
 
 export function pluginURL(value, origin = globalThis.location?.origin) {
@@ -11,7 +12,7 @@ export function pluginURL(value, origin = globalThis.location?.origin) {
 
 export function readConfig(storage) {
   const raw = storage.getItem(CONFIG_KEY);
-  if (!raw) return { version: 1, plugins: [] };
+  if (!raw) return { version: 1, plugins: [{url: DEFAULT_CLIENT_URL, enabled: true}] };
   const config = JSON.parse(raw);
   if (config.version !== 1 || !Array.isArray(config.plugins) || config.plugins.length > 12) throw new Error('Invalid saved plugin configuration.');
   const seen = new Set();
@@ -70,6 +71,9 @@ export class Hooks {
         notify('after', [result, ...args]);
         return result;
       };
+      // Starling dispatches zero, one or two arguments based on listener.length.
+      // Haxe $bind preserves this length; a rest-argument wrapper must too.
+      Object.defineProperty(entry.wrapper, 'length', { value: entry.original.length });
       target[key] = entry.wrapper;
       methods.set(key, entry);
     } else if (target[key] !== entry.wrapper) {
