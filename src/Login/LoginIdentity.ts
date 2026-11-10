@@ -15,6 +15,7 @@ export function loginIdentity(api: API, login: Raw) {
     'left',
     'DAIDRR_16',
   );
+  label.set_name('qolaf.loginIdentity');
   label.set_autoSize('bothDirections');
   label.get_format().set_verticalAlign('top');
   ui.place(label, 10, 10, login);

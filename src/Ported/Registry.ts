@@ -1,3 +1,6 @@
+import { createSettingsBindings } from './SettingsBindings';
+import { createSettingsChat } from './SettingsChat';
+import { createSettingsKeybind } from './SettingsKeybind';
 import type { API, Raw } from '../Api/Types';
 import { aliasProperties } from '../Runtime/As3';
 import { createLoginButton } from './LoginButton';
@@ -40,6 +43,12 @@ export function portedClasses(api: API) {
       if (!instance) throw Error('Initialize session settings before opening a settings page');
       return (cache[name] = instance.constructor);
     }
+    if (name === 'core.hud.components.SettingsKeybind')
+      return (cache[name] = createSettingsKeybind(resolve));
+    if (name === 'core.states.gameStates.SettingsChat')
+      return (cache[name] = createSettingsChat(resolve));
+    if (name === 'core.states.gameStates.SettingsBindings')
+      return (cache[name] = createSettingsBindings(resolve));
     if (name === 'qolaf.states.SettingsQoLAF') return (cache[name] = createSettingsQoLAF(resolve));
     if (name === 'core.states.gameStates.SettingsGeneral')
       return (cache[name] = createSettingsGeneral(resolve));

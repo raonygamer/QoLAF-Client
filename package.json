@@ -6,6 +6,7 @@
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "preview": "node scripts/Preview.mjs",
     "check": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "build": "node scripts/build.mjs",

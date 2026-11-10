@@ -351,13 +351,44 @@ export class Unit {
     return false;
   }
 }
-export class PlayerShip extends Unit {
+export class Ship extends Unit {
+  initCourse(_heading: any) {}
+  set_course(heading: any) {
+    return heading;
+  }
+  destroy() {}
+  update() {}
+  reset() {}
+  draw() {}
+}
+
+export class ShipSync {
+  playerCourse(_message: any, _offset = 0) {}
+  playerUsedBoost(_message: any, _offset = 0) {}
+}
+export class Converger {
+  run() {}
+}
+export class Heading {
+  parseMessage(_message: any, _offset: number) {}
+}
+
+export class GameStateMachine {
+  update() {}
+  set_clock(clock: any) {
+    return clock;
+  }
+}
+
+export class PlayerShip extends Ship {
+  land() {}
+  enterWarpJump() {}
   player: any;
   get_course() {
     return { speed: { x: 3, y: 4 } };
   }
 }
-export class EnemyShip extends Unit {
+export class EnemyShip extends Ship {
   static RARE_TYPE_DEFENDER = 1;
   static RARE_TYPE_ATTACKER = 2;
   static RARE_TYPE_SPEEDER = 3;
@@ -365,6 +396,8 @@ export class EnemyShip extends Unit {
   static RARE_TYPE_UNIQUE = 5;
 }
 export class Game extends Display {
+  camera = { _switch: false, update() {} };
+  parallaxManager = { update() {} };
   stage = new Stage();
   overlay = new Display();
   canvas = new Display();
@@ -411,6 +444,22 @@ export class Game extends Display {
   }
 }
 export function registry() {
+  class SettingsState {
+    container = new Display();
+    bg = new Quad(760, 580);
+    constructor(public g: Game) {}
+    enter() {
+      this.container.addChild(this.bg);
+      this.g.stage.addChild(this.container);
+    }
+    resize() {}
+    close() {
+      this.exit();
+    }
+    exit() {
+      this.container.removeFromParent();
+    }
+  }
   class Login extends Display {
     init() {}
     resize() {}
@@ -439,6 +488,12 @@ export function registry() {
   const texture = { width: 32, height: 32, get_root: () => ({}), dispose() {} };
   return {
     'core.scene.Game': Game,
+    'core.states.GameStateMachine': GameStateMachine,
+    'core.ship.Ship': Ship,
+    'core.ship.ShipSync': ShipSync,
+    'core.sync.Converger': Converger,
+    'movement.Heading': Heading,
+    'core.states.gameStates.SettingsState': SettingsState,
     'core.scene.SceneBase': {},
     Login: Login,
     'core.hud.components.chat.ChatInputText': Chat,

@@ -13,6 +13,14 @@ Current checks:
 - Settings tests cover original defaults/ranges, account separation, one-time migration from the earlier subset, live HUD/page preferences, and Aim Assist page listener cleanup.
 - Session tests cover HUD ownership, frame delivery, native boss-bar visibility restoration, unit touch handlers, exit and reconnect cleanup.
 
-Display-list fixtures are test doubles, not a browser/WebGL renderer. These checks do not establish visual parity or authenticated gameplay. The user confirmed that the deployed host's frame-event fix restored game rendering. The new native client branch still needs live visual/authentication checks and completion of the remaining integrations before being described as a full port.
+Display-list fixtures are test doubles, not a browser/WebGL renderer. These checks do not establish visual parity or authenticated gameplay. The user confirmed that the deployed host's frame-event fix restored game rendering. The local native branch has now been exercised in the authenticated browser through reload/auto-login, play, Settings and Plugins. These observations do not establish full parity; the remaining integrations and screen-by-screen comparisons are still required.
 
 `src/Ported` preserves original source class boundaries. `src/Settings/RuntimeSettings.ts` adapts original SharedObject persistence to plugin-scoped storage; it does not upload settings. `src/Runtime/GameSession.ts` owns per-game hooks and native HUD objects. The host's upstream snapshot/update workflow remains separate from this client module.
+
+Additional checks during desktop comparison:
+
+- Auto-login hides the profile/provider panels during its countdown; late authentication callbacks cannot complete a superseded attempt.
+- Plugins is visible on login, absent during play, and mounted inside Settings. Host lifecycle tests cover opening, closing and leaving that dialog.
+- Fixed-step timing and camera easing are checked separately from ship render interpolation. Native engine rotation access uses its Haxe getter.
+- `RemoteRotationBuffer` is translated from the original `movement/RemoteRotationBuffer.as`. A local deterministic differential run compared 10,000 mixed packet/frame operations directly against the original AS3 method bodies: all returned values matched exactly. Unit tests retain stale-packet, held-turn, wraparound, pause, and cinematic-ownership cases. This is arithmetic parity, not a sign-off on the entire movement pipeline.
+- Source keybinding-row tests cover Escape cancellation, both mouse bindings, and capture-listener removal after the row is detached from the stage.

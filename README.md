@@ -37,3 +37,20 @@ Use `npm run format` after editing. TypeScript filenames, classes, and our own n
 `npm test` builds and exercises the emitted module alongside source-level tests. `dist/qolaf-client.js` is one self-contained ES module with no external imports. The build also emits a download page and SHA-256 metadata. Actions checks formatting, types and tests, uploads the module artifact, and publishes Pages from `main`. The host's separate upstream-update workflow remains responsible for the official game snapshot.
 
 See [verification](docs/verification.md) for test coverage and its limits.
+
+## Local comparison
+
+Build this module, then build and snapshot the sibling host repository:
+
+```sh
+npm run build
+cd ../AstrofluxClient-Port
+npm run build
+npm run snapshot
+cd ../QoLAF-Client
+npm run preview
+```
+
+The preview runs at `http://127.0.0.1:8087/`. It serves the latest local module from `dist` and substitutes the host's default plugin URL only in the local HTTP response. Rebuild the module and reload to test changes. Published URLs and the official snapshot/updater stay unchanged. An optional first argument to `scripts/Preview.mjs` selects another host `dist` directory.
+
+The local preview reports a fixed set of startup flags at `/__preview/status`; it does not send credentials, chat, or account identifiers. Screenshots and authenticated runtime comparisons remain local.

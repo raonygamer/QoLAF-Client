@@ -5,7 +5,7 @@ import { nativeManager } from './Fixtures/NativeManager.js';
 // @ts-expect-error actual host JavaScript module
 import { PluginHost } from './Fixtures/HostCore.js';
 import { registry, Stage, Game } from './Fixtures/NativeGame';
-test('native Plugins UI mounts in login/game display lists, blocks input only while open, and cleans up', () => {
+test('Plugins stays on login, moves into Settings, and never floats over play', () => {
   const errors: any[] = [];
   const host = new PluginHost({
     storage: { getItem: () => null },
@@ -31,13 +31,22 @@ test('native Plugins UI mounts in login/game display lists, blocks input only wh
   host.created(game);
   game.runGameLoop();
   assert.equal(login.children.length, 0);
-  assert.equal(game.overlay.children.length, 1);
+  assert.equal(game.overlay.children.length, 0);
+  ui.open();
+  assert.equal(game.overlay.children.length, 0, 'Plugins is unavailable over play');
+  const settings = new classes['core.states.gameStates.SettingsState'](game);
+  settings.enter();
+  assert.equal(settings.container.children.length, 2, 'settings background plus Plugins');
   ui.open();
   assert.equal(game.blockHotkeys, true);
-  assert.equal(game.overlay.children.length, 2);
-  const panel = game.overlay.children[1],
+  assert.equal(game.overlay.children.length, 1);
+  const panel = game.overlay.children[0],
     close = panel.children.find((c: any) => typeof c.callback === 'function');
   close!.callback();
+  assert.equal(game.blockHotkeys, false);
+  ui.open();
+  settings.close();
+  assert.equal(game.overlay.children.length, 0, 'leaving Settings closes its plugin dialog');
   assert.equal(game.blockHotkeys, false);
   host.dispose();
   assert.equal(game.overlay.children.length, 0);

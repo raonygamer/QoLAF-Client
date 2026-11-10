@@ -1,6 +1,7 @@
 import { read, type API, type Raw } from '../Api/Types';
 import { NativeUI } from '../UI/NativeUI';
 import { portedClasses } from '../Ported/Registry';
+import { LoginAttempt } from './LoginAttempt';
 export type Provider = 'simple' | 'kongregate' | 'armor';
 export interface Profile {
   id: string;
@@ -112,6 +113,7 @@ export function loginProfiles(api: API, login: Raw) {
     timer: ReturnType<typeof setInterval> | undefined;
   let pending: Profile | null = null;
   const cleanups: (() => void)[] = [];
+  const attempts = new LoginAttempt();
   const save = () =>
     api.storage.set(key, {
       profiles: profiles.filter((p) => p.type === 'site'),
@@ -122,6 +124,7 @@ export function loginProfiles(api: API, login: Raw) {
     countdown = 0;
     if (timer) clearInterval(timer);
     timer = undefined;
+    login.connectStatus.set_subText('');
     login.connectStatus.set_visible(false);
   };
   const hide = () => {
@@ -142,6 +145,7 @@ export function loginProfiles(api: API, login: Raw) {
   };
   const fail = (error: any) => {
     if (disposed) return;
+    attempts.cancel();
     inFlight = false;
     pending = null;
     login.connectStatus.set_visible(false);
@@ -161,8 +165,15 @@ export function loginProfiles(api: API, login: Raw) {
       login.connectSteam();
       return;
     }
+    const attempt = attempts.start(() => {
+      fail('The server did not answer in time. Please try again.');
+    });
+    const failure = (error: unknown) => {
+      if (disposed || !attempts.finish(attempt)) return;
+      fail(error);
+    };
     const success = (client: Raw) => {
-      if (disposed) return;
+      if (disposed || !attempts.finish(attempt)) return;
       inFlight = false;
       state.selected = profile.id;
       save();
@@ -176,7 +187,7 @@ export function loginProfiles(api: API, login: Raw) {
           profile.email,
           profile.password,
           success,
-          fail,
+          failure,
         );
       else if (profile.authProvider === 'kongregate') {
         const sdk = (globalThis as Raw)._pio,
@@ -190,7 +201,7 @@ export function loginProfiles(api: API, login: Raw) {
           'javascript',
           {},
           (client: Raw) => success(api.cls('playerio.Client')!.wrap(client)),
-          fail,
+          failure,
           api.cls('playerio.QuickConnect')!.convertFor(channel, Login.gameId),
         );
       } else {
@@ -203,7 +214,7 @@ export function loginProfiles(api: API, login: Raw) {
             if (!response.ok) throw Error('Armor Games authentication failed.');
             const [id, token] = (await response.text()).split('\n').map((v) => v.trim());
             if (!id || !token) throw Error('Invalid Armor Games authentication response.');
-            if (disposed) return;
+            if (disposed || !attempts.isCurrent(attempt)) return;
             const channel = new (globalThis as Raw)._pio.channel();
             api.cls('playerio.sdk.PlayerIOSdk')!.keepChannels();
             channel.connect(
@@ -216,14 +227,14 @@ export function loginProfiles(api: API, login: Raw) {
               'javascript',
               {},
               (client: Raw) => success(api.cls('playerio.Client')!.wrap(client)),
-              fail,
+              failure,
               api.cls('playerio.QuickConnect')!.convertFor(channel, Login.gameId),
             );
           })
-          .catch(fail);
+          .catch(failure);
       }
     } catch (error) {
-      fail(error);
+      failure(error);
     }
   };
   const panel = new (resolve('core.hud.components.LoginProfilePanel'))(
@@ -265,6 +276,7 @@ export function loginProfiles(api: API, login: Raw) {
     },
     show,
   );
+  panel.set_name('qolaf.loginProfiles');
   panel.autoLogin = state.autoLogin === true;
   panel.steamIntegrationAvailable = steam;
   panel.steamIntegrationEnabled = true;
@@ -379,6 +391,7 @@ export function loginProfiles(api: API, login: Raw) {
   cleanups.push(api.after(login, 'centerLogin', layout));
   cleanups.push(
     api.before(login, 'handleConnect', () => {
+      attempts.cancel();
       inFlight = false;
       hide();
       if (pending) {
@@ -393,9 +406,22 @@ export function loginProfiles(api: API, login: Raw) {
     }),
   );
   cleanups.push(api.around(login, 'showLoginError', (_next, message: string) => fail(message)));
+  // Native registration/recovery callbacks must not revive the vanilla form
+  // behind the source profile/provider panels.
+  cleanups.push(
+    api.around(login, 'setState', (next, nextState: string) => {
+      if (nextState === 'site') {
+        show();
+        return;
+      }
+      hide();
+      return next(nextState);
+    }),
+  );
+  cleanups.push(api.before(login, 'hideLogin', hide));
   cleanups.push(
     api.after(login, 'onKeyPress', (_result, event: Raw) => {
-      if (read(event, 'keyCode') === 17) cancel();
+      if (read(event, 'keyCode') === 17 && countdown > 0) show();
       if (read(event, 'keyCode') === 13 && Login.currentState === 'profiles') panel.loginSelected();
     }),
   );
@@ -403,12 +429,14 @@ export function loginProfiles(api: API, login: Raw) {
   if (panel.autoLogin && state.selected && !Rymden.controlKeyDown) {
     const p = profiles.find((p) => p.id === state.selected);
     if (p) {
+      hide();
+      Login.currentState = 'qolaf-autologin';
       countdown = 3;
       login.updateStatus('Auto-login in 3...');
       login.connectStatus.set_subText('(press CTRL to cancel...)');
       timer = setInterval(() => {
         if (Rymden.controlKeyDown) {
-          cancel();
+          show();
           return;
         }
         if (--countdown <= 0) {
@@ -421,6 +449,7 @@ export function loginProfiles(api: API, login: Raw) {
   const dispose = () => {
     if (disposed) return;
     disposed = true;
+    attempts.cancel();
     cancel();
     for (const off of cleanups.reverse()) off();
     for (const node of [form, providers, panel]) ui.dispose(node);

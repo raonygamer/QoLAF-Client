@@ -5,6 +5,7 @@ import { loadFonts } from './UI/Fonts';
 import { loginIdentity, PORT_VERSION } from './Login/LoginIdentity';
 import { loginProfiles } from './Login/LoginProfiles';
 import { installArtifactUI } from './Artifacts/NativeArtifacts';
+import { installInterpolation } from './Rendering/Interpolation';
 
 export default {
   id: 'qolaf.client',
@@ -16,6 +17,7 @@ export default {
     let fonts: Promise<void> | undefined;
     const ensureFonts = () => (fonts ??= loadFonts(api));
     api.on('classesReady', () => {
+      installInterpolation(api);
       const login = api.cls('Login')!.prototype;
       api.around(login, 'connectSteam', function (next, ...args) {
         if (this.$qolafAllowSteam) return next(...args);
