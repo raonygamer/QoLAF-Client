@@ -1611,3 +1611,23 @@ This is a controlled browser rendering check, not real combat parity. Still
 compare equipped beams/twins and actual emitters against the SWF; port original
 visual target grace/hysteresis and multipart hull mounts. Radio, visual IPC and
 the broader ship-visual feature family remain unfinished.
+
+## Radio native screen review — 2026-11-10
+
+Direct source port reviewed inside the running native Haxe canvas, with a
+separate temporary harness and explicit screen-review labels. Empty/unavailable
+state: /tmp/QoLAF-RadioScreen.png. Populated queue/request pane:
+/tmp/QoLAF-RadioPopulatedFixed.png. Selected DJ/peer pane:
+/tmp/QoLAF-RadioPeers.png. These are **isolated fixture data**, not connected Radio.
+
+Verified 900×780 layout and shrink-to-fit with the console reducing stage height;
+source request/peer switching; pointer selection of a request and DJ; source
+permission-dependent controls; and moving clipped glyph batches. Live inspection
+observed the 242px hint mask and advancing elapsed time (14.61s), with queue-label
+time also advancing. Full runtime Radio backend/chat/lifecycle parity remains open.
+
+Public delivery audit: GitHub Pages still served the initial 77c3c55 client while
+133 newer commits existed on port/full-client. The public host's upstream client
+SHA matches the locally verified Service-1410 bundle. Publishing 0.3.0-dev makes
+already-implemented native Help, Changelog, Music, Inspector, welcome/login and
+settings work available publicly; it does not imply full original-client parity.

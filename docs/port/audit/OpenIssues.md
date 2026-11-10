@@ -1880,3 +1880,26 @@ draw/chain order and failure cleanup. Remaining beam parity: original visual tar
 hysteresis/grace, multipart visual mounts (depends on the missing multipart ship
 visual port), actual combat/twins/emitter comparison, and supported-hull Apply.
 Radio, visual IPC and other /sv screens/features remain outstanding.
+
+## RADIO-01 — native view ported, service remains unconnected
+
+Ported the original 900×780 RadioPopup into native Starling controls: room and
+queue lists, request/peer panes, leader/DJ controls, seek revision guards, queue
+modes, local volume, source chrome, viewport scaling, and disposal. RadioInput
+retains native focus/selection and full query text while truncating only its
+unfocused bitmap preview; passwords are masked. RadioMarqueeTextRenderer keeps
+the source 28px/s motion and 1.25-second endpoint pauses.
+
+This view is **not installed as a working /radio command**. RadioViewService is
+the boundary for the pending session service. The browser still needs a media
+backend, authenticated IPC room integration, synchronized playback, invites,
+and RadioChatBridge/modal chat behavior. No placeholder service was shipped.
+The temporary local screen-review harness used isolated test data, never joined
+a room, and never downloaded media. Opening a screenshot is not playback proof.
+
+Live review corrected a collision with ScrollBox's internal content field,
+the bound base draw getter overwriting the marquee override, and Haxe's
+get_passedTime accessor. Long labels now clip and animate in the browser.
+Four added tests cover bitmap clipping across revalidation, marquee motion,
+native slider interaction boundaries, changed-track seek cancellation, listener
+request routing and queue mode coupling. Full suite: 438 passing tests.
