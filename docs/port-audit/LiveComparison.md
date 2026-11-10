@@ -209,3 +209,24 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   protected stats, icon geometry/reuse and tooltip cleanup. Extended the fixture
   with native tooltip ownership APIs; TypeScript, bundle build and all 75 tests
   pass. Live combat/debuff rendering and original-SWF visual parity are pending.
+
+### Rare-aura information and target header alignment
+
+- Restored the original 20x20 rare-aura question-mark button, aura-specific color,
+  descriptions and 260px native tooltip. Descriptions are copied from
+  RareAuraStyle; they are presentation only, never enemy stat calculations.
+  Current server multipliers have not independently been measured in combat.
+- Button appears only for the five source aura types on EnemyShip, reserves the
+  original 26px (button plus gap), and releases tooltips on target/type changes
+  and session exit. Native constants determine type mapping.
+- Header children now center vertically in the original 25px row. Name width and
+  following button positions use the original minimum width and six-pixel gaps,
+  including when the minimum name width makes the row exceed its nominal width.
+- TypeScript/build and all 77 tests pass. Tests cover all five descriptions,
+  native constant mapping, tooltip reuse/disposal and unchanged enemy fields.
+- Reloaded local preview through auto-login into gameplay. Capture
+  /tmp/QoLAF-AuraHudLoaded.png shows the rendered target header behind the native
+  sale dialog; closed that dialog afterwards. No rare target was present in this
+  check, so live aura hover and original-SWF visual comparison remain pending.
+  Native ToolTip's current style remains the same known typography limitation as
+  the debuff tooltip; this is not a complete target-HUD parity sign-off.

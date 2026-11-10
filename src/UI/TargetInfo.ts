@@ -4,6 +4,7 @@ import { DebuffDisplay } from './DebuffDisplay';
 import { NativeUI } from './NativeUI';
 import { ProgressBar } from './ProgressBar';
 import { AuraText } from './AuraText';
+import { AuraInfo } from './AuraInfo';
 import { NearbyTargetBar } from './NearbyTargetBar';
 import { TargetPresentation, levelColor } from '../Target/TargetPresentation';
 import type { TargetSystem } from '../Target/TargetSystem';
@@ -17,6 +18,7 @@ export class TargetInfo {
   private boss: Raw;
   private level: Raw;
   private name: AuraText;
+  private auraInfo: AuraInfo;
   private collapse: Raw;
   private collapseText: Raw;
   private shield: ProgressBar;
@@ -60,6 +62,8 @@ export class TargetInfo {
     this.node.addChild(this.level);
     this.name = new AuraText(ui, 188, 20, 14);
     this.node.addChild(this.name.node);
+    this.auraInfo = new AuraInfo(ui, game);
+    this.node.addChild(this.auraInfo.node);
     this.collapse = ui.sprite();
     this.collapse.addChild(ui.quad(22, 20, 0x101010, 0.9));
     this.collapseText = ui.text(22, 20, '-', 16, 0xdddddd, 'center', 'DAIDRR_16');
@@ -102,7 +106,9 @@ export class TargetInfo {
     this.level.set_text(unit ? 'Lv. ' + this.info.level(unit) : '--');
     this.level.get_format().set_color(unit ? levelColor(this.info.level(unit)) : 0x777777);
     this.name.text(unit ? this.info.name(unit) : 'No active target');
-    this.name.auraColor(unit ? this.info.aura(unit) : 0);
+    const auraColor = unit ? this.info.aura(unit) : 0;
+    this.name.auraColor(auraColor);
+    const hasAura = this.auraInfo.update(unit, auraColor);
     this.name.update(dt);
     let x = this.lock.get_width() + 6;
     if (this.boss.get_visible()) {
@@ -112,8 +118,23 @@ export class TargetInfo {
     this.level.set_x(x);
     x += this.level.get_width() + 6;
     this.name.node.set_x(x);
-    this.name.viewport(Math.max(60, 300 - x - 28), 20);
-    this.collapse.set_x(278);
+    const nameWidth = Math.max(60, 300 - x - 28 - (hasAura ? 26 : 0));
+    this.name.viewport(nameWidth, 20);
+    x += nameWidth + 6;
+    if (hasAura) {
+      this.auraInfo.node.set_x(x);
+      x += 26;
+    }
+    this.collapse.set_x(x);
+    for (const child of [
+      this.lock,
+      this.boss,
+      this.level,
+      this.name.node,
+      this.auraInfo.node,
+      this.collapse,
+    ])
+      child.set_y((25 - child.get_height()) / 2);
     this.collapseText.set_text(this.config.target_list_expanded ? '-' : '+');
     const v = unit ? this.info.values(unit) : { hp: 0, hpMax: 0, shield: 0, shieldMax: 0 };
     for (const [bar, max, value] of [
@@ -182,6 +203,7 @@ export class TargetInfo {
   }
   dispose() {
     this.debuffs?.dispose();
+    this.auraInfo.dispose();
     for (const row of this.rows) row.dispose();
     this.shield.dispose();
     this.health.dispose();
