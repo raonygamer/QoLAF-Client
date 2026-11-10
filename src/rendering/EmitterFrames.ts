@@ -1,3 +1,4 @@
+import { installRarityAuraLayers } from './RarityAuraLayers';
 import { installEmitterDelays } from './EmitterDelays';
 import { EmitterTargets } from './EmitterTargets';
 import { read, type API, type Raw } from '../api/Types';
@@ -66,6 +67,7 @@ export class EmitterFrames {
     private Emitter: Raw,
     private Color: Raw,
     private targets = new EmitterTargets(),
+    private prepareFrame?: (emitter: Raw) => void,
   ) {}
 
   reset(emitter: Raw): void {
@@ -74,6 +76,7 @@ export class EmitterFrames {
   }
 
   update(emitter: Raw, milliseconds: number): void {
+    this.prepareFrame?.(emitter);
     if (this.targets.stale(emitter)) {
       emitter.killEmitter();
       this.targets.release(emitter);
@@ -254,7 +257,8 @@ export function installEmitterFrames(api: API): void {
   const Collective = api.cls('core.particle.CollectiveMeshBatch');
   if (!Emitter || !Particle || !Color || !Collective) return;
   const targets = new EmitterTargets(api.cls('core.engine.Engine'), api.cls('core.ship.EnemyShip'));
-  const frames = new EmitterFrames(Particle, Emitter, Color, targets);
+  const prepareAuras = installRarityAuraLayers(api);
+  const frames = new EmitterFrames(Particle, Emitter, Color, targets, prepareAuras);
   installEmitterDelays(api, targets);
   // Unit.reset reaches GameObject.reset; Engine.reset does not call its base.
   for (const name of ['core.GameObject', 'core.engine.Engine']) {

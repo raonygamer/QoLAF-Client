@@ -1215,3 +1215,38 @@ arguments and hook restoration. Typecheck and all 324 tests pass. This change is
 built and source/runtime-boundary tested, but has not yet been reloaded into the
 running browser or observed during combat. Remastered auras and custom projectile
 thrust-anchor validity remain separate unfinished work.
+
+## Rarity aura display layers (2026-11-10)
+
+Ported AuraRenderLayer's world-transform and display-order behavior. Native
+createRareType results now receive a dedicated native MeshBatch and layer beside
+the owning movie clip instead of remaining in the global shared effects batch.
+Multiple aura layers remain adjacent without shuffling each other every frame.
+Layer transforms map world effects into the owner's parent space, inherit owner
+opacity/visibility and effects visibility, and detach when the owner is absent.
+Preparation runs before emitter early returns, including idle/offscreen frames.
+
+Dedicated batch removal releases its layer on death, pool disposal or scene
+cleanup. Unloading restores live emitters to native shared batching. A retired
+batch cannot release a newer layer after its emitter object is reused. Atlas
+textures remain borrowed. This implements the original owner-scoped batch role
+using native MeshBatch; it does not add those batches to the shared native pool.
+
+Typecheck and all 326 tests pass. Tests cover ordering stability, transforms,
+reparent/hide, release, duplicate preparation, stale batch callbacks and unload.
+Live reload/autologin succeeded. A temporary local blue-rarity effect on the
+player ship returned native MeshBatch, ownerIndex=1, layerIndex=2, sameParent=true,
+touchable=false, blend=add and equal owner/layer alpha=1. The effect rendered and
+its scheduled cleanup removed exactly one probe emitter; cleanup was observed.
+Screenshots: /tmp/QoLAF-AuraLayers.png, AuraVisible.png and AuraCleanup.png.
+No transport messages or account state changes were made. Preview remained
+connected with runtimeErrors=0. The final retired-batch guard is test-verified
+but was added after that live reload.
+
+Remaining aura scope: GrayscaleAuraStyle/Effect (padded bounded atlas sampling,
+grayscale/tint, reconstruction and flowing rim), source pulse/blue breathing,
+lightning/outline meshes and texture anchor/contour extraction, multipart aura
+targets, and the disableRemasteredAuras setting's complete rendering behavior.
+Current texture/color/pulse appearance is still native, not full aura parity.
+The delayed-target guard from aa50dfe was also loaded by this reload; its combat
+trigger remains covered by the native-factory test rather than visual observation.
