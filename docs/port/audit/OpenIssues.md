@@ -2028,3 +2028,26 @@ complete rendering parity: source renderState attachments, timestamp-aligned
 server bullet drawing, ribbon-head refresh, body culling/distortion integration
 and the remaining changed rendering methods still need semantic review and live
 comparison. User specifically requires this review across ALL changed client code.
+
+### Ribbon heads and attached-projectile rendering — 2026-11-10
+
+Ported `RibbonTrail.updateHead` and `Projectile.positionRibbonHead` from the
+original source. Heads now use the final displayed projectile transform every
+frame, including the authored radius offset. Tail history still advances only
+through the native tick path. Native RibbonTrailPool.update already copies these
+vertices after Game.draw; it does not need a second history update.
+
+Ported `Projectile.drawAttachedTo`, `ProjectileStuck` render-state entry/exit,
+and `MissileStuck.draw` fractional convergence. Attachment state is discarded on
+exit and projectile pool reset. Drawing changes clip transforms only, leaving
+course positions, TTL and newer native gameplay intact. Ribbon heads are updated
+after attachment transforms, matching the original draw ordering.
+
+Typecheck and the full local suite pass (479 tests). Regressions cover ribbon
+heads at 60/120/180 Hz, unchanged tail history/physics, radius offsets, inactive
+trails, host rotation, fractional convergence, state exit and pool reset. These
+changes have not been visually verified in the live game. Instant/InstantSplitting
+render states, timestamp-aligned server bullet drawing and the other previously
+listed omissions remain open. Neither the missing sun nor whole-client parity is
+marked resolved. The required scope remains every original client change across
+all files, including non-rendering code and screens.

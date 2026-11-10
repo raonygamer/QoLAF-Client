@@ -157,3 +157,61 @@ test('undrawn body anchors use world coordinates, never a stale clip at the orig
   assert.equal(emitterTargetPose(body).x, 1234);
   fixture.dispose();
 });
+
+test('stuck projectiles follow rendered host rotation, then release on exit and pool reset', () => {
+  const host = {
+    alive: true,
+    isAddedToCanvas: true,
+    hasRenderPosition: true,
+    pos: { x: 100, y: 200 },
+    rotation: 0,
+    _mc: new Clip(),
+  };
+  host._mc.set_x(110);
+  host._mc.set_y(210);
+  host._mc.set_rotation(Math.PI / 2);
+  class Projectile {
+    alive = true;
+    course = { pos: { x: 110, y: 200 }, speed: { x: 0, y: 0 } };
+    rotation = 0;
+    _mc = new Clip();
+    g = { gameStateMachine: { accumulator: 16.5 } };
+    error = { x: 4, y: 0 };
+    convergenceTime = 4;
+    convergenceCounter = 1;
+    draw() {}
+    update() {}
+    reset() {}
+  }
+  class Stuck {
+    stuckUnit = host;
+    constructor(public p: Projectile) {}
+    enter() {}
+    exit() {}
+  }
+  class Game {
+    draw() {}
+  }
+  const fixture = apiFor({
+    'core.projectile.Projectile': Projectile,
+    'core.scene.Game': Game,
+    'core.states.aistates.MissileStuck': Stuck,
+  });
+  installProjectileFrames(fixture.api);
+  const p = new Projectile();
+  const state = new Stuck(p);
+  state.enter();
+  p.draw();
+  assert.equal(p._mc.get_x(), 110);
+  assert.equal(p._mc.get_y(), 219.5, 'fractional correction rotates with the host');
+  assert.equal(p._mc.get_rotation(), Math.PI / 2);
+  assert.deepEqual(p.course.pos, { x: 110, y: 200 });
+  state.exit();
+  p.draw();
+  assert.equal(p._mc.get_y(), 200);
+  state.enter();
+  p.reset();
+  p.draw();
+  assert.equal(p._mc.get_y(), 200, 'pool reset releases the old host');
+  fixture.dispose();
+});
