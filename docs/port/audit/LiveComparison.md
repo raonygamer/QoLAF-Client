@@ -887,3 +887,31 @@ presentation cadence.
 - TypeScript, formatting, and 173 tests pass. Full chat remains incomplete:
   emoji/friend autocomplete, rich composer/views and source command inventory
   still require implementation. Wheel/drag/click and resize need live checks.
+
+
+## Native editor history and pointer checks — 2026-11-10
+
+- Connected existing ChatHistory model to native ChatInputText. Complete
+  submitted lines, including commands/channel prefixes, are recorded before
+  dispatch; adjacent duplicates collapse, history caps at 100, and the in-memory
+  session survives replacement Game instances. No persistent storage is used.
+- Native previous/next now use chronological history with a restorable draft.
+  Reopening starts from the newest entry; editing recalled text does not destroy
+  the original draft. Caret moves to the end. History traversal dismisses command
+  suggestions and avoids reopening them on the next frame; suggestions otherwise
+  retain first priority over arrow-key history. Cleanup restores native hooks.
+- Live check submitted only the local /echo command, entered an unsent draft,
+  pressed Up to recall /echo, then Down to restore `Draft stays here`. Evidence:
+  `/tmp/QoLAF-HistoryPrevious.png`, `/tmp/QoLAF-HistoryDraft.png`.
+- Live slash list displayed eight rows and scrollbar. Wheel moved the list;
+  clicking /echo completed it with focus/caret retained and passive help. No
+  command was submitted by the click. Evidence: `/tmp/QoLAF-CommandList.png`,
+  `/tmp/QoLAF-CommandScroll.png`, `/tmp/QoLAF-CommandClick.png`. Input cleared
+  afterward. Dragging, resizing and dynamic registry changes remain live checks.
+- Native text input appeared serif on this machine; Verdana is not installed
+  (`fc-match Verdana` resolves Noto Sans). Added explicit Verdana/Arial/sans-serif
+  fallback while preserving configured size/DPI scaling and cleanup. This is an
+  interim native adapter; the original bitmap/rich composer still needs porting.
+  Fallback visual verification is pending next reload.
+- TypeScript check and 176 tests pass, including real host-hook lifecycle tests
+  for commands, drafts, bounded traversal and replacement game instances.

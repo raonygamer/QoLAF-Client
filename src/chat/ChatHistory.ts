@@ -6,6 +6,20 @@ export class ChatHistory {
   constructor(private limit = 100) {
     this.limit = Math.max(1, limit);
   }
+  static readonly session = new ChatHistory();
+
+  get length(): number {
+    return this.entries.length;
+  }
+
+  get isBrowsing(): boolean {
+    return this.cursor >= 0 && this.cursor < this.entries.length;
+  }
+
+  updateDraft(value: string): void {
+    if (this.cursor === this.entries.length) this.draft = value ?? '';
+  }
+
   begin(draft = '') {
     this.cursor = this.entries.length;
     this.draft = draft;

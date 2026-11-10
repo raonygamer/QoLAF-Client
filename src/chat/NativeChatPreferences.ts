@@ -18,6 +18,7 @@ export function installNativeChatPreferences(
   const originalTabsWidth = read(chat.tabs, 'width');
   const element = input.element;
   const originalFontSize = element?.style.fontSize;
+  const originalFontFamily = element?.style.fontFamily;
   const cssFontSize = () => {
     if (!element) return;
     const overlay = api.cls('core.hud.components.ui.DomOverlay');
@@ -25,6 +26,9 @@ export function installNativeChatPreferences(
     // browser zoom and a CSS-scaled canvas.
     const scale = overlay?.toCss({ x: 0, y: 0, width: 1, height: 1 }).height ?? 1;
     element.style.fontSize = `${preferences.get('legacyChatFontSize') * scale}px`;
+    // A missing Verdana face otherwise falls through to the browser's default
+    // serif. The full bitmap composer will replace this native input adapter.
+    element.style.fontFamily = 'Verdana, Arial, sans-serif';
   };
   const layout = () => {
     const stage = read(game, 'stage');
@@ -62,6 +66,7 @@ export function installNativeChatPreferences(
     chat.set_x(originalX);
     chat.set_y(originalY);
     if (element && originalFontSize !== undefined) element.style.fontSize = originalFontSize;
+    if (element && originalFontFamily !== undefined) element.style.fontFamily = originalFontFamily;
   });
   api.defer(
     preferences.subscribe((key) => {

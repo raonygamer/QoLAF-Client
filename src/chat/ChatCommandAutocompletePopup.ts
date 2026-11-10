@@ -240,6 +240,13 @@ export function installCommandAutocomplete(api: API, game: Raw): void {
     popup.node.set_x(read(input, 'x', 0));
     popup.node.set_y(top - 4 - popup.height);
   };
+  const hideForHistory = () => {
+    lastText = read(input, 'text', '');
+    model.dismiss();
+    popup.node.set_visible(false);
+  };
+  api.after(chat, 'previous', hideForHistory);
+  api.after(chat, 'next', hideForHistory);
   input.addEventListener('change', refresh);
   const keydown = (event: KeyboardEvent) => {
     if (
@@ -251,7 +258,13 @@ export function installCommandAutocomplete(api: API, game: Raw): void {
       event.metaKey
     )
       return;
-    if (popup.handleKey(event.key)) {
+    let handled = popup.handleKey(event.key);
+    if (!handled && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+      if (event.key === 'ArrowUp') chat.previous();
+      else chat.next();
+      handled = true;
+    }
+    if (handled) {
       event.preventDefault();
       event.stopImmediatePropagation();
       place();

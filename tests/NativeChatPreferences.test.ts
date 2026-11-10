@@ -8,7 +8,7 @@ test('native composer font, DPI placement, narrow window and cleanup preserve in
   class Input extends Display {
     textFormat: any = { font: 'Verdana', size: 12 };
     element = {
-      style: { fontSize: '12px' },
+      style: { fontSize: '12px', fontFamily: 'Verdana' },
       value: 'unsent draft',
       selectionStart: 3,
       selectionEnd: 5,
@@ -59,6 +59,7 @@ test('native composer font, DPI placement, narrow window and cleanup preserve in
   installNativeChatPreferences(api, game, preferences);
   assert.equal(input.textFormat.size, 14);
   assert.equal(input.element.style.fontSize, '14px');
+  assert.equal(input.element.style.fontFamily, 'Verdana, Arial, sans-serif');
   assert.equal(chat.get_x(), 350);
   preferences.set('legacyChatFontSize', 22);
   assert.equal(input.element.style.fontSize, '22px');
@@ -78,5 +79,6 @@ test('native composer font, DPI placement, narrow window and cleanup preserve in
   assert.equal(input.textFormat, originalFormat);
   assert.equal(input.get_width(), 300);
   assert.equal(input.element.style.fontSize, '12px');
+  assert.equal(input.element.style.fontFamily, 'Verdana');
   assert.equal(stage.listeners('resize').length, 0);
 });
