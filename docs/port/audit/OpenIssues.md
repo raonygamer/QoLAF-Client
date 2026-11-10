@@ -1024,3 +1024,30 @@ removed in finally and Simple chat refreshed. No transport send was invoked.
 /tmp/QoLAF-PingReceive.png records the returned row data. The immediate renderer
 sample was empty, so this confirms native receive projection/snapshot wiring,
 not a visual assertion of the resulting glyph color.
+
+## Friend ping hover card (2026-11-10)
+
+Ported ChatFriendPingPreviewPopup: original 276×82 geometry, 56px ship slot,
+14px name with 22px field height, ID/level/clan/location fields, blue border,
+12px pointer gap and edge flipping/clamping. Uses the native ShipFactory paint
+filter and borrowed atlas texture; replacing/removing the preview releases its
+filter without disposing shared textures. Location labels use only the original
+seven recognized room types.
+
+Advanced hit testing maps rendered glyphs back through source offsets into the
+message-time ping ranges, including artifact token projection. Lazy room lookup
+matches the exact RoomInfo ID within the requested solar system, coalesces waiters,
+limits pending requests to four, and retries failures after 30 seconds. Unknown
+modes remain unlabeled. Closing, scrolling, covering the chat, changing the row or
+disposing the session prevents late replies from reopening/repainting old cards.
+
+Verification: typecheck and 306 tests pass. Coverage includes exact field geometry,
+paint disposal/texture ownership, changed snapshots, lazy type lookup and unknown
+modes, concurrency/retry limits, stale callbacks, and real renderer hit mapping
+after a projected artifact label. One reload/autologin succeeded. Live local-only
+receive/display probe rendered the current player's ping in blue and its hover
+card with ship, ID, level, clan, Fulzar and Hostile labels, matching the source
+layout (/tmp/QoLAF-FriendHover.png). Moving off closes the card. The probe removes
+its queue entry synchronously and its temporary display row after 60 seconds;
+no transport send is invoked. This verifies one live card, not all ship paints or
+an exact SWF screenshot comparison. Self-ping audio and other chat gaps remain.

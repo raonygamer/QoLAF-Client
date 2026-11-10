@@ -1,3 +1,5 @@
+import type { ChatFriendPingData } from './ChatFriendPingData';
+import { RichBitmapMarkupParser } from './rich/RichBitmapMarkupParser';
 import type { ChatImageCache } from './ChatImageCache';
 import { ChatDiscordImageLink } from './ChatDiscordImageLink';
 import { createChatImageThumbnail } from '../ported/ChatImageThumbnail';
@@ -20,6 +22,7 @@ export function installNativeChatMessages(
       simpleRenderer: Raw;
       imageLinkAtStagePoint(point: Raw): ChatDiscordImageLink | null;
       roleTagAtStagePoint(point: Raw, simple: boolean): string | null;
+      pingAtStagePoint(point: Raw): { row: Raw; ping: ChatFriendPingData } | null;
       artifactAtStagePoint(point: Raw): { row: Raw; token: ChatArtifactToken } | null;
     }
   | undefined {
@@ -200,6 +203,34 @@ export function installNativeChatMessages(
   });
   return {
     simpleRenderer: rows.get(log.simple.tf)!.renderer,
+    pingAtStagePoint(point) {
+      for (let index = read(scroll, 'numChildren') - 1; index >= 0; index--) {
+        const row = scroll.getChildAt(index);
+        const entry = rows.get(row);
+        if (!entry?.message?.pings || !read(row, 'visible') || read(row, 'alpha') <= 0) continue;
+        const local = entry.renderer.globalToLocal(point);
+        const visibleIndex = entry.renderer.visibleTextIndexAtPoint(local.x, local.y);
+        const sourceIndex = entry.renderer.sourceTextIndexAtVisibleIndex(visibleIndex);
+        if (sourceIndex < 0) continue;
+        const source = String(read(entry.field, 'text', ''));
+        if (ChatArtifactToken.parseAt(source, sourceIndex)) continue;
+        const markup = RichBitmapMarkupParser.parse(
+          source,
+          14,
+          0xffffff,
+          null,
+          null,
+          ChatDiscordImageLink.isEmbedChannel(entry.message.type),
+          false,
+        );
+        const rawVisibleIndex = markup.visibleIndexAtSource(sourceIndex, false);
+        const ping = (entry.message.pings as ChatFriendPingData[]).find((ping) =>
+          ping?.containsVisibleIndex(rawVisibleIndex),
+        );
+        if (ping) return { row, ping };
+      }
+      return null;
+    },
     artifactAtStagePoint(point) {
       for (let index = read(scroll, 'numChildren') - 1; index >= 0; index--) {
         const row = scroll.getChildAt(index);

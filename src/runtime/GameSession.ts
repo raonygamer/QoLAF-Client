@@ -1,3 +1,4 @@
+import { installNativeChatPingPreview } from '../chat/NativeChatPingPreview';
 import { installNativeFriendPings } from '../chat/NativeFriendPings';
 import { installNativeAimAssist } from '../aim/NativeAimAssist';
 import { installTargetPicking } from '../target/TargetPicking';
@@ -92,6 +93,7 @@ export function installGameSession(
   if (messages) installNativeChatRolePreview(session, game, bitmap.resolve, messages);
   if (messages)
     installNativeChatArtifactPreview(session, game, bitmap.resolve, messages, artifacts);
+  if (messages) installNativeChatPingPreview(session, game, bitmap.resolve, messages);
   installNativeFriendPings(session, game);
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences);

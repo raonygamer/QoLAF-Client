@@ -1,3 +1,5 @@
+import { ChatFriendPingData } from '../src/chat/ChatFriendPingData';
+import { snapshotFriendPings } from '../src/chat/ChatFriendPingTargets';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installNativeChatMessages } from '../src/chat/NativeChatMessages';
@@ -256,4 +258,25 @@ test('verified artifact resolution reprojects existing chat tokens without repla
   assert.equal(hit?.token.sourceBegin, 7, 'projected label maps to the raw token offset');
   advancedRow.set_visible(false);
   assert.equal(messages!.artifactAtStagePoint(point), null, 'hidden rows cannot open cards');
+  advancedRow.set_visible(true);
+  const pingText = raw + " <font color='#66aaff'>@Pilot</font>";
+  const pings = snapshotFriendPings(pingText, [
+    Object.assign(new ChatFriendPingData(), { name: 'Pilot', playerId: 'pilot' }),
+  ]);
+  advancedRow.set_text(pingText);
+  game.messageLog.advanced.addText({ text: pingText, type: 'local', pings });
+  const pingGlyph = advancedRenderer.activeGlyphs.find(
+    (glyph: any) => glyph.textBegin === advancedRenderer.markup.text.indexOf('@'),
+  );
+  const pingPoint = { x: pingGlyph.hitX + 1, y: pingGlyph.hitY + 1 };
+  assert.equal(
+    messages!.pingAtStagePoint(pingPoint)?.ping,
+    pings[0],
+    'artifact label projection cannot shift ping hit ranges',
+  );
+  assert.equal(
+    messages!.pingAtStagePoint(point),
+    null,
+    'artifact glyphs cannot become friend ping hits',
+  );
 });
