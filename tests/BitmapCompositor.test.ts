@@ -52,13 +52,29 @@ test('Starling HTML uses bitmap glyph colors while plain text retains the native
   assert.deepEqual(output[0].colors, [0x123456, 0xffffff]);
   assert.equal(output[0].y, 60 - fixture.font.lineHeight);
   const renderer = font.htmlRenderer;
+  font.fillMeshBatch(target, 1, 100000, '<font color="#00ff00">AB</font>', format, {
+    isHtmlText: true,
+    wordWrap: true,
+    autoScale: false,
+    autoSize: 'bothDirections',
+  });
+  assert.equal(renderer._numLines, 1, 'HTML autosize must not wrap to a stale one-pixel hit area');
+  assert.ok(renderer.measuredWidth > 1);
+  font.fillMeshBatch(target, 1, 100000, 'AB', format, {
+    isHtmlText: true,
+    wordWrap: true,
+    autoScale: false,
+    autoSize: 'vertical',
+  });
+  assert.equal(renderer._numLines, 2, 'vertical-only autosizing must retain explicit width');
+
   font.fillMeshBatch(target, 100, 60, '<font color="#ff0000">A</font>', format, {
     isHtmlText: true,
     wordWrap: false,
     autoScale: false,
   });
   assert.equal(font.htmlRenderer, renderer, 'reuse one scratch renderer per font');
-  assert.deepEqual(output[1].colors, [0xff0000]);
+  assert.deepEqual(output[3].colors, [0xff0000]);
   assert.deepEqual(
     output[0].colors,
     [0x123456, 0xffffff],

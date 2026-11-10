@@ -529,6 +529,17 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       );
       bitmapFormat.isKerningEnabled = format.kerning;
 
+      // Haxe TextField keeps its previous hit-area width for HTML even when
+      // horizontal autosizing is enabled. An empty/short previous value can
+      // therefore constrain the next value to one glyph per line. Match the
+      // native plain-text compositor's unconstrained measurement width.
+      if (
+        options != null &&
+        (options.autoSize === 'horizontal' || options.autoSize === 'bothDirections')
+      ) {
+        width = 100000;
+      }
+
       this._textFormat = bitmapFormat;
       this._resolvedTextFormat = bitmapFormat;
       this._text = value;

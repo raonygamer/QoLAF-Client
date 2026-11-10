@@ -40,6 +40,19 @@ test('compiled native client: real Starling event dispatch, HUD ownership and se
   );
   for (let i = 0; i < 35; i++) game.frame();
   assert.equal(game.frames, 35);
+  const radar = new classes['core.hud.components.radar.Radar']();
+  const targetPanel = game.hud.container.children[1];
+  const hasNoTargetLabel = (node: any): boolean =>
+    node.get_text?.() === 'No active target' || node.children?.some(hasNoTargetLabel);
+  for (let i = 0; i < 90; i++) {
+    radar.update();
+    game.frame();
+  }
+  assert.ok(
+    hasNoTargetLabel(targetPanel),
+    'nearby radar hostiles must not auto-select without a personal hit',
+  );
+
   const preferences = classes['core.scene.SceneBase'].clientSettings;
   assert.ok(preferences);
   assert.equal(game.hud.bossHealth.get_visible(), false);

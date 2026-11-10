@@ -766,3 +766,36 @@ The original rich composer, autocomplete popup, expanded chat rendering, and
 remaining commands still require porting. `/resync` needs a dedicated adaptation:
 the newer native clock lacks the source's parallel-resync API and lifecycle
 tracking. No substitute clock behavior was installed here.
+
+## Reported target switching and HTML wrapping — 2026-11-10
+
+Removed the erroneous GameSession radar-update auto-target scan. Auditing the
+current AS3 tree finds `tryAutoTarget` called only by
+`Weapon.registerSimulatedHit`, not by radar membership. The extra port hook
+could replace an unlocked target every 0.5 seconds and consequently move that
+unit between the main and nearby bars. Personal weapon/pet contact targeting,
+manual selection, locks, and the source nearby-row comparator remain in place.
+The compiled integration test now runs 90 radar updates with a nearby hostile
+and asserts the main display stays `No active target`; existing hit-targeting
+tests verify real contact selection.
+
+Corrected the HTML bitmap compositor's horizontal autosizing constraint. Native
+Haxe `TextField.updateText` deliberately skips the unconstrained 100000px width
+for HTML, unlike plain text. Passing its stale hit-area width to our custom
+compositor could wrap an autosized field one glyph per line after empty/short
+content. The custom compositor now uses the same unconstrained width for
+`horizontal` and `bothDirections`; vertical-only/fixed-width wrapping remains
+constrained. Added regression coverage for a one-pixel stale width and verified
+vertical-only wrapping still produces multiple lines. Typecheck and all 156
+tests pass. The exact user-reported inventory/player tooltip and mission screens
+still need live re-verification; passing renderer tests do not establish that
+all text-layout issues are resolved.
+
+Additional reported work remains: full chat renderer/composer; slash-command
+popup (three source-model/metadata files are in progress but not integrated);
+world text motion; and general emitter frame-rate animation. Native inspection
+confirms EmitterManager is called from Game.tickUpdate and Emitter uses fixed
+33ms lifetime, emission and motion increments. Native TextManager already
+receives frame seconds from Game.update, so its motion issue needs separate
+rounding/attachment analysis. Do not accelerate the native simulation to fix
+presentation cadence.

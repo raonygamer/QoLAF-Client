@@ -81,15 +81,8 @@ export function installGameSession(
     updateBossVisibility();
   });
 
-  // As in the original client, radar candidates offer automatic targets.
-  const radar = session.cls('core.hud.components.radar.Radar')?.prototype;
-  if (typeof radar?.update === 'function') {
-    session.after(radar, 'update', function () {
-      for (const unit of game.unitManager.units) {
-        if (unit.isHostile) target.auto(unit);
-      }
-    });
-  }
+  // Original Weapon.registerSimulatedHit is the automatic selection trigger.
+  // Merely appearing on the radar must not replace the current target.
 }
 
 function installTargetPicking(game: Raw, session: API, ui: NativeUI, target: TargetSystem): void {
