@@ -1,3 +1,6 @@
+import { ChatFriendRoster } from './ChatFriendRoster';
+import { ChatFriendAutocompleteModel } from './ChatFriendAutocompleteModel';
+import { ChatFriendAutocompleteParser } from './ChatFriendAutocompleteParser';
 import type { ChatCommandSuggestion } from './ChatCommandSuggestion';
 import type { Resolve } from '../runtime/As3';
 import type { NativeBitmapInput } from './rich/NativeBitmapInput';
@@ -32,6 +35,8 @@ interface Row {
   emoji?: Raw;
   preview?: Raw;
   texture?: Raw;
+  paintKey?: string;
+  paintFilter?: Raw;
 }
 
 /** Native Starling command rows, using the source popup's dimensions and colors. */
@@ -222,7 +227,10 @@ export class ChatCommandAutocompletePopup {
         field.set_visible(!!match);
       row.emoji?.set_visible(!!match?.emojiScalar);
       row.preview?.set_visible(false);
-      if (!match) continue;
+      if (!match) {
+        this.clearPreviewPaint(row);
+        continue;
+      }
       const rowY = 5 + this.sectionHeight + index * 34;
       row.background.set_y(rowY);
       row.command.set_y(rowY);
@@ -234,6 +242,7 @@ export class ChatCommandAutocompletePopup {
       const texture = this.previewTexture(match);
       const inset = match.emojiScalar || texture ? 40 : 0;
       this.updatePreview(row, texture, rowY);
+      this.updatePreviewPaint(row, texture ? (match.context as Raw | null) : null);
       row.command.set_x(10 + inset);
       row.description.set_x(10 + inset);
       if (row.emoji && match.emojiScalar) {
@@ -296,6 +305,40 @@ export class ChatCommandAutocompletePopup {
     preview.set_visible(true);
   }
 
+  private clearPreviewPaint(row: Row): void {
+    if (row.paintFilter) {
+      row.preview?.set_filter(null);
+      row.paintFilter.dispose();
+    }
+    row.paintFilter = undefined;
+    row.paintKey = undefined;
+  }
+
+  private updatePreviewPaint(row: Row, friend: Raw | null): void {
+    const values = ['Hue', 'Brightness', 'Saturation', 'Contrast'].map(
+      (property) => friend?.['previewShip' + property] ?? 0,
+    );
+    if (!row.preview || values.every((value) => value === 0)) {
+      this.clearPreviewPaint(row);
+      return;
+    }
+    const key = values.join(':');
+    if (row.paintKey === key && row.paintFilter) return;
+    this.clearPreviewPaint(row);
+    const factory = this.ui.api.cls('core.ship.ShipFactory');
+    const filter = factory?.createPlayerShipColorMatrixFilter({
+      shipHue: values[0],
+      shipBrightness: values[1],
+      shipSaturation: values[2],
+      shipContrast: values[3],
+    });
+    if (filter) {
+      row.preview.set_filter(filter);
+      row.paintFilter = filter;
+      row.paintKey = key;
+    }
+  }
+
   private fitDescription(field: Raw, text: string): void {
     // Measure unwrapped text at generous width; narrow fields may omit overflow.
     const width = read(field, 'width');
@@ -317,6 +360,7 @@ export class ChatCommandAutocompletePopup {
 
   dispose(): void {
     this.cleanups.reverse().forEach((cleanup) => cleanup());
+    this.rows.forEach((row) => this.clearPreviewPaint(row));
     this.ui.dispose(this.node);
   }
 }
@@ -358,6 +402,69 @@ export function installCommandAutocomplete(
   if (emojiPopup) {
     emojiPopup.node.set_name('qolaf.emojiAutocomplete');
     chat.addChild(emojiPopup.node);
+  }
+  const friendModel = new ChatFriendAutocompleteModel();
+  const friendRoster = new ChatFriendRoster(api, game);
+  const friendPopup = rich
+    ? new ChatCommandAutocompletePopup(ui, friendModel, completeFriend, undefined, (skin) =>
+        friendRoster.texture(skin),
+      )
+    : undefined;
+  if (friendPopup) {
+    friendPopup.node.set_name('qolaf.friendAutocomplete');
+    chat.addChild(friendPopup.node);
+  }
+  function friendTokenAtCaret() {
+    const editor = rich?.editor.model;
+    return editor
+      ? ChatFriendAutocompleteParser.find(
+          editor.visibleText,
+          editor.selectionBegin,
+          editor.selectionEnd,
+        )
+      : null;
+  }
+  function completeFriend(text: string) {
+    const token = friendTokenAtCaret();
+    if (!rich || !token || resolving) return;
+    resolving = true;
+    let changed = false;
+    try {
+      changed = rich.editor.model.replaceRange(token.beginIndex, token.endIndex, text + ' ');
+      if (changed) {
+        rich.editor.binding.project();
+        input.dispatchEventWith('change', true);
+        input.setFocus();
+      }
+    } finally {
+      resolving = false;
+    }
+    if (changed) refresh();
+  }
+  function refreshFriends() {
+    const token = friendTokenAtCaret();
+    const command = /^\/([^\s]+)(?:\s|$)/
+      .exec(rich?.editor.model.visibleText ?? '')?.[1]
+      .toLowerCase();
+    // These commands use authenticated IPC/saved-visual rosters in the source.
+    // Never substitute friends for those independent providers.
+    const independent = [
+      'ssv',
+      'invitetoroom',
+      'kickfromroom',
+      'invitetoradio',
+      'roominvite',
+      'radioinvite',
+    ].includes(command ?? '');
+    if (!token || independent || emojiModel.active || (model.active && !model.argumentMode)) {
+      friendPopup?.update(null);
+      return;
+    }
+    friendModel.setFriends(friendRoster.records());
+    friendPopup?.update(token.query);
+    friendRoster.refresh(() => {
+      refresh();
+    });
   }
   function tokenAtCaret() {
     const model = rich?.editor.model;
@@ -401,6 +508,7 @@ export function installCommandAutocomplete(
       !(rich?.preferences?.get('enableNewChatIntegrationSystem') ?? true)
     ) {
       emojiPopup?.update(null);
+      friendPopup?.update(null);
       model.dismiss();
       popup.node.set_visible(false);
       return;
@@ -424,6 +532,7 @@ export function installCommandAutocomplete(
       }
       emojiPopup.update(null);
     }
+    refreshFriends();
     place();
   };
   const place = () => {
@@ -445,9 +554,19 @@ export function installCommandAutocomplete(
         if (model.argumentMode) commandBottom = read(emojiPopup.node, 'y') - 4;
       }
     }
+    if (friendPopup) {
+      friendPopup.layout(read(input, 'width', 400), read(chat, 'y', 0) + top - 4);
+      friendPopup.node.set_x(read(input, 'x', 0));
+      friendPopup.node.set_y(top - 4 - friendPopup.height);
+      if (friendModel.active) {
+        chat.setChildIndex(friendPopup.node, read(chat, 'numChildren') - 1);
+        if (model.argumentMode) commandBottom = read(friendPopup.node, 'y') - 4;
+      }
+    }
     popup.node.set_y(commandBottom - popup.height);
   };
   const hideForHistory = () => {
+    friendPopup?.update(null);
     emojiPopup?.update(null);
     lastText = read(input, 'text', '');
     lastSelection = rich
@@ -470,7 +589,10 @@ export function installCommandAutocomplete(
       event.metaKey
     )
       return;
-    let handled = emojiPopup?.handleKey(event.key) || popup.handleKey(event.key);
+    let handled =
+      emojiPopup?.handleKey(event.key) ||
+      friendPopup?.handleKey(event.key) ||
+      popup.handleKey(event.key);
     if (!handled && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
       if (event.key === 'ArrowUp') chat.previous();
       else chat.next();
@@ -485,7 +607,10 @@ export function installCommandAutocomplete(
   window.addEventListener('keydown', keydown, true);
   const wheel = (event: WheelEvent) => {
     if (!chat.isActive()) return;
-    const activePopup = emojiPopup && read(emojiPopup.node, 'visible') ? emojiPopup : popup;
+    const activePopup = [emojiPopup, friendPopup, popup].find(
+      (candidate) => candidate && read(candidate.node, 'visible'),
+    );
+    if (!activePopup) return;
     if (!read(activePopup.node, 'visible')) return;
     const overlay = api.cls('core.hud.components.ui.DomOverlay');
     const bounds = overlay?.globalRect(activePopup.node);
@@ -506,6 +631,7 @@ export function installCommandAutocomplete(
   window.addEventListener('wheel', wheel, { capture: true, passive: false });
   api.on('frame', () => {
     if (!chat.isActive() || isFormatting()) {
+      friendPopup?.update(null);
       emojiPopup?.update(null);
       if (model.active) {
         model.dismiss();
@@ -524,6 +650,8 @@ export function installCommandAutocomplete(
     input.removeEventListener('change', refresh);
     window.removeEventListener('keydown', keydown, true);
     window.removeEventListener('wheel', wheel, true);
+    friendRoster.dispose();
+    friendPopup?.dispose();
     emojiPopup?.dispose();
     popup.dispose();
   });

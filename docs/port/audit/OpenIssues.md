@@ -480,3 +480,27 @@ Typecheck, build/full suite (259 tests), formatting and diff checks pass. These
 capabilities are not wired to friend completion yet. Friend paint filters and
 metadata hydration, native roster source/refresh logic, insertion/keyboard/wheel
 integration and live comparison remain open. No live reload was needed here.
+
+Ordinary @friend completion is now connected to the rich native composer. It
+reads online friends before persisted friends, hydrates skin and fleet paint from
+live players (ID first, otherwise unique case-insensitive name), resolves account
+IDs without using transport playerKey, and lazily requests online friends with a
+30-second throttle. Disposal suppresses late callbacks. Skin textures resolve
+through Skins -> Ships -> native texture service, with cached misses as in source.
+Native pooled previews use the upstream ShipFactory color-filter path; unchanged
+paint reuses filters, changed/default paint and disposal release owned filters.
+
+The friend popup follows command-name/emoji precedence, stacks under passive
+command help, handles arrows/Tab/Escape and mouse row acceptance, and replaces the
+visible token plus trailing space through the rich editor. History and inactive
+composer states dismiss it. IPC-specific commands do not fall back to friends:
+the independent IPC/visual-reset providers are still unported and remain open.
+
+Roster regressions cover persistent versus transport IDs, ambiguous names,
+texture cache, refresh recursion/throttle and late callbacks. Integration test
+uses the native event-invocation fixture plus actual rich editor model to verify
+styled replacement, keyboard completion, command-help stacking, IME and IPC
+exclusion. Paint regression verifies filter reuse/replacement/disposal. Full
+build/suite passed 262 tests before the final paint-only regression was added;
+all 8 popup tests and typecheck passed afterward. Live SWF comparison remains
+required for this newly wired feature; no reload or game input in this change.

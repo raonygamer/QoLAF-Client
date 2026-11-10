@@ -106,9 +106,28 @@ class Node {
 }
 function popupFixture(emoji = false, previews = false) {
   let cleanupCount = 0;
+  const filters: { disposed: boolean; dispose(): void }[] = [];
   const ui = {
+    api: {
+      cls: () => ({
+        createPlayerShipColorMatrixFilter: () => {
+          const filter = {
+            disposed: false,
+            dispose() {
+              this.disposed = true;
+            },
+          };
+          filters.push(filter);
+          return filter;
+        },
+      }),
+    },
     image: (texture: Node) =>
       Object.assign(new Node(texture.width, texture.height), {
+        filter: null as unknown,
+        set_filter(value: unknown) {
+          this.filter = value;
+        },
         texture,
         width: texture.width,
         height: texture.height,
@@ -177,7 +196,7 @@ function popupFixture(emoji = false, previews = false) {
         }
       : undefined,
   );
-  return { popup, model, completions, cleanupCount: () => cleanupCount };
+  return { popup, model, completions, filters, cleanupCount: () => cleanupCount };
 }
 
 test('native popup preserves Enter, completes with Tab and keeps argument help passive', () => {
@@ -302,4 +321,27 @@ test('ship previews fit source bounds, reuse images and clear missing textures',
   assert.equal(preview.visible, false);
   assert.equal(node.children[2].x, 10);
   popup.dispose();
+});
+
+test('friend preview paint filters are cached, replaced and disposed independently of shared textures', () => {
+  const { popup, model, filters } = popupFixture(false, true);
+  const friend = { previewShipHue: 0.3 };
+  const matches = [
+    new ChatCommandSuggestion('Pilot', '', '', '@Pilot', '@Pilot', 0, 'ship', friend),
+  ];
+  Object.defineProperty(model, 'matches', { get: () => matches });
+  popup.update('/cmd');
+  popup.update('/cmd');
+  assert.equal(filters.length, 1);
+  friend.previewShipHue = 0.5;
+  popup.update('/cmd');
+  assert.equal(filters.length, 2);
+  assert.equal(filters[0].disposed, true);
+  friend.previewShipHue = 0;
+  popup.update('/cmd');
+  assert.equal(filters[1].disposed, true);
+  friend.previewShipHue = 0.2;
+  popup.update('/cmd');
+  popup.dispose();
+  assert.equal(filters[2].disposed, true);
 });
