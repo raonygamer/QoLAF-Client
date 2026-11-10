@@ -1,3 +1,4 @@
+import { installNativeWeaponColorPopup } from '../visuals/NativeWeaponColorPopup';
 import { installNativeBeamGeometry } from '../weapon/NativeBeamGeometry';
 import { installNativeClientDevVisual } from '../visuals/NativeClientDevVisual';
 import { installNativeMusicPlayer } from '../music/NativeMusicPlayer';
@@ -78,6 +79,7 @@ export function installGameSession(
   installNexarWorldLabels(session, game);
   installNativeSettings(session, preferences);
   installNativeClientDevVisual(session, game);
+  installNativeWeaponColorPopup(session, game);
   installNativeBeamGeometry(session, game);
   installHealthAndShield(session, game);
   installRespawn(session, game);

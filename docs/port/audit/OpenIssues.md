@@ -1928,3 +1928,12 @@ This corrects the earlier inventory note that IPC was entirely uninstalled.
 Still pending: commit/verify ClientQolafChat inbox, scene receiver and QoLAF tab/send
 integration, then reward/visual sharing and Radio applications. No live human chat
 or original-AS3 interoperability was tested; zero peers were present.
+
+### Weapon-color screen installed — 2026-11-10
+
+`/sv wc` now opens the original native RGB/slider/grayscale dialog. Apply, Cancel,
+reopen and reset were exercised live; the Haxe weapon-name getter was corrected.
+Explicit per-weapon colors have local rendering and per-account persistence.
+See LiveComparison.md for evidence and screenshot. All 450 tests pass.
+Remaining: equipped combat and charge-up transitions, remote IPC sharing, and the rest of the visual command family.
+Radio remains a disconnected view. No claim of complete screen or feature parity.

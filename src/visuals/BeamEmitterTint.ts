@@ -23,6 +23,7 @@ interface EmitterState {
   appliedFinish: number;
   particles: Map<Raw, { previous: Raw; owned: Raw }>;
   previousBatch: Raw | null;
+  grayscale: boolean;
 }
 
 export function installBeamEmitterTint(api: API, resolve: Resolve) {
@@ -82,6 +83,52 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
   const release = (weapon: Raw) => {
     for (const [emitter, state] of owned) if (state.owner === weapon) releaseEmitter(emitter);
   };
+  /** Fixed weapon RGB uses source brightness; beams may supply the source hue rotation. */
+  const updateFixed = (
+    owner: Raw,
+    emitters: Raw[],
+    color: number,
+    grayscale: boolean,
+    hue?: number,
+  ) => {
+    for (const emitter of emitters) {
+      let state = owned.get(emitter);
+      if (state && state.owner !== owner) {
+        releaseEmitter(emitter);
+        state = undefined;
+      }
+      if (!state) {
+        state = {
+          owner,
+          start: emitter._startColor,
+          finish: emitter._finishColor,
+          appliedStart: emitter._startColor,
+          appliedFinish: emitter._finishColor,
+          particles: new Map(),
+          grayscale,
+          previousBatch: grayscale ? isolateBatch(emitter) : null,
+        };
+        owned.set(emitter, state);
+      }
+      if (hue !== undefined) emitter.changeHue(hue);
+      else {
+        emitter._startColor = tintAtOriginalBrightness(color, emitter._originalStartColor);
+        emitter._finishColor = tintAtOriginalBrightness(color, emitter._originalFinishColor);
+      }
+      state.appliedStart = emitter._startColor;
+      state.appliedFinish = emitter._finishColor;
+      state.grayscale = grayscale;
+      if (grayscale) {
+        state.previousBatch ??= isolateBatch(emitter);
+        for (const particle of emitter.particles ?? []) styleParticle(state, particle);
+        for (const particle of emitter.inactiveParticles ?? []) styleParticle(state, particle);
+      } else {
+        for (const [particle, style] of state.particles)
+          if (read(particle, 'style') === style.owned) particle.setStyle(style.previous, false);
+        state.particles.clear();
+      }
+    }
+  };
   const update = (weapon: Raw, palette: HullPalette | null, transform: Raw) => {
     if (!palette) {
       release(weapon);
@@ -111,6 +158,7 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
             appliedStart: emitter._startColor,
             appliedFinish: emitter._finishColor,
             particles: new Map(),
+            grayscale: true,
             previousBatch: isolateBatch(emitter),
           };
           owned.set(emitter, state);
@@ -138,7 +186,7 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
       const count = this.particles?.length ?? 0;
       const result = next(...args);
       const state = owned.get(this);
-      if (state)
+      if (state?.grayscale)
         for (let index = count; index < this.particles.length; index++)
           styleParticle(state, this.particles[index]);
       return result;
@@ -157,5 +205,5 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
       tintBatch = null;
     }
   });
-  return { update, release };
+  return { update, updateFixed, release };
 }

@@ -1694,3 +1694,42 @@ reserved destinations, logout, duplicate login, bfcache, hot activation, timer a
 class-registry cleanup. Existing native SDK and IPC protocol tests remain in place.
 QoLAF inbox/scene receiver, visible channel/send UI and application features are
 still pending; this connection alone does not complete QoLAF chat or Radio.
+
+## Weapon RGB screen — 2026-11-10
+
+Ported WeaponColorPopup from the original AS3 screen: 360px panel, three 205px
+sliders and 55×24 numeric inputs, 34px row spacing, 40×92 preview, grayscale
+checkbox, escaped weapon subtitle, and native Apply/Cancel buttons. The whole
+panel fits short viewports. Invalid edits now disable Apply immediately; the
+original input handler returned before updating the button on invalid input.
+
+Installed `/sv wc`, `/sv weapon-color`, selected-weapon reset and `reset weapon`,
+including `/shipvisual` and `/ship` aliases. Apply captures the opened weapon key,
+checks that it remains in the loadout, and saves a validated per-account map.
+Cancel discards the draft. The screen uses bitmap-backed native input controls.
+
+Live local preview checks:
+- Opened from the current Lightning Gun; fixed the Haxe get_name boundary after
+  the first title showed the internal key.
+- Empty input invalidated the draft. Restoring 128 synchronized its slider;
+  changing the green slider to 64 synchronized the input.
+- Cancel/reopen restored white rather than the unsaved purple draft.
+- Apply/reopen restored RGB(128,64,255) and grayscale enabled.
+- `/sv wc reset` restored white/grayscale off. Test values were removed.
+- Full and console-short viewport layouts remained usable.
+- A temporary native Beam/BeamLine, never registered in gameplay simulation,
+  batched four vertices with GrayscaleTintStyle and color 8405247 (0x8040FF).
+  Its pooled segment color was restored to white afterward. Temporary objects
+  were disposed. This verifies native batching, not equipped combat appearance.
+
+Screenshot: `/tmp/QoLAF-WeaponColorVerified.png`.
+Typecheck and all 450 tests pass. New tests cover draft synchronization,
+validation, cancellation primitives, atomic storage restore, per-weapon state,
+shader texture preservation, separate grayscale batching and projectile reuse.
+
+Rendering preserves native simulation. Local explicit colors apply to beams,
+projectiles, ribbons, thrust/explosion and charge-up effects. Hull palettes retain
+priority on the Phase Blade. Native emitter colors retain the original beam hue
+rotation versus projectile RGB/brightness distinction. Full combat comparison,
+charge-up weapon transitions and remote IPC color sharing remain unverified or
+unfinished; do not label this complete `/sv` parity. The weapon and hull editors share one two-second session cooldown. This screen does not complete Radio or the remaining ship visuals.

@@ -1,3 +1,4 @@
+import { ShipVisualCooldown } from './ShipVisualCooldown';
 import { read, type API, type Raw } from '../api/Types';
 import { portedClasses } from '../ported/Registry';
 import { createBitmapClasses } from '../ui/BitmapClasses';
@@ -22,7 +23,7 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
   let mode = 'default';
   let settings = ClientDevVisual.defaults();
   let palette: HullPalette | null = null;
-  let lastApplied = -Infinity;
+  const cooldown = ShipVisualCooldown.forGame(game);
   let clip: any = null;
   let ownedStyle: any = null;
   let previousStyle: any = null;
@@ -121,9 +122,9 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
     const normalized = ClientDevVisual.normalize(nextMode);
     const validated = ClientDevVisual.settings(nextSettings);
     if (!normalized || !validated) return false;
-    const elapsed = performance.now() - lastApplied;
-    if (elapsed < 2000) {
-      write('Wait ' + ((2000 - elapsed) / 1000).toFixed(1) + 's before using /sv again.');
+    const remaining = cooldown.remaining(performance.now());
+    if (remaining > 0) {
+      write('Wait ' + (remaining / 1000).toFixed(1) + 's before using /sv again.');
       return false;
     }
     mode = normalized;
@@ -131,7 +132,7 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
     refreshPalette();
     clear();
     update();
-    lastApplied = performance.now();
+    cooldown.mark(performance.now());
     try {
       api.storage.set(storageKey, { devvis: mode, devvisSettings: settings });
     } catch {
