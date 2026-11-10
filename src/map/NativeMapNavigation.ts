@@ -23,6 +23,11 @@ interface MapView {
   cancel: () => void;
 }
 const views = new WeakMap<Raw, MapView>();
+const navigating = new WeakSet<Raw>();
+
+export function isMapNavigating(game: Raw): boolean {
+  return navigating.has(game);
+}
 
 export function mapHeatViewport(map: Raw, width: number, height: number) {
   const view = views.get(map),
@@ -151,7 +156,10 @@ export function installMapNavigation(api: API, game: Raw): void {
         cancel: () => {},
       };
       view.cancel = () => {
-        if (pointerView === view) pointerView = undefined;
+        if (pointerView === view) {
+          pointerView = undefined;
+          navigating.delete(game);
+        }
         view.navigation.cancelPan();
       };
       view.onTouch = (event) => {
@@ -165,6 +173,7 @@ export function installMapNavigation(api: API, game: Raw): void {
         if (phase === 'began' && nav.dragTouchId < 0) {
           nav.begin(id, view.pointer.x, view.pointer.y);
           pointerView = view;
+          navigating.add(game);
         } else if (id === nav.dragTouchId && (phase === 'moved' || phase === 'ended')) {
           nav.move(id, view.pointer.x, view.pointer.y);
           apply(view);

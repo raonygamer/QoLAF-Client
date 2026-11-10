@@ -1,3 +1,4 @@
+import { installNativeAimAssist } from '../aim/NativeAimAssist';
 import { installTargetPicking } from '../target/TargetPicking';
 import { installNativeChatImageViewer } from '../chat/NativeChatImageViewer';
 import { ChatImageCache } from '../chat/ChatImageCache';
@@ -48,7 +49,7 @@ export function installGameSession(
   targetIcon?: string,
 ): void {
   const ui = new NativeUI(session);
-  const { config, save } = sessionSettings(session, game);
+  const { client, config, save } = sessionSettings(session, game);
   installInactivityPreference(session, game);
   installTorpedoCue(session, game);
   installTorpedoWarnings(session, game);
@@ -101,6 +102,7 @@ export function installGameSession(
   const panel = new TargetInfo(ui, game, target, config, save, debuffs);
   session.defer(() => panel.dispose());
   const damage = installDamageObserver(session, game, config, (unit) => target.auto(unit));
+  installNativeAimAssist(session, game, client, target, damage);
   const telemetry = new RadarTelemetry(ui, game, config, damage);
   session.defer(() => telemetry.dispose());
 

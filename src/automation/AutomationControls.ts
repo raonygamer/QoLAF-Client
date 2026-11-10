@@ -103,7 +103,11 @@ export function installAutomationControls(api: API): void {
     return Math.atan2(read(overlay, 'mouseY') - position.y, read(overlay, 'mouseX') - position.x);
   };
   method('get_currentAimAngle', aimAngle);
-  addProperty(prototype, 'currentAimAngle', { get: aimAngle });
+  addProperty(prototype, 'currentAimAngle', {
+    get(this: Raw) {
+      return this.get_currentAimAngle();
+    },
+  });
   method('get_currentAimControlMode', controlMode);
   addProperty(prototype, 'currentAimControlMode', { get: controlMode });
   for (const [name, value] of Object.entries({

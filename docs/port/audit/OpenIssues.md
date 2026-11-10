@@ -720,3 +720,26 @@ exposure, original debug overlay and live comparison. Upstream updateMouseAim
 currently coalesces to one command with a 66 ms send interval; retain that newer
 transport behavior while adapting the original assist around it. Native weapon
 properties mix fields and get_* accessors, so the boundary uses read().
+
+Aim-assist runtime adapter now installs from GameSession with the actual per-player
+ClientSettings, TargetSystem and DamageObserver. It samples native overlay input,
+uses the source 12 px hull-center deadzone, exposes corrected currentAimAngle,
+and routes mouse/keyboard assistance through native sendCommand. It retains the
+current Haxe one-command-per-66-ms transport. Disabled assist leaves upstream
+steering intact. Automation ownership and active map gestures release/yield the
+assist; map navigation now exposes its pointer ownership without mutating ships.
+Entering/exiting states discards accumulated assist state. The automation property
+getter delegates to its Haxe method so both access paths see the same correction.
+
+Integration regression uses actual host hooks and both automation/assist installers.
+It covers disabled behavior, confirmed-target acquisition, the 65/66 ms boundary,
+command coalescing, corrected-angle property/getter agreement, deadzone input,
+automation ownership, keyboard acquisition and disposal. Map regression also
+checks pointer-ownership begin/end state. Typecheck/build/full suite: 281 pass.
+Original debug overlay, live enabled-assist combat comparison and the ordinary
+mouse deadzone/hysteresis behavior when assist is disabled remain open. The latter
+still follows current upstream steering rather than the source client's extra
+input stabilization; do not mark full aiming parity complete.
+Live initialization after one reload: game/HUD render and remain connected with
+zero reported runtime errors (/tmp/QoLAF-AimAdapterLoaded.png). This is only the
+initialization check; no firing, target manipulation or account movement was used.

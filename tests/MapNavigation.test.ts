@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { MapNavigation } from '../src/map/MapNavigation';
-import { installMapNavigation, mapHeatViewport } from '../src/map/NativeMapNavigation';
+import {
+  installMapNavigation,
+  isMapNavigating,
+  mapHeatViewport,
+} from '../src/map/NativeMapNavigation';
 import { Display } from './fixtures/NativeGame';
 // @ts-expect-error actual host hooks
 import { Hooks } from './fixtures/HostCore.js';
@@ -244,8 +248,10 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
       return (id < 0 || id === touch.id) && (!phase || phase === touch.phase) ? touch : null;
     },
   };
+  assert.equal(isMapNavigating(game), false);
   const onTouch = viewport.listeners('touch')[0];
   onTouch(event);
+  assert.equal(isMapNavigating(game), true);
   const play = new Play();
   play.updateAimAngle();
   assert.equal(aims, 0, 'map drag owns mouse aim');
@@ -258,6 +264,7 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
   );
   assert.equal(clicks, 0);
   onTouch(event);
+  assert.equal(isMapNavigating(game), false);
   assert.equal(map.mapContainer.get_x(), 299);
   assert.equal(body.click(event), undefined, 'cancelled touch-end stays suppressed');
   play.updateAimAngle();
