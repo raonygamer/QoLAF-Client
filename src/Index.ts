@@ -1,3 +1,4 @@
+import { installMapPlayerLifecycle } from './map/MapPlayerLifecycle';
 import { installDisplayTexturePixels } from './ui/DisplayTexturePixels';
 import { installCombatTextFrames } from './rendering/CombatTextFrames';
 import { installEmitterFrames } from './rendering/EmitterFrames';
@@ -47,6 +48,7 @@ export default {
       installTorpedoCueHooks(api);
       installDisplayTexturePixels(api);
       installMapTextureKeys(api);
+      installMapPlayerLifecycle(api);
       installNetherBlobBeamHooks(api);
       installInterpolation(api);
       installEmitterFrames(api);

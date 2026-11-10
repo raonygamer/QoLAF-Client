@@ -615,3 +615,20 @@ Typecheck/build/full suite: 268 pass; formatting/diff checks pass. Regression
 covers initial upload, fresh-bitmap restoration, source/matrix/key preservation,
 unrelated draws and hook cleanup. Real GPU context-loss restoration and other
 map layout/miniature differences remain unverified, not covered by this color fix.
+
+Map lifecycle audit: source MapLiveMiniature scales, offsets and borrowed-texture
+handling match the current port; the different ships in the comparison accounts
+do not establish a miniature scale bug. A separate concrete gap was found in
+native MapPlayer.update/dispose. Source hides hull, label AND supporter badge
+when a player/ship is absent, dead, landed or at zero HP, restores the badge on
+reappearance, and kills layer tweens before disposal. Upstream omitted the alive
+check, left badges behind and did not kill the opening tween.
+
+MapPlayerLifecycle now ports those conditions around native drawing. It preserves
+opening-tween visibility while a marker is already visible, and leaves native
+position/team-color/drawing behavior intact. Regression covers missing/dead/
+landed/zero-HP ships, all three visual parts, reappearance, initial tween ownership,
+return-value preservation, disposal ordering and hook cleanup. Verified native
+TweenMax exposes killTweensOf. Typecheck/build/full suite: 269 pass; formatting
+and diff checks pass. Live death/landing/reopen verification remains open; no
+account was killed or moved for this fixture check.
