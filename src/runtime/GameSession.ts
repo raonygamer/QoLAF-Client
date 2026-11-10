@@ -3,6 +3,7 @@ import { installNativeSimpleChat } from '../chat/NativeSimpleChat';
 import { installNativeChatLayout } from '../chat/NativeChatLayout';
 import { installNativeChatMessages } from '../chat/NativeChatMessages';
 import { installNativeChatTheme } from '../chat/NativeChatTheme';
+import { installNativeChatContext } from '../chat/NativeChatContext';
 import { installNativeRichChatInput } from '../chat/NativeRichChatInput';
 import { installNativeChatFormatting } from '../chat/NativeChatFormatting';
 import { portedClasses } from '../ported/Registry';
@@ -59,6 +60,7 @@ export function installGameSession(
   installNativeChatPreferences(session, game, preferences);
   const bitmap = createBitmapClasses(portedClasses(session).resolve);
   installNativeChatMessages(session, game, bitmap.resolve, preferences);
+  installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve);
   installNativeChatHistory(session, game);
   installNativeSimpleChat(session, game);

@@ -1136,3 +1136,13 @@ controls disable there. Returned to Local with an empty composer; no messages
 sent. Tests cover hover/down/disabled/focus colors, preference restoration and
 cleanup. All 212 tests, typecheck and format checks pass. Source prompt and
 emoji/image controls are still missing; full chat parity remains open.
+
+### Message right-click and copy
+
+`/tmp/QoLAF-MessageContext.png` shows the source one-row context menu on a local
+/echo line. Clicking Copy closed the menu; pasting into an unsent composer
+produced plain text without markup (`/tmp/QoLAF-ContextCopied.png`). Cleared that
+draft with Ctrl+A/Backspace and verified empty (`/tmp/QoLAF-ContextCleared.png`).
+No player-facing message or ignore request was sent. Player metadata and block
+flows are implemented but not live-verified. Popup tests cover edge positioning,
+metadata-driven rows and action dispatch; 214 tests pass.

@@ -79,3 +79,19 @@ remain intact. Bitmap input uses the source idle/focused/disabled skin colors,
 tab appearance. The regression covers all these visual state transitions and
 cleanup; all 212 tests pass. Remaining theme work includes the original prompt
 and missing emoji/image controls, alongside the broader CHAT-01 work.
+
+## Advanced message context menu
+
+Ported the source ChatMessageContextData and ChatMessageContextPopup, preserving
+310px width, 32px rows, panel clamping, outside-click cleanup and action order.
+Advanced rows now open this menu on right click; left clicks remain available for
+scrolling. Browser coordinates use the native canvas/CSS transform and require
+the topmost hit to belong to the chat viewport. Copy uses source plain-text
+parsing. Player/room IDs remain separate, system/self blocking is excluded, and
+clan metadata uses the original PlayerObjects/Clans lookup flow. Block invokes
+the original ignore service action and removes that player's local history.
+
+Live right-click/copy verified with local /echo output. Copied text was pasted
+into an unsent draft and then cleared. Full player/clan lookup, block behavior,
+covered-panel rejection and resize/scroll cases need broader integration testing;
+no player was blocked. Source popup and metadata tests pass (214 total).
