@@ -29,19 +29,47 @@ export function aliasProperties(api: API, ctor: Raw) {
   }
 }
 // AS3 method closures bind their receiver. Preserve arity for Starling events.
+const boundGetters = new WeakSet<Function>();
 export function bound(
-  _target: object,
+  target: object,
   key: string,
   descriptor: PropertyDescriptor,
 ): PropertyDescriptor {
   const method = descriptor.value;
-  return {
-    configurable: true,
-    get(this: Raw) {
-      const fn = method.bind(this);
-      Object.defineProperty(this, key, { value: fn, writable: true, configurable: true });
-      return fn;
-    },
+  const getter = function (this: Raw) {
+    // Inspecting a source prototype must not permanently bind it to itself.
+    if (this === target) return method;
+    const fn = method.bind(this);
+    Object.defineProperty(this, key, { value: fn, writable: true, configurable: true });
+    return fn;
   };
+  boundGetters.add(getter);
+  return { configurable: true, get: getter };
+}
+
+/** Let native Haxe callers use an AS3 port's explicit ES property overrides. */
+export function bridgeNativeProperties(ctor: Raw): void {
+  const prototype = ctor.prototype;
+  for (const [name, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(prototype))) {
+    if (descriptor.get && !boundGetters.has(descriptor.get)) {
+      Object.defineProperty(prototype, 'get_' + name, {
+        configurable: true,
+        writable: true,
+        value: function (this: Raw) {
+          return descriptor.get!.call(this);
+        },
+      });
+    }
+    if (descriptor.set) {
+      Object.defineProperty(prototype, 'set_' + name, {
+        configurable: true,
+        writable: true,
+        value: function (this: Raw, value: any) {
+          descriptor.set!.call(this, value);
+          return value;
+        },
+      });
+    }
+  }
 }
 export type Resolve = (name: string) => any;

@@ -21,12 +21,18 @@ test('compiled native client: real Starling event dispatch, HUD ownership and se
   const result = await host.load('https://example.com/client.js');
   assert.equal(result.state, 'active');
   const classes = registry();
+  const textField = classes['starling.text.TextField'];
+  const originalFont = { name: 'upstream-font' };
+  textField.registerBitmapFont(originalFont, 'DAIDRR');
   host.classesReady(classes);
   const game = new Game();
   host.created(game);
   game.runGameLoop();
   await new Promise((resolve) => setImmediate(resolve));
   assert.deepEqual(errors, []);
+  assert.notEqual(textField.getBitmapFont('DAIDRR'), originalFont);
+  assert.ok(textField.getBitmapFont('DAIDRR_8'));
+  assert.ok(textField.getBitmapFont('verdana32_bitmap'));
   assert.equal(
     game.hud.container.children.length,
     3,
@@ -68,5 +74,6 @@ test('compiled native client: real Starling event dispatch, HUD ownership and se
   assert.equal(second.frames, 1);
   assert.deepEqual(errors, []);
   host.dispose();
+  assert.equal(textField.getBitmapFont('DAIDRR'), originalFont, 'restore the upstream font alias');
   assert.equal(second.hud.container.children.length, 1);
 });

@@ -1,3 +1,4 @@
+import { createFontRegistries } from '../UI/FontRegistries';
 import { createSettingsBindings } from './SettingsBindings';
 import { createSettingsChat } from './SettingsChat';
 import { createSettingsKeybind } from './SettingsKeybind';
@@ -12,11 +13,6 @@ import { createSettingsQoLAF } from './SettingsQoLAF';
 import { settingsControls } from '../Settings/NativeControls';
 export function portedClasses(api: API) {
   const cache: Record<string, any> = {
-    'core.text.RussoBitmapFontRegistry': {
-      UI_24_FONT_NAME: 'DAIDRR_24',
-      fontNameForSize: (size: number) => (size <= 16 ? 'DAIDRR_16' : 'DAIDRR_24'),
-    },
-    'core.text.VerdanaBitmapFontRegistry': { fontNameForSize: () => 'QoLAF_Verdana16' },
     'starling.utils.Align': {
       LEFT: 'left',
       CENTER: 'center',
@@ -34,6 +30,15 @@ export function portedClasses(api: API) {
   };
   const resolve = (name: string): any => {
     if (cache[name]) return cache[name];
+    if (
+      name === 'core.text.RussoBitmapFontRegistry' ||
+      name === 'core.text.VerdanaBitmapFontRegistry'
+    ) {
+      const fonts = createFontRegistries(resolve);
+      cache['core.text.RussoBitmapFontRegistry'] = fonts.RussoBitmapFontRegistry;
+      cache['core.text.VerdanaBitmapFontRegistry'] = fonts.VerdanaBitmapFontRegistry;
+      return cache[name];
+    }
     if (name.startsWith('feathers.controls.')) {
       Object.assign(cache, settingsControls(resolve));
       if (cache[name]) return cache[name];

@@ -1,39 +1,56 @@
 import type { API, Raw } from '../Api/Types';
-import russo24 from '../assets/russo24_bitmap.png';
-import russo24XML from '../assets/russo24_bitmap.fnt';
-import russo16 from '../assets/russo16_bitmap.png';
-import russo16XML from '../assets/russo16_bitmap.fnt';
-import verdana16 from '../assets/verdana16_bitmap.png';
-import verdana16XML from '../assets/verdana16_bitmap.fnt';
-const assets = [
-  ['DAIDRR_24', russo24, russo24XML],
-  ['DAIDRR_16', russo16, russo16XML],
-  ['QoLAF_Verdana16', verdana16, verdana16XML],
-];
-// The original checked-in bitmap sheets are embedded in the one module, not redrawn.
+import { fontAssets } from './FontAssets';
+
+/** Texture roots retain the original bitmap for Starling context restoration. */
 export function loadFonts(api: API): Promise<void> {
-  const BitmapData = api.cls('openfl.display.BitmapData')!,
-    Texture = api.cls('starling.textures.Texture')!;
-  const BitmapFont: any = api.cls('starling.text.BitmapFont'),
-    TextField = api.cls('starling.text.TextField')!;
+  const BitmapData = api.cls('openfl.display.BitmapData')!;
+  const Texture = api.cls('starling.textures.Texture')!;
+  const BitmapFont: any = api.cls('starling.text.BitmapFont');
+  const TextField = api.cls('starling.text.TextField')!;
+  let alive = true;
+  const aliases: { name: string; previous: Raw | null; font: Raw }[] = [];
+  api.defer(() => {
+    alive = false;
+    for (const { name, previous, font } of aliases.reverse()) {
+      if (TextField.getBitmapFont(name) !== font) continue;
+      if (previous) TextField.registerBitmapFont(previous, name);
+      else TextField.unregisterBitmapFont(name, false);
+    }
+  });
   return Promise.all(
-    assets.map(
-      ([name, url, xml]) =>
+    fontAssets.map(
+      (asset) =>
         new Promise<void>((resolve, reject) => {
-          if (TextField.getBitmapFont(name)) {
+          const registerAliases = (font: Raw) => {
+            if (alive)
+              for (const name of asset.aliases) {
+                aliases.push({ name, previous: TextField.getBitmapFont(name), font });
+                TextField.registerBitmapFont(font, name);
+              }
             resolve();
+          };
+          const existing = TextField.getBitmapFont(asset.owner);
+          if (existing) {
+            registerAliases(existing);
             return;
           }
-          const future = BitmapData.loadFromBase64(url.slice(url.indexOf(',') + 1), 'image/png');
+          const future = BitmapData.loadFromBase64(
+            asset.image.slice(asset.image.indexOf(',') + 1),
+            'image/png',
+          );
           future.onError(reject);
           future.onComplete((bitmap: Raw) => {
-            try {
-              const texture = Texture.fromBitmapData(bitmap, false, false, 1);
-              const font = new BitmapFont(texture, xml);
-              font.set_smoothing('bilinear');
-              // Texture retains bitmap for context restoration, as the original registry does.
-              TextField.registerBitmapFont(font, name);
+            if (!alive) {
+              bitmap.dispose();
               resolve();
+              return;
+            }
+            try {
+              const texture = Texture.fromBitmapData(bitmap, asset.mipmaps, false, 1);
+              const font = new BitmapFont(texture, asset.xml);
+              font.set_smoothing(asset.mipmaps ? 'trilinear' : 'bilinear');
+              TextField.registerBitmapFont(font, asset.owner);
+              registerAliases(font);
             } catch (error) {
               reject(error);
             }

@@ -6,7 +6,7 @@ Reference: original AstrofluxClient revision `b7a4f5cba87c8af9c484339de4ecf0dec0
 
 - Reload displays auto-login countdown without profile/add-account controls overlaying it; countdown successfully enters the game.
 - Plugins appears at login, disappears from play, and can be opened within Settings.
-- Rebuilt interpolation module loads and the game still renders after authentication. Remote player rotation has its own source-ported history buffer.
+- Camera follow regression fixed: the cached Haxe enterFrame callback bypassed an instance timing hook, leaving the camera delta at zero. Timing now comes directly from the parallax render call. A short local flight confirms the ship stays centered while the gate moves; a cached-listener regression test covers this path. Original empty shake() is now hooked too. Remote player rotation has its own source-ported history buffer.
 
 ## Open differences — not signed off
 
@@ -17,7 +17,7 @@ Reference: original AstrofluxClient revision `b7a4f5cba87c8af9c484339de4ecf0dec0
 - **Settings behavior:** original device settings, keybind extensions, rich-chat settings and automation dependencies must work before opening their source pages in the live game. Source-translated factories alone are not completed screens.
 - **Plugins manager:** blank URL entry needs an explicit native input outline/label. Its settings placement must survive replacement of the upstream Settings class.
 - **Login:** provider/profile screens need full side-by-side alignment and interaction comparison; only the countdown/autologin path is live-verified here.
-- **Rich text:** markup parser/serializer, atomic artifact/image labels, typed-markup promotion, emoji lookup and UTF-16 navigation are source-ported and tested. They are not yet connected to the missing bitmap renderer/editor; visible text is still upstream.
+- **Rich text:** original Text and bitmap renderer source factories now pass layout, alignment, and Text.htmlText-to-glyph color tests. These factories are not yet installed into native Text constructors; this is not visual parity. All thirteen original bitmap atlases load, and plugin disposal restores upstream font aliases. Markup parser/serializer, atomic artifact/image labels, typed-markup promotion, emoji lookup and UTF-16 navigation are source-ported and tested. They are not yet connected to the missing bitmap renderer/editor; visible text is still upstream.
 - **Remaining systems:** rich chat/composer integration, commands, aim assist behavior, artifacts/sharing/overview, debuffs, boss/map/timers, native/private functionality, loading/reconnect and Steam packaging are still open.
 
 The 722-file source inventory is the exhaustive review input; this ledger lists live observations and does not replace reviewing changes outside named QoLAF namespaces. The patched corrosive-percent/all-percent workaround is intentionally excluded per the user's instruction.
