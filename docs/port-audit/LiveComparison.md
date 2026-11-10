@@ -170,3 +170,23 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   a nearby remote player displays clan name, rank and logo above the native name.
   Original-SWF pixel comparison of that label is still pending.
 - TypeScript check and build pass after correcting a missing type import.
+
+### Selected-target marker and target validity
+
+- Ported TargetAimIndicator with the byte-identical original 29x29 target_icon.png,
+  three white inward-pointing markers, original 32 degree/sec rotation, 6 rad/sec
+  radius pulse and unit-size radius. Uses native clip render coordinates where
+  Haxe lacks source renderX/renderY, preserving interpolated placement.
+- Added it to the world canvas and connected disableSelectedTargetIcon. The
+  source default is disabled; preserved that default. Texture loading handles
+  session exit before completion and owns indicator/texture cleanup.
+- Fixed target validity to read Haxe's landed getter; the lock setter now refuses
+  invalid targets like the original. No movement or combat calculations changed.
+- Live Settings HUD -> target display: enabled the marker, clicked a nearby target
+  row to lock, and observed all three markers around that ship in
+  `/tmp/QoLAF-TargetMarkerLocked.png`. Unlocked and restored the original disabled
+  preference (`/tmp/QoLAF-TargetRestored.png`), then closed Settings.
+- Tests cover exact arrow geometry/animation, rendered-vs-simulation coordinates,
+  visibility, stale texture completion, native landed access and locking. Expanded
+  the Image fixture with real pivot/rotation semantics needed by the new feature.
+  TypeScript/build pass and all 72 tests pass. Full original-SWF parity remains open.

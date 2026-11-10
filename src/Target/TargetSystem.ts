@@ -3,7 +3,13 @@ import type { Settings } from '../Settings/Settings';
 export class TargetSystem {
   current: Raw | null = null;
   previous: Raw | null = null;
-  locked = false;
+  private lockedTarget = false;
+  get locked(): boolean {
+    return this.lockedTarget;
+  }
+  set locked(value: boolean) {
+    this.lockedTarget = value && this.valid(this.current);
+  }
   private timeout = 0;
   constructor(
     private game: Raw,
@@ -22,7 +28,7 @@ export class TargetSystem {
       ship &&
       unit?.alive &&
       unit !== ship &&
-      (!this.player(unit) || (unit.player && !unit.player.isMe && !unit.landed))
+      (!this.player(unit) || (unit.player && !unit.player.isMe && !read(unit, 'landed')))
     );
   }
   distance(unit: Raw) {

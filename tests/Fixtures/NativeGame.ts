@@ -273,6 +273,13 @@ export class Image extends Quad {
     super(texture.width ?? 32, texture.height ?? 32);
     this.texture = texture;
   }
+  alignPivot() {
+    this.values.pivotX = this.get_width() / 2;
+    this.values.pivotY = this.get_height() / 2;
+  }
+  set_rotation(value: number) {
+    this.values.rotation = value;
+  }
   set_texture(t: any) {
     this.texture = t;
   }

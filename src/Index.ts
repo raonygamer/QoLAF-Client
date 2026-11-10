@@ -1,3 +1,4 @@
+import targetIcon from './Assets/Images/TargetIcon.png';
 import { read, type API } from './Api/Types';
 import { installGameSession } from './Runtime/GameSession';
 import { ChatHistory } from './Chat/ChatHistory';
@@ -74,7 +75,7 @@ export default {
       void ensureFonts()
         .then(() => {
           if (!alive) return;
-          installGameSession(game, session, deviceSettings);
+          installGameSession(game, session, deviceSettings, targetIcon);
         })
         .catch((error) => session.log('Native client initialization failed', error));
     });

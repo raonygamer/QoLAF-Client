@@ -5,6 +5,7 @@ import type { DeviceSettings } from '../Settings/DeviceSettings';
 import type { Settings } from '../Settings/Settings';
 import { TargetSystem } from '../Target/TargetSystem';
 import { NativeUI } from '../UI/NativeUI';
+import { loadTargetAimIndicator, type TargetAimIndicator } from '../UI/TargetAimIndicator';
 import { TargetInfo } from '../UI/TargetInfo';
 import { installHealthAndShield } from '../Hud/HealthAndShield';
 import { installNativeChatPreferences } from '../Chat/NativeChatPreferences';
@@ -14,7 +15,12 @@ import { installRespawn } from './Respawn';
 import { RadarTelemetry } from '../UI/RadarTelemetry';
 
 /** Owns the native HUD nodes and hooks for one connected game session. */
-export function installGameSession(game: Raw, session: API, preferences?: DeviceSettings): void {
+export function installGameSession(
+  game: Raw,
+  session: API,
+  preferences?: DeviceSettings,
+  targetIcon?: string,
+): void {
   const ui = new NativeUI(session);
   const { config, save } = sessionSettings(session, game);
   installNativeSettings(session, preferences);
@@ -24,6 +30,11 @@ export function installGameSession(game: Raw, session: API, preferences?: Device
   installClanLabels(session, game);
   installNativeChatPreferences(session, game, preferences);
   const target = new TargetSystem(game, config, session.cls('core.ship.PlayerShip'));
+  let indicator: TargetAimIndicator | undefined;
+  if (targetIcon)
+    loadTargetAimIndicator(ui, game, target, targetIcon, (value) => {
+      indicator = value;
+    });
   const panel = new TargetInfo(ui, game, target, config, save);
   session.defer(() => panel.dispose());
   const telemetry = new RadarTelemetry(ui, game, config);
@@ -41,6 +52,10 @@ export function installGameSession(game: Raw, session: API, preferences?: Device
 
     const elapsedSeconds = read(event, 'passedTime', 0);
     target.update(elapsedSeconds);
+    indicator?.update(
+      elapsedSeconds,
+      !!session.cls('core.scene.SceneBase')?.clientSettings?.disableSelectedTargetIcon,
+    );
     panel.update(elapsedSeconds);
     telemetry.update(elapsedSeconds);
     updateBossVisibility();

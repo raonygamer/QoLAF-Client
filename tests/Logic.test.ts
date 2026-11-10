@@ -133,3 +133,26 @@ test('artifact scoring preserves conversion thresholds, aliases and unique const
     12,
   );
 });
+
+test('target validity uses Haxe landed accessor and rejects locking an invalid selection', () => {
+  const game = { me: { ship: { pos: { x: 0, y: 0 } } } };
+  const system = new TargetSystem(game, settings({}));
+  const player = {
+    alive: true,
+    pos: { x: 10, y: 0 },
+    player: { isMe: false },
+    get_landed: () => true,
+  };
+  assert.equal(system.valid(player), false);
+  assert.equal(system.select(player), false);
+  system.locked = true;
+  assert.equal(system.locked, false);
+  player.get_landed = () => false;
+  assert.equal(system.select(player), true);
+  system.locked = true;
+  assert.equal(system.locked, true);
+  player.get_landed = () => true;
+  system.update(0.01);
+  assert.equal(system.current, null);
+  assert.equal(system.locked, false);
+});
