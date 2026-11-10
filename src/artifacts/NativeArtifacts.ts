@@ -1,8 +1,10 @@
 import type { API, Raw } from '../api/Types';
-import { NativeUI } from '../ui/NativeUI';
+import { read } from '../api/Types';
+import { artifactOrder } from './ArtifactOrder';
 import { artifactFitness } from './Fitness';
-export function installArtifactUI(api: API) {
-  const ui = new NativeUI(api);
+export function installArtifactUI(api: API, createSorting: () => any) {
+  let Sorting: any;
+  const popups = new Map<Raw, Raw>();
   for (const [name, method] of [
     ['core.artifact.ArtifactCargoBox', 'addToolTip'],
     ['core.artifact.ArtifactBox', 'setArtifact'],
@@ -17,29 +19,55 @@ export function installArtifactUI(api: API) {
     });
   }
   const overview = api.cls('core.artifact.ArtifactOverview')!.prototype;
-  api.after(overview, 'chooseSorting', function () {
-    const popup = this.getChildAt(this.get_numChildren() - 1);
-    if (!(popup instanceof (api.cls('core.artifact.ArtifactSorting') as any))) return;
-    // Existing sorting dialog and callback; new options stay in its scroll body.
-    popup.newRow();
-    for (const [label, order] of [
-      ['Fitness high', 'fitnesshigh'],
-      ['Fitness low', 'fitnesslow'],
-    ]) {
-      const button = ui.button(label, () => popup.closeAndSort(order));
-      ui.place(button, popup.nextX, popup.nextY, popup.mainBody);
-      popup.nextX += button.get_width() + 20;
+  const dismiss = (view: Raw) => {
+    const popup = popups.get(view);
+    popups.delete(view);
+    if (popup) popup.removeFromParent(true);
+    view.chooseSortingButton?.set_enabled(true);
+  };
+  api.around(overview, 'chooseSorting', function () {
+    if (popups.has(this)) {
+      dismiss(this);
+      return;
+    }
+    Sorting ??= createSorting();
+    const view = this;
+    const popup = new Sorting(
+      this.g,
+      (order: string) => view.onSort(order),
+      () => dismiss(view),
+      !!this.expandedView,
+    );
+    popup.x = this.expandedView ? Math.round((this.viewWidth - 665) / 2) : 0;
+    popup.y = this.expandedView ? Math.round((this.viewHeight - 520) / 2) : 0;
+    popups.set(this, popup);
+    this.addChild(popup);
+    for (const node of [this.sortingBar, this.layoutToggleButton, this.closeViewButton]) {
+      if (node && read(node, 'parent') === this)
+        this.setChildIndex(node, read(this, 'numChildren') - 1);
     }
   });
-  api.around(overview, 'onSort', function (next, order: string) {
-    if (order !== 'fitnesshigh' && order !== 'fitnesslow') return next(order);
+  if (typeof overview.dispose === 'function')
+    api.before(overview, 'dispose', function () {
+      dismiss(this);
+    });
+  api.defer(() => {
+    for (const view of popups.keys()) dismiss(view);
+  });
+  api.around(overview, 'onSort', function (_next, order: string) {
+    let compare = artifactOrder(this.p, order);
+    if (!compare) {
+      const Artifact = api.cls('core.artifact.Artifact');
+      if (Artifact) Artifact.currentTypeOrder = order;
+      compare = (a: Raw, b: Raw) => {
+        if (a.revealed !== b.revealed) return a.revealed ? -1 : 1;
+        const left = a.getStat(order),
+          right = b.getStat(order);
+        return left > right ? -1 : left < right ? 1 : 0;
+      };
+    }
     this.chooseSortingButton.set_enabled(true);
-    const direction = order === 'fitnesshigh' ? -1 : 1;
-    this.p.artifacts.sort(
-      (a: Raw, b: Raw) =>
-        Number(b.revealed) - Number(a.revealed) ||
-        direction * (artifactFitness(a as any) - artifactFitness(b as any)),
-    );
+    this.p.artifacts.sort(compare);
     this.cargoContainer.removeChildren(0, -1, true);
     this.cargoBoxes.length = 0;
     this.drawArtifactsInCargo();

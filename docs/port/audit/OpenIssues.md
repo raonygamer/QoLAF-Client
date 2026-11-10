@@ -2101,3 +2101,22 @@ ordering change, whose cached-listener regression was then extended and passed.
 Typecheck/build and diff whitespace checks pass. These corrections are built in
 the local preview. No live sun-appearance claim: browser connector inventory is
 empty, and active desktop focus changes previously interrupted comparison.
+
+### Original artifact sorting dialog — 2026-11-10
+
+Reviewed the pending ArtifactSorting implementation against the complete source
+class and the original overview chooseSorting/onSort/refreshArtifactAdequacy.
+The port now uses its 665×520 native-display panel, theme/borders, bitmap headline,
+scrolling stat rows, source tooltips and ten sort controls. Original comparator
+semantics include revealed grouping, potential, fitness, adequacy with equipped
+modifier-family counts, modifier count, upgrade count, names, and native stat
+values. The actual Service1412 Artifact initializes levelPotential and provides
+the recycle-rate constant used by the dialog.
+
+Lifecycle integration toggles the popup, centers it in expanded mode, keeps
+source overview controls above it, closes on overview disposal/plugin cleanup,
+and restores the sort button. Sorting rebuilds cargo and resets scroll. Four
+regressions cover comparators, controls, theme/geometry, popup lifecycle and
+cleanup; typecheck passes. Expanded ArtifactOverview layout, overview stat rows,
+and broader artifact screens remain unfinished. This dialog has not yet been
+visually compared in the running client.

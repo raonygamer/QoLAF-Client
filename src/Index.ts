@@ -1,3 +1,5 @@
+import { createArtifactSorting } from './artifacts/ArtifactSorting';
+import { portedClasses } from './ported/Registry';
 import { installNativeIpcAuthentication } from './ipc/NativeIpcAuthentication';
 import { installMusicService } from './music/NativeMusicPlayer';
 import type { MusicPlayerService } from './music/MusicPlayer';
@@ -93,7 +95,7 @@ export default {
         history.record(text);
         return result;
       });
-      installArtifactUI(api);
+      installArtifactUI(api, () => createArtifactSorting(portedClasses(api).resolve));
       installCompactStarMap(api);
     });
     api.onGame((game, session) => {
