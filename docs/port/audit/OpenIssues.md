@@ -814,3 +814,44 @@ Next evidence needed: actual index contents/draw offsets versus expected quad da
 including buffers already allocated before capture. Reuse-size arithmetic alone
 has not explained the original prefix loss. No production rendering change or
 additional reload-loop workaround was introduced.
+
+
+## GPU contents and clipping isolation (2026-11-10)
+
+Live WebGL2 readback compared complete index payloads for 500 Effect uploads
+(81,786 indices), then complete vertex payloads for 500 uploads (1,177,600 bytes).
+Both samples had zero mismatches and zero undersized buffers. This includes
+buffers created before the capture. These bounded samples rule out neither
+incorrect CPU geometry nor changes after upload. Evidence: /tmp/QoLAF-FullIndex.png
+and /tmp/QoLAF-FullVertex.png. Wrappers restored themselves after two seconds;
+readback restored the prior GL binding and index ByteArray position.
+
+A draw-time observation checked the first 1,000 Effect draws for index binding,
+enabled vertex attribute buffer bindings 0–2, cached depth/stencil/cull/scissor
+enables, front stencil reference/read/write masks and depth write mask. No
+mismatches. The reported 36,912 is total calls observed, NOT all checked calls.
+Evidence: /tmp/QoLAF-DrawState.png.
+
+A 15-second draw-only scissor bypass visibly removed intentional clipping from
+weapon rows, but missing text persisted (/tmp/QoLAF-ScissorIsolation.png). A separate
+15-second stencil bypass showed complete text (/tmp/QoLAF-StencilIsolation.png),
+and prefix loss returned after restoration (/tmp/QoLAF-StencilRestored.png).
+Neither bypass is a fix: intentional clipping must remain, and this defect has
+also recovered spontaneously in earlier samples.
+
+Follow-up complicates the stencil hypothesis: Painter.renderMask was called zero
+times in a one-second sample. Painter uses non-shared context and stencil reference
+127; first prepareToDraw had desired comparison ALWAYS and all actions KEEP.
+Bypassing stencil only inside Effect.render did NOT restore the text. During that
+15-second capture, all 314,429 Effect draws and 5,340 other drawElements calls
+reported stencil enabled and front STENCIL_FUNC=519 (ALWAYS). Evidence:
+/tmp/QoLAF-MaskAudit.png, /tmp/QoLAF-StencilState.png,
+/tmp/QoLAF-StarlingStencil.png, /tmp/QoLAF-StarlingStencilRestored.png.
+Thus the single all-draw stencil A/B is a lead, not root-cause proof. Check back-face
+stencil state and repeat isolation with enough samples to separate spontaneous
+recovery; distinguish OpenFL composition from Starling draws. Do not globally
+disable stencil or ship an unconditional buffer reupload.
+
+All temporary render/draw wrappers automatically restored and restoration was
+observed in the console. No game reload, settings change, message send, movement,
+or firing occurred during these captures. Production code remains unchanged.
