@@ -77,3 +77,23 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   and skipUnchangedFrames value on plugin unload.
 - Remaining radar gaps explicitly include DPS observation, emperor coordination,
   boss timers, service pooling/IPC and desktop radio integration.
+
+### DPI scale wiring
+
+- Ported RymdenRunt's even-sized logical stage calculation: even physical viewport
+  divided by DPI, truncated to an even logical size with a minimum of two.
+  Physical browser viewport remains native; Starling retains pointer conversion.
+- Hooked the current Starling stage setters so existing cached resize callbacks
+  cannot overwrite the scale. Other Starling stages remain untouched. Applied at
+  login initialization, game creation, and preference changes; restored on unload.
+- Live Settings -> Graphics -> DPI slider changed 100% to 125%. Capture
+  `/tmp/QoLAF-DpiChanged.png` shows the scaled 930x580 source Settings window,
+  HUD and radar; clicking Close at its new position worked.
+- Automated coverage checks odd dimensions, scale limits, cached resize callbacks,
+  repeated values/no double scaling, unrelated stages, and unload cleanup.
+- Reload persistence verified at 125% in `/tmp/QoLAF-DpiPersist.png`; reopened
+  Settings using its scaled HUD button, restored 100% through the slider, and
+  saved by closing. `/tmp/QoLAF-DpiRestored.png` shows the restored geometry.
+  Preview diagnostic reported zero uncaught runtime errors after reload.
+- TypeScript check, build, and all 65 tests pass. This verifies DPI behavior,
+  not overall completion of the client port.

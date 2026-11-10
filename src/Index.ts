@@ -7,6 +7,7 @@ import { loginIdentity, PORT_VERSION } from './Login/LoginIdentity';
 import { loginProfiles } from './Login/LoginProfiles';
 import { installArtifactUI } from './Artifacts/NativeArtifacts';
 import { installInterpolation } from './Rendering/Interpolation';
+import { installDisplayScale } from './Rendering/DisplayScale';
 import { DeviceSettings } from './Settings/DeviceSettings';
 import { installBackgroundLayers } from './Rendering/BackgroundLayers';
 
@@ -30,6 +31,7 @@ export default {
       }));
     api.on('classesReady', () => {
       installInterpolation(api);
+      installDisplayScale(api, deviceSettings);
       const login = api.cls('Login')!.prototype;
       api.around(login, 'connectSteam', function (next, ...args) {
         if (this.$qolafAllowSteam) return next(...args);
