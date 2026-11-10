@@ -104,7 +104,7 @@ class Node {
     this.listeners.delete(key);
   }
 }
-function popupFixture(emoji = false, previews = false) {
+function popupFixture(emoji = false, previews = false, applyCompletion = true) {
   let cleanupCount = 0;
   const filters: { disposed: boolean; dispose(): void }[] = [];
   const ui = {
@@ -187,7 +187,7 @@ function popupFixture(emoji = false, previews = false) {
     model,
     (text) => {
       completions.push(text);
-      popup.update(text);
+      if (applyCompletion) popup.update(text);
     },
     emoji ? () => new Node(20, 20) : undefined,
     previews
@@ -375,5 +375,27 @@ test('mouse press selects before release and cancelled scrollbar touches stop dr
   touch('moved', 6);
   assert.equal(node.children[2].text, last, 'cancelled touch has released the drag');
   assert.equal(stopped, 3);
+  popup.dispose();
+});
+
+test('mouse acceptance dismisses before a rejected edit while Tab preserves the active suggestion', () => {
+  const { popup, model, completions } = popupFixture(false, false, false);
+  popup.update('/cmd');
+  popup.handleKey('Tab');
+  assert.equal(model.active, true, 'source Tab relies on the editor change to refresh');
+  assert.equal(popup.node.visible, true);
+  const node = popup.node as Node;
+  node.children[1].listeners.get('click')!();
+  assert.equal(model.active, false, 'source mouse completion dismisses even if insertion fails');
+  assert.equal(popup.node.visible, false);
+  assert.deepEqual(completions, ['/cmd00 ', '/cmd00 ']);
+  popup.update('/cmd00 argument');
+  assert.equal(
+    node.children[1].alpha,
+    0.88,
+    'passive command usage retains source selected-row paint',
+  );
+  node.children[1].listeners.get('click')!();
+  assert.equal(completions.length, 2, 'passive command help never inserts text');
   popup.dispose();
 });

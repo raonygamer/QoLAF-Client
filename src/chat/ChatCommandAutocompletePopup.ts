@@ -102,7 +102,7 @@ export class ChatCommandAutocompletePopup {
           () => {
             if (this.model.argumentMode) return;
             this.model.selectIndex(this.offset + index);
-            this.accept();
+            this.accept(true);
           },
           'ended',
         ),
@@ -212,8 +212,12 @@ export class ChatCommandAutocompletePopup {
     this.redraw(false);
   }
 
-  private accept(): void {
+  private accept(dismiss = false): void {
     const text = this.model.complete();
+    if (dismiss) {
+      this.model.dismiss();
+      this.redraw();
+    }
     if (text !== null) this.complete(text);
   }
 
@@ -249,9 +253,7 @@ export class ChatCommandAutocompletePopup {
       row.command.set_y(rowY);
       row.description.set_y(rowY + 18);
       row.background.set_width(this.width - 10);
-      row.background.set_alpha(
-        !this.model.argumentMode && this.offset + index === this.model.selectedIndex ? 0.88 : 0.001,
-      );
+      row.background.set_alpha(this.offset + index === this.model.selectedIndex ? 0.88 : 0.001);
       const texture = this.previewTexture(match);
       const inset = match.emojiScalar || texture ? 40 : 0;
       this.updatePreview(row, texture, rowY);

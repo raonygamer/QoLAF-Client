@@ -583,3 +583,14 @@ Follow-up live screenshot /tmp/QoLAF-BitmapFollowup.png still shows all target,
 empty-target and safe-zone labels after the previous broader batching fix,
 with the chat composer empty. This is another sampled observation, not exhaustive
 continuous rendering verification.
+
+Source autocomplete acceptance audit: mouse-up explicitly dismisses/redraws
+before emitting completion; Tab intentionally leaves state intact for the editor's
+CHANGE event. Port previously used the same non-dismissing path for both. Mouse
+acceptance now dismisses first, including when an editor rejects insertion, while
+Tab retains the source behavior. Passive command help remains non-completing but
+now paints its selected row at source alpha 0.88 (previously forced transparent).
+Regression distinguishes rejected mouse versus Tab completions and checks passive
+help highlighting/non-insertion. Typecheck/build/full suite: 267 pass; formatting
+and diff checks pass. This source/fixture verification did not require another
+live reload. Live wheel occlusion and longer gameplay audits remain open.
