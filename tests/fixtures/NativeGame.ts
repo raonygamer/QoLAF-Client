@@ -499,9 +499,10 @@ export function registry() {
     closeChat() {}
     sendMessage() {}
   }
-  class Overview {
+  class Overview extends Display {
     chooseSorting() {}
     onSort() {}
+    drawArtifactsInCargo() {}
   }
   class Cargo {
     addToolTip() {}
@@ -560,6 +561,9 @@ export function registry() {
     'core.artifact.ArtifactCargoBox': Cargo,
     'core.artifact.ArtifactBox': Box,
     'core.artifact.ArtifactOverview': Overview,
+    'core.player.Player': { ARTIFACT_CAPACITY: [250, 400, 600, 800] },
+    'generics.Localize': { t: (text: string) => text },
+    'core.hud.components.TextBitmap': Text,
     'core.artifact.ArtifactSorting': class {},
     'core.hud.components.ToolTip': ToolTip,
     'core.hud.components.Button': NativeButton,

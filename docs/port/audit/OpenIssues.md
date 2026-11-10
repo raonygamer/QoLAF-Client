@@ -2120,3 +2120,23 @@ regressions cover comparators, controls, theme/geometry, popup lifecycle and
 cleanup; typecheck passes. Expanded ArtifactOverview layout, overview stat rows,
 and broader artifact screens remain unfinished. This dialog has not yet been
 visually compared in the running client.
+
+### Artifact cargo grid and capacity footer — 2026-11-10
+
+Ported original drawArtifactsInCargo row calculation and configurable columns,
+with the source minimum of 100 cells and original native ArtifactCargoBox actions.
+The old Haxe calculation added an entire empty row at exact multiples above 100.
+The cargo container uses the ported original scrollbar skin.
+
+Ported refreshCapacityFooter: only artifact count and capacity level are compared
+per visible frame; changes update the footer without rescanning or rebuilding the
+grid. Maximum capacity replaces the upgrade button with count text. Native
+onUpgradeCapacity is still invoked only by its button; no purchase was performed.
+Frame listeners are removed on rebuild, overview disposal and plugin cleanup.
+
+Full suite: 493 passing after extending the compiled integration fixture with
+the newly required native overview/Player/TextBitmap dependencies. Typechecking
+passes. Regression coverage includes empty inventories, exact and partial rows,
+configurable columns, unchanged artifact identity, live count updates, maximum
+capacity transitions, leaving the room and cleanup. Full expanded layout and
+live visual comparison remain open.

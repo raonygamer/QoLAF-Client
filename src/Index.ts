@@ -1,4 +1,5 @@
 import { createArtifactSorting } from './artifacts/ArtifactSorting';
+import { installArtifactCargo } from './artifacts/ArtifactCargo';
 import { portedClasses } from './ported/Registry';
 import { installNativeRewardNotices } from './chat/NativeRewardNotices';
 import { installNativeIpcAuthentication } from './ipc/NativeIpcAuthentication';
@@ -98,6 +99,9 @@ export default {
         return result;
       });
       installArtifactUI(api, () => createArtifactSorting(portedClasses(api).resolve));
+      installArtifactCargo(api, () =>
+        portedClasses(api).resolve('feathers.controls.ScrollContainer'),
+      );
       installCompactStarMap(api);
     });
     api.onGame((game, session) => {
