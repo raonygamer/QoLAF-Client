@@ -500,14 +500,25 @@ export function registry() {
     sendMessage() {}
   }
   class Overview extends Display {
+    drawComponents() {}
+    onRecycleSelect() {}
+    selectAllForRecycle() {}
+    toggleRecycle() {}
+    onRecycle() {}
+    onRecycleMessage() {}
     chooseSorting() {}
     onSort() {}
     drawArtifactsInCargo() {}
   }
-  class Cargo {
+  class Cargo extends Display {
+    update() {}
+    onClick() {}
+    toggleRecycle() {}
+    setSelectedForRecycle() {}
     addToolTip() {}
   }
-  class Box {
+  class Box extends Display {
+    update() {}
     setArtifact() {}
   }
   class Radar {

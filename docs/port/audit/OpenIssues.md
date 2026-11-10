@@ -2284,3 +2284,24 @@ storage handling. TypeScript and formatting pass. These modules are intentionall
 not installed in Index yet: the source context menu and inset gold markers still
 need integration before this can be considered a player-usable feature. No star
 icon is in the original marker; it is a four-sided inset outline.
+
+### Favorites UI connected — 2026-11-10
+
+Installed the favorites foundation with the source 190×66 context menu, 32px
+rows, bitmap labels, border/hover/down colors, placement clamping and outside
+click dismissal. Unrevealed artifacts can be favorited but cannot be shared;
+action requires a matching, non-cancelled press/release. Favorite tiles receive
+the source four-sided gold inset outline while preserving their ordinary frame.
+Changing a favorite prunes protected recycle selections and respects pending RPCs.
+Share closes the enclosing menu before inserting an unsent artifact chat draft.
+
+Adapted browser pointer coordinates through native DomOverlay.toCss. The current
+Haxe ToolTip has no hideType, so the adapter hides only shown artifactBox tooltips.
+Native event/touch values use accessors without depending on unrelated aliases.
+Menu, marker and document listeners are removed on disposal/unload.
+
+Full suite 517 passes; focused UI/integration tests and TypeScript rerun after
+accessor tightening. Tests cover exact menu dimensions, eligibility/cancelled
+presses, marker geometry, pending/stale toggles, pruning and close-before-draft.
+No live favorite, recycle, or chat action was performed. Browser visual comparison
+is still pending; this does not establish whole artifact-screen parity.

@@ -1,5 +1,6 @@
 import { createArtifactSorting } from './artifacts/ArtifactSorting';
 import { loginControl } from './login/LoginControl';
+import { installNativeArtifactFavorites } from './artifacts/NativeArtifactFavorites';
 import { installArtifactCargo } from './artifacts/ArtifactCargo';
 import { installArtifactSetupSelection } from './artifacts/ArtifactSetupSelection';
 import { setupScrollbarSkin } from './artifacts/SetupScrollbarSkin';
@@ -105,6 +106,7 @@ export default {
         return result;
       });
       installArtifactUI(api, () => createArtifactSorting(portedClasses(api).resolve));
+      installNativeArtifactFavorites(api, portedClasses(api).resolve);
       installArtifactSetupSelection(api, setupScrollbarSkin(api, aeonImage));
       installArtifactCargo(api, () =>
         portedClasses(api).resolve('feathers.controls.ScrollContainer'),
