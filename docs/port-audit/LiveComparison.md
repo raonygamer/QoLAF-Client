@@ -326,3 +326,28 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
 - Original Automations navigation is visibly present and remains absent from the
   port pending its real runtime/page implementation. This comparison does not
   establish complete Settings functionality or all-screen parity.
+
+### Automation runtime contract (integration in progress)
+
+- Inspected current original SettingsAutomations and af.AutomationManager,
+  AutomationModule, AutomationEvent, AutomationInfo and EventBus. This feature
+  uses AIR filesystem and SWF/ApplicationDomain loading; it requires an actual
+  browser module/storage adapter, not just enabling the missing category.
+- Ported metadata/event objects, defensive argument/author copies, command-only
+  handled flag, EventBus snapshot/arity dispatch, subscription ownership, command
+  namespace validation and disposal. Command parsing/registry is an explicit
+  injected dependency, not an inert placeholder implementation.
+- Added the source module lifecycle: initialize/start/stop/update/render/command,
+  stopped rendering/commands, fresh runtime after room suspension, original error
+  STOP path, initialize-failure cleanup and preservation of the original error.
+  Cleanup remains possible after the game detaches, and cleanup errors cannot
+  prevent room control release. Native game objects are passed through unchanged.
+- TypeScript/build and all 103 tests pass, including lifecycle ordering and
+  milliseconds-vs-seconds delta semantics, callback mutation, namespace ownership,
+  room handoff/restart and constructor/event cleanup paths.
+- These classes are not yet wired into the active game or Settings category.
+  Browser import/persistence, full command registry integration, manager-level
+  ownership and the original UI remain pending. Existing SWF automation binaries
+  cannot execute directly in the browser runtime; modules need a JS/TS port.
+- Original repository has ongoing modified/untracked files; none were edited or
+  reset. Source reads in this pass used the current worktree as authoritative.
