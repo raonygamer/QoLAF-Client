@@ -2190,3 +2190,18 @@ Tests cover overflow, bounds, wheel/drag/page behavior, shrinking, cleanup, and
 texture loading cancelled by disposal. Live visual comparison, touch-content
 dragging/inertia, and expanded overview layout remain open; this is not full
 artifact-screen parity.
+
+### Instant beam orbit lightning — 2026-11-10
+
+Ported BeamOrbitLightning from the original ActionScript: fixed 288-vertex mesh,
+three bounded orbit arcs, source weapon-key eligibility, noise/phase formulas,
+additive blend, source color whitening, and network-server-time fallback. Instant
+rendering now drives the mesh each display frame and releases it with the beam
+on death, state exit, pooling reset, room exit, and plugin cleanup. Ordinary and
+splitting rays retain their existing eligibility/behavior.
+
+Validation: 503 tests pass, TypeScript and formatting checks pass. Regressions
+exercise native Instant callbacks, 180 Hz geometry changes without simulation
+aging, unused-geometry collapse, invalid-frame hiding, eligibility and disposal.
+Live visual comparison remains outstanding. This does not implement the separate
+room-owned NetherBlobAttackVisuals controller or full beam grayscale/color parity.

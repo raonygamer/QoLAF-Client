@@ -24,6 +24,13 @@ export class Indices {
   }
 }
 export class Mesh extends Display {
+  rotation = 0;
+  set_rotation(value: number) {
+    this.rotation = value;
+  }
+  get_rotation() {
+    return this.rotation;
+  }
   constructor(
     readonly vertices: Vertices,
     readonly indices: Indices,

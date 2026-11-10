@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { Mesh, Vertices, Indices } from './fixtures/AuraMesh';
 import { installProjectileFrames } from '../src/rendering/ProjectileFrames';
 // @ts-expect-error extracted native Haxe methods
 import { InstantPrototype, InstantSplittingPrototype } from './fixtures/NativeInstant.js';
 // @ts-expect-error actual host dispatcher
 import { Hooks } from './fixtures/HostCore.js';
 
-function fixture(splitting: boolean) {
+function fixture(splitting: boolean, weaponKey = '') {
   const released: any[] = [];
   const cleanup: Function[] = [];
   const hooks = new Hooks();
@@ -28,11 +29,14 @@ function fixture(splitting: boolean) {
     addChild(line: any) {
       line.parent = this;
     },
-    removeChild(line: any) {
+    removeChild(line: any, dispose = false) {
       line.parent = null;
+      if (dispose) line.dispose();
     },
   };
   const game = {
+    time: 0,
+    networkServerTime: 1000,
     gameStateMachine: { accumulator: 0 },
     canvasEffects: canvas,
     beamLinePool: {
@@ -76,7 +80,7 @@ function fixture(splitting: boolean) {
     range = 100;
     ttl = 100;
     ttlMax = 100;
-    weapon = { range: 100, maxProjectiles: 0 };
+    weapon = { range: 100, maxProjectiles: 0, key: weaponKey };
     get_pos() {
       return this.course.pos;
     }
@@ -90,6 +94,10 @@ function fixture(splitting: boolean) {
   function State() {}
   State.prototype = { ...(splitting ? InstantSplittingPrototype : InstantPrototype) };
   const classes: any = {
+    'starling.display.Mesh': Mesh,
+    'starling.rendering.VertexData': Vertices,
+    'starling.rendering.IndexData': Indices,
+    'generics.Color': { interpolateColor: () => 0x7799ff },
     'core.projectile.Projectile': Projectile,
     'core.scene.Game': { prototype: { draw() {}, exit() {} } },
     ['core.states.aistates.' + (splitting ? 'InstantSplitting' : 'Instant')]: State,
@@ -182,3 +190,45 @@ for (const splitting of [false, true]) {
     dispose();
   });
 }
+
+test('Chrono orbit geometry follows display frames and is released with its native ray', () => {
+  const { p, state, game, dispose } = fixture(false, 'mG64bGPqEUaJHvf2sadUHg');
+  state.enter();
+  const orbit = state.orbitLightning;
+  assert.ok(orbit);
+  assert.equal(orbit.parent, game.canvasEffects);
+  assert.equal(orbit.get_vertexData().count, 288);
+  assert.equal(orbit.get_indexData().count, 432);
+  p.draw();
+  assert.equal(orbit.get_visible(), true);
+  assert.equal(orbit.get_x(), 25);
+  assert.equal(orbit.get_y(), 50);
+  const first = structuredClone(orbit.get_vertexData().points);
+  game.networkServerTime += 1000 / 180;
+  p.draw();
+  assert.notDeepEqual(orbit.get_vertexData().points.slice(0, 96), first.slice(0, 96));
+  assert.ok(
+    orbit
+      .get_vertexData()
+      .points.slice(96)
+      .every((p: number[]) => p.every((v) => v === 0)),
+  );
+  assert.equal(p.ttl, 100);
+  p.range = NaN;
+  p.draw();
+  assert.equal(orbit.get_visible(), false, 'invalid next frame must hide previously drawn arcs');
+  state.exit();
+  assert.equal(state.orbitLightning, null);
+  assert.equal(orbit.disposed, true);
+  assert.equal(orbit.parent, null);
+  dispose();
+});
+
+test('ordinary instant rays and splitting rays do not acquire Chrono-only effects', () => {
+  for (const splitting of [false, true]) {
+    const { state, dispose } = fixture(splitting, splitting ? 'mG64bGPqEUaJHvf2sadUHg' : 'other');
+    state.enter();
+    assert.equal(state.orbitLightning, undefined);
+    dispose();
+  }
+});

@@ -1,4 +1,5 @@
 import { read, type API, type Raw } from '../api/Types';
+import { createBeamOrbitLightning, supportsBeamOrbit } from './BeamOrbitLightning';
 
 /** Projectile.renderTimeToLive only interpolates unrestricted projectile weapons. */
 export function projectileRenderLifetime(projectile: Raw): number {
@@ -8,7 +9,8 @@ export function projectileRenderLifetime(projectile: Raw): number {
 }
 
 /** Instant.draw / InstantSplitting.draw, using native lines and the fired world position. */
-export function drawInstantFrame(state: Raw, splitting: boolean): void {
+export function drawInstantFrame(state: Raw, splitting: boolean, color?: Raw): void {
+  state.orbitLightning?.set_visible(false);
   const p = state.p;
   if (!p.alive || !p._mc) return;
   if (
@@ -50,10 +52,26 @@ export function drawInstantFrame(state: Raw, splitting: boolean): void {
   } else state.lineInner.set_visible(false);
   state.lineOuter.thickness = state.thickness * scale * (0.2 + (0.8 * remaining) / maximum);
   place(state.lineOuter, (state.alpha * remaining) / maximum, remaining > 0);
+  if (state.orbitLightning && color) {
+    const arcColor = isNaN(p.determinedColor) ? state.color : p.determinedColor >>> 0;
+    const serverTime = read(state.g, 'networkServerTime');
+    state.orbitLightning.drawBetween(
+      position.x,
+      position.y,
+      endX,
+      endY,
+      state.lineOuter.thickness,
+      color.interpolateColor(arcColor, 0xffffff, 0.3),
+      Number.isFinite(serverTime) ? serverTime : state.g.time,
+      read(state.lineOuter, 'alpha'),
+    );
+  }
 }
 
 /** Source releaseLines: return each line once, including exit before projectile death. */
 export function releaseInstantLines(state: Raw, splitting: boolean): void {
+  state.orbitLightning?.removeFromParent(true);
+  state.orbitLightning = null;
   const lines = splitting ? state.lines : [state.lineInner, state.lineOuter];
   for (const line of lines) {
     if (!line) continue;
@@ -67,6 +85,8 @@ export function releaseInstantLines(state: Raw, splitting: boolean): void {
 }
 
 export function installInstantFrames(api: API): (projectile: Raw) => void {
+  const OrbitLightning = createBeamOrbitLightning(api);
+  const color = api.cls('generics.Color');
   const states = new Map<Raw, { state: Raw; splitting: boolean }>();
   const release = (projectile: Raw) => {
     const entry = states.get(projectile);
@@ -82,6 +102,10 @@ export function installInstantFrames(api: API): (projectile: Raw) => void {
       release(this.p);
     });
     api.after(prototype, 'enter', function () {
+      if (!splitting && OrbitLightning && color && supportsBeamOrbit(this.p)) {
+        this.orbitLightning = new OrbitLightning();
+        this.g.canvasEffects.addChild(this.orbitLightning);
+      }
       states.set(this.p, { state: this, splitting });
     });
     api.around(prototype, 'execute', function (next, ...args) {
@@ -110,6 +134,6 @@ export function installInstantFrames(api: API): (projectile: Raw) => void {
   });
   return (projectile) => {
     const entry = states.get(projectile);
-    if (entry) drawInstantFrame(entry.state, entry.splitting);
+    if (entry) drawInstantFrame(entry.state, entry.splitting, color);
   };
 }
