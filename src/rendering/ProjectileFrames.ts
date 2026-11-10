@@ -2,6 +2,7 @@ import { read, type API, type Raw } from '../api/Types';
 import { drawProjectileRibbon } from './RibbonFrames';
 import { drawProjectileAttachment } from './ProjectileAttachments';
 import { installInstantFrames } from './InstantFrames';
+import { installNetherTentacleVisuals } from './NetherTentacleVisuals';
 
 /** Source Projectile.draw: predict presentation between fixed 33 ms updates. */
 export function drawProjectileFrame(
@@ -39,6 +40,7 @@ export function installProjectileFrames(api: API): void {
   const projectile = api.cls('core.projectile.Projectile')?.prototype;
   const game = api.cls('core.scene.Game')?.prototype;
   if (!projectile || !game) return;
+  installNetherTentacleVisuals(api);
   const drawInstant = installInstantFrames(api);
   const rotations = new WeakMap<Raw, number>();
   const attachments = new WeakMap<Raw, { state: Raw; missile: boolean }>();

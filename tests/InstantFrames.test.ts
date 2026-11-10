@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { Display } from './fixtures/NativeGame';
 import { Mesh, Vertices, Indices } from './fixtures/AuraMesh';
 import { installProjectileFrames } from '../src/rendering/ProjectileFrames';
 // @ts-expect-error extracted native Haxe methods
@@ -7,7 +8,12 @@ import { InstantPrototype, InstantSplittingPrototype } from './fixtures/NativeIn
 // @ts-expect-error actual host dispatcher
 import { Hooks } from './fixtures/HostCore.js';
 
-function fixture(splitting: boolean, weaponKey = '') {
+function fixture(splitting: boolean, weaponKey = '', tentacle = false) {
+  class Enemy {
+    hasFaction(name: string) {
+      return name === 'Nether';
+    }
+  }
   const released: any[] = [];
   const cleanup: Function[] = [];
   const hooks = new Hooks();
@@ -73,6 +79,7 @@ function fixture(splitting: boolean, weaponKey = '') {
   };
   class Projectile {
     g = game;
+    unit = tentacle ? new Enemy() : null;
     alive = true;
     _mc = clip;
     rotation = 0;
@@ -94,6 +101,9 @@ function fixture(splitting: boolean, weaponKey = '') {
   function State() {}
   State.prototype = { ...(splitting ? InstantSplittingPrototype : InstantPrototype) };
   const classes: any = {
+    'starling.display.Sprite': Display,
+    'core.ship.EnemyShip': Enemy,
+    'core.projectile.ProjectileManager': { prototype: { activateProjectile() {}, dispose() {} } },
     'starling.display.Mesh': Mesh,
     'starling.rendering.VertexData': Vertices,
     'starling.rendering.IndexData': Indices,
@@ -231,4 +241,24 @@ test('ordinary instant rays and splitting rays do not acquire Chrono-only effect
     assert.equal(state.orbitLightning, undefined);
     dispose();
   }
+});
+
+test('Nether tentacles suppress duplicate native rays while retaining Haxe TTL arithmetic', () => {
+  const { p, state, released, dispose } = fixture(false, '0O4EOmZ-_USlz3RhlUCQ4Q', true);
+  p.range = 75;
+  state.enter();
+  assert.equal(state.lineInner, null);
+  assert.equal(state.lineOuter, null);
+  state.execute();
+  assert.equal(p.ttl, 81);
+  assert.equal(p.ttlMax, 81);
+  assert.equal(p.course.time, 33);
+  p.draw();
+  p.alive = false;
+  state.execute();
+  assert.equal(p.course.time, 66);
+  assert.equal(released.length, 0, 'room snapshots own their pair; native state owns none');
+  state.exit();
+  p.reset();
+  dispose();
 });

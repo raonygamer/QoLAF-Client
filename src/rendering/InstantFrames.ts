@@ -1,4 +1,5 @@
 import { read, type API, type Raw } from '../api/Types';
+import { isNetherTentacle } from './NetherTentacleVisuals';
 import { createBeamOrbitLightning, supportsBeamOrbit } from './BeamOrbitLightning';
 
 /** Projectile.renderTimeToLive only interpolates unrestricted projectile weapons. */
@@ -87,6 +88,9 @@ export function releaseInstantLines(state: Raw, splitting: boolean): void {
 export function installInstantFrames(api: API): (projectile: Raw) => void {
   const OrbitLightning = createBeamOrbitLightning(api);
   const color = api.cls('generics.Color');
+  const tentacles = new WeakSet<Raw>();
+  const snapshotAvailable =
+    !!api.cls('core.projectile.ProjectileManager') && !!api.cls('starling.display.Sprite');
   const states = new Map<Raw, { state: Raw; splitting: boolean }>();
   const release = (projectile: Raw) => {
     const entry = states.get(projectile);
@@ -98,8 +102,14 @@ export function installInstantFrames(api: API): (projectile: Raw) => void {
     const prototype = api.cls(`core.states.aistates.${name}`)?.prototype;
     if (!prototype) continue;
     const splitting = name === 'InstantSplitting';
-    api.before(prototype, 'enter', function () {
+    api.around(prototype, 'enter', function (next, ...args) {
       release(this.p);
+      tentacles.delete(this);
+      if (!splitting && snapshotAvailable && isNetherTentacle(api, this.p)) {
+        tentacles.add(this);
+        return;
+      }
+      return next(...args);
     });
     api.after(prototype, 'enter', function () {
       if (!splitting && OrbitLightning && color && supportsBeamOrbit(this.p)) {
@@ -109,6 +119,18 @@ export function installInstantFrames(api: API): (projectile: Raw) => void {
       states.set(this.p, { state: this, splitting });
     });
     api.around(prototype, 'execute', function (next, ...args) {
+      if (tentacles.has(this)) {
+        // Retain current Haxe tick/TTL arithmetic; only the appearance outlives it.
+        if (this.tick === 0 && this.p.range !== 0) {
+          const scale = 0.25 + (0.75 * this.p.range) / this.p.weapon.range;
+          this.p.ttl = (this.p.ttl * scale) | 0;
+          this.p.ttlMax = (this.p.ttlMax * scale) | 0;
+          this.tick = 1;
+        }
+        if (!this.p.alive) release(this.p);
+        this.p.course.time += 33;
+        return;
+      }
       if (this.p.alive) return next(...args);
       // Native execute returns Instant lines repeatedly and never returns splitting
       // lines to their pool. Keep its clock behavior while using source cleanup.
@@ -134,6 +156,6 @@ export function installInstantFrames(api: API): (projectile: Raw) => void {
   });
   return (projectile) => {
     const entry = states.get(projectile);
-    if (entry) drawInstantFrame(entry.state, entry.splitting, color);
+    if (entry && !tentacles.has(entry.state)) drawInstantFrame(entry.state, entry.splitting, color);
   };
 }

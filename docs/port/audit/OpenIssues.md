@@ -2219,3 +2219,20 @@ Verified actual extracted native enter methods for both ray types, core/glow
 values, grayscale routing, unselected pooled reuse, unrelated lines/rooms, and
 restoration. All 506 tests and TypeScript checks pass. Browser visual verification
 of the shader remains outstanding.
+
+### Room-owned Nether tentacle snapshots — 2026-11-10
+
+Ported NetherTentacleVisuals from the original source. Activation captures only
+position, endpoint, scale and local timing, so an expired/reused projectile cannot
+remove or move its appearance. The 350 ms fade starts at the first displayed
+frame, rejects pending shots older than 500 ms, supports unsigned timer wrap,
+and caps active shots and line geometry. Pooled pairs are returned on expiry,
+partial allocation failure, manager disposal, room exit and plugin teardown.
+Native Instant lines are suppressed for the exact Nether enemy/tentacle weapon;
+the current Haxe integer TTL arithmetic and course clock are preserved.
+
+Validation: 510 tests pass, TypeScript and formatting checks pass. Coverage
+includes projectile reuse before first render, partial allocations, geometry and
+capacity limits, timer wrap, stale pending shots, and native Instant timing.
+Live encounter comparison remains pending. The separate Nether beam Chrono-style
+selection (NetherBlobAttackVisuals.instantStyle) is still unported.
