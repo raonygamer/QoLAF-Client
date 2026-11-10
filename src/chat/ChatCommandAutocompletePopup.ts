@@ -1,13 +1,34 @@
+import type { Resolve } from '../runtime/As3';
+import type { NativeBitmapInput } from './rich/NativeBitmapInput';
+import type { DeviceSettings } from '../settings/DeviceSettings';
+import { ChatEmojiAutocompleteModel } from './ChatEmojiAutocompleteModel';
+import { ChatEmojiAutocompleteParser } from './ChatEmojiAutocompleteParser';
+import { EmojiShortcodeCatalog } from './EmojiShortcodeCatalog';
 import { read, type API, type Raw } from '../api/Types';
 import { NativeUI } from '../ui/NativeUI';
 import { ChatCommandAutocompleteModel } from './ChatCommandAutocompleteModel';
 import { builtInCommandSuggestions, registryCommandSuggestions } from './ChatCommandSuggestions';
 import type { ChatCommandRegistry } from './ChatCommandRegistry';
 
+type AutocompleteModel = Pick<
+  ChatCommandAutocompleteModel,
+  | 'active'
+  | 'argumentMode'
+  | 'matches'
+  | 'selectedIndex'
+  | 'update'
+  | 'dismiss'
+  | 'selectNext'
+  | 'selectPrevious'
+  | 'selectIndex'
+  | 'complete'
+>;
+
 interface Row {
   background: Raw;
   command: Raw;
   description: Raw;
+  emoji?: Raw;
 }
 
 /** Native Starling command rows, using the source popup's dimensions and colors. */
@@ -26,8 +47,9 @@ export class ChatCommandAutocompletePopup {
 
   constructor(
     private ui: NativeUI,
-    readonly model: ChatCommandAutocompleteModel,
+    readonly model: AutocompleteModel,
     private complete: (text: string) => void,
+    createEmoji?: () => Raw,
   ) {
     this.node = ui.sprite();
     this.node.set_name('qolaf.commandAutocomplete');
@@ -36,18 +58,23 @@ export class ChatCommandAutocompletePopup {
     for (let index = 0; index < 8; index++) {
       const background = ui.place(ui.quad(390, 34, 0x444444, 0.001), 5, 5 + index * 34, this.node);
       const command = ui.place(
-        ui.text(380, 18, '', 12, 0xffffff, 'left', 'Verdana'),
+        ui.text(380, 18, '', 12, 0xffffff, 'left', 'verdana16_bitmap'),
         10,
         5 + index * 34,
         this.node,
       );
       const description = ui.place(
-        ui.text(380, 16, '', 10, 0xbcbcbc, 'left', 'Verdana'),
+        ui.text(380, 16, '', 10, 0xbcbcbc, 'left', 'verdana16_bitmap'),
         10,
         23 + index * 34,
         this.node,
       );
-      this.rows.push({ background, command, description });
+      const emoji = createEmoji?.();
+      if (emoji) {
+        emoji.set_touchable(false);
+        this.node.addChild(emoji);
+      }
+      this.rows.push({ background, command, description, emoji });
       this.cleanups.push(
         ui.touch(
           background,
@@ -98,7 +125,7 @@ export class ChatCommandAutocompletePopup {
     return read(this.background, 'height', 0);
   }
 
-  update(text: string): void {
+  update(text: string | null): void {
     this.model.update(text);
     this.offset = 0;
     this.redraw();
@@ -153,14 +180,23 @@ export class ChatCommandAutocompletePopup {
         match = index < count ? matches[this.offset + index] : null;
       for (const field of [row.background, row.command, row.description])
         field.set_visible(!!match);
+      row.emoji?.set_visible(!!match?.emojiScalar);
       if (!match) continue;
       row.background.set_width(this.width - 10);
       row.background.set_alpha(
         !this.model.argumentMode && this.offset + index === this.model.selectedIndex ? 0.88 : 0.001,
       );
-      row.command.set_width(this.width - 20);
+      const inset = match.emojiScalar ? 40 : 0;
+      row.command.set_x(10 + inset);
+      row.description.set_x(10 + inset);
+      if (row.emoji && match.emojiScalar) {
+        row.emoji.text = match.completionText;
+        row.emoji.set_x(10);
+        row.emoji.set_y(5 + index * 34 + Math.round((34 - read(row.emoji, 'height')) / 2));
+      }
+      row.command.set_width(this.width - 20 - inset);
       row.command.set_text(match.displayCommand);
-      row.description.set_width(this.width - 20);
+      row.description.set_width(this.width - 20 - inset);
       this.fitDescription(row.description, match.description);
     }
     const scrolling = matches.length > count;
@@ -206,7 +242,12 @@ export class ChatCommandAutocompletePopup {
   }
 }
 
-export function installCommandAutocomplete(api: API, game: Raw, isFormatting = () => false): void {
+export function installCommandAutocomplete(
+  api: API,
+  game: Raw,
+  isFormatting = () => false,
+  rich?: { editor: NativeBitmapInput; resolve: Resolve; preferences?: DeviceSettings },
+): void {
   const chat = game.chatInput,
     input = chat?.input;
   if (!input?.element) return;
@@ -217,6 +258,9 @@ export function installCommandAutocomplete(api: API, game: Raw, isFormatting = (
   );
   const ui = new NativeUI(api);
   let lastText = '';
+  let lastSelection = '';
+  let resolving = false;
+  const emojiModel = new ChatEmojiAutocompleteModel();
   const popup = new ChatCommandAutocompletePopup(ui, model, (text) => {
     input.set_text(text);
     input.setFocus();
@@ -224,14 +268,83 @@ export function installCommandAutocomplete(api: API, game: Raw, isFormatting = (
     refresh();
   });
   chat.addChild(popup.node);
+  const emojiPopup = rich
+    ? new ChatCommandAutocompletePopup(ui, emojiModel, completeEmoji, () => {
+        const Text = rich.resolve('core.hud.components.Text');
+        const field = new Text(0, 0, false, 'verdana48_bitmap');
+        field.size = 20;
+        return field;
+      })
+    : undefined;
+  if (emojiPopup) {
+    emojiPopup.node.set_name('qolaf.emojiAutocomplete');
+    chat.addChild(emojiPopup.node);
+  }
+  function tokenAtCaret() {
+    const model = rich?.editor.model;
+    return model
+      ? ChatEmojiAutocompleteParser.find(
+          model.visibleText,
+          model.selectionBegin,
+          model.selectionEnd,
+        )
+      : null;
+  }
+  function completeEmoji(text: string) {
+    const token = tokenAtCaret();
+    if (!rich || !token || resolving) return;
+    resolving = true;
+    let changed = false;
+    try {
+      emojiModel.dismiss();
+      emojiPopup?.node.set_visible(false);
+      changed = rich.editor.model.replaceRange(token.beginIndex, token.endIndex, text);
+      if (changed) {
+        rich.editor.binding.project();
+        input.dispatchEventWith('change', true);
+        input.setFocus();
+      }
+    } finally {
+      resolving = false;
+    }
+    if (changed) refresh();
+  }
   const refresh = () => {
+    if (resolving || rich?.editor.binding.isComposing) return;
     lastText = read(input, 'text', '');
-    if (isFormatting()) {
+    lastSelection = rich
+      ? `${rich.editor.model.selectionAnchor}:${rich.editor.model.selectionActive}`
+      : '';
+    if (
+      !chat.isActive() ||
+      !read(chat, 'visible', true) ||
+      isFormatting() ||
+      !(rich?.preferences?.get('enableNewChatIntegrationSystem') ?? true)
+    ) {
+      emojiPopup?.update(null);
       model.dismiss();
       popup.node.set_visible(false);
       return;
     }
     popup.update(lastText);
+    const token = tokenAtCaret();
+    if (!emojiPopup || !token || (model.active && !model.argumentMode)) emojiPopup?.update(null);
+    else if (!token.closed) emojiPopup.update(token.query);
+    else {
+      let completion: string | null = null;
+      if (emojiModel.active && emojiModel.query === token.query.toLowerCase())
+        completion = emojiModel.complete();
+      else {
+        const exact = EmojiShortcodeCatalog.findExact(token.query);
+        if (exact >= 0) completion = EmojiShortcodeCatalog.emojiAt(exact);
+        else if (emojiModel.update(token.query)) completion = emojiModel.complete();
+      }
+      if (completion !== null) {
+        completeEmoji(completion);
+        return;
+      }
+      emojiPopup.update(null);
+    }
     place();
   };
   const place = () => {
@@ -243,10 +356,24 @@ export function installCommandAutocomplete(api: API, game: Raw, isFormatting = (
     if (lastChild >= 0 && chat.getChildAt(lastChild) !== popup.node)
       chat.setChildIndex(popup.node, lastChild);
     popup.node.set_x(read(input, 'x', 0));
-    popup.node.set_y(top - 4 - popup.height);
+    let commandBottom = top - 4;
+    if (emojiPopup) {
+      emojiPopup.layout(read(input, 'width', 400), read(chat, 'y', 0) + top - 4);
+      emojiPopup.node.set_x(read(input, 'x', 0));
+      emojiPopup.node.set_y(top - 4 - emojiPopup.height);
+      if (emojiModel.active) {
+        chat.setChildIndex(emojiPopup.node, read(chat, 'numChildren') - 1);
+        if (model.argumentMode) commandBottom = read(emojiPopup.node, 'y') - 4;
+      }
+    }
+    popup.node.set_y(commandBottom - popup.height);
   };
   const hideForHistory = () => {
+    emojiPopup?.update(null);
     lastText = read(input, 'text', '');
+    lastSelection = rich
+      ? `${rich.editor.model.selectionAnchor}:${rich.editor.model.selectionActive}`
+      : '';
     model.dismiss();
     popup.node.set_visible(false);
   };
@@ -264,7 +391,7 @@ export function installCommandAutocomplete(api: API, game: Raw, isFormatting = (
       event.metaKey
     )
       return;
-    let handled = popup.handleKey(event.key);
+    let handled = emojiPopup?.handleKey(event.key) || popup.handleKey(event.key);
     if (!handled && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
       if (event.key === 'ArrowUp') chat.previous();
       else chat.next();
@@ -278,10 +405,12 @@ export function installCommandAutocomplete(api: API, game: Raw, isFormatting = (
   };
   window.addEventListener('keydown', keydown, true);
   const wheel = (event: WheelEvent) => {
-    if (!chat.isActive() || !read(popup.node, 'visible')) return;
+    if (!chat.isActive()) return;
+    const activePopup = emojiPopup && read(emojiPopup.node, 'visible') ? emojiPopup : popup;
+    if (!read(activePopup.node, 'visible')) return;
     const overlay = api.cls('core.hud.components.ui.DomOverlay');
-    const bounds = overlay?.globalRect(popup.node);
-    if (bounds) bounds.height = popup.height;
+    const bounds = overlay?.globalRect(activePopup.node);
+    if (bounds) bounds.height = activePopup.height;
     const rect = bounds ? overlay?.toCss(bounds) : null;
     if (
       !rect ||
@@ -291,13 +420,14 @@ export function installCommandAutocomplete(api: API, game: Raw, isFormatting = (
       event.clientY > rect.y + rect.height
     )
       return;
-    popup.scroll(event.deltaY);
+    activePopup.scroll(event.deltaY);
     event.preventDefault();
     event.stopImmediatePropagation();
   };
   window.addEventListener('wheel', wheel, { capture: true, passive: false });
   api.on('frame', () => {
     if (!chat.isActive() || isFormatting()) {
+      emojiPopup?.update(null);
       if (model.active) {
         model.dismiss();
         popup.node.set_visible(false);
@@ -305,13 +435,17 @@ export function installCommandAutocomplete(api: API, game: Raw, isFormatting = (
       lastText = '';
       return;
     }
-    if (read(input, 'text', '') !== lastText) refresh();
+    const selection = rich
+      ? `${rich.editor.model.selectionAnchor}:${rich.editor.model.selectionActive}`
+      : '';
+    if (read(input, 'text', '') !== lastText || selection !== lastSelection) refresh();
     else place();
   });
   api.defer(() => {
     input.removeEventListener('change', refresh);
     window.removeEventListener('keydown', keydown, true);
     window.removeEventListener('wheel', wheel, true);
+    emojiPopup?.dispose();
     popup.dispose();
   });
 }

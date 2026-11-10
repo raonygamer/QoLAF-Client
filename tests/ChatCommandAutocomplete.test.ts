@@ -1,3 +1,4 @@
+import { ChatEmojiAutocompleteModel } from '../src/chat/ChatEmojiAutocompleteModel';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatCommandAutocompleteModel } from '../src/chat/ChatCommandAutocompleteModel';
@@ -59,6 +60,7 @@ class Node {
   visible = true;
   alpha = 1;
   text = '';
+  font = '';
   disposed = false;
   listeners = new Map<string, Function>();
   parent?: Node;
@@ -66,6 +68,7 @@ class Node {
     Object.assign(this, { width, height, text });
   }
   set_name(_value: string) {}
+  set_touchable(_value: boolean) {}
   set_x(value: number) {
     this.x = value;
   }
@@ -101,12 +104,20 @@ class Node {
     this.listeners.delete(key);
   }
 }
-function popupFixture() {
+function popupFixture(emoji = false) {
   let cleanupCount = 0;
   const ui = {
     sprite: () => new Node(),
     quad: (w: number, h: number) => new Node(w, h),
-    text: (w: number, h: number, value: string) => new Node(w, h, value),
+    text: (
+      w: number,
+      h: number,
+      value: string,
+      _size: number,
+      _color: number,
+      _align: string,
+      font: string,
+    ) => Object.assign(new Node(w, h, value), { font }),
     place(node: Node, x: number, y: number, parent?: Node) {
       node.x = x;
       node.y = y;
@@ -124,14 +135,23 @@ function popupFixture() {
       node.disposed = true;
     },
   };
-  const model = new ChatCommandAutocompleteModel(
-    Array.from({ length: 20 }, (_, index) => suggestion(`cmd${String(index).padStart(2, '0')}`)),
-  );
+  const model = emoji
+    ? new ChatEmojiAutocompleteModel()
+    : new ChatCommandAutocompleteModel(
+        Array.from({ length: 20 }, (_, index) =>
+          suggestion(`cmd${String(index).padStart(2, '0')}`),
+        ),
+      );
   const completions: string[] = [];
-  const popup = new ChatCommandAutocompletePopup(ui as any, model, (text) => {
-    completions.push(text);
-    popup.update(text);
-  });
+  const popup = new ChatCommandAutocompletePopup(
+    ui as any,
+    model,
+    (text) => {
+      completions.push(text);
+      popup.update(text);
+    },
+    emoji ? () => new Node(20, 20) : undefined,
+  );
   return { popup, model, completions, cleanupCount: () => cleanupCount };
 }
 
@@ -171,4 +191,28 @@ test('native popup scrolls rows, ellipsizes descriptions and disposes listeners'
   assert.equal(node.disposed, true);
   assert.equal(cleanupCount(), 8);
   assert.equal(node.children.at(-1)!.listeners.size, 0);
+});
+
+test('emoji popup uses source preview column and resets pooled rows on query changes', () => {
+  const { popup, model, completions } = popupFixture(true);
+  popup.update('grinning');
+  const node = popup.node as Node;
+  assert.equal(node.children[2].font, 'verdana16_bitmap');
+  assert.equal(node.children[3].font, 'verdana16_bitmap');
+  assert.equal(node.children[2].x, 50);
+  assert.equal(node.children[2].width, 340);
+  assert.equal(node.children[4].x, 10);
+  assert.equal(node.children[4].y, 12);
+  assert.equal(node.children[4].text, model.matches[0].completionText);
+  assert.equal(node.children[4].visible, true);
+  const second = model.matches[1].completionText;
+  popup.handleKey('ArrowDown');
+  popup.handleKey('Tab');
+  assert.deepEqual(completions, [second]);
+  popup.update('no_such_emoji');
+  assert.equal(node.visible, false);
+  popup.update('thumbsup');
+  assert.equal(node.children[2].text, ':thumbs_up:');
+  assert.equal(node.children[8].visible, false);
+  popup.dispose();
 });

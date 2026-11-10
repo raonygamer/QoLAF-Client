@@ -420,3 +420,33 @@ this unbound data/model addition. The shared suggestion popup still needs emoji
 preview rendering and integration with command precedence, caret tokens, closing
 colon selection, keyboard/mouse acceptance and command-argument help placement.
 Saved image alias live verification from the previous entry also remains open.
+
+
+Emoji autocomplete now uses the shared native popup with source 40px preview
+column, 20px bitmap emoji, canonical display text, descriptions and pooled rows.
+Composer integration tracks visible caret tokens, gives active command-name
+suggestions priority, stacks passive command argument help above emoji choices,
+and supports ArrowUp/Down, Tab, Escape and closing-colon acceptance. A closing
+colon preserves an already-selected match; otherwise it resolves exact canonical
+or compatibility aliases before ranked fallback. Selection replacement uses the
+rich editor and does not submit chat. Composition, hidden/inactive input and
+integration-off states are guarded. Rejected replacements do not recursively
+retry the unchanged closed token. History navigation dismisses both popups.
+
+Live SWF comparison for ':grinning' exposed an existing shared-popup font mismatch:
+device Verdana omitted/distorted underscores compared with source bitmap labels.
+Both command and description fields now use verdana16_bitmap (source registry
+choice at 12/10px). After rebuild/reload, popup geometry, preview placement, row
+ordering and bitmap labels visually match the same SWF query. Evidence:
+/tmp/QoLAF-OriginalEmojiSuggestions.png and /tmp/QoLAF-EmojiBitmapSuggestions.png.
+Live ArrowDown+Tab and ArrowDown+closing-colon inserted the second emoji and
+closed suggestions (EmojiTab.png, EmojiColon.png). '/echo :grinning' displayed
+passive help above the emoji panel (EmojiArgumentHelp.png). Both original and
+ported drafts were cleared without sending messages. No temporary files or
+runtime probes were installed.
+
+New regression verifies preview geometry, display/completion separation, bitmap
+font selection, pooled-row hiding and keyboard completion. Full suite: 254 pass;
+typecheck/build, formatting and diff checks pass. Remaining: saved-image alias
+live check, more mouse/wheel/occlusion cases, small-stage help stacking and the
+friend/player suggestion system. This is not a claim of full chat parity.

@@ -84,7 +84,12 @@ export function installGameSession(
   const formatting = editor
     ? installNativeChatFormatting(session, game, editor, bitmap.resolve, preferences, images)
     : undefined;
-  installCommandAutocomplete(session, game, () => formatting?.isOpen ?? false);
+  installCommandAutocomplete(
+    session,
+    game,
+    () => formatting?.isOpen ?? false,
+    editor ? { editor, resolve: bitmap.resolve, preferences } : undefined,
+  );
   const target = new TargetSystem(game, config, session.cls('core.ship.PlayerShip'));
   let indicator: TargetAimIndicator | undefined;
   if (targetIcon)
