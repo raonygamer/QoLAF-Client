@@ -1165,3 +1165,31 @@ aura rendering includes grayscale textures/layers, breathing/pulse alpha and
 AuraLightning/AuraOutlineLightning. Those paths are not yet implemented in the
 port's emitter adapter; SettingsGeneral already exposes related wording. This
 remains an explicit fidelity gap, not an implemented feature inferred from UI.
+
+## Emitter target lifetime guards (2026-11-10)
+
+Ported Emitter.hasStaleTarget for existing Haxe target types. EmitterTargets
+captures a reset generation immediately when EmitterFactory.create returns and
+invalidates it through GameObject.reset and Engine.reset (the engine override
+does not call its base). Following effects stop before moving, emitting or
+writing batches when their target has been recycled. Engine effects additionally
+require a living ship that still owns that engine. Enemy effects require a
+positive native getter ID and matching identity in the native enemiesById map.
+Independent effects with no followed target retain their native lifetime.
+Emitter disposal releases its attachment; a new factory effect captures the new
+life. Directly assigned different targets are captured on their first frame.
+
+Tests cover recycle-before-first-frame, new-effect recapture, emitter reuse,
+missing/detached/dead engine ships, native enemy ID/registry identity, and stopping
+before any particle update. Integration uses actual host Hooks and factory/reset/
+render ordering and verifies restoration on cleanup. All 321 tests pass; typecheck
+passes after correcting a test-only unknown narrowing. One reload/autologin
+succeeded; screenshot /tmp/QoLAF-EmitterLifecycleReady.png shows the live rendered
+game, and preview reports connected=true, runtimeErrors=0. Actual combat pool
+recycling has not yet been visually observed.
+
+The original also validates target generations inside delayed multiple-effect
+factory callbacks. This commit guards already-created effects; delayed factory
+callback capture remains to be ported. ProjectileThrustAnchor's custom validity
+path is also dependent on that source class being ported. Neither is claimed
+complete by these guards.

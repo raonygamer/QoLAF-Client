@@ -1,3 +1,4 @@
+import { EmitterTargets } from './EmitterTargets';
 import { read, type API, type Raw } from '../api/Types';
 
 /** Render-only mount lookup; never writes ship/engine course or simulation position. */
@@ -63,13 +64,20 @@ export class EmitterFrames {
     private Particle: any,
     private Emitter: Raw,
     private Color: Raw,
+    private targets = new EmitterTargets(),
   ) {}
 
   reset(emitter: Raw): void {
     this.emittedCount.delete(emitter);
+    this.targets.release(emitter);
   }
 
   update(emitter: Raw, milliseconds: number): void {
+    if (this.targets.stale(emitter)) {
+      emitter.killEmitter();
+      this.targets.release(emitter);
+      return;
+    }
     const delta = Number.isFinite(milliseconds) ? Math.max(0, Math.min(500, milliseconds)) : 0;
     const constant = read(emitter, 'constantEmitter');
     if (!emitter.isEmitting && !emitter.particles.length && constant) return;
@@ -244,7 +252,23 @@ export function installEmitterFrames(api: API): void {
   const Color = api.cls('generics.Color');
   const Collective = api.cls('core.particle.CollectiveMeshBatch');
   if (!Emitter || !Particle || !Color || !Collective) return;
-  const frames = new EmitterFrames(Particle, Emitter, Color);
+  const targets = new EmitterTargets(api.cls('core.engine.Engine'), api.cls('core.ship.EnemyShip'));
+  const frames = new EmitterFrames(Particle, Emitter, Color, targets);
+  // Unit.reset reaches GameObject.reset; Engine.reset does not call its base.
+  for (const name of ['core.GameObject', 'core.engine.Engine']) {
+    const prototype = api.cls(name)?.prototype;
+    if (typeof prototype?.reset === 'function') {
+      api.before(prototype, 'reset', function () {
+        targets.resetTarget(this);
+      });
+    }
+  }
+  const factory = api.cls('core.particle.EmitterFactory');
+  if (typeof factory?.create === 'function') {
+    api.after(factory, 'create', function (emitters: Raw[] | null) {
+      for (const emitter of emitters ?? []) targets.capture(emitter);
+    });
+  }
   api.around(Emitter.prototype, 'updateOnScreen', function () {
     updateEmitterVisibility(this);
   });
