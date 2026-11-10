@@ -273,3 +273,19 @@ missing labels, including typing then clearing the alias field. Evidence:
 /tmp/QoLAF-ImgNoTyping.png and /tmp/QoLAF-ImgTypedRepro.png. Issue remains open;
 no speculative renderer invalidation patch applied. Existing 241-test result
 still applies; no production code changed during this verification.
+
+
+ChatImageThumbnail source port added. Preserves 220x140 maximum preview bounds,
+no upscaling, 92x16 loading / 110x16 failure geometry, source bitmap status text,
+cache-hit geometry priming, stale-generation release, and frame playback driven
+by the native enterFrame event and source elapsed-time deadlines. Catch-up keeps
+the original N+1 transition bound. All presentation is complete before invoking
+size callbacks because a virtualized row may dispose/recycle itself there.
+
+Four tests cover aspect limits, cached reopening without re-invalidating layout,
+late load delivery after recycling/disposal, placeholders, exact GIF deadlines,
+bounded catch-up, stopped listeners and reentrant size callbacks. 245 tests,
+typecheck/build and changed-file formatting pass. The thumbnail is not yet bound
+to chat message rows; this does not claim live playback or image-viewer parity.
+Next: share cache between composer and received-message views, port source row
+layout/image placement and viewer interaction, then verify actual chat rendering.
