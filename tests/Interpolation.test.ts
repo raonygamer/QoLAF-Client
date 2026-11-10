@@ -131,11 +131,18 @@ test('camera follows the cached game listener using the render delta and disable
   }
   try {
     installInterpolation(api);
+    const framePositions: number[] = [];
+    // Emitters install after interpolation, but must run before camera movement.
+    api.before(instance.parallaxManager, 'update', () => {
+      framePositions.push(tracked._focusTracker.x);
+    });
     cachedListener({ get_passedTime: () => 0.0165 });
+    assert.equal(framePositions[0], 0);
     assert.ok(tracked._focusTracker.x > 0, 'already-bound frame callback still follows the ship');
     const first = tracked._focusTracker.x;
     tracked.focusTarget.x = 300;
     cachedListener({ get_passedTime: () => 0.0165 });
+    assert.equal(framePositions[1], first);
     assert.ok(tracked._focusTracker.x > first);
     tracked.shake();
     assert.equal(tracked.isShaking, false);

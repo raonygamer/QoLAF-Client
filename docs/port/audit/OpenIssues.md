@@ -2076,3 +2076,28 @@ combat input was issued. Latest changes are built locally for the next compariso
 Room-exit cleanup now has two additional native-hook regressions (one per state).
 Final full suite: 485 passing. Typecheck passes. Live visual comparison remains
 outstanding for these changes.
+
+### Camera bounds and large-body visibility — 2026-11-10
+
+Found another concrete missing source correction relevant to the sun: native
+StarlingCameraFocus.isCircleOnScreen tests whether any bounding-box corner is
+inside the view. An effect enclosing the viewport has no corner inside and is
+incorrectly rejected. `CameraView` ports the original overlap predicate. The
+regression demonstrates native rejection and source acceptance of that case.
+
+Ported source updateViewRectangle using all four corners through the actual
+stage-container globalToLocal transform, rather than requested destination zoom.
+World culling radius includes portrait height; persistent size revisions survive
+multiple render frames between simulation ticks. `BodyVisibility` ports the
+original visual/zone extent, center, distance scheduling and zoom/resize cache
+invalidation. Hidden/boss anchors and body course updates remain native.
+
+Also restored original emitter→camera→parallax frame ordering. Camera movement
+now uses the hook around phase after emitter before-hooks, regardless of module
+installation order. Cached native enter-frame listeners still reach this path.
+
+Five new culling regressions pass; full suite was 490 passing before the frame
+ordering change, whose cached-listener regression was then extended and passed.
+Typecheck/build and diff whitespace checks pass. These corrections are built in
+the local preview. No live sun-appearance claim: browser connector inventory is
+empty, and active desktop focus changes previously interrupted comparison.
