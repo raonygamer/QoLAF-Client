@@ -1937,3 +1937,8 @@ Explicit per-weapon colors have local rendering and per-account persistence.
 See LiveComparison.md for evidence and screenshot. All 450 tests pass.
 Remaining: equipped combat and charge-up transitions, remote IPC sharing, and the rest of the visual command family.
 Radio remains a disconnected view. No claim of complete screen or feature parity.
+
+Follow-up audit caught a shader-batch transition when grayscale is turned off:
+release the isolated emitter batch before restoring ordinary particle styles.
+Regression covers both batch membership and newly emitted particles. All 451
+tests and typecheck pass after the correction.

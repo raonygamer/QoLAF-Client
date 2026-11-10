@@ -1,3 +1,4 @@
+import { installBeamEmitterTint } from '../src/visuals/BeamEmitterTint';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installNativePhaseBlade, type HullPalette } from '../src/visuals/NativePhaseBlade';
@@ -290,6 +291,8 @@ function fixture() {
     () => palette,
   );
   return {
+    api,
+    resolve: (name: string) => defs[name],
     game,
     Emitter,
     Collective,
@@ -445,4 +448,26 @@ test('grayscale emitter batches stay isolated from ordinary effects and disposal
   f.cleanup();
   assert.equal(isolated.disposed, true);
   assert.equal(f.Collective.meshBatches.length, 0);
+});
+
+test('turning weapon grayscale off returns emitters to their compatible original batch', () => {
+  const f = fixture();
+  const tint = installBeamEmitterTint(f.api, f.resolve);
+  const emitter = new f.Emitter();
+  const originalBatch = emitter.collectiveMeshBatch;
+  const particle = emitter.add();
+  const originalStyle = particle.get_style();
+  const owner = {};
+  tint.updateFixed(owner, [emitter], 0xff0000, true);
+  const grayscaleBatch = emitter.collectiveMeshBatch!;
+  assert.notEqual(grayscaleBatch, originalBatch);
+  tint.updateFixed(owner, [emitter], 0x00ff00, false);
+  assert.equal(emitter.collectiveMeshBatch, originalBatch);
+  assert.equal(grayscaleBatch.emitters.length, 0);
+  assert.equal(particle.get_style(), originalStyle);
+  assert.equal(emitter._startColor, 0x008000);
+  assert.equal(emitter.add().get_style().constructor, Style);
+  tint.release(owner);
+  assert.equal(emitter._startColor, 0x808080);
+  f.cleanup();
 });

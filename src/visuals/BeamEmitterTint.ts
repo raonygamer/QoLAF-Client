@@ -93,7 +93,7 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
   ) => {
     for (const emitter of emitters) {
       let state = owned.get(emitter);
-      if (state && state.owner !== owner) {
+      if (state && (state.owner !== owner || state.grayscale !== grayscale)) {
         releaseEmitter(emitter);
         state = undefined;
       }
