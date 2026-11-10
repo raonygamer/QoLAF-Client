@@ -1,3 +1,4 @@
+import { createSettingsAutomations } from './SettingsAutomations';
 import { createFontRegistries } from '../UI/FontRegistries';
 import { createButtonAdapter } from '../UI/ButtonAdapter';
 import { createSettingsBindings } from './SettingsBindings';
@@ -51,6 +52,8 @@ export function portedClasses(api: API) {
     }
     if (name === 'core.hud.components.SettingsKeybind')
       return (cache[name] = createSettingsKeybind(resolve));
+    if (name === 'core.states.gameStates.SettingsAutomations')
+      return (cache[name] = createSettingsAutomations(resolve));
     if (name === 'core.states.gameStates.SettingsChat')
       return (cache[name] = createSettingsChat(resolve));
     if (name === 'core.states.gameStates.SettingsBindings')

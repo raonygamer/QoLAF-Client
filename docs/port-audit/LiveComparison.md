@@ -421,3 +421,36 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   pending. The category stays hidden until its actual page is available.
 - Current Haxe gameplay stays authoritative, including shields and corrected
   corrosive calculations. Automation wiring does not replace game simulation.
+
+### Automation Settings page and browser import controls
+
+- Ported SettingsAutomations from the current original worktree: original viewport,
+  spacing, two-column list/details layout, metadata colors, start/stop states,
+  native removal confirmation, empty state and selection preservation. Registered
+  the real page and enabled its Settings category. Browser wording uses modules
+  and browser storage instead of SWFs and AIR's filesystem folder.
+- Adapted original AstroTheme automation rows onto native ItemList: 64px rows,
+  centered wrapped Russo 14px labels, original shop skins/colors and 10px padding.
+  Replaced rows dispose attached and inactive skins. URL entry uses the native
+  input with a sans-serif fallback; its underlying browser input remains a single
+  line (original Feathers text editor enabled word wrapping).
+- Added JS/MJS file selection with cancel/disposal cleanup. URL/file completion and
+  removal confirmation cannot operate on a disposed page. The original manager's
+  installed-module lifecycle remains authoritative; imports never auto-start.
+- Compared the empty page on the running original SWF and browser port. Relative
+  title, input, buttons, storage, section and empty-state positions agree. Captures:
+  /tmp/QoLAF-OriginalAutomationSettings.png and /tmp/QoLAF-AutomationSettings.png.
+  Populated original SWF visual comparison remains unverified; row styling was
+  checked against AstroTheme source instead.
+- Live native UI checks: Add File imported a passive module, Start/Stop updated
+  controls/status, reload restored the installed module stopped, Add URL rejected
+  its duplicate, Remove required confirmation and restored the empty state, then
+  Add URL successfully imported it after removal. Removed the probe again and
+  deleted its temporary preview endpoint. No gameplay actions or chat were sent.
+  Evidence: /tmp/QoLAF-AutomationRunning.png, AutomationStopped.png,
+  AutomationRestored.png, AutomationDuplicate.png, AutomationUrlImported.png and
+  AutomationCleaned.png (all with the same QoLAF- prefix).
+- TypeScript/build and all 119 tests pass. Added page selection/lifecycle/stale
+  callback tests and file picker selection, cancellation and abort cleanup tests.
+  Full automation control arbitration against native input, command help and
+  completion, and the remaining full-client port still need work.

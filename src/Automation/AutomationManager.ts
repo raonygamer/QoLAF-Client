@@ -45,8 +45,7 @@ export class AutomationModule {
 /** Original installed-module/control ownership semantics with browser I/O boundaries. */
 export class AutomationManager {
   static readonly CHANGED = 'automationManagerChanged';
-  // Enabled with the source Settings page once its browser controls are connected.
-  readonly settingsAvailable = false;
+  readonly settingsAvailable = true;
   static readonly MODULE_ALREADY_IMPORTED = 'Module already imported.';
   private readonly installed = new Map<string, AutomationModule>();
   private readonly listeners = new Set<() => void>();
