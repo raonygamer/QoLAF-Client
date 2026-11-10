@@ -1719,3 +1719,54 @@ reconnect/expiry/cleanup and message-pack dispatch; then ClientQolafChat receive
 channel tab/send integration, reward notices and artifact sharing controls. Keep
 new gameplay connection semantics intact and verify actual interop before claiming
 QoLAF chat or artifact sharing complete.
+
+
+## Dedicated IPC Service transport and native ABI (2026-11-10)
+
+Ported the original ClientIpcService into typed browser code, with its send queue
+and channel policy extracted into readable classes. Source behavior retained:
+invisible Service-1409_24 joins; validated 19-field handshake; 8-second join timeout;
+generation guards and exponential reconnect; stable authentication login ID versus
+per-socket session ID; schema-4 finite discovery; acknowledgments before peer-ready
+notification; retired-session rejection; 60-second presence and 150-second expiry;
+authenticated chat-envelope identity; whole-pack channel validation; chat restriction,
+missing-player notice correlation and duplicate-login handling; deferred SDK callback
+removal; and best-effort graceful leave.
+
+The queue retains Local 1000 ms / Private 200 ms pacing, separate waiting/active
+transmission deadlines, bounded storage, source factories, destination/session
+checks, radio and discovery/presence priorities, same-destination contiguous packing
+only when the pack stays one physical frame, and completion/error callback isolation.
+NativeIpcClient adapts the inspected Haxe wrappers. Haxe Message has no getObject;
+its SDK raw._internal_("get-objects") supplies an uncoerced copied field array.
+No game or scene timer is held by the service.
+
+Verification: typecheck and all 392 tests pass. Twenty-one added tests exercise
+transport/queue behavior and the actual extracted Haxe Multiplayer/Connection/Message
+wrapper code. Coverage includes delayed stale join callbacks, reconnect identity,
+wrong handshakes, ACK ordering, retired peers, envelope identity, rejecting entire
+mixed-channel packs, listener mutation, delayed handler removal, presence, bans,
+kicks, duplicate login, notice correlation, pacing, packing, priority, factories,
+queue limits and expiry. A test-fixture callback typing error was fixed before the
+final successful typecheck. No live sockets or user chat messages were used.
+
+Independent current-SDK compatibility check is now reproducible with:
+`npx tsx scripts/CheckIpcInterop.ts /path/to/PlayerIOClient.minified.js`.
+Downloaded the original endpoint's SDK to /tmp/QoLAF-PlayerIOClient.js; SHA-256:
+0ac4f691d1b81857d32481cf5ef4c900e2bb9848eb025d541e6a2357338dbfee.
+Its decoder accepted all 1,022 generated packets, including Unicode, bytes and
+numeric boundaries; 1,020 reserialized byte-for-byte. Two SDK encoder failures were
+observed and asserted separately: astral Unicode (URI malformed) and Number.MAX_SAFE_INTEGER
+(invalid byte). Our inner packet codec handles both; outer Service frames are ASCII,
+so these values never pass through the SDK string/numeric encoder directly. This
+is independent JavaScript-SDK runtime evidence, not an AIR interoperability result;
+the previous AIR-oracle limitation still stands.
+
+Not yet installed into Index/authentication or the live client. Remaining: reuse one
+NativeIpcClient per native authentication owner, attach service lifetime to auth/host
+cleanup, exclude the reserved IPC Service room from ordinary gameplay selection,
+port ClientQolafChat inbox/scene receiver and reward announcements, then wire the
+QoLAF channel and artifact sharing. The protocol version label accepts only numeric
+release triples and Public/Private; identify the port by its own numeric version,
+not the original AS3 source version. UI may keep the explicit development suffix.
+No claim of live connection, visible chat parity or completed sharing is made here.
