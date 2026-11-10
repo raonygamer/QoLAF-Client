@@ -1,3 +1,4 @@
+import { installNativeChatShortcuts } from './NativeChatShortcuts';
 import { read, type API, type Raw } from '../api/Types';
 import type { Resolve } from '../runtime/As3';
 import type { DeviceSettings } from '../settings/DeviceSettings';
@@ -37,6 +38,7 @@ export function installNativeChatFormatting(
   if (!sharedImages) api.defer(() => images.dispose());
   const prefetch = (link: ChatDiscordImageLink) => images.prefetch(link);
   const shortcuts = new ChatImageShortcutStore(api.storage, prefetch);
+  installNativeChatShortcuts(api, chat, editor, shortcuts, preferences);
   const ImagePicker = createChatImageShortcutPicker(resolve, prefetch);
   const imagePicker = new ImagePicker(shortcuts);
   chat.addChild(color);

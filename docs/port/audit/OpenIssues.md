@@ -381,3 +381,23 @@ Temporary GIF deleted and console closed. Original SWF visual comparison,
 external-host CORS, alias expansion and remaining chat interaction parity remain
 open. Advanced suffix text can be covered by the thumbnail; compare its source
 layout before deciding whether that needs adaptation.
+
+
+Saved image aliases now expand on the closing colon in the composer using the
+original ChatEmojiAutocompleteParser's visible-text token boundaries. The shared
+picker store resolves aliases case-insensitively; replacement goes through the
+rich editor's visible range operation, retaining styles and length restrictions.
+Only source embed channels participate (including privateSaved -> private), with
+integration/visibility/activity guards and a reentrancy guard. Browser selection
+changes also recheck the token after the input binding updates its selection.
+IME composition is explicitly excluded until compositionend commits the text.
+
+Two regression tests cover source URL/path/namespace boundaries, open and closed
+tokens, selection rejection, styled replacements, unknown aliases, channel policy,
+IME completion and listener cleanup using the actual editor model/input binding.
+Typecheck/build and all 251 tests pass. This alias interaction has not yet been
+verified live; the currently open browser still runs the previous build. The
+original emoji/friend autocomplete popups and their command-help positioning
+remain unported. Next verify saving/typing/removing a temporary alias live and
+continue those suggestion popups; do not interpret alias support as completion
+of the autocomplete system.

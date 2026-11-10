@@ -46,6 +46,10 @@ export class RichBitmapInputBinding {
     this.project();
   }
 
+  get isComposing(): boolean {
+    return this.composition.isActive;
+  }
+
   /** History, commands and channel changes replace source text, never the visible buffer. */
   setText(source: string): void {
     this.composition.discard();
