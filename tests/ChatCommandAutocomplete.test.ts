@@ -162,11 +162,12 @@ function popupFixture(emoji = false, previews = false) {
       parent?.addChild(node);
       return node;
     },
-    touch(node: Node, listener: Function) {
-      node.listeners.set('click', listener);
+    touch(node: Node, listener: Function, phase: string) {
+      const event = phase === 'began' ? 'press' : 'click';
+      node.listeners.set(event, listener);
       return () => {
         cleanupCount++;
-        node.listeners.delete('click');
+        node.listeners.delete(event);
       };
     },
     dispose(node: Node) {
@@ -233,7 +234,7 @@ test('native popup scrolls rows, ellipsizes descriptions and disposes listeners'
   assert.equal(node.children[5].text, '/cmd19 [value]');
   popup.dispose();
   assert.equal(node.disposed, true);
-  assert.equal(cleanupCount(), 8);
+  assert.equal(cleanupCount(), 16);
   assert.equal(node.children.at(-1)!.listeners.size, 0);
 });
 
@@ -344,4 +345,35 @@ test('friend preview paint filters are cached, replaced and disposed independent
   popup.update('/cmd');
   popup.dispose();
   assert.equal(filters[2].disposed, true);
+});
+
+test('mouse press selects before release and cancelled scrollbar touches stop dragging', () => {
+  const { popup, model, completions } = popupFixture();
+  popup.layout(400, 100);
+  popup.update('/cmd');
+  const node = popup.node as Node;
+  node.children[4].listeners.get('press')!();
+  assert.equal(model.selectedIndex, 1);
+  assert.equal(completions.length, 0);
+  assert.equal(node.children[4].alpha, 0.88);
+  node.children[4].listeners.get('click')!();
+  assert.deepEqual(completions, ['/cmd01 ']);
+  popup.update('/cmd');
+  const hit = node.children.at(-1)!;
+  let stopped = 0;
+  const touch = (phase: string, y: number, cancelled = false) =>
+    hit.listeners.get('touch')!({
+      stopImmediatePropagation() {
+        stopped++;
+      },
+      getTouch: () => ({ phase, cancelled, getLocation: () => ({ y }) }),
+    });
+  touch('began', 6);
+  touch('stationary', 55, true);
+  const last = node.children[2].text;
+  assert.notEqual(last, '/cmd00 [value]');
+  touch('moved', 6);
+  assert.equal(node.children[2].text, last, 'cancelled touch has released the drag');
+  assert.equal(stopped, 3);
+  popup.dispose();
 });

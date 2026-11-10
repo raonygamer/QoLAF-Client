@@ -504,3 +504,31 @@ exclusion. Paint regression verifies filter reuse/replacement/disposal. Full
 build/suite passed 262 tests before the final paint-only regression was added;
 all 8 popup tests and typecheck passed afterward. Live SWF comparison remains
 required for this newly wired feature; no reload or game input in this change.
+
+Live friend autocomplete comparison completed for the two logged-in accounts.
+One F5 down/up pair loaded the latest local bundle; autologin reached the safe
+station and diagnostics reported connected with zero runtime errors. Typing @
+showed the reciprocal online friend, ship thumbnail, level and persistent account
+ID. Native Tab inserted the name and trailing space and dismissed suggestions.
+The SWF's @ entry showed matching popup position relative to its composer,
+508x44 single-row panel, 40px visual column, bitmap labels and metadata layout.
+Accounts/ships differ, so this is not a same-texture color equivalence test.
+Evidence: /tmp/QoLAF-FriendSuggestions.png, /tmp/QoLAF-FriendTab.png,
+/tmp/QoLAF-OriginalFriendSuggestions.png. Both unsent drafts were cleared;
+/tmp/QoLAF-FriendCleanup.png confirms the local composer is empty. No messages sent.
+
+Source input audit found two remaining shared-popup differences, now fixed:
+mouse-down selects/highlights a row before mouse-up acceptance; scrollbar touches
+stop propagation, update during stationary phases and release drag state when
+cancelled. Regression exercises press without acceptance and cancellation after
+a stationary drag. Typecheck, build, full suite (264 tests), formatting and diff
+checks pass. These final touch changes were tested in fixtures, not another live
+reload. Remaining: multiple friend rows/live mouse-scroll cases, same-ship paint
+comparison, IPC/saved-visual roster providers and the previously recorded chat
+and broader port gaps.
+
+During the Tab screenshot several target-bar text labels temporarily disappeared
+while bars stayed visible; subsequent cleanup screenshot showed them restored.
+This may relate to the earlier intermittent label redraw issue; cause remains
+unproven. Preserve this observation for renderer/cache investigation rather than
+claiming the full scene matches based on the popup alone.

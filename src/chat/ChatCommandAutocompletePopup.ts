@@ -91,6 +91,14 @@ export class ChatCommandAutocompletePopup {
         ui.touch(
           background,
           () => {
+            this.model.selectIndex(this.offset + index);
+            this.redraw();
+          },
+          'began',
+        ),
+        ui.touch(
+          background,
+          () => {
             if (this.model.argumentMode) return;
             this.model.selectIndex(this.offset + index);
             this.accept();
@@ -115,7 +123,8 @@ export class ChatCommandAutocompletePopup {
     this.node.addChild(this.scrollHit);
     const onScrollTouch = (event: Raw) => {
       const touch = event.getTouch(this.scrollHit);
-      if (!touch) return;
+      if (!touch || !read(this.scrollHit, 'visible')) return;
+      event.stopImmediatePropagation?.();
       const point = touch.getLocation(this.node);
       const phase = read(touch, 'phase');
       if (phase === 'began') {
@@ -123,7 +132,10 @@ export class ChatCommandAutocompletePopup {
           height = read(this.thumb, 'height');
         this.dragOffset = point.y >= top && point.y <= top + height ? point.y - top : height / 2;
       }
-      if (this.dragOffset !== null && (phase === 'began' || phase === 'moved')) {
+      if (
+        this.dragOffset !== null &&
+        (phase === 'began' || phase === 'moved' || phase === 'stationary')
+      ) {
         const travel = read(this.track, 'height') - read(this.thumb, 'height');
         const maximum = Math.max(0, this.model.matches.length - this.capacity);
         this.offset =
@@ -137,7 +149,7 @@ export class ChatCommandAutocompletePopup {
             : 0;
         this.redraw(false);
       }
-      if (phase === 'ended') this.dragOffset = null;
+      if (phase === 'ended' || read(touch, 'cancelled', false)) this.dragOffset = null;
     };
     this.scrollHit.addEventListener('touch', onScrollTouch);
     this.cleanups.push(() => this.scrollHit.removeEventListener('touch', onScrollTouch));
