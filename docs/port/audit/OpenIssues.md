@@ -174,3 +174,25 @@ The picker is not installed in NativeChatFormatting yet: cache/decoder/view
 integration and live comparison remain required. No fake cache or no-op loader
 has been attached to the game. Next: port ChatImageAsset/ChatImageCache and the
 browser decoding/upload boundary, then wire composer controls and image views.
+
+
+Image asset/cache port completed as typed modules. Preserves GPU plus retained
+CPU byte accounting, minimum/default frame delays, shared pending loads,
+original-first normalized cache keys, prefetch references, synchronous hits,
+24-entry/96 MiB LRU thresholds, live-reference protection and callback isolation.
+The cache is instance-owned with injected loader/clock so the eventual game
+adapter can share one cache across views without emulating Flash globals.
+
+Five tests exercise reentrant prefetch release during delivery, oversized
+textures, reference reservation, consumer exceptions, retry after failure,
+last-use eviction, normalized signed keys and exact resource disposal. All 229
+tests, typecheck/build and changed-file formatting pass. This does not validate
+GPU upload or network decoding; integration remains unfinished.
+
+Inspected actual compiled openfl.display.BitmapData in the extracted game:
+fromBytes/fromBase64/fromFile return null, while fromCanvas constructs a bitmap
+from lime.graphics.Image.fromCanvas. Browser decoding must feed fromCanvas and
+then Starling Texture.fromBitmapData. A direct port of Flash Loader.loadBytes
+would not work. Preserve the source GIF animation threshold (60000 pixels),
+4096 dimension / 8000000 pixel bounds, 20 MiB encoded bound, 20-second per-candidate
+timeout, candidate fallbacks and retained restoration pixels in that adapter.
