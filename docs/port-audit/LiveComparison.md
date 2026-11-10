@@ -377,3 +377,25 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
 - The manager is not yet attached to the live game. Full command-registry adapter,
   game tick/render wiring, import callback ownership and SettingsAutomations UI
   remain next steps; the category stays absent until that integration works.
+
+### Structured automation commands
+
+- Ported af.ChatCommandRegistry dispatch, descriptor validation, namespaced and
+  bare-name resolution, oldest-surviving registration precedence, built-in bare
+  name reservations, help snapshots and owner/namespace cleanup. Uses the already
+  ported quoted/escaped argument parser and source error/usage wording.
+- Added defensive invocation argument/named/default/extra data and dispatch result
+  objects. AutomationStopError routes expected stops through manager STOP cleanup;
+  ordinary callback exceptions remain handler_error results as in the source.
+- Connected current-game/current-EventBus ownership checks to AutomationManager.
+  A known command outside its initialized module session is consumed before
+  exposing parse details or running callbacks. Stopped-module commands remain
+  available, but buses from a previous room cannot execute in the new room.
+- TypeScript/build and all 115 tests pass. Audited against original registry,
+  invocation/result/help definitions and original test categories; regression
+  coverage includes collisions/promotion, built-in reservations, structured args,
+  parse/arity/handler errors, defensive help data, namespace disposal, room handoff
+  and expected-stop control release.
+- Native chat routing, built-in command inventory registration, live automation
+  import/execution, game tick/render wiring and SettingsAutomations remain pending.
+  No command was sent through a live account during these tests.

@@ -56,6 +56,13 @@ export class AutomationRuntime {
     return false;
   }
 
+  ownsBus(bus: EventBus): boolean {
+    return this.bus === bus;
+  }
+  commandStop(error: unknown): void {
+    this.handleError(AutomationEvent.COMMAND, error);
+  }
+
   start(): boolean {
     if (!this.game() || this.running || !this.initialize()) return false;
     this.lastError = '';

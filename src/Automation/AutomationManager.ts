@@ -208,6 +208,23 @@ export class AutomationManager {
     this.changed();
     return true;
   }
+  canDispatchOwnedCommand(owner: EventBus, game: Raw): boolean {
+    const module = this.getModule(owner.scriptId);
+    return (
+      !this.disposed &&
+      game === this.game &&
+      !!game &&
+      !!module?.initialized &&
+      module.runtime.ownsBus(owner)
+    );
+  }
+  handleCommandStop(owner: EventBus, error: unknown): boolean {
+    const module = this.getModule(owner.scriptId);
+    if (this.disposed || !module || !module.runtime.ownsBus(owner)) return false;
+    module.runtime.commandStop(error);
+    this.changed();
+    return true;
+  }
   dispatchCommand(id: string, name: string, args: readonly string[] = []): boolean {
     if (this.disposed || !this.game) return false;
     const result = this.installed.get(id)?.runtime.command(name, args) ?? false;
