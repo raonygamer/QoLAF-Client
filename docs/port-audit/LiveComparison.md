@@ -734,3 +734,35 @@ canvas/bridge present, zero uncaught runtime errors. This does not prove absence
 of caught hook errors. Actual kill-to-respawn encounter transitions and narrow
 viewport wrapping remain unverified in the live game; automated tests cover their
 model/layout contracts. Full client parity is still incomplete.
+
+## Local chat commands — 2026-11-10
+
+Ported `/timers`, `/clearchat`, `/echo`, and the original custom-command help
+format. `/timers` uses the existing persisted per-account setting and original
+argument/error/status wording. `/clearchat` empties the shared received queue in
+place and clears both native projections, their timeouts, scroll position, and
+open player menu; sent-input history and settings remain intact. The current
+Haxe Advanced chat has immediate row insertion, unlike the source's batched
+renderer, so its delayed scroll callbacks cannot reinsert cleared messages.
+`/echo` retains the source purple local presentation while explicitly identifying
+the TypeScript port version rather than falsely claiming completed AS3 parity.
+Registered automation help uses the live ownership snapshot, qualified fallback
+names, source usage strings, and HTML escaping. These built-in names are reserved
+from automation bare-name dispatch; ordinary native commands still pass through.
+
+Verification: typecheck and 156 tests pass. Tests cover native fall-through,
+argument validation, missing settings, hook removal, queue identity, both views,
+repeated clearing, preserved sent history, registry ownership, and escaped help.
+Live browser reload/autologin succeeded. Entered only local commands through the
+actual chat input: `/timers` displayed six additional Fulzar entries, `/echo`
+rendered the purple port version, `/clearchat` removed received rows in Advanced
+and Simple, and `/timers` restored the original primary-only radar setting.
+Screenshots: `/tmp/QoLAF-SecondaryTimers.png`, `/tmp/QoLAF-Echo.png`,
+`/tmp/QoLAF-ChatCleared.png`, `/tmp/QoLAF-ChatSimpleCleared.png`, and
+`/tmp/QoLAF-TimersRestored.png`. Diagnostics remain connected with zero uncaught
+errors. Custom help rendering is covered by tests, not a live automation demo.
+
+The original rich composer, autocomplete popup, expanded chat rendering, and
+remaining commands still require porting. `/resync` needs a dedicated adaptation:
+the newer native clock lacks the source's parallel-resync API and lifecycle
+tracking. No substitute clock behavior was installed here.

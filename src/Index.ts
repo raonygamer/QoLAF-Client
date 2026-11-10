@@ -1,3 +1,4 @@
+import { installLocalClientCommands } from './Chat/LocalClientCommands';
 import { installBossSpawnTimerHooks } from './Boss/NativeBossSpawnTimers';
 import { installMapTextureKeys } from './Map/MapTextureKeys';
 import { installNetherBlobBeamHooks } from './Ship/NetherBlobBeamCountdown';
@@ -38,6 +39,7 @@ export default {
         }
       }));
     api.on('classesReady', () => {
+      installLocalClientCommands(api);
       installBossSpawnTimerHooks(api);
       installTorpedoCueHooks(api);
       installMapTextureKeys(api);
