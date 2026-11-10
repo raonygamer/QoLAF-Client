@@ -96,6 +96,7 @@ test('favorite menu toggles source outline, prunes recycle selection and drafts 
   assert.equal(saved['account:p']['artifact:a'], true, 'stale identity is ignored');
   popup.dispatchEventWith('artifactShareContextFavorite', false, artifact);
   assert.equal(marker.visible, false);
+  (view as any).artifactMenu = { close: () => actions.push(['close']) };
   popup.dispatchEventWith('artifactShareContextShare', false, artifact);
   await Promise.resolve();
   assert.deepEqual(actions.slice(-2), [['close'], ['draft', 'p', artifact]]);

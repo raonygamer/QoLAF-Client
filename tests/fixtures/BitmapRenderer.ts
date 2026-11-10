@@ -25,7 +25,11 @@ import { createChatRoleTags } from '../../src/ported/ChatRoleTags';
 
 /** GPU-free layout fixture, using the original atlas's actual glyph metrics. */
 export function bitmapRendererFixture(
-  atlas: 'russo16_bitmap' | 'verdana16_bitmap' | 'verdana48_bitmap' = 'russo16_bitmap',
+  atlas:
+    | 'russo16_bitmap'
+    | 'verdana16_bitmap'
+    | 'verdana24_bitmap'
+    | 'verdana48_bitmap' = 'russo16_bitmap',
 ) {
   const cleanup: (() => void)[] = [];
   aliasProperties({ defer: (fn: () => void) => cleanup.push(fn) } as any, Display);
@@ -168,7 +172,10 @@ export function bitmapRendererFixture(
       fontNameForSize: () => 'DAIDRR_16',
       register: () => font,
     },
-    'core.text.VerdanaBitmapFontRegistry': { fontNameForSize: () => 'verdana16_bitmap' },
+    'core.text.VerdanaBitmapFontRegistry': {
+      UI_24_FONT_NAME: 'verdana24_bitmap',
+      fontNameForSize: () => 'verdana16_bitmap',
+    },
   };
   definitions['core.scene.Game'] = { instance: null };
   const resolve = (name: string) => {

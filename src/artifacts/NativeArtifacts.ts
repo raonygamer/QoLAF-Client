@@ -58,6 +58,7 @@ export function installArtifactUI(api: API, createSorting: () => any) {
     for (const view of popups.keys()) dismiss(view);
   });
   api.around(overview, 'onSort', function (_next, order: string) {
+    dismiss(this);
     let compare = artifactOrder(this.p, order);
     if (!compare) {
       const Artifact = api.cls('core.artifact.Artifact');
@@ -69,7 +70,6 @@ export function installArtifactUI(api: API, createSorting: () => any) {
         return left > right ? -1 : left < right ? 1 : 0;
       };
     }
-    this.chooseSortingButton.set_enabled(true);
     this.p.artifacts.sort(compare);
     this.cargoContainer.removeChildren(0, -1, true);
     this.cargoBoxes.length = 0;

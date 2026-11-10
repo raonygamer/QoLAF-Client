@@ -1,3 +1,6 @@
+import { createBitmapClasses } from './ui/BitmapClasses';
+import { installArtifactMenu } from './artifacts/ArtifactMenu';
+import { installExpandedArtifactOverview } from './artifacts/ExpandedArtifactOverview';
 import { installArtifactPurify } from './artifacts/ArtifactPurify';
 import { installArtifactRecycleLayout } from './artifacts/ArtifactRecycleLayout';
 import { createArtifactSorting } from './artifacts/ArtifactSorting';
@@ -107,6 +110,8 @@ export default {
         history.record(text);
         return result;
       });
+      installArtifactMenu(api);
+      installExpandedArtifactOverview(api, createBitmapClasses(portedClasses(api).resolve).resolve);
       installArtifactUI(api, () => createArtifactSorting(portedClasses(api).resolve));
       const artifactFavorites = installNativeArtifactFavorites(api, portedClasses(api).resolve);
       installArtifactPurify(api, artifactFavorites);

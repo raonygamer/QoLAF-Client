@@ -247,6 +247,10 @@ export class Text extends Display {
   get_format() {
     return this.format;
   }
+  set_format(value: Format) {
+    this.format = value;
+    return value;
+  }
   get_textBounds() {
     return { width: Array.from(this.text).length * this.format.size * 0.5 };
   }
@@ -256,6 +260,7 @@ Text.prototype.__properties__ = {
   get_text: 'get_text',
   set_text: 'set_text',
   get_format: 'get_format',
+  set_format: 'set_format',
   get_textBounds: 'get_textBounds',
 };
 export class Quad extends Display {
@@ -500,6 +505,10 @@ export function registry() {
     sendMessage() {}
   }
   class Overview extends Display {
+    load() {}
+    loadComplate() {}
+    initActiveSlots() {}
+    reloadStats() {}
     drawComponents() {}
     onRecycleSelect() {}
     selectAllForRecycle() {}
@@ -572,6 +581,14 @@ export function registry() {
     'core.artifact.ArtifactCargoBox': Cargo,
     'core.artifact.ArtifactBox': Box,
     'core.artifact.ArtifactOverview': Overview,
+    'core.states.DisplayState': class {
+      enter() {}
+      exit() {}
+    },
+    'core.states.menuStates.ArtifactState2': class {
+      enter() {}
+      exit() {}
+    },
     'core.player.Player': { ARTIFACT_CAPACITY: [250, 400, 600, 800] },
     'generics.Localize': { t: (text: string) => text },
     'core.hud.components.TextBitmap': Text,

@@ -2345,3 +2345,31 @@ All 528 tests, TypeScript and formatting pass. No live Purify/recycle request wa
 performed. Desktop was in use, so no reload or UI input was issued this turn.
 Visual comparison remains pending. Expanded geometry in this adapter prepares
 for the still-missing expanded overview; it does not implement that whole screen.
+
+### Expanded artifact overview connected — 2026-11-10
+
+Ported the original in-space expanded overview into the native ArtifactState2
+lifecycle. The source preference defaults to expanded; landed menus stay classic
+without overwriting it. Layout toggles rebuild the overview, restore the classic
+menu frame/backdrop/stats correctly, and use native MenuHud.close on close/share.
+The native state owns a container rather than being a display object itself;
+views now retain their actual menu owner so artifact sharing reaches that menu.
+
+Implemented source full-stage/minimum dimensions, three-column geometry, active
+slot/setup placement, borders/background alpha, loading panel, wrapped inline
+sorting, stats/upgrades/recycle control placement, inventory summary and the
+original fitness/adequacy guide with the medium Verdana bitmap renderer. Existing
+Purify, favorite, cargo and recycle adapters receive the expanded geometry.
+Setup-row overflow updates the sorting row, cargo bounds and panel border.
+Inline sorting also dismisses the stat-type popup. Closing a view retires delayed
+loading callbacks; all draw-component adapters reject disposed views.
+
+Tests cover native DisplayState container ownership, stage-origin positioning,
+classic/expanded transitions, landed preference preservation, close/resize
+listener cleanup, FPS/backdrop restoration, source geometry, loading disposal,
+sorting order toggles, wrapped sorting rows, information text and native-close
+chat sharing. Full suite 531 passes; latest loading cleanup changes reran focused
+screen tests, TypeScript, formatting and build. The rich-text test uses original
+Verdana24 atlas metrics, but is not a browser/WebGL visual comparison. Live
+side-by-side screen verification, drag-scroller parity and remaining whole-client
+mismatches are still open. No live account actions or reloads this turn.

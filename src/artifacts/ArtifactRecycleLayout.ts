@@ -62,6 +62,7 @@ export function installArtifactRecycleLayout(api: API, resolve: Resolve): void {
   const overview = api.cls('core.artifact.ArtifactOverview')?.prototype;
   if (!overview) return;
   api.after(overview, 'drawComponents', function () {
+    if (this.artifactViewDisposed) return;
     layoutArtifactRecycle(this, resolve);
   });
 }

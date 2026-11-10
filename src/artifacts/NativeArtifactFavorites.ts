@@ -54,6 +54,7 @@ export function installNativeArtifactFavorites(api: API, resolve: Resolve): Arti
     });
   }
   api.after(Overview, 'drawComponents', function () {
+    if (this.artifactViewDisposed) return;
     if (views.has(this)) return;
     const view = this;
     const popup = new Popup();
@@ -77,10 +78,11 @@ export function installNativeArtifactFavorites(api: API, resolve: Resolve): Arti
     popup.addEventListener('artifactShareContextShare', (event: Raw) => {
       const artifact = read(event, 'data');
       const game = view.g;
-      const menu = read(view, 'parent')?.sm?.parent;
-      if (!artifact?.revealed || !menu?.closeMenu || !game.chatInput?.insertArtifactLink) return;
+      const menu = view.artifactMenu ?? read(view, 'parent')?.sm?.parent;
+      const closeMenu = menu?.closeMenu ?? menu?.close;
+      if (!artifact?.revealed || !closeMenu || !game.chatInput?.insertArtifactLink) return;
       api.cls('core.hud.components.ToolTip')?.disposeType('artifactBox');
-      menu.closeMenu();
+      closeMenu.call(menu);
       queueMicrotask(() => {
         if (!read(game, 'isLeaving') && game.me && game.chatInput)
           game.chatInput.insertArtifactLink(game.me.id, artifact);

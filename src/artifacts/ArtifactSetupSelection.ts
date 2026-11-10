@@ -44,6 +44,7 @@ export function installArtifactSetupSelection(
     });
     if (typeof overview.drawComponents === 'function')
       api.after(overview, 'drawComponents', function () {
+        if (this.artifactViewDisposed) return;
         // Haxe keeps this separator in a local variable; source gives it a field.
         const separator = this.getChildAt(0);
         if (read(separator, 'height') === 1 && read(separator, 'color') === 0xaaaaaa)

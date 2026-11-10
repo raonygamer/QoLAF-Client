@@ -137,6 +137,7 @@ export function installArtifactPurify(api: API, favorites: ArtifactFavorites): v
     views.delete(view);
   };
   api.after(Overview, 'drawComponents', function () {
+    if (this.artifactViewDisposed) return;
     remove(this);
     const view = this;
     const controller = new ArtifactPurify(

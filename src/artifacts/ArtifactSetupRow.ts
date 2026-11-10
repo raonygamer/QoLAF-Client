@@ -105,10 +105,21 @@ export class ArtifactSetupRow {
     this.root.frame.set_height(layout.height);
     this.track.set_width(this.width);
     this.track.set_visible(this.maximum > 0);
+    const previousHeight = view.artifactSetupRowHeight;
     view.artifactSetupRowY = rowY;
     view.artifactSetupRowHeight = layout.height;
     view.artifactSetupSeparator?.set_y(rowY + layout.height + 6);
-    if (!view.expandedView) {
+    if (view.expandedView && view.sortingBar) {
+      view.sortingBar.set_y(rowY + layout.height + 8);
+      view.cargoY = Math.max(
+        152,
+        Math.ceil(read(view.sortingBar, 'y') + read(view.sortingBar, 'height') + 10),
+      );
+      view.cargoHeight = view.actionY - view.cargoY - 18;
+      view.cargoContainer?.set_y(view.cargoY);
+      view.cargoContainer?.set_height(view.cargoHeight);
+      if (previousHeight !== layout.height) view.redrawExpandedChrome?.();
+    } else if (!view.expandedView) {
       view.cargoY = layout.cargoY;
       view.cargoHeight = layout.cargoHeight;
       view.cargoContainer?.set_y(layout.cargoY);
