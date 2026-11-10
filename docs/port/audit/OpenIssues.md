@@ -36,3 +36,19 @@ Advanced's native receive path. All 208 tests and type checking pass.
 This is lifecycle parity only. Simple still uses the native WrapText projection;
 original bitmap rich rows, image entries, role hover, clipping and panel geometry
 remain part of CHAT-01. This change has not yet been verified in the live browser.
+
+## Integrated chat geometry
+
+`ChatLayout` ports the source 680×500 stage-space fit and narrow-window rules.
+The native Simple projection now uses the source viewport mask and bottom
+clipping; Advanced's background, viewport and existing rows reflow to that fit.
+The integrated composer sits immediately below the panel, with the source
+background, tab inset/gap/height and 39px input row. Opening the composer opens
+Advanced temporarily and closing restores Simple unless Advanced was already
+open. The first browser check exposed the old preference hook overwriting this
+placement; both hooks now share the source fit, with an integration regression.
+
+Remaining CHAT-01 gaps include the original tab skin, bitmap message renderer,
+virtualized Advanced rows, rich links/images/context interactions, and emoji and
+image controls. Current toolbar reserves space only for implemented Color/Size
+controls. Geometry work does not establish complete chat parity.

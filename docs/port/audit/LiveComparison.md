@@ -1094,3 +1094,21 @@ presentation cadence.
 - Validation: TypeScript, formatting and all 206 tests pass. Live IME, clipboard
   menu, resize while open, right-click menu and remaining integrated controls
   require additional work/verification.
+
+### Integrated panel placement and ownership
+
+Ported source ChatLayout fit (680×500 at stage x20/y70), composer at y590,
+Simple clipping, Advanced viewport and row reflow, and temporary Advanced opening
+for the composer. First live check found the existing preference hook recentered
+the composer; corrected both paths and added a combined-hook regression.
+
+After reload, `/tmp/QoLAF-IntegratedLayoutFixed.png` shows the panel at viewport
+x20/y90 and the composer directly below at y590 (browser viewport origin x41/y85).
+`/tmp/QoLAF-IntegratedClosed.png` confirms empty-composer close restores Simple.
+`/tmp/QoLAF-AdvancedRetained.png` confirms manually opened Advanced remains after
+opening/closing the composer. Returned to Simple afterward. No player messages
+were sent. Reloads used separate F5 down/up calls with release in finally.
+
+All 210 tests, typecheck and formatting pass. This verifies panel placement and
+view ownership, not full chat appearance: original tab skin, rich message rows,
+virtualization, emoji/image controls and contextual interactions remain open.

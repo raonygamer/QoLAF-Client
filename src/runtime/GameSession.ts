@@ -1,5 +1,6 @@
 import { installNativeChatHistory } from '../chat/NativeChatHistory';
 import { installNativeSimpleChat } from '../chat/NativeSimpleChat';
+import { installNativeChatLayout } from '../chat/NativeChatLayout';
 import { installNativeRichChatInput } from '../chat/NativeRichChatInput';
 import { installNativeChatFormatting } from '../chat/NativeChatFormatting';
 import { portedClasses } from '../ported/Registry';
@@ -58,6 +59,7 @@ export function installGameSession(
   const editor = installNativeRichChatInput(session, game, bitmap.resolve);
   installNativeChatHistory(session, game);
   installNativeSimpleChat(session, game);
+  installNativeChatLayout(session, game, preferences);
   const formatting = editor
     ? installNativeChatFormatting(session, game, editor, bitmap.resolve, preferences)
     : undefined;

@@ -142,8 +142,10 @@ export function installNativeChatFormatting(
   popup.addEventListener(Popup.PASTE, paste);
   const layout = () => {
     if (disposed) return;
-    const width = read(chat.tabs, 'width', original.width);
-    const show = (preferences?.get('enableNewChatIntegrationSystem') ?? true) && width >= 280;
+    const integrated = preferences?.get('enableNewChatIntegrationSystem') ?? true;
+    const width =
+      read(chat.tabs, 'width', original.width) + (integrated && game.messageLog ? 8 : 0);
+    const show = integrated && width >= 280;
     color.set_visible(show);
     size.set_visible(show);
     color.enabled = size.enabled = chat.chatMode !== 'global';

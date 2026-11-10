@@ -1,5 +1,6 @@
 import { read, type API, type Raw } from '../api/Types';
 import type { DeviceSettings } from '../settings/DeviceSettings';
+import { ChatLayout } from './ChatLayout';
 
 /** Apply legacy composer preferences to the current game's native TextEntry. */
 export function installNativeChatPreferences(
@@ -33,6 +34,15 @@ export function installNativeChatPreferences(
   const layout = () => {
     const stage = read(game, 'stage');
     if (!stage) return;
+    if (preferences.get('enableNewChatIntegrationSystem') && game.messageLog) {
+      const view = ChatLayout.fit(read(stage, 'stageWidth'), read(stage, 'stageHeight'));
+      input.set_width(view.width);
+      chat.tabs.set_width(Math.max(1, view.width - 8));
+      chat.set_x(Math.max(0, Math.min(view.x, read(stage, 'stageWidth') - view.width - 10)));
+      chat.set_y(Math.max(0, Math.min(view.y + 20 + view.height, read(stage, 'stageHeight') - 81)));
+      cssFontSize();
+      return;
+    }
     const width = Math.max(1, Math.min(originalWidth, read(stage, 'stageWidth') - 20));
     input.set_width(width);
     chat.tabs.set_width(width);
@@ -70,7 +80,12 @@ export function installNativeChatPreferences(
   });
   api.defer(
     preferences.subscribe((key) => {
-      if (key === 'legacyChatFontSize' || key === 'dpiScale') apply();
+      if (
+        key === 'legacyChatFontSize' ||
+        key === 'dpiScale' ||
+        key === 'enableNewChatIntegrationSystem'
+      )
+        apply();
     }),
   );
   if (typeof input.updatePlacement === 'function') api.after(input, 'updatePlacement', cssFontSize);
