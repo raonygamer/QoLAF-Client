@@ -26,6 +26,11 @@ interface EmitterState {
   grayscale: boolean;
 }
 
+// Hull palettes and fixed weapon colors install separate render hooks. Transfer
+// ownership before saving restoration state, never nest one temporary style/batch
+// inside another. Weak keys do not retain disposed native emitters.
+const emitterOwners = new WeakMap<Raw, (emitter: Raw) => void>();
+
 export function installBeamEmitterTint(api: API, resolve: Resolve) {
   const owned = new Map<Raw, EmitterState>();
   let Style: any;
@@ -79,6 +84,12 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
       }
     }
     owned.delete(emitter);
+    if (emitterOwners.get(emitter) === releaseEmitter) emitterOwners.delete(emitter);
+  };
+  const claim = (emitter: Raw) => {
+    const previous = emitterOwners.get(emitter);
+    if (previous && previous !== releaseEmitter) previous(emitter);
+    emitterOwners.set(emitter, releaseEmitter);
   };
   const release = (weapon: Raw) => {
     for (const [emitter, state] of owned) if (state.owner === weapon) releaseEmitter(emitter);
@@ -92,6 +103,7 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
     hue?: number,
   ) => {
     for (const emitter of emitters) {
+      claim(emitter);
       let state = owned.get(emitter);
       if (state && (state.owner !== owner || state.grayscale !== grayscale)) {
         releaseEmitter(emitter);
@@ -109,6 +121,7 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
           previousBatch: grayscale ? isolateBatch(emitter) : null,
         };
         owned.set(emitter, state);
+        emitterOwners.set(emitter, releaseEmitter);
       }
       if (hue !== undefined) emitter.changeHue(hue);
       else {
@@ -145,6 +158,7 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
         transform.b * point.x + transform.d * point.y + transform.ty,
       );
       for (const emitter of emitters ?? []) {
+        claim(emitter);
         let state = owned.get(emitter);
         if (state && state.owner !== weapon) {
           releaseEmitter(emitter);
@@ -162,6 +176,7 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
             previousBatch: isolateBatch(emitter),
           };
           owned.set(emitter, state);
+          emitterOwners.set(emitter, releaseEmitter);
         }
         state.appliedStart = emitter._startColor = tintAtOriginalBrightness(
           color,

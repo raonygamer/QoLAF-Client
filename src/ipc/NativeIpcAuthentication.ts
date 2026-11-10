@@ -1,3 +1,5 @@
+import { ClientQolafChat } from '../chat/ClientQolafChat';
+import { ensureNativeQolafChat } from '../chat/NativeQolafChat';
 import { read, type API, type Raw } from '../api/Types';
 import { PORT_VERSION } from '../login/LoginIdentity';
 import { ClientIpcService, type IpcEnvironment } from './ClientIpcService';
@@ -25,14 +27,18 @@ export function installNativeIpcAuthentication(
   });
   const classes = api.raw?.classes;
   if (classes) {
-    const name = 'core.ipc.ClientIpcService';
-    const previous = Object.getOwnPropertyDescriptor(classes, name);
-    classes[name] = ClientIpcService;
-    api.defer(() => {
-      if (classes[name] !== ClientIpcService) return;
-      if (previous) Object.defineProperty(classes, name, previous);
-      else delete classes[name];
-    });
+    for (const [name, type] of [
+      ['core.ipc.ClientIpcService', ClientIpcService],
+      ['core.hud.components.chat.ClientQolafChat', ClientQolafChat],
+    ] as const) {
+      const previous = Object.getOwnPropertyDescriptor(classes, name);
+      classes[name] = type;
+      api.defer(() => {
+        if (classes[name] !== type) return;
+        if (previous) Object.defineProperty(classes, name, previous);
+        else delete classes[name];
+      });
+    }
   }
   const adapters = new WeakMap<Raw, NativeIpcClient>();
   let owner: Raw | null = null;
@@ -61,6 +67,7 @@ export function installNativeIpcAuthentication(
     }
     owner = client;
     ClientIpcService.ensure(adapter, version, serviceEnvironment);
+    ensureNativeQolafChat(api, client.connectUserId);
   };
   const shutdown = () => {
     owner = null;

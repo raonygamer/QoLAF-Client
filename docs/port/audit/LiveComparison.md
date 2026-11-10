@@ -1733,3 +1733,44 @@ priority on the Phase Blade. Native emitter colors retain the original beam hue
 rotation versus projectile RGB/brightness distinction. Full combat comparison,
 charge-up weapon transitions and remote IPC color sharing remain unverified or
 unfinished; do not label this complete `/sv` parity. The weapon and hull editors share one two-second session cooldown. This screen does not complete Radio or the remaining ship visuals.
+
+## QoLAF native channel and inbox — 2026-11-10
+
+The authentication owner now creates ClientQolafChat before the game receiver is
+ready. Game sessions attach/detach receivers without owning the transport. The
+source inbox retains at most 64 rows for five minutes, validates markup and
+identity, copies rows before delivery, and echoes sends only after IPC success.
+Reward notice validation/queue helpers are ported; automatic award/purchase event
+hooks remain pending. There is no startup purchase or reward broadcast.
+
+Added the original QoLAF tab to the native TabBar. `/qolaf` switches channels and
+`/qolaf message` uses IPC. Disconnected, muted and all-channel-silenced sends retain
+the draft. Received rows use the existing native MessageLog/rich renderer and
+friend-ping hooks, with original #82cfff channel color and account ownership.
+The original class namespace is exposed for plugin access and restored on unload.
+
+Local runtime verification: Service-1410_24 online with zero peers; native tab
+selection reported QoLAF and the original formatter controls remained present.
+A clearly labeled local fixture was delivered through the actual inbox callback:
+its colored body, channel tag, raw player metadata and account ownership reached
+the native log. Screenshot `/tmp/QoLAF-ChatChannel.png`. This fixture never went
+through the outbound transport. The fixture row and unsent draft were removed;
+no human chat messages were sent. Preview reported zero runtime errors.
+
+All 457 tests pass, including authentication lifecycle and new inbox/retry,
+expiry, validation, receiver replacement, send-success echo, reward receipt,
+native tab/draft and per-account queue checks. Live cross-client delivery and
+real warps/reconnections with pending messages still need verification. The
+broader chat port still lacks original trusted-relay/role-tag presentation and
+automatic reward/artifact-sharing hooks; native routing is not full chat parity.
+Music and visual-editor commands are now present in autocomplete, and /ship and
+/shipvisual accept the developer-editor alias as well as weapon-color commands.
+
+## Hull/fixed-color emitter transition — 2026-11-10
+
+Separate palette and weapon-color render hooks could capture each other's
+transient shader/batch as their restoration target. Added exclusive per-emitter
+ownership transfer, restoring the native state before the next hook acquires it.
+The regression exercises both transition directions, stale-owner cleanup, native
+particle style restoration and exactly one original-batch membership. This is a
+verified regression fix, not additional equipped-combat comparison evidence.

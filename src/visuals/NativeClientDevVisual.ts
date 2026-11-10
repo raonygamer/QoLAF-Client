@@ -171,7 +171,7 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
   chat.openDevVisualPopup = open;
   api.around(chat, 'sendMessage', (next, ...args) => {
     const text = read(chat.input, 'text', '').trim();
-    const match = /^\/sv\s+devvis(?:\s+(.*))?$/i.exec(text);
+    const match = /^\/(?:sv|shipvisual|ship)\s+devvis(?:\s+(.*))?$/i.exec(text);
     if (!match) return next(...args);
     if (!isClientDeveloper(game.me?.id))
       write('Developer ship visuals are available only to client developers.');

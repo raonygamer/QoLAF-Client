@@ -1942,3 +1942,14 @@ Follow-up audit caught a shader-batch transition when grayscale is turned off:
 release the isolated emitter batch before restoring ordinary particle styles.
 Regression covers both batch membership and newly emitted particles. All 451
 tests and typecheck pass after the correction.
+
+### QoLAF chat receiver and channel installed — 2026-11-10
+
+The original authentication-owned inbox and native QoLAF tab/send path are now
+installed. Local-only inbox rendering and unsent draft/tab selection were checked
+in-game; transport reported online with zero peers. All 457 tests pass. No peer
+message was sent, so live cross-client interoperability remains unproved.
+Remaining: trusted-relay/role tags, automatic reward/purchase event hooks, artifact
+sharing transport, real warp/reconnect delivery checks, and Radio integration.
+The visual emitter ownership transition between hull palettes and explicit weapon
+colors was also corrected with a two-direction regression.

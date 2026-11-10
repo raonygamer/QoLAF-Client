@@ -1,3 +1,4 @@
+import { installNativeQolafChat } from '../chat/NativeQolafChat';
 import { installNativeWeaponColorPopup } from '../visuals/NativeWeaponColorPopup';
 import { installNativeBeamGeometry } from '../weapon/NativeBeamGeometry';
 import { installNativeClientDevVisual } from '../visuals/NativeClientDevVisual';
@@ -117,6 +118,7 @@ export function installGameSession(
   const pingSound = new ChatPingSound(session, pingSoundUrl);
   session.defer(() => pingSound.dispose());
   installNativeFriendPings(session, game, () => pingSound.play());
+  installNativeQolafChat(session, game);
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences, artifacts);
   installNativeChatArtifactPolicy(session, game);

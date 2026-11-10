@@ -12,6 +12,7 @@ import { installNativeWeaponColors } from './NativeWeaponColors';
 export function installNativeWeaponColorPopup(api: API, game: Raw): void {
   const chat = game.chatInput;
   if (!chat || !game.me) return;
+  api.cls('af.ChatCommandRegistry')?.reserveBuiltInCommands(['sv', 'ship', 'shipvisual']);
   const resolve = portedClasses(api).resolve;
   const colors = new WeaponColors();
   const storageKey = 'weapon-colors:' + game.me.id;

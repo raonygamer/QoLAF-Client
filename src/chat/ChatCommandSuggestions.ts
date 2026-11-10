@@ -27,6 +27,13 @@ const definitions: readonly (readonly [string, string, string])[] = [
   ['r reply', ' <message>', 'Reply to the last private message'],
   ['l local', ' [message]', 'Switch or send to local chat'],
   ['global', ' [message]', 'Send to global chat'],
+  ['qolaf', ' [message]', 'Switch or send to QoLAF chat'],
+  ['music', '', 'Open the client music player'],
+  [
+    'sv ship shipvisual',
+    ' wc [reset] | reset weapon | devvis [mode]',
+    'Open weapon colors or developer hull colors',
+  ],
   ['c clan', ' [message]', 'Switch or send to clan chat'],
   ['modchat', ' [message]', 'Switch or send to moderator chat'],
   ['leave', '', 'Leave the current group'],

@@ -471,3 +471,44 @@ test('turning weapon grayscale off returns emitters to their compatible original
   assert.equal(emitter._startColor, 0x808080);
   f.cleanup();
 });
+
+test('fixed colors and hull palettes transfer emitter ownership without nesting temporary batches', () => {
+  const f = fixture();
+  const tint = installBeamEmitterTint(f.api, f.resolve);
+  const emitter = new f.Emitter();
+  const originalBatch = emitter.collectiveMeshBatch!;
+  const particle = emitter.add();
+  const originalStyle = particle.get_style();
+  f.weapon.startEffect = [emitter];
+  f.weapon.draw();
+  const hullBatch = emitter.collectiveMeshBatch!;
+  assert.notEqual(hullBatch, originalBatch);
+
+  // This is the actual hook order when disabling the hull palette: fixed RGB
+  // takes ownership before the nested hull hook sees its now-empty palette.
+  f.setPalette(null);
+  tint.updateFixed(f.weapon, [emitter], 0xff0000, true);
+  const fixedBatch = emitter.collectiveMeshBatch!;
+  f.weapon.draw();
+  assert.notEqual(fixedBatch, hullBatch);
+  assert.equal(emitter.collectiveMeshBatch, fixedBatch);
+  assert.equal(hullBatch.emitters.length, 0);
+  assert.equal(emitter._startColor, 0x800000);
+  tint.release(f.weapon);
+  assert.equal(emitter.collectiveMeshBatch, originalBatch);
+  assert.equal(particle.get_style(), originalStyle);
+  assert.equal(emitter._startColor, 0x808080);
+
+  tint.updateFixed(f.weapon, [emitter], 0x00ff00, true);
+  f.setPalette({ mode: 1, settings: ClientDevVisual.defaults() });
+  f.weapon.draw();
+  tint.release(f.weapon); // A stale owner's cleanup cannot undo the hull palette.
+  assert.equal(emitter.collectiveMeshBatch, hullBatch);
+  assert.equal(fixedBatch.emitters.length, 0);
+  f.setPalette(null);
+  f.weapon.draw();
+  assert.equal(emitter.collectiveMeshBatch, originalBatch);
+  assert.equal(particle.get_style(), originalStyle);
+  assert.equal(originalBatch.emitters.filter((value) => value === emitter).length, 1);
+  f.cleanup();
+});
