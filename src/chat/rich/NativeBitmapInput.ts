@@ -18,6 +18,7 @@ export function bindNativeBitmapInput(
   input: Raw,
   resolve: Resolve,
   active = () => true,
+  artifactResolver: Function | null = null,
 ): NativeBitmapInput {
   const element: HTMLInputElement = input.element;
   const cleanups: (() => void)[] = [];
@@ -43,6 +44,7 @@ export function bindNativeBitmapInput(
   const model = new RichBitmapEditorModel(
     initialFormat?.size ?? 13,
     initialFormat?.color ?? 0xffffff,
+    artifactResolver,
   );
   model.text = read(input, 'text', '');
   model.maxChars = input.maxChars;
@@ -50,7 +52,7 @@ export function bindNativeBitmapInput(
     // AstroTheme's bitmap chat format deliberately uses the 48px atlas: it
     // contains the synthetic full-color emoji glyphs that smaller text faces lack.
     new Format('verdana48_bitmap', model.defaultSize, model.defaultColor);
-  const view = new RichBitmapEditorView(resolve, model, makeFormat());
+  const view = new RichBitmapEditorView(resolve, model, makeFormat(), artifactResolver);
   view.node.set_name('QoLAF.RichComposer');
   input.addChild(view.node);
   const opacity = element.style.opacity;

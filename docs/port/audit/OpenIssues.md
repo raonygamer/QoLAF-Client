@@ -1625,3 +1625,32 @@ Evidence: /tmp/QoLAF-WordLive.png, /tmp/QoLAF-WordCleanup.png,
 
 Artifact share UI/channel selection and QoLAF transport remain separate unfinished
 work; this closes the editor operations needed to edit those references faithfully.
+
+## Composer artifact label resolver wiring (2026-11-10)
+
+Found an integration gap while tracing sharing: the message renderer received
+ChatArtifactLinkResolver, but NativeBitmapInput constructed both editor model and
+view without it. Thus model-only artifact tests passed while the actual composer
+displayed raw references and did not treat them as atomic labels.
+
+GameSession now passes the existing resolver into the native rich input. Its model,
+bitmap renderer and caret metrics use the same presentation function. Input
+changes request resolution; completion reparses labels while retaining source
+selection positions, explicitly invalidates the renderer's unchanged-wire-text
+cache, and projects the new visible selection to the DOM. Session cleanup removes
+both change and resolution listeners before disposing the editor.
+
+Typecheck and all 360 tests pass. The new integration regression uses the actual
+resolver with deferred PlayerObjects/Artifacts callbacks and the actual native
+input adapter: fallback label, colored resolved label, unchanged wire source,
+whole-token selection, increased rendered glyph geometry, and ignored late
+completion after disposal are all checked.
+
+After one reload/autologin, a real revealed Armorlock Protocol reference in an
+unsent draft changed from "A [Artifact] Z" to
+"A [Artifact: Armorlock Protocol] Z". The raw draft remained unchanged and source
+selection mapped to the complete visible label [2,32]. Its orange bitmap label
+and selection were visible in /tmp/QoLAF-ComposerArtifactLive.png. Cleanup restored
+the previous empty draft and closed the composer; no chat message was sent and no
+artifact data was modified. Sharing actions and automatic channel selection are
+still unfinished.

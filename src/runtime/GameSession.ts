@@ -101,7 +101,7 @@ export function installGameSession(
   session.defer(() => pingSound.dispose());
   installNativeFriendPings(session, game, () => pingSound.play());
   installNativeChatContext(session, game, bitmap.resolve);
-  const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences);
+  const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences, artifacts);
   installNativeChatArtifactPolicy(session, game);
   installNativeChatHistory(session, game);
   installNativeSimpleChat(

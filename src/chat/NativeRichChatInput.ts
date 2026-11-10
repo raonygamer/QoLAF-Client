@@ -3,6 +3,7 @@ import type { Resolve } from '../runtime/As3';
 import { bindNativeBitmapInput, type NativeBitmapInput } from './rich/NativeBitmapInput';
 import type { DeviceSettings } from '../settings/DeviceSettings';
 import { GlobalChatSanitizer } from './GlobalChatSanitizer';
+import type { ChatArtifactLinkResolver } from './ChatArtifactLinkResolver';
 
 /** Keep native chat identity and source channel restrictions around the shared bitmap input. */
 export function installNativeRichChatInput(
@@ -10,11 +11,31 @@ export function installNativeRichChatInput(
   game: Raw,
   resolve: Resolve,
   preferences?: DeviceSettings,
+  artifacts?: Pick<ChatArtifactLinkResolver, 'resolvePresentation' | 'resolveText' | 'onResolved'>,
 ): NativeBitmapInput | undefined {
   const chat = game.chatInput;
   const input = chat?.input;
   if (!input?.element) return;
-  const editor = bindNativeBitmapInput(api, input, resolve, () => chat.isActive());
+  const editor = bindNativeBitmapInput(
+    api,
+    input,
+    resolve,
+    () => chat.isActive(),
+    artifacts?.resolvePresentation,
+  );
+  if (artifacts) {
+    const resolveDraft = () => artifacts.resolveText(input.get_text());
+    input.addEventListener('change', resolveDraft);
+    api.defer(() => input.removeEventListener('change', resolveDraft));
+    api.defer(
+      artifacts.onResolved(() => {
+        editor.model.refreshArtifactLabels();
+        editor.view.refreshArtifactLabels();
+        editor.binding.project();
+      }),
+    );
+    resolveDraft();
+  }
   const syncPrompt = () => {
     const integrated = preferences?.get('enableNewChatIntegrationSystem') ?? true;
     const localize = api.cls?.('generics.Localize');

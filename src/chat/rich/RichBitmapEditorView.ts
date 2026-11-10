@@ -84,6 +84,14 @@ export class RichBitmapEditorView {
     this.refresh();
   }
 
+  refreshArtifactLabels(): void {
+    if (this.disposed) return;
+    // The wire text is unchanged when a lookup completes. Invalidate the
+    // renderer's cached token labels as well as recomputing caret metrics.
+    this.renderer.refreshArtifactTokenLabels();
+    this.refresh();
+  }
+
   refresh(): void {
     if (this.disposed) return;
     RichBitmapMarkupParser.parse(

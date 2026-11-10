@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import { installNativeRichChatInput } from '../src/chat/NativeRichChatInput';
 import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
 import { GlobalChatSanitizer } from '../src/chat/GlobalChatSanitizer';
+import { ChatArtifactLinkResolver } from '../src/chat/ChatArtifactLinkResolver';
 // @ts-expect-error actual host hook dispatcher
 import { Hooks } from './fixtures/HostCore.js';
 
@@ -42,7 +43,7 @@ class Element extends EventTarget {
   }
 }
 
-function fixture() {
+function fixture(artifacts?: Parameters<typeof installNativeRichChatInput>[4]) {
   const bitmap = bitmapRendererFixture('verdana48_bitmap');
   bitmap.resolve('starling.text.TextField').getBitmapFont = (name: string) =>
     name === 'verdana48_bitmap' ? bitmap.font : null;
@@ -115,11 +116,18 @@ function fixture() {
     },
     defer: (fn: () => void) => cleanups.push(fn),
   };
-  installNativeRichChatInput(Object.freeze(api) as any, { chatInput: chat }, bitmap.resolve);
+  const editor = installNativeRichChatInput(
+    Object.freeze(api) as any,
+    { chatInput: chat },
+    bitmap.resolve,
+    undefined,
+    artifacts,
+  )!;
   return {
     input,
     element,
     chat,
+    editor,
     cleanup() {
       cleanups.reverse().forEach((fn) => fn());
       bitmap.cleanup();
@@ -232,4 +240,70 @@ test('native click counts select bitmap words and lines without DOM selection ov
   element.disabled = true;
   element.emit('click', { button: 0, detail: 2, clientX: 10 });
   assert.deepEqual([element.selectionStart, element.selectionEnd], [0, 7]);
+});
+
+test('live composer resolves artifact labels without changing wire tokens or selected references', () => {
+  const pending: Array<{ table: string; id: string; complete: (record: any) => void }> = [];
+  const resolver = new ChatArtifactLinkResolver(
+    {
+      client: {
+        bigDB: {
+          load(table: string, id: string, complete: (record: any) => void) {
+            pending.push({ table, id, complete });
+          },
+        },
+      },
+    },
+    (record) => ({ ...record, stats: [{}], getColor: () => 0x123456 }),
+  );
+  const { input, element, editor, cleanup } = fixture(resolver);
+  const token = '$artifact:player-1:item$';
+  input.set_text(`A ${token} Z`);
+  assert.equal(element.value, 'A [Artifact] Z');
+  assert.deepEqual(
+    pending.map(({ table, id }) => [table, id]),
+    [['PlayerObjects', 'player-1']],
+  );
+  input.selectRange(2, 2 + token.length);
+  assert.equal(editor.model.selectedCopyText, token);
+  const renderer = input.children[0].children[1] as any;
+  const initialMeshes = renderer.characterBatch.meshes.length;
+  pending.shift()!.complete({ key: 'player-1', name: 'Pilot', level: 42 });
+  assert.equal(pending[0].table, 'Artifacts');
+  pending
+    .shift()!
+    .complete({
+      key: 'item',
+      id: 'item',
+      player: 'player-1',
+      revealed: true,
+      name: 'Long Purple Artifact',
+    });
+  assert.equal(element.value, 'A [Artifact: Long Purple Artifact] Z');
+  assert.equal(input.get_text(), `A ${token} Z`);
+  assert.equal(editor.model.selectedCopyText, token);
+  assert.equal(editor.model.selectedVisibleText, '[Artifact: Long Purple Artifact]');
+  assert.deepEqual([element.selectionStart, element.selectionEnd], [2, 34]);
+  assert.ok(renderer.characterBatch.meshes.length > initialMeshes);
+  assert.ok(renderer.characterBatch.meshes.some((mesh: any) => mesh.color === 0x123456));
+
+  input.set_text('$artifact:player-1:later$');
+  assert.equal(pending.length, 1);
+  cleanup();
+  assert.equal(renderer.disposed, true);
+  pending
+    .shift()!
+    .complete({
+      key: 'later',
+      id: 'later',
+      player: 'player-1',
+      revealed: true,
+      name: 'Late result',
+    });
+  assert.equal(
+    editor.model.visibleText,
+    '[Artifact]',
+    'disposed composer unsubscribes from lookup completion',
+  );
+  resolver.dispose();
 });
