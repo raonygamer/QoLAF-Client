@@ -304,3 +304,25 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   locks/cooldown/settings, pets/healing/foreign ownership, display-only geometry,
   sticking after an estimate, duplicate mine explosions and weapon history reset.
   Live combat auto-selection and original-SWF comparison remain pending.
+
+### Direct Settings comparison and Plugins styling
+
+- Opened the original SWF's General Settings and the port's General Settings on
+  the two monitors. Captures /tmp/QoLAF-OriginalSettingsNow.png and
+  /tmp/QoLAF-PortSettingsNow.png show matching 930x580 panel geometry, headings,
+  sidebar controls and General rows after accounting for viewport position.
+  Account preferences differ; they were not changed to manufacture a match.
+- The comparison exposed the host Plugins button still using the uppercase,
+  outlined login control in Settings. Fixed the host on port/native-manager
+  (30667b9) to use native normal Button controls: original 13px Verdana atlas,
+  130x32 sidebar size and unscaled text. Vanilla host falls back to font13;
+  login retains LoginButton. Dialog buttons also use the current context's style.
+- Reloaded the local preview with the updated host module, opened Settings and
+  Plugins, then closed both. /tmp/QoLAF-PluginsStyled.png and
+  /tmp/QoLAF-PluginsDialogStyled.png show the corrected controls. Native display
+  ownership and game hotkey restoration are tested. Host tests: 17 pass, 1 skip.
+  Upstream snapshot was preserved by copying only the changed host module into
+  the local preview, not running the snapshot-destroying host build.
+- Original Automations navigation is visibly present and remains absent from the
+  port pending its real runtime/page implementation. This comparison does not
+  establish complete Settings functionality or all-screen parity.
