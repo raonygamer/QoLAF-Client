@@ -1,3 +1,4 @@
+import { installMapLiveMiniatures } from '../Map/NativeMapLiveMiniatures';
 import { installMapNavigation } from '../Map/NativeMapNavigation';
 import { installBossSpawnMarkers } from '../Map/BossSpawnMarkerManager';
 import { installNetherBlobBeamCountdown } from '../Ship/NetherBlobBeamCountdown';
@@ -37,6 +38,7 @@ export function installGameSession(
   installNetherBlobBeamCountdown(session, game);
   installMapNavigation(session, game);
   installBossSpawnMarkers(session, game);
+  installMapLiveMiniatures(session, game);
   installNativeSettings(session, preferences);
   installHealthAndShield(session, game);
   installRespawn(session, game);

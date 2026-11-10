@@ -1,3 +1,4 @@
+import { installMapTextureKeys } from './Map/MapTextureKeys';
 import { installNetherBlobBeamHooks } from './Ship/NetherBlobBeamCountdown';
 import { installTorpedoCueHooks } from './Projectile/XhersixTorpedoCue';
 import { installNativeAutomations } from './Automation/NativeAutomations';
@@ -37,6 +38,7 @@ export default {
       }));
     api.on('classesReady', () => {
       installTorpedoCueHooks(api);
+      installMapTextureKeys(api);
       installNetherBlobBeamHooks(api);
       installInterpolation(api);
       installDisplayScale(api, deviceSettings);

@@ -646,3 +646,36 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
 - Original reference remains /tmp/QoLAF-OriginalSpawnMap.png. Dynamic miniboss
   icons, live boss synchronization and orbit/area appearance still differ;
   this is not full map or full-client parity.
+
+### Live map miniatures and cache-key source alignment
+
+- Ported MapLiveMiniature and its part renderer: live hull textures, frame changes,
+  pivot, tint, alpha, mirrored scales and rotation; multipart component offsets;
+  source 0.25 miniboss, 0.1 boss and 0.075 Advectorian scales. Reuses game textures
+  without taking ownership. The source one-filter FilterChain is represented by
+  Haxe's native GlowFilter (FilterChain is absent), with the same parameters,
+  resolution 2 and bilinear sampling. Visual filter equivalence is not yet proven
+  pixel-for-pixel across Flash/Haxe renderers.
+- Ported exact Nexar miniboss classification, including the three named Emperor
+  ships with miniBoss=false. Reconcile live boss activation/death and miniboss
+  id-map/list membership each frame. Sidecar reset counters invalidate pooled
+  identities; component death can retain new explosion frames while stale hull
+  frames hide. Current rendered clip coordinates are used when drawn; off-screen
+  units use native positions rather than stale clips.
+- Native skull layers are hidden only for managed maps and restored when released.
+  Added displays/filters are disposed separately; source gameplay objects and
+  textures remain untouched.
+- Added the original map-orbits:<body>:<scale> and map-elite:<body>:<scale> cache
+  key separation, scoped to those native drawing calls. Initial attribution of
+  yellow orbit lines to cache collision was incomplete: live recheck still shows
+  yellow rather than original blue. The separate color/rendering discrepancy is
+  unresolved, and the deferred bitmap-label investigation was not reopened.
+- TypeScript, formatting and all 144 tests pass. Checks cover exact classification,
+  live texture updates, render pose, tint/pivot/mirror, multipart offsets, explosion
+  visibility, pooled lifetimes, reconciliation, native layer restoration, texture
+  ownership and scoped cache keys across map scales.
+- Live Fulzar screenshots: /tmp/QoLAF-LiveMiniatures.png and
+  /tmp/QoLAF-MapTextureKeys.png. Boss/miniboss hull icons and multipart Executor
+  render; /tmp/QoLAF-MiniaturesReopened.png records close/reopen. Original reference
+  remains /tmp/QoLAF-OriginalSpawnMap.png. Real death/reuse timing and exact
+  cross-renderer glow parity remain unverified; full-client parity is incomplete.
