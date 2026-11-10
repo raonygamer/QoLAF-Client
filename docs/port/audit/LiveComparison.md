@@ -1168,3 +1168,13 @@ The comparison also shows the original chat tabs have a larger minimum width
 than the port's natural text widths. Audit the inherited Feathers minimum before
 claiming tab geometry parity. Prompt, image shortcuts and emoji autocomplete
 remain open.
+
+
+Chat tab measurement follow-up: traced the 100px source width to
+`starling.display.Image(null)` via `ImageSkin`, and Feathers
+`Button.autoSizeIfNeeded` retaining the skin width. The native adapter now uses
+max(100, label width + 24) for natural tab widths, while explicit equal-width
+layout can shrink below 100. Regression covers short/long labels, background
+width and narrow distributed tabs. Typecheck and build pass. This change has
+not yet been rechecked in the live browser; prompt and image shortcuts remain
+open.

@@ -103,7 +103,9 @@ export function installNativeChatTheme(
               1,
               (read(tabs, 'width') - Math.max(0, buttons.length - 1) * 3) / buttons.length,
             )
-          : button.labelWidth() + 24;
+          : // Source ImageSkin(null) inherits Image's 100px width, which
+            // Feathers Button.autoSizeIfNeeded includes in its natural size.
+            Math.max(100, button.labelWidth() + 24);
         button.set_width(width);
         button.set_x(x);
         x += width + 3;

@@ -97,8 +97,20 @@ test('source chat skins track selection, hover, press, focus and preference chan
   assert.equal(other.color, 0x191919);
   assert.equal(buttons[1].format.color, 0xbdbdbd);
   assert.equal(buttons[0].format.font, 'russo12_bitmap');
-  assert.equal(buttons[0].get_width(), 54);
-  assert.equal(buttons[1].get_x(), 57);
+  assert.equal(buttons[0].get_width(), 100);
+  assert.equal(buttons[1].get_x(), 103);
+  assert.equal(selected.get_width(), 100);
+  buttons[1].labelWidth = () => 120;
+  tabs.layoutTabs();
+  assert.equal(buttons[1].get_width(), 144);
+  // Explicitly distributed tabs may be narrower than the natural skin width.
+  tabs.equalTabs = true;
+  tabs.set_width(153);
+  tabs.layoutTabs();
+  assert.equal(buttons[0].get_width(), 75);
+  assert.equal(buttons[1].get_width(), 75);
+  assert.equal(buttons[1].get_x(), 78);
+  assert.equal(selected.get_width(), 75);
   buttons[1].hover = true;
   buttons[1].showSkin();
   assert.equal(other.color, 0x292929);
