@@ -23,8 +23,25 @@ export class ProgressBar {
   private lerped = 100;
   private colors: number[];
   obscured = false;
-  multibar = true;
-  dividend = 10000;
+  private multipleLayers = true;
+  private layerDividend = 10000;
+  get multibar(): boolean {
+    return this.multipleLayers;
+  }
+  set multibar(value: boolean) {
+    if (this.multipleLayers === value) return;
+    this.multipleLayers = value;
+    this.colors = [this.color];
+  }
+  get dividend(): number {
+    return this.layerDividend;
+  }
+  set dividend(value: number) {
+    const normalized = Number.isFinite(value) ? Math.max(1, value) : 10000;
+    if (this.layerDividend === normalized) return;
+    this.layerDividend = normalized;
+    this.colors = [this.color];
+  }
   constructor(
     private ui: NativeUI,
     private width = 300,
@@ -128,9 +145,10 @@ export class ProgressBar {
     }
     this.overlay.set_color(color);
     this.trail.set_color(color);
-    const ratio = (v: number) => Math.max(0, Math.min(1, (v - start) / capacity));
-    const w = this.width * ratio(this.value);
-    this.overlay.set_width(Math.max(0.01, w));
+    const ratio = (v: number) =>
+      this.multibar && layer === 0 ? 0 : Math.max(0, Math.min(1, (v - start) / capacity));
+    const w = Math.max(0.01, this.width * ratio(this.value));
+    this.overlay.set_width(w);
     this.trail.set_width(Math.max(0.01, this.width * ratio(this.lerped)));
     const delta = Math.abs(this.lerped - this.value);
     this.tip.set_visible(delta >= 0.5);

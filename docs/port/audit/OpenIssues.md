@@ -882,3 +882,20 @@ client bundle and reloaded the local preview once with separate F5 down/up calls
 autologin returned to the game and nearby HUD rows rendered
 (/tmp/QoLAF-NearbyReload.png). Actual combat pool-reuse visual comparison remains
 unverified; no game units were artificially removed or reassigned during live QA.
+
+
+## Target resource multibar parity (2026-11-10)
+
+Source CustomProgressBar.renderMultibar explicitly sets BOTH fill ratios to zero
+when the layer reaches zero. The port previously retained a colored interpolated
+trail at zero. Matched that branch while preserving ordinary-bar interpolation.
+Also ported the source multibarEnabled/dividend setter behavior: changed settings
+reset layer colors; identical assignments retain them; nonfinite dividend falls
+back to 10000 and finite values clamp to at least 1. Tip positioning now uses the
+actual minimum-width overlay, as in source updateLerpTip.
+
+Verified typecheck, full suite (289 pass), and regressions for zero layers versus
+ordinary trails, palette reset versus stable settings, and invalid dividends.
+The bundle was rebuilt by the test pre-step. These are behavior/geometry checks,
+not a live combat visual comparison; no additional browser reload was performed
+for this change. The intermittent text draw defect remains separate and open.
