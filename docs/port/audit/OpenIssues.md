@@ -645,3 +645,14 @@ post-disposal joins. Source pan threshold, cancellation and wheel zoom arithmeti
 were also checked against current code without finding another mismatch there.
 Typecheck/build/full suite: 269 pass; formatting/diff checks pass. Live concurrent
 map/join lifecycle remains unverified; no synthetic server join was sent.
+
+Remaining map-marker source audit: MapSpawner matches current native behavior.
+MapKilled's native implementation adds a killedSystem/current-system condition
+absent from the old client; preserve that newer correctness fix. Its animation
+and cleanup otherwise match. MapDeathLine.dispose had a concrete missing source
+step: removeFromParent before returning the line to the shared pool.
+MapDeathLineLifecycle now performs that detach before native disposal, including
+when the game's line pool is already absent. It does not dispose pooled geometry.
+Regression verifies detachment before a pool can reuse the object, no-pool teardown
+and native return preservation using host hooks. Typecheck/build/full suite:
+270 pass; formatting/diff checks pass. Live death-line map reopening remains open.

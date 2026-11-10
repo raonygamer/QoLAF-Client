@@ -1,3 +1,4 @@
+import { installMapDeathLineLifecycle } from './map/MapDeathLineLifecycle';
 import { installMapPlayerLifecycle } from './map/MapPlayerLifecycle';
 import { installDisplayTexturePixels } from './ui/DisplayTexturePixels';
 import { installCombatTextFrames } from './rendering/CombatTextFrames';
@@ -49,6 +50,7 @@ export default {
       installDisplayTexturePixels(api);
       installMapTextureKeys(api);
       installMapPlayerLifecycle(api);
+      installMapDeathLineLifecycle(api);
       installNetherBlobBeamHooks(api);
       installInterpolation(api);
       installEmitterFrames(api);
