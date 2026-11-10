@@ -7,7 +7,7 @@ export function artifactStatFamily(type: string | null): string {
 }
 
 /** Source overview adequacy: affinity with the currently equipped modifier mix. */
-export function artifactAdequacy(player: Raw): Map<Raw, number> {
+function adequacyWeights(player: Raw): Map<string, number> {
   const counts = new Map<string, number>();
   let highest = 0;
   for (const id of player.activeArtifacts ?? []) {
@@ -20,16 +20,26 @@ export function artifactAdequacy(player: Raw): Map<Raw, number> {
       highest = Math.max(highest, count);
     }
   }
-  const result = new Map<Raw, number>();
-  for (const artifact of player.artifacts) {
-    let matched = 0;
-    if (artifact.revealed && artifact.stats?.length && highest) {
-      for (const stat of artifact.stats)
-        matched += (counts.get(artifactStatFamily(stat.type)) ?? 0) / highest;
-      result.set(artifact, (100 * matched) / artifact.stats.length);
-    } else result.set(artifact, 0);
-  }
-  return result;
+  for (const [family, count] of counts) counts.set(family, count / highest);
+  return counts;
+}
+
+function scoreAdequacy(artifact: Raw, weights: Map<string, number>): number {
+  if (!artifact.revealed || !artifact.stats?.length || !weights.size) return 0;
+  let matched = 0;
+  for (const stat of artifact.stats) matched += weights.get(artifactStatFamily(stat.type)) ?? 0;
+  return (100 * matched) / artifact.stats.length;
+}
+
+export function artifactAdequacyValue(player: Raw, artifact: Raw): number {
+  return scoreAdequacy(artifact, adequacyWeights(player));
+}
+
+export function artifactAdequacy(player: Raw): Map<Raw, number> {
+  const weights = adequacyWeights(player);
+  return new Map(
+    player.artifacts.map((artifact: Raw) => [artifact, scoreAdequacy(artifact, weights)]),
+  );
 }
 
 /** Source comparators; unknown stat orders remain the native game's responsibility. */

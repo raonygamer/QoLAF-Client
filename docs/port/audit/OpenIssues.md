@@ -2254,3 +2254,19 @@ and the local /Client/qolaf-client.js URL in Plugins. The older window showed an
 outdated-client notice. Screen comparison remains incomplete; the user was also
 actively switching windows, so input routing was unreliable. No gameplay parity
 claim is based on these screenshots.
+
+### Artifact tooltip source formatting — 2026-11-10
+
+Replaced the appended decimal Fitness text with the original cargo/active tooltip
+construction. Cargo uses integer Fitness followed by Adequacy before upgrades;
+active slots show Adequacy without the cargo-only Fitness/restriction/max-upgrade
+lines. Names and labels use localization; restriction colors and native stat HTML
+remain intact. Crew upgrade end times are refreshed before formatting. Equipped
+tooltips refresh with reloadStats, including changed setup adequacy.
+
+Adequacy scoring now shares the same family-weight computation between sorting
+and single tooltips without scanning the whole cargo for every tooltip. Tests
+check exact output, localization, native stat flags, upgrade timing, cargo/active
+differences and changed setup scores. All 513 tests, TypeScript and formatting
+checks pass. Live hover comparison remains pending. Expanded overview layout and
+favorite protection are still separate unported requirements.

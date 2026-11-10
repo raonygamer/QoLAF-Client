@@ -1,7 +1,7 @@
 import type { API, Raw } from '../api/Types';
 import { read } from '../api/Types';
 import { artifactOrder } from './ArtifactOrder';
-import { artifactFitness } from './Fitness';
+import { artifactTooltip } from './ArtifactTooltip';
 export function installArtifactUI(api: API, createSorting: () => any) {
   let Sorting: any;
   const popups = new Map<Raw, Raw>();
@@ -13,12 +13,15 @@ export function installArtifactUI(api: API, createSorting: () => any) {
     if (typeof prototype?.[method] !== 'function') throw Error(`Missing ${name}.${method}`);
     api.after(prototype, method, function () {
       if (this.a?.revealed && this.toolTip)
-        this.toolTip.set_text(
-          this.toolTip.s + `<br>Fitness: ${artifactFitness(this.a).toFixed(2)}`,
-        );
+        this.toolTip.set_text(artifactTooltip(api, this, name.endsWith('.ArtifactCargoBox')));
     });
   }
   const overview = api.cls('core.artifact.ArtifactOverview')!.prototype;
+  if (typeof overview.reloadStats === 'function')
+    api.before(overview, 'reloadStats', function () {
+      for (const box of this.activeSlots ?? [])
+        if (box.a?.revealed && box.toolTip) box.toolTip.set_text(artifactTooltip(api, box, false));
+    });
   const dismiss = (view: Raw) => {
     const popup = popups.get(view);
     popups.delete(view);
