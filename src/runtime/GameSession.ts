@@ -11,6 +11,7 @@ import { createBrowserImagePlatform } from '../chat/BrowserImagePlatform';
 import { installNativeChatHistory } from '../chat/NativeChatHistory';
 import { installNativeChatArtifactPolicy } from '../chat/NativeChatArtifactPolicy';
 import { installNativeSimpleChat } from '../chat/NativeSimpleChat';
+import { installNativeAdvancedChat } from '../chat/NativeAdvancedChat';
 import { installNativeChatLayout } from '../chat/NativeChatLayout';
 import { installNativeChatMessages } from '../chat/NativeChatMessages';
 import { installNativeChatTheme } from '../chat/NativeChatTheme';
@@ -92,6 +93,7 @@ export function installGameSession(
     images,
     artifacts,
   );
+  installNativeAdvancedChat(session, game);
   if (messages) installNativeChatImageViewer(session, game, bitmap.resolve, images, messages);
   if (messages) installNativeChatRolePreview(session, game, bitmap.resolve, messages);
   if (messages)

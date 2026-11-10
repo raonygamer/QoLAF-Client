@@ -1654,3 +1654,28 @@ and selection were visible in /tmp/QoLAF-ComposerArtifactLive.png. Cleanup resto
 the previous empty draft and closed the composer; no chat message was sent and no
 artifact data was modified. Sharing actions and automatic channel selection are
 still unfinished.
+
+
+## Advanced chat receive batching and retention (2026-11-10)
+
+Compared original ChatAdvanced.updateText/flushPendingMessages with the native
+Haxe implementation. Ported the original 100 ms receive batch, bottom-follow
+capture before inserting rows (2 px tolerance), and 150 ms scroll debounce.
+Pending messages are rechecked against mute state and the current source queue.
+Clear, removal from stage, disposal and plugin cleanup cancel pending work.
+
+Native addText checked the row limit before insertion with a strict greater-than
+comparison. The adapter now enforces the exact configured limit and excludes the
+native player-options popup from the message count, disposing it when necessary.
+The existing rich-message addText hook still handles row rendering.
+
+Typecheck and all 364 tests pass. Four regressions exercise the actual host hook
+dispatcher and an extracted native addText method: burst timing, bottom following,
+reading history, exact retention, popup disposal, mute/block changes and lifecycle
+cancellation. Preview status reports canvas, bridge and connection present with
+zero runtime errors. No live messages were sent. Live receive/scroll behavior has
+not yet been visually verified for this change.
+
+Still open: the original virtualized list, initial bottom reveal/settling and
+full advanced-history UI parity. This change retains the native ScrollBox and its
+initial load path; it does not establish complete chat parity.

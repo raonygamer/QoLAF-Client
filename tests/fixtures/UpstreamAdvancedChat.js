@@ -1,0 +1,5 @@
+// Inspected Haxe ChatAdvanced.addText; dependencies supplied by the test.
+export function makeAddText(core_hud_components_ui_WrapText, core_hud_components_chat_MessageLog, core_hud_components_chat_PlayerChatOptions) {
+const Std = { string: String };
+return function(e){var t=this,i=e.text,s=null==i?null:Std.string(i);if(null!=s&&0!=s.length&&"/"!=s.charAt(0)){var n=new core_hud_components_ui_WrapText("chat");n.set_text(s),n.set_width(this.scroll.get_width()-10),this.scroll.get_numChildren()>core_hud_components_chat_MessageLog.extendedMaxLines&&this.scroll.removeChildAt(0,!0),this.scroll.addChild(n),e.playerKey&&e.playerKey!=this.g.get_me().id&&(n.set_useHandCursor(!0),n.set_touchable(!0),n.addEventListener("touch",(function(i){if(null!=i.getTouch(n,"ended")){null!=t.playerChatOptions&&t.scroll.removeChild(t.playerChatOptions,!0);var s=t.scroll.getChildIndex(n);t.playerChatOptions=new core_hud_components_chat_PlayerChatOptions(t.g,e),t.scroll.addChildAt(t.playerChatOptions,s+1)}})))}};
+}
