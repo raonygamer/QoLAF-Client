@@ -1252,3 +1252,36 @@ missing labels, including typing then clearing the alias field. Evidence:
 /tmp/QoLAF-ImgNoTyping.png and /tmp/QoLAF-ImgTypedRepro.png. Issue remains open;
 no speculative renderer invalidation patch applied. Existing 241-test result
 still applies; no production code changed during this verification.
+
+## Settings comparison, 2026-11-10
+
+Compared the running original SWF on the second display with the current browser
+port. Original client geometry is x=1920,y=28,width=1920,height=1022; its active
+window screenshots omit the 28px title bar. Browser game is x=41,y=85,width=1879,
+height=965. The centered settings panels therefore differ by approximately
+20px horizontally and 56px vertically in their screenshots; that translation is
+not a layout defect.
+
+Chat and Combat pages matched their visible source labels, controls, spacing and
+panel size after that translation. Evidence pairs:
+/tmp/QoLAF-OriginalChatSettings.png / /tmp/QoLAF-PortChatSettings.png;
+/tmp/QoLAF-OriginalCombatSettings.png / /tmp/QoLAF-PortCombatSettings.png.
+The port includes the requested Plugins navigation entry. These captures do not
+prove every setting's behavior, scrolling states, localization or DPI cases.
+
+Aim Assist revealed a real difference: the port still had the newer 6px blue
+scroll thumb; source AstroTheme.settingsScrollThumb uses 8px gray fill #505050,
+#707070 border, minimum 24px height and 12px minimum touch width. The settings-only
+ScrollContainer adapter now supplies that skin and sizing, retaining the native
+ScrollBox's wheel/page/drag event path. Source and pre-fix port:
+/tmp/QoLAF-OriginalAimSettings.png / /tmp/QoLAF-PortAimSettings.png.
+Regression uses the extracted native ScrollBox to check full-range thumb dragging,
+page clicks, minimum thumb height, non-scaling borders and hidden no-overflow bar.
+Typecheck and 310 tests pass. No gameplay or account settings were toggled.
+
+Live follow-up: /tmp/QoLAF-AimScrollFixed.png shows the gray 8px bordered thumb
+aligned with the original after the panel translation. Dragged it from screen
+y=380 to y=600 and verified the page scrolled to Stationary tracking controls
+(/tmp/QoLAF-AimScrollDragged.png), then dragged it back. Mouse release was sent in
+finally after each drag. This closes the observed settings scrollbar skin gap;
+it does not establish full Aim Assist behavior parity.

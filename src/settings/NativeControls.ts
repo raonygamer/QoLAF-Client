@@ -144,9 +144,43 @@ export function settingsControls(resolve: Resolve) {
       }
     }
   }
+  class ScrollContainer extends Scroll {
+    private thumbHit: any;
+
+    constructor(...args: any[]) {
+      super(...args);
+      this.thumb.removeFromParent(true);
+      this.thumb = new Frame(8, 24, 0x505050, 0x707070);
+      this.thumb.set_touchable(true);
+      this.thumbHit = new Quad(12, 24, 0);
+      this.thumbHit.set_alpha(0.01);
+      this.thumbHit.set_x(-2);
+      this.thumb.addChildAt(this.thumbHit, 0);
+      this.scrollBar.addChild(this.thumb);
+      this.updateScrollBar();
+    }
+
+    updateScrollBar() {
+      // Retain ScrollBox's hit testing, page clicks, wheel and drag calculations.
+      // The source settings theme supplies an 8px bordered thumb, minimum 24px.
+      super.updateScrollBar();
+      if (!this.thumbHit || !this.scrollBar.get_visible()) return;
+      const maximum = this.get_maxVerticalScrollPosition();
+      const height = Math.min(
+        this.viewHeight,
+        Math.max(24, (this.viewHeight * this.viewHeight) / (this.viewHeight + maximum)),
+      );
+      this.scrollBar.set_x(this.viewWidth - 8);
+      this.thumb.set_width(8);
+      this.thumb.set_height(height);
+      this.thumb.set_y(((this.viewHeight - height) * this.scrollY) / maximum);
+      this.thumbHit.set_height(height);
+      this.trackQuad.set_width(8);
+    }
+  }
   return {
     'feathers.controls.Check': Check,
     'feathers.controls.Slider': Slider,
-    'feathers.controls.ScrollContainer': Scroll,
+    'feathers.controls.ScrollContainer': ScrollContainer,
   };
 }
