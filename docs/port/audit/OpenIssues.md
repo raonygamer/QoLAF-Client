@@ -196,3 +196,21 @@ then Starling Texture.fromBitmapData. A direct port of Flash Loader.loadBytes
 would not work. Preserve the source GIF animation threshold (60000 pixels),
 4096 dimension / 8000000 pixel bounds, 20 MiB encoded bound, 20-second per-candidate
 timeout, candidate fallbacks and retained restoration pixels in that adapter.
+
+
+Incremental GIF decoder and synchronous facade ported from ChatGifDecodeTask /
+ChatGifDecoder. GifBytes adapts browser Uint8Array responses to the source's
+ByteArray read operations; compressed sub-blocks are assembled once. Restored
+AS3 zero-filled fixed vector sizes for LZW prefix/suffix/stack/output, corrected
+converter shift syntax, and preserved interlace passes, transparency, disposal
+2/3, frame delays, source dimension/frame-count/total-pixel limits. Incremental
+nextFrame still returns at most one composited bitmap per call.
+
+Independent Pillow-generated fixtures exercise interlaced local/global palette
+and LZW behavior plus four animated disposal/transparency frames. Every decoded
+RGBA frame matches the independent hash. The facade test checks ownership of
+successful frames and disposal of all partial resources on a late stream error.
+Fixtures can be regenerated with scripts/GenerateGifFixtures.py (Pillow 13.0.0).
+All 233 tests, typecheck/build pass. These are CPU pixel tests using a bitmap
+boundary fixture; actual Haxe bitmap upload, network timeout/fallback behavior,
+frame scheduling, composer wiring and live image comparison remain unverified.
