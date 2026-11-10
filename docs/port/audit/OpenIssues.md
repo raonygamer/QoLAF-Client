@@ -925,3 +925,33 @@ regression suite; the earlier live bundle verified the same successful hover pat
 This closes missing role-card wiring only. Advanced virtualization, artifact/ping
 hover cards and other chat gaps are not claimed complete. Intermittent text
 corruption remains visible elsewhere and is independent of this addition.
+
+
+## Verified artifact token resolution (2026-11-10)
+
+Ported ChatArtifactLinkData and ChatArtifactLinkResolver from the original client.
+The resolver loads PlayerObjects before Artifacts, verifies record keys, owner and
+revealed===true before constructing the current Haxe Artifact, and projects its
+localized plain-text name and display color. Preserved coalesced player/artifact
+waiters, 32 pending resolutions, 30-second negative caching, 256-player and
+512-artifact/negative bounds, registry eviction, local snapshot precedence,
+room/session reuse, account isolation and disposal/reentrant notification guards.
+Map keys handle prototype-like IDs without inherited Object properties. Cache
+identity also prevents old account callbacks becoming current after A→B→A.
+
+GameSession owns the resolver. Both received-message renderers now resolve token
+labels and refresh existing glyphs when verified data arrives, retaining the raw
+wire token in message history and preserving scroll position. This does NOT yet
+port the artifact stat hover card, artifact sharing controls or outgoing channel
+policy; those remain required follow-up work.
+
+Verification: typecheck, 298 tests passing. Resolver cases cover invalid ownership,
+hidden records, request coalescing/limits, negative expiry, account changes, cache
+bounds/eviction, local snapshot precedence and disposal. Renderer integration
+asserts fallback→verified label/tinted glyphs while the underlying raw text stays
+unchanged. One local reload/autologin succeeded. A temporary Simple label for the
+account's first revealed inventory artifact resolved live to
+[Artifact: Armorlock Protocol] (/tmp/QoLAF-ArtifactProjection.png). Only read-only
+BigDB requests were made; no chat message or database write was sent. The display
+probe restores its prior text after 20 seconds unless normal chat updates already
+replaced it. Intermittent unrelated bitmap drawing corruption remains open.

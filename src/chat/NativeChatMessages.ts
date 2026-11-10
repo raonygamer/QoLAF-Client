@@ -4,6 +4,7 @@ import { createChatImageThumbnail } from '../ported/ChatImageThumbnail';
 import { read, type API, type Raw } from '../api/Types';
 import type { Resolve } from '../runtime/As3';
 import type { DeviceSettings } from '../settings/DeviceSettings';
+import type { ChatArtifactLinkResolver } from './ChatArtifactLinkResolver';
 
 /** Project received messages with the original rich bitmap renderer. */
 export function installNativeChatMessages(
@@ -12,6 +13,7 @@ export function installNativeChatMessages(
   resolve: Resolve,
   preferences?: DeviceSettings,
   images?: ChatImageCache,
+  artifacts?: ChatArtifactLinkResolver,
 ):
   | {
       simpleRenderer: Raw;
@@ -95,6 +97,7 @@ export function installNativeChatMessages(
   const bind = (row: Raw) => {
     if (!row?.field || rows.has(row)) return;
     const renderer = new Renderer();
+    renderer.artifactTokenLabelResolver = artifacts?.resolvePresentation ?? null;
     renderer.textFormat = font();
     renderer.wordWrap = true;
     renderer.truncateToFit = false;
@@ -150,6 +153,16 @@ export function installNativeChatMessages(
   api.after(log.advanced, 'addText', bindAdvanced);
   bind(log.simple.tf);
   bindAdvanced();
+  if (artifacts)
+    api.defer(
+      artifacts.onResolved(() => {
+        for (const [row, entry] of rows) {
+          entry.renderer.refreshArtifactTokenLabels();
+          row.layoutText();
+        }
+        arrangePreservingPosition();
+      }),
+    );
   if (preferences)
     api.defer(
       preferences.subscribe((key) => {

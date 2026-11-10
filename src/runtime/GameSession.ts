@@ -37,6 +37,7 @@ import { TargetInfo } from '../ui/TargetInfo';
 import { installHealthAndShield } from '../hud/HealthAndShield';
 import { installNativeChatPreferences } from '../chat/NativeChatPreferences';
 import { installNativeChatRolePreview } from '../chat/NativeChatRolePreview';
+import { ChatArtifactLinkResolver } from '../chat/ChatArtifactLinkResolver';
 import { installClanLabels } from '../ui/ClanLabel';
 import { installDamageText } from '../hud/DamageText';
 import { installRespawn } from './Respawn';
@@ -70,7 +71,21 @@ export function installGameSession(
     () => new ChatRemoteImageLoader(createBrowserImagePlatform(bitmap.resolve)),
   );
   session.defer(() => images.dispose());
-  const messages = installNativeChatMessages(session, game, bitmap.resolve, preferences, images);
+  const Artifact = session.cls('core.artifact.Artifact') as any;
+  const artifacts = new ChatArtifactLinkResolver(
+    game,
+    (record) => new Artifact(record),
+    (text) => session.cls('generics.Localize')!.t(text),
+  );
+  session.defer(() => artifacts.dispose());
+  const messages = installNativeChatMessages(
+    session,
+    game,
+    bitmap.resolve,
+    preferences,
+    images,
+    artifacts,
+  );
   if (messages) installNativeChatImageViewer(session, game, bitmap.resolve, images, messages);
   if (messages) installNativeChatRolePreview(session, game, bitmap.resolve, messages);
   installNativeChatContext(session, game, bitmap.resolve);

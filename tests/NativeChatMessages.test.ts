@@ -158,3 +158,81 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
   assert.equal(renderer.disposed, true);
   assert.ok(simple.tf.nativeLayouts > 0);
 });
+
+test('verified artifact resolution reprojects existing chat tokens without replacing raw message text', async (t) => {
+  const { ChatArtifactLinkResolver } = await import('../src/chat/ChatArtifactLinkResolver');
+  const { ChatArtifactTokenRegistry } = await import('../src/chat/rich/ChatArtifactTokenRegistry');
+  const fixture = bitmapRendererFixture('verdana16_bitmap');
+  t.after(fixture.cleanup);
+  const cleanup: (() => void)[] = [];
+  const hooks = new Hooks();
+  class WrapText extends fixture.Sprite {
+    field = new Text(200, 20, '');
+    hasWidth = true;
+    viewWidth = 200;
+    maxWidth = 200;
+    constructor() {
+      super();
+      this.addChild(this.field);
+    }
+    layoutText() {}
+    get_text() {
+      return this.field.text;
+    }
+    set_text(text: string) {
+      this.field.text = text;
+      this.layoutText();
+    }
+  }
+  const row = new WrapText();
+  const scroll = Object.assign(new fixture.Sprite(), {
+    arrange() {},
+    scrollToPosition() {},
+    get_verticalScrollPosition: () => 0,
+    get_maxVerticalScrollPosition: () => 0,
+  });
+  const pending: ((record: any) => void)[] = [];
+  const game: any = {
+    client: {
+      bigDB: {
+        load: (_table: string, _key: string, ok: (record: any) => void) => pending.push(ok),
+      },
+    },
+    messageLog: { simple: { tf: row }, advanced: { scroll, addText() {} } },
+  };
+  const artifacts = new ChatArtifactLinkResolver(
+    game,
+    (record) => ({ ...record, getColor: () => 0x55ccff }),
+    (text) => text,
+    () => 1,
+    new ChatArtifactTokenRegistry(),
+  );
+  t.after(() => artifacts.dispose());
+  const api: any = {
+    cls: () => WrapText,
+    around: (object: any, key: string, fn: Function) =>
+      cleanup.push(hooks.add(object, key, 'around', fn)),
+    after: (object: any, key: string, fn: Function) =>
+      cleanup.push(hooks.add(object, key, 'after', fn)),
+    defer: (fn: () => void) => cleanup.push(fn),
+  };
+  installNativeChatMessages(api, game, fixture.resolve, undefined, undefined, artifacts);
+  t.after(() => cleanup.reverse().forEach((fn) => fn()));
+  const raw = '$artifact:pilot:artifact$';
+  row.set_text(raw);
+  const renderer: any = row.getChildAt(0);
+  assert.equal(renderer.markup.text, '[Artifact]');
+  assert.equal(pending.length, 1);
+  pending.shift()!({ key: 'pilot', name: 'Pilot', level: 100 });
+  pending.shift()!({
+    key: 'artifact',
+    player: 'pilot',
+    revealed: true,
+    name: 'Shield',
+    stats: [{}],
+  });
+  assert.equal(renderer.markup.text, '[Artifact: Shield]');
+  assert.equal(renderer.markup.atoms[0].displayColor, 0x55ccff);
+  assert.equal(renderer.characterBatch.meshes[0].color, 0x55ccff);
+  assert.equal(row.get_text(), raw, 'history retains the exact token');
+});
