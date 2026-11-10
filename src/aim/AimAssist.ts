@@ -41,6 +41,9 @@ export class AimAssist {
   turnThreshold = NaN;
   intentError = NaN;
   leadError = NaN;
+  evaluatedTarget = false;
+  directAngle = NaN;
+  leadAngle = NaN;
   mouseSpeed = NaN;
   mouseMoving = false;
   movingToward = false;
@@ -76,12 +79,18 @@ export class AimAssist {
     );
   }
 
-  update(input: AimAssistInput): void {
+  resetDiagnostics(): void {
+    this.evaluatedTarget = false;
+    this.directAngle = this.leadAngle = NaN;
     this.tracking = false;
     this.targetLocked = false;
     this.correction = this.turnError = this.turnThreshold = NaN;
     this.intentError = this.leadError = this.mouseSpeed = NaN;
     this.mouseMoving = this.movingToward = false;
+  }
+
+  update(input: AimAssistInput): void {
+    this.resetDiagnostics();
     const elapsed =
       this.lastUpdate === 0 ? 0 : Math.max(0.001, (input.now - this.lastUpdate) / 1000);
     this.lastUpdate = input.now;
@@ -93,8 +102,11 @@ export class AimAssist {
     if (input.mouseAim && input.mouseBlocked)
       return this.release('mouse aim is blocked by keyboard steering');
     if (!this.option('enabled')) return this.release('aim assist is disabled in QoLAF settings');
+    this.evaluatedTarget = true;
     if (!input.target) return this.release(input.rejectionReason);
 
+    this.directAngle = input.directAngle;
+    this.leadAngle = input.leadAngle;
     const intentError = aimAngleDifference(input.directAngle, this.mouseAngle);
     const previousError = aimAngleDifference(input.directAngle, previousAngle);
     const correctionError = aimAngleDifference(input.leadAngle, this.mouseAngle);

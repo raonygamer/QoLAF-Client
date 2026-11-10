@@ -614,7 +614,7 @@ export function createSettingsQoLAF(resolve: Resolve): any {
             this.game != null &&
             this.game.gameStateMachine != null
           ) {
-            var playState: PlayState = <PlayState>this.game.gameStateMachine.activeState;
+            var playState: PlayState = <PlayState>this.game.gameStateMachine.currentState;
             if (playState != null) {
               playState.applyAimAssistDebugVisibility();
             }

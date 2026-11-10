@@ -32,9 +32,16 @@ test('original Aim Assist page updates source settings and removes every owned l
     ) {}
   }
   const scene: any = {};
+  let debugUpdates = 0;
   const game: any = {
     me: { id: 'p1' },
-    gameStateMachine: { activeState: { applyAimAssistDebugVisibility() {} } },
+    gameStateMachine: {
+      currentState: {
+        applyAimAssistDebugVisibility() {
+          debugUpdates++;
+        },
+      },
+    },
   };
   const definitions: any = {
     'core.scene.Game': { instance: game },
@@ -67,6 +74,12 @@ test('original Aim Assist page updates source settings and removes every owned l
   toggle.control.isSelected = !scene.clientSettings.getAimAssistBoolean(toggle.key);
   toggle.control.dispatchEventWith('change');
   assert.equal(scene.clientSettings.getAimAssistBoolean(toggle.key), toggle.control.isSelected);
+  const debugToggle = toggles.find(
+    (binding: any) => binding.key === ClientSettings.AIM_ASSIST_DEBUG,
+  );
+  debugToggle.control.isSelected = true;
+  debugToggle.control.dispatchEventWith('change');
+  assert.equal(debugUpdates, 1, 'debug toggle addresses the native currentState');
   const slider = sliders[0];
   slider.control.value = ClientSettings.getAimAssistNumberMaximum(slider.key);
   slider.control.dispatchEventWith('change');

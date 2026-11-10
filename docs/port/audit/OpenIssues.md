@@ -743,3 +743,27 @@ input stabilization; do not mark full aiming parity complete.
 Live initialization after one reload: game/HUD render and remain connected with
 zero reported runtime errors (/tmp/QoLAF-AimAdapterLoaded.png). This is only the
 initialization check; no firing, target manipulation or account movement was used.
+
+Aim debug overlay now uses native OpenFL Sprite/Shape/TextField with the source
+460x218 panel at (8,72), typewriter 12 text, 14 diagnostic lines, and source ray
+colors/widths/lengths. One session-owned overlay is reused, duplicate named
+panels are removed, stale diagnostics reset, and disable/exit/session cleanup
+remove the display. Settings now address native currentState (the earlier fixture
+incorrectly supplied activeState) and call the installed visibility handler.
+The source static toggle method also writes through ClientSettings.
+
+The first live test exposed mouseEnabled/mouseChildren being plain OpenFL fields,
+not setters. Fixed those boundaries and tightened the fixture. Typecheck/build/
+full suite: 282 pass. Corrected live panel and input ray verified in
+/tmp/QoLAF-AimDebugCorrected.png; panel removal verified in
+/tmp/QoLAF-AimDebugOff.png. Debug and assist both false after cleanup; probe global
+removed, console closed, sale popup dismissed. No weapon fire or ship movement.
+This does not verify enabled-assist combat, original SWF side-by-side diagnostics,
+or the absent debug command registration.
+
+Rendering follow-up: during the overlay check the sale popup showed missing
+prefixes on several bitmap labels (including stat labels and description lines),
+persisting after debug was disabled. Compare AimDebugCorrected/AimDebugOff against
+the earlier DebugPaste screenshot. Cause not yet established; investigate native
+OpenFL/Starling rendering handoff and existing bitmap batching/cache issue rather
+than treating the overlay display check as full rendering parity.

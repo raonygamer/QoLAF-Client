@@ -1,3 +1,4 @@
+import { AimAssistDebugOverlay } from './AimAssistDebugOverlay';
 import { read, type API, type Raw } from '../api/Types';
 import { isMapNavigating } from '../map/NativeMapNavigation';
 import type { DamageObserver } from '../telemetry/DamageObserver';
@@ -7,13 +8,14 @@ import {
   calculateProjectileAimAngle,
   selectAimAssistTarget,
   type AimAssistSettings,
+  type AimAssistEligibility,
 } from './AimAssistTarget';
 
 /** Adapt source aiming to live Haxe objects without changing weapon simulation. */
 export function installNativeAimAssist(
   api: API,
   game: Raw,
-  settings: AimAssistSettings,
+  settings: AimAssistSettings & { setAimAssistBoolean?: (key: string, value: boolean) => void },
   targets: TargetSystem,
   contacts: Pick<DamageObserver, 'lastContact' | 'now'>,
 ): void {
@@ -21,6 +23,59 @@ export function installNativeAimAssist(
   const prototype = Play?.prototype;
   if (!prototype?.updateCommands || !prototype.updateMouseAim || !prototype.handleTurn) return;
   const states = new WeakMap<Raw, AimAssist>();
+  const eligibility = new WeakMap<Raw, AimAssistEligibility>();
+  const debug = new AimAssistDebugOverlay((name) => {
+    const value = api.cls(name);
+    if (!value) throw Error('Missing aim debug class: ' + name);
+    return value;
+  });
+  let debugOwner: Raw | undefined;
+  const drawDebug = (state: Raw) => {
+    if (state.g !== game) return;
+    if (!settings.getAimAssistBoolean('aim_assist_debug')) {
+      debug.dispose();
+      debugOwner = undefined;
+      return;
+    }
+    const overlay = read(read(api.cls('starling.core.Starling'), 'current'), 'nativeOverlay');
+    if (!overlay) return;
+    let assist = states.get(state);
+    if (!assist) {
+      assist = new AimAssist(settings);
+      states.set(state, assist);
+    }
+    debug.update(overlay, {
+      assist,
+      ship: state.me?.ship ?? null,
+      activeTarget: targets.current,
+      eligibility: assist.evaluatedTarget ? eligibility.get(state) : undefined,
+      mouseAim: mouseAim(),
+      mode: automated() ? 'AutomationControlled' : 'PlayerControlled',
+    });
+    debugOwner = state;
+  };
+  const method = (object: Raw, name: string, value: Function) => {
+    const previous = Object.getOwnPropertyDescriptor(object, name);
+    Object.defineProperty(object, name, { configurable: true, writable: true, value });
+    api.defer(() => {
+      if (object[name] !== value) return;
+      if (previous) Object.defineProperty(object, name, previous);
+      else delete object[name];
+    });
+  };
+  method(prototype, 'applyAimAssistDebugVisibility', function (this: Raw) {
+    drawDebug(this);
+  });
+  if (settings.setAimAssistBoolean)
+    method(Play!, 'toggleAimAssistDebug', () => {
+      const value = !settings.getAimAssistBoolean('aim_assist_debug');
+      settings.setAimAssistBoolean!('aim_assist_debug', value);
+      return value;
+    });
+  api.defer(() => {
+    debug.dispose();
+    debugOwner = undefined;
+  });
   const enabled = () => settings.getAimAssistBoolean('aim_assist_enabled');
   const automated = () => !!game.automationManager?.controlsClaimed;
   const belongs = (state: Raw) => state.g === game;
@@ -45,7 +100,9 @@ export function installNativeAimAssist(
   api.before(prototype, 'updateCommands', function () {
     if (!belongs(this)) return;
     if (automated() || isMapNavigating(game)) {
-      states.get(this)?.release(automated() ? 'automation owns aim control' : 'map navigation');
+      const assist = states.get(this);
+      assist?.resetDiagnostics();
+      assist?.release(automated() ? 'automation owns aim control' : 'map navigation');
       return;
     }
     let assist = states.get(this);
@@ -57,6 +114,7 @@ export function installNativeAimAssist(
     const starling = read(api.cls('starling.core.Starling'), 'current');
     const overlay = read(starling, 'nativeOverlay');
     if (!ship || !ship.engine || !overlay) {
+      assist.resetDiagnostics();
       assist.release('player, ship, or native overlay unavailable');
       return;
     }
@@ -76,6 +134,7 @@ export function installNativeAimAssist(
     const now = contacts.now();
     const weapon = read(ship, 'weapon');
     const eligible = selectAimAssistTarget(ship, weapon, now, settings, context);
+    eligibility.set(this, eligible);
     const target = eligible.target;
     const origin = read(ship, 'pos');
     const position = read(target, 'pos');
@@ -97,6 +156,9 @@ export function installNativeAimAssist(
         : NaN,
       rejectionReason: eligible.reason,
     });
+  });
+  api.after(prototype, 'updateCommands', function () {
+    drawDebug(this);
   });
   api.around(prototype, 'handleTurn', function (next, ...args) {
     if (!belongs(this) || !enabled() || automated() || isMapNavigating(game)) return next(...args);
@@ -166,5 +228,10 @@ export function installNativeAimAssist(
     if (typeof prototype[method] === 'function')
       api.before(prototype, method, function () {
         states.delete(this);
+        eligibility.delete(this);
+        if (debugOwner === this) {
+          debug.dispose();
+          debugOwner = undefined;
+        }
       });
 }

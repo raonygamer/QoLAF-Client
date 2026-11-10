@@ -102,7 +102,7 @@ test('native assist integrates settings and confirmed targets while preserving t
     cls: (name: string) => classes[name],
     defer: (fn: () => void) => cleanups.push(fn),
   };
-  for (const kind of ['before', 'around'])
+  for (const kind of ['before', 'after', 'around'])
     api[kind] = (object: any, name: string, fn: Function) =>
       cleanups.push(hooks.add(object, name, kind, fn));
   const settings = {
