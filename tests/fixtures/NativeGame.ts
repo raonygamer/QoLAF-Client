@@ -422,7 +422,16 @@ export class Game extends Display {
   frames = 0;
   blockHotkeys = false;
   projectileManager = {};
-  unitManager = { units: [new EnemyShip()] };
+  unitManager = {
+    units: [new EnemyShip()],
+    add(unit: EnemyShip) {
+      this.units.push(unit);
+    },
+    remove(unit: EnemyShip) {
+      this.units.splice(this.units.indexOf(unit), 1);
+      unit.reset();
+    },
+  };
   clock = { latency: 25 };
   serviceConnection = { get_connected: () => true };
   me = { id: 'tester', ship: new PlayerShip(), get_group: () => null };

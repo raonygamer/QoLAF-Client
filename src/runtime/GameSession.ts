@@ -1,3 +1,4 @@
+import { installTargetPicking } from '../target/TargetPicking';
 import { installNativeChatImageViewer } from '../chat/NativeChatImageViewer';
 import { ChatImageCache } from '../chat/ChatImageCache';
 import { ChatRemoteImageLoader } from '../chat/ChatRemoteImageLoader';
@@ -126,50 +127,6 @@ export function installGameSession(
 
   // Original Weapon.registerSimulatedHit is the automatic selection trigger.
   // Merely appearing on the radar must not replace the current target.
-}
-
-function installTargetPicking(game: Raw, session: API, ui: NativeUI, target: TargetSystem): void {
-  const bindings = new Map<Raw, { clip: Raw; dispose: () => void }>();
-  const canvas = game.canvas;
-  const originalCanvasTouchable = read(canvas, 'touchable');
-
-  canvas.set_touchable(true);
-  session.defer(() => canvas.set_touchable(originalCanvasTouchable));
-  session.defer(() => {
-    for (const binding of bindings.values()) binding.dispose();
-    bindings.clear();
-  });
-
-  session.interval(() => {
-    const units: Raw[] = game.unitManager.units;
-    const presentUnits = new Set(units);
-
-    for (const [unit, binding] of bindings) {
-      const clipChanged = read(unit, 'movieClip') !== binding.clip;
-      if (!presentUnits.has(unit) || !unit.alive || clipChanged) {
-        binding.dispose();
-        bindings.delete(unit);
-      }
-    }
-
-    for (const unit of units) {
-      if (!target.valid(unit) || bindings.has(unit)) continue;
-
-      const clip = read(unit, 'movieClip');
-      if (!clip) continue;
-
-      const originalTouchable = read(clip, 'touchable');
-      clip.set_touchable(true);
-      const removeListener = ui.touch(clip, () => target.select(unit));
-      bindings.set(unit, {
-        clip,
-        dispose() {
-          removeListener();
-          clip.set_touchable(originalTouchable);
-        },
-      });
-    }
-  }, 250);
 }
 
 function installBossVisibility(game: Raw, session: API, config: Settings): () => void {

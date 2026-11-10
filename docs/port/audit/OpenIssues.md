@@ -673,3 +673,31 @@ markers and blue orbits visible; connected with zero reported runtime errors.
 Evidence: /tmp/QoLAF-MapFirstOpen.png and /tmp/QoLAF-MapReopened.png.
 Every keyboard action used separate key-down/key-up calls with finally release.
 This sample does not establish heap stability or PvP/death-line lifecycle parity.
+
+## Target binding lifetime audit
+
+Source UnitManager.add binds picking immediately; remove unbinds and force-clears
+the selected unit before native reset. The port previously only reconciled clips
+every 250 ms and never cleared a selection on unbinding. A removed and reused
+object could therefore retain selection/lock across lifetimes. TargetPicking now
+hooks native manager add/remove, binds existing units immediately and retains
+reconciliation for late-created/replaced clips. A clip replacement preserves the
+same unit selection; actual removal clears it even when locked. Session cleanup
+restores touchability/listeners and clears the session's target.
+
+The regression uses real host hooks and NativeUI's began-phase handler. It checks
+locked removal before reset, same-object reuse, immediate new-unit picking,
+texture replacement, late textures, bypassed removal reconciliation and cleanup.
+The full-suite fixture initially lacked native UnitManager.add/remove; extended
+that fixture after confirming both methods in current upstream JavaScript.
+Typecheck/build/full suite: 272 pass. Live pooled-combat verification remains open.
+
+Compared map touch/wheel navigation, player draw coordinates and live miniature
+ownership, scaling and part visibility against source; no additional mismatch
+found in those paths. This does not close broader live map parity. Target arrow
+radius, rotation and animation increments also match source. Aim assist remains
+a real runtime gap: settings exist, but PlayState acquisition/tracking/lead and
+turn-control integration are not ported yet.
+Live initialization after one reload also succeeds: connected, rendered game/HUD,
+zero reported runtime errors. Screenshot /tmp/QoLAF-TargetLifecycleLoaded.png.
+This confirms initialization only, not pooled-target combat behavior.
