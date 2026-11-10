@@ -1034,3 +1034,24 @@ presentation cadence.
   exactly one change event, channel restrictions, serialized limits, font changes
   and unload restoration, plus model atomic navigation/source selection tests.
 - Validation: TypeScript and all 201 tests pass. Formatting corrected and rechecked.
+
+
+## Source formatting controls — 2026-11-10
+
+- Ported ChatComposerFormatButton, ChatSelectionValueSlider and the complete
+  ChatSelectionFormatPopup from original AS3. Preserved charcoal colors, touch
+  isolation, 286x138 context menu, 336x228 color panel, 336x166 size panel, RGB
+  channels, six-digit hex contract, 12–48 size range, mixed-style preview,
+  stage-clamped below/above positioning and outside-listener/mask cleanup.
+- Corrected mechanical conversion errors before use: vector literal construction
+  must yield flat arrays; regexp flags must not duplicate; menu index must
+  truncate like AS3 int. Public size inputs retain AS3 int coercion. Preview
+  sizing uses the existing bitmap adapter's width/height setters.
+- Component tests exercise real ported controls and bitmap preview rendering,
+  with a temporary hex-field contract double. They cover touch colors/disabled
+  buttons, full-height slider hit area, snapping, silent setter changes, mixed
+  preview styles, partial hex normalization, detail positioning and listener
+  removal. These are not screenshots or proof of live popup parity.
+- Native hex-field integration and toolbar wiring remain next. The new controls
+  are not registered or activated in the live composer yet; CHAT-01 stays open.
+- Validation: TypeScript, formatting and all 205 tests pass.
