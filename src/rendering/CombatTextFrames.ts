@@ -1,4 +1,5 @@
 import { read, type API, type Raw } from '../api/Types';
+import { installCombatTextLayout } from './CombatTextLayout';
 
 interface Attachment {
   owner: Raw | null;
@@ -159,6 +160,7 @@ export function installCombatTextFrames(api: API): void {
   const particle = api.cls('core.text.TextParticle')?.prototype;
   const unit = api.cls('core.unit.Unit')?.prototype;
   if (!handler || !manager || !particle || !unit) return;
+  installCombatTextLayout(api);
   const frames = new CombatTextFrames();
   api.after(
     handler,

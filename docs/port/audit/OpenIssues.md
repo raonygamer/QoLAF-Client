@@ -1435,3 +1435,29 @@ reward rows and XP are horizontal/readable (/tmp/QoLAF-TextMission.png). This
 case does not reproduce the previously reported vertical XP text. Other tooltip
 and intermittent bitmap corruption cases remain open. Ownership cleanup does
 not claim to fix bitmap rasterization or establish full visual parity.
+
+## Original combat atlas and particle layout (2026-11-10)
+
+The native TextHandler still selected font13/font26 despite the original combat
+atlas already being registered. Ported TextHandler.add and TextParticle's text
+preparation/reset behavior through CombatTextLayout: DAIDRR_COMBAT is selected
+before measuring, generous 800x100 bounds are measured once, final padding is
+45x42, every alignment sets its pivot, and the original word-wrap option and
+fractional lifetime are retained. Text updates no longer invoke native autoWidth
+on every assignment. Pool return composes empty text; immediate reuse skips that
+extra composition. Native zoom fields baseScale/createdZoom remain intact.
+
+Handler disposal now disposes active and inactive particles, matching source;
+native disposal omitted the inactive pool. Existing owner cleanup hooks still
+run for reset/disposal. Typecheck and all 348 tests pass, including native handler
+pool reuse, measurement counts/font at measurement time, alignment, fractional
+lifetime, nonwrapping output and complete pool disposal.
+
+Live temporary standalone handler rendered 12345 (15px), +250 xp (20px), and
+Mission complete! (40px), all reporting DAIDRR_COMBAT with correct centered pivots.
+Evidence: /tmp/QoLAF-CombatFontLive.png and /tmp/QoLAF-CombatFontCleanup.png.
+Scheduled cleanup disposed its private pool and removed its display layer. No
+mission completion or XP event occurred; these were local display samples only.
+The bundled russo64 bitmap and metrics SHA256 hashes match the source files
+exactly. Full moving-combat comparison, text tooltip corruption, and remaining
+TextManager-specific source presentation still require audit.
