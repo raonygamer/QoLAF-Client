@@ -4,19 +4,22 @@ import { drawProjectileAttachment } from './ProjectileAttachments';
 import { installInstantFrames } from './InstantFrames';
 import { installNetherBeamStyle } from './NetherBeamStyle';
 import { installNetherTentacleVisuals } from './NetherTentacleVisuals';
+import { TorpedoFrames } from './TorpedoFrames';
 
 /** Source Projectile.draw: predict presentation between fixed 33 ms updates. */
 export function drawProjectileFrame(
   projectile: Raw,
   rotationDelta: number,
   drawState?: () => void,
+  frameSeconds?: (projectile: Raw, fallback: number) => number,
 ): void {
   const clip = projectile._mc;
   const course = projectile.course;
   if (!clip || !course || !projectile.alive) return;
   const alpha = Math.max(0, Math.min(1, projectile.g.gameStateMachine.accumulator / 33));
-  clip.set_x(course.pos.x + course.speed.x * 0.033 * alpha);
-  clip.set_y(course.pos.y + course.speed.y * 0.033 * alpha);
+  const seconds = frameSeconds?.(projectile, 0.033 * alpha) ?? 0.033 * alpha;
+  clip.set_x(course.pos.x + course.speed.x * seconds);
+  clip.set_y(course.pos.y + course.speed.y * seconds);
   clip.set_rotation(read(projectile, 'rotation', 0) + rotationDelta * alpha);
   drawState?.();
   drawProjectileRibbon(projectile);
@@ -45,6 +48,20 @@ export function installProjectileFrames(api: API): void {
   installNetherTentacleVisuals(api);
   const drawInstant = installInstantFrames(api);
   const rotations = new WeakMap<Raw, number>();
+  const torpedoes = new TorpedoFrames();
+  const manager = api.cls('core.projectile.ProjectileManager')?.prototype;
+  if (typeof manager?.getProjectile === 'function') {
+    api.after(manager, 'getProjectile', function (projectile: Raw) {
+      // Source ProjectileFactory captures this option once per pooled life.
+      torpedoes.capture(
+        projectile,
+        api.cls('core.scene.SceneBase')?.clientSettings?.correctXhersixTorpedoPrediction ?? true,
+      );
+    });
+  }
+  api.before(game, 'draw', function () {
+    torpedoes.beginFrame(this);
+  });
   const attachments = new WeakMap<Raw, { state: Raw; missile: boolean }>();
   for (const name of ['ProjectileStuck', 'MissileStuck']) {
     const state = api.cls(`core.states.aistates.${name}`)?.prototype;
@@ -66,13 +83,19 @@ export function installProjectileFrames(api: API): void {
   api.before(projectile, 'reset', function () {
     rotations.delete(this);
     attachments.delete(this);
+    torpedoes.reset(this);
   });
   api.after(projectile, 'draw', function () {
     const attached = attachments.get(this);
-    drawProjectileFrame(this, rotations.get(this) ?? 0, () => {
-      if (attached) drawProjectileAttachment(attached.state, attached.missile);
-      drawInstant(this);
-    });
+    drawProjectileFrame(
+      this,
+      rotations.get(this) ?? 0,
+      () => {
+        if (attached) drawProjectileAttachment(attached.state, attached.missile);
+        drawInstant(this);
+      },
+      (projectile, fallback) => torpedoes.seconds(projectile, fallback),
+    );
   });
   // Haxe Game.draw already visits each visible projectile after the fixed ticks.
   // Its manager copied vertices only during update, leaving that draw invisible.

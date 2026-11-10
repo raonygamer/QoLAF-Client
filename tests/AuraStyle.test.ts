@@ -65,7 +65,10 @@ function fixture(rotated: boolean) {
   };
   const Style = createAuraStyle({
     cls: (key: string) => classes[key],
-    game: { getServerTime: () => 800 },
+    game: {
+      clock: { getServerTime: () => 800 },
+      getServerTime: () => assert.fail('drawing an aura must not update simulation time'),
+    },
   } as any);
   const style = new Style();
   const points: any[] = Array.from({ length: 4 }, () => ({}));

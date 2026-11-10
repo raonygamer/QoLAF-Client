@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import { drawProjectileFrame, installProjectileFrames } from '../src/rendering/ProjectileFrames';
 import { installRenderPosition } from '../src/rendering/RenderPosition';
 import { emitterTargetPose } from '../src/rendering/EmitterFrames';
+import { xhersixTorpedoWeaponKey } from '../src/projectile/XhersixTorpedoCue';
 import { Display } from './fixtures/NativeGame';
 // @ts-expect-error host hook dispatcher
 import { Hooks } from './fixtures/HostCore.js';
@@ -116,6 +117,70 @@ test('projectile frame prediction uses source rotation delta and clamps interpol
   drawProjectileFrame(p, 0.2);
   assert.ok(Math.abs(clip.get_x() - 7.3) < 1e-10);
   assert.equal(clip.get_rotation(), 1.2);
+});
+
+test('pooled torpedoes capture the setting at checkout and share the frame timestamp', () => {
+  class Projectile {
+    alive = true;
+    isEnemy = true;
+    ai = 'bullet';
+    wave = false;
+    weapon = { key: xhersixTorpedoWeaponKey };
+    course = { time: 1033, pos: { x: 100, y: 200 }, speed: { x: 300, y: -100 } };
+    _mc = new Clip();
+    constructor(public g: Game) {}
+    draw() {}
+    update() {}
+    reset() {}
+  }
+  class Manager {
+    inactiveProjectiles: Projectile[] = [];
+    constructor(public g: Game) {}
+    getProjectile() {
+      const projectile = this.inactiveProjectiles.pop() ?? new Projectile(this.g);
+      projectile.reset();
+      return projectile;
+    }
+  }
+  let clockReads = 0;
+  class Game {
+    time = 990;
+    gameStateMachine = { accumulator: 16.5 };
+    clock = {
+      getServerTime: () => {
+        clockReads++;
+        return 1000;
+      },
+    };
+    projectiles: Projectile[] = [];
+    draw() {
+      for (const projectile of this.projectiles) projectile.draw();
+    }
+  }
+  const settings = { correctXhersixTorpedoPrediction: true };
+  const fixture = apiFor({
+    'core.projectile.Projectile': Projectile,
+    'core.projectile.ProjectileManager': Manager,
+    'core.scene.Game': Game,
+    'core.scene.SceneBase': { clientSettings: settings },
+  });
+  installProjectileFrames(fixture.api);
+  const game = new Game();
+  const manager = new Manager(game);
+  const first = manager.getProjectile();
+  settings.correctXhersixTorpedoPrediction = false;
+  const second = manager.getProjectile();
+  game.projectiles = [first, second];
+  game.draw();
+  assert.equal(first._mc.get_x(), 90.1);
+  assert.equal(second._mc.get_x(), 104.95);
+  assert.equal(clockReads, 1);
+  assert.equal(game.time, 990);
+  manager.inactiveProjectiles.push(first);
+  assert.equal(manager.getProjectile(), first);
+  game.draw();
+  assert.equal(first._mc.get_x(), 104.95, 'reused particle captures the current disabled option');
+  fixture.dispose();
 });
 
 test('undrawn body anchors use world coordinates, never a stale clip at the origin', () => {

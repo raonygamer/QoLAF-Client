@@ -2,6 +2,7 @@ import { read, type Raw } from '../api/Types';
 import type { Resolve } from '../runtime/As3';
 import { ClientDevVisual } from './ClientDevVisual';
 import { clientDevVisualShader } from './ClientDevVisualShader';
+import { networkTime } from '../rendering/NetworkTime';
 
 /** Native Starling styles, using the source's additional hull-local coordinates. */
 export function createClientDevVisualStyles(resolve: Resolve) {
@@ -121,10 +122,8 @@ export function createClientDevVisualStyles(resolve: Resolve) {
       effect.mode = this.mode;
       effect.settings = this.settings;
       effect.tintTexture = this.tintTexture;
-      effect.phase = ClientDevVisual.phaseAt(
-        read(Game.instance, 'networkServerTime', Game.instance?.getServerTime?.() ?? 0),
-        this.settings,
-      );
+      const time = networkTime(Game.instance);
+      effect.phase = ClientDevVisual.phaseAt(Number.isFinite(time) ? time : 0, this.settings);
     }
   }
 

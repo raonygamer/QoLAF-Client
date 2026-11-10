@@ -1,5 +1,6 @@
 import { read, type API, type Raw } from '../api/Types';
 import { auraShader } from './AuraShader';
+import { networkTime } from './NetworkTime';
 
 /** Native Haxe subclasses retain the source vertex format and AGAL shader programs. */
 export function createAuraStyle(api: API): any {
@@ -54,7 +55,7 @@ export function createAuraStyle(api: API): any {
       );
       this.flow.set(0, width / 48);
       this.flow.set(1, height / 80);
-      let time = read(api.game, 'networkServerTime', api.game?.getServerTime?.());
+      let time = networkTime(api.game);
       if (!Number.isFinite(time)) time = performance.now();
       this.flow.set(2, (time % 3200) / 3200);
       [this.luminance, this.texel, this.cubic, this.rim, this.flow, this.shape].forEach(

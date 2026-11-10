@@ -1,4 +1,5 @@
 import { getActiveBeamGeometry } from '../weapon/BeamRenderGeometry';
+import { networkTime } from '../rendering/NetworkTime';
 import { read, type API, type Raw } from '../api/Types';
 import type { Resolve } from '../runtime/As3';
 import { ClientDevVisual } from './ClientDevVisual';
@@ -147,7 +148,8 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
       release(weapon);
       return;
     }
-    const time = read(weapon.g, 'networkServerTime', weapon.g?.getServerTime?.() ?? 0);
+    const observedTime = networkTime(weapon.g);
+    const time = Number.isFinite(observedTime) ? observedTime : 0;
     const tint = (emitters: Raw[] | undefined, point: Raw | undefined) => {
       if (!point) return;
       const color = ClientDevVisual.colorAt(

@@ -2430,3 +2430,28 @@ Added coverage for a 600ms frame with a moving owner, expiration across the next
 500ms, and invalid/negative duration inputs. Existing 30/60/120/180 FPS checks
 still pass. All 535 tests, TypeScript and formatting pass. This is source and
 automated verification; live visual comparison remains open.
+
+### Torpedo display timestamps and observer clock — 2026-11-10
+
+Ported the Xhersix-specific Projectile.draw timestamp projection and the scalar
+XhersixTorpedoTimeline.projectOffsetSeconds validation. The source captures the
+prediction setting per projectile life, applies signed offsets within 250ms,
+and uses a single server-clock sample per Game.draw. Pool checkout/reset now
+capture/release eligibility; player shots, waves, other weapons and disabled
+new projectiles retain their normal render prediction. No native course, TTL,
+collision, fastforward or damage method is replaced. The original's separate
+server-course/collision changes remain outside this display-only implementation
+and need compatibility review against the requested current-game mechanics.
+
+Auditing the clock exposed three visual paths invoking SceneBase.getServerTime,
+which writes game.time. Ported the source networkServerTime observer semantics
+using the native clock directly, with lazy fallback. Applied it to aura flow,
+beam emitter tint, developer hull styles, instant orbit lightning and torpedo
+rendering. Instant lightning can now use the current clock instead of tick time.
+
+Regression coverage includes signed/horizon/invalid timestamps, 30/60/120/180 FPS,
+unchanged physics and TTL, one clock sample per frame, per-life settings and pool
+reuse, read-only visual clock calls, and the actual aura shader upload path.
+All 541 tests, TypeScript and formatting pass. Desktop was on other applications;
+no game inputs or reloads were issued. Live encounter/visual comparison remains
+unverified, and this does not establish complete projectile or client parity.

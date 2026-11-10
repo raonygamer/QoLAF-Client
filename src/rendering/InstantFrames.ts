@@ -1,5 +1,6 @@
 import { read, type API, type Raw } from '../api/Types';
 import { isNetherTentacle } from './NetherTentacleVisuals';
+import { networkTime } from './NetworkTime';
 import { createBeamOrbitLightning, supportsBeamOrbit } from './BeamOrbitLightning';
 
 /** Projectile.renderTimeToLive only interpolates unrestricted projectile weapons. */
@@ -55,7 +56,7 @@ export function drawInstantFrame(state: Raw, splitting: boolean, color?: Raw): v
   place(state.lineOuter, (state.alpha * remaining) / maximum, remaining > 0);
   if (state.orbitLightning && color) {
     const arcColor = isNaN(p.determinedColor) ? state.color : p.determinedColor >>> 0;
-    const serverTime = read(state.g, 'networkServerTime');
+    const serverTime = networkTime(state.g);
     state.orbitLightning.drawBetween(
       position.x,
       position.y,
