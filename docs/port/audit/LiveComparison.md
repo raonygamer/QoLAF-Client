@@ -1285,3 +1285,27 @@ y=380 to y=600 and verified the page scrolled to Stationary tracking controls
 (/tmp/QoLAF-AimScrollDragged.png), then dragged it back. Mouse release was sent in
 finally after each drag. This closes the observed settings scrollbar skin gap;
 it does not establish full Aim Assist behavior parity.
+
+## Native changelog and empty bindings — 2026-11-10
+
+Ported the original 840×540 changelog window, 23-release catalog, two scroll
+regions, bitmap HTML chunks and native release buttons. Compared the running SWF
+against the local port: header, content offsets, paragraph line breaks, divider
+and close-button placement agree at their respective stage sizes. The selected
+label uses the source AstroTheme yellow; the running SWF shows gray. That
+source/runtime discrepancy remains recorded rather than claiming pixel identity.
+
+Verified with actual pointer input: release selection, scrolling to the oldest
+archive, selecting it and scrolling its reading region. Escape initially leaked
+to the game and opened its menu; a capture-phase modal handler now consumes the
+press, repeats and release. Retested after reload: changelog closed and the
+underlying menu stayed closed. Key bindings also now show empty secondary buttons
+instead of Haxe's default “Button Text”, matching the original.
+
+Local evidence: `/tmp/QoLAF-OriginalChangelog.png`,
+`/tmp/QoLAF-ChangelogRows.png`, `/tmp/QoLAF-ChangelogSelected.png`,
+`/tmp/QoLAF-ChangelogArchive.png`, `/tmp/QoLAF-ChangelogArchiveScroll.png`,
+`/tmp/QoLAF-ChangelogEscapeFixed.png`, `/tmp/QoLAF-BindingsFixed.png`.
+Type checking and all 396 tests pass. Preview reported zero uncaught runtime
+errors. Narrow-window fitting and graphics-context restoration remain unverified
+live. Other missing screens and complete parity remain open.

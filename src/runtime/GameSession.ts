@@ -1,3 +1,4 @@
+import { installNativeClientChangelog } from '../dialogs/NativeClientChangelog';
 import pingSoundUrl from '../assets/sounds/Ping.mp3';
 import { ChatPingSound } from '../chat/ChatPingSound';
 import { installNativeChatPingPreview } from '../chat/NativeChatPingPreview';
@@ -94,6 +95,7 @@ export function installGameSession(
     artifacts,
   );
   installNativeAdvancedChat(session, game);
+  installNativeClientChangelog(session, game);
   if (messages) installNativeChatImageViewer(session, game, bitmap.resolve, images, messages);
   if (messages) installNativeChatRolePreview(session, game, bitmap.resolve, messages);
   if (messages)

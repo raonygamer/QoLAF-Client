@@ -48,3 +48,18 @@ test('source button height resizes its surfaces without stretching glyphs and se
   const normal = new Button(() => {});
   assert.equal(normal.tf.get_format().font, 'Russo:13');
 });
+
+test('empty source button labels stay empty instead of the Haxe constructor placeholder', () => {
+  class NativeButton {
+    text: string;
+    constructor(_callback: Function, text: string) {
+      this.text = text || 'Button Text';
+    }
+    set_text(text: string) {
+      this.text = text;
+    }
+  }
+  const Button = createButtonAdapter(NativeButton, () => ({ fontNameForSize: () => 'DAIDRR_16' }));
+  assert.equal(new Button(() => {}, '').text, '');
+  assert.equal(new Button(() => {}, 'W').text, 'W');
+});

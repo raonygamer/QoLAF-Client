@@ -22,6 +22,10 @@ export function createButtonAdapter(NativeButton: any, resolve: Resolve): any {
     ) {
       super(callback, text, style, size, fontName(family, size));
       this.logicalFontFamily = family;
+      // Haxe substitutes "Button Text" for an empty constructor label. The
+      // original leaves unbound key slots blank; restore the requested text
+      // through the native setter before sizing the control.
+      if (text === '') this.set_text('');
     }
 
     get_height(): number {

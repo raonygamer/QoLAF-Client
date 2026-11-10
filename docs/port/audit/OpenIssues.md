@@ -1770,3 +1770,13 @@ QoLAF channel and artifact sharing. The protocol version label accepts only nume
 release triples and Public/Private; identify the port by its own numeric version,
 not the original AS3 source version. UI may keep the explicit development suffix.
 No claim of live connection, visible chat parity or completed sharing is made here.
+
+## Screen parity follow-up — 2026-11-10
+
+Changelog now has its native popup and complete source release archive; live
+selection, both scrolling regions and Escape were verified. Historical notes
+describe the original client, not claims of implemented port features. Empty
+key-binding labels are fixed and visually verified. Still audit narrow-window
+layout, reopening/context restoration, the tabbed client help, welcome/credits,
+player inspection, music/radio and ship-visual dialogs against original source
+and running UI. These remain full-port requirements, not optional follow-ups.
