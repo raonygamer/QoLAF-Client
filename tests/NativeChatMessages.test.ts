@@ -86,7 +86,7 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
     },
   }));
   t.after(() => images.dispose());
-  installNativeChatMessages(
+  const messages = installNativeChatMessages(
     api,
     { messageLog: { simple, advanced } },
     (name) => (name === 'starling.text.TextField' ? Text : fixture.resolve(name)),
@@ -96,6 +96,7 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
   t.after(() => cleanup.reverse().forEach((fn) => fn()));
   simple.tf.set_text("A<font color='#ff0000' size='24'>B</font>C");
   const renderer = simple.tf.getChildAt(0) as any;
+  renderer.globalToLocal = (point: any) => point;
   assert.equal(simple.tf.field.parent, null);
   assert.equal(simple.tf.get_alpha(), 1);
   assert.deepEqual(
@@ -103,6 +104,17 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
     [0xffffff, 0xff0000, 0xffffff],
   );
   assert.equal(renderer.characterBatch.meshes[1].scale, 24 / fixture.font.size);
+  simple.tf.set_text("<font color='#ffaa44'>[mod]</font> Pilot");
+  const badgeGlyph = renderer.activeGlyphs[1];
+  const badgePoint = { x: badgeGlyph.hitX + 1, y: badgeGlyph.hitY + 1 };
+  assert.equal(messages!.roleTagAtStagePoint(badgePoint, true), 'mod');
+  simple.tf.set_text('[mod] Pilot');
+  assert.equal(
+    messages!.roleTagAtStagePoint(badgePoint, true),
+    null,
+    'plain typed tags have no role card',
+  );
+  simple.tf.set_text("A<font color='#ff0000' size='24'>B</font>C");
   const originalHeight = renderer.get_height();
   simple.tf.set_text('a long received message with several words and a second line');
   simple.tf.set_width(70);

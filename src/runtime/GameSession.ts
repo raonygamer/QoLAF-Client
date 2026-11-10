@@ -36,6 +36,7 @@ import { loadTargetAimIndicator, type TargetAimIndicator } from '../ui/TargetAim
 import { TargetInfo } from '../ui/TargetInfo';
 import { installHealthAndShield } from '../hud/HealthAndShield';
 import { installNativeChatPreferences } from '../chat/NativeChatPreferences';
+import { installNativeChatRolePreview } from '../chat/NativeChatRolePreview';
 import { installClanLabels } from '../ui/ClanLabel';
 import { installDamageText } from '../hud/DamageText';
 import { installRespawn } from './Respawn';
@@ -71,6 +72,7 @@ export function installGameSession(
   session.defer(() => images.dispose());
   const messages = installNativeChatMessages(session, game, bitmap.resolve, preferences, images);
   if (messages) installNativeChatImageViewer(session, game, bitmap.resolve, images, messages);
+  if (messages) installNativeChatRolePreview(session, game, bitmap.resolve, messages);
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences);
   installNativeChatHistory(session, game);

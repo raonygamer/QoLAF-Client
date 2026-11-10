@@ -899,3 +899,29 @@ ordinary trails, palette reset versus stable settings, and invalid dividends.
 The bundle was rebuilt by the test pre-step. These are behavior/geometry checks,
 not a live combat visual comparison; no additional browser reload was performed
 for this change. The intermittent text draw defect remains separate and open.
+
+
+## Chat role hover cards (2026-11-10)
+
+Ported source ChatRolePreviewPopup and connected the already-ported renderer's
+roleTagAtPoint lookup to Simple and Advanced chat. The native 280x70 card retains
+Verdana sizes, border/background, explanations, pointer gap, edge flipping and
+small-viewport scaling. Simple remains click-through. Advanced checks the scroll
+viewport and hit ownership. Covering windows, clicks, hidden/removed views, new
+messages and scroll changes close the card. Session cleanup removes listeners and
+both popup nodes. Plain typed [mod] text does not become a role card; lookup uses
+the source parsed tag/color rules and remains presentation-only.
+
+Typecheck and full suite: 291 pass. Tests use the real role parser and renderer,
+plus popup geometry and stage-hook fixtures covering both views, occlusion,
+scrolling, clicks, small bounds, wording and disposal. Live local previews showed
+[mod] in Simple (/tmp/QoLAF-RoleHover.png) and [client_dev] in Advanced
+(/tmp/QoLAF-RoleAdvancedHover.png). No messages were sent: Simple temporarily
+replaced its displayed label; Advanced received one temporary local row that was
+removed by its cleanup timer. Preview timers restore the original view/data.
+The final additional Advanced scroll-hit ownership guard was checked by the
+regression suite; the earlier live bundle verified the same successful hover path.
+
+This closes missing role-card wiring only. Advanced virtualization, artifact/ping
+hover cards and other chat gaps are not claimed complete. Intermittent text
+corruption remains visible elsewhere and is independent of this addition.

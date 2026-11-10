@@ -13,7 +13,11 @@ export function installNativeChatMessages(
   preferences?: DeviceSettings,
   images?: ChatImageCache,
 ):
-  | { simpleRenderer: Raw; imageLinkAtStagePoint(point: Raw): ChatDiscordImageLink | null }
+  | {
+      simpleRenderer: Raw;
+      imageLinkAtStagePoint(point: Raw): ChatDiscordImageLink | null;
+      roleTagAtStagePoint(point: Raw, simple: boolean): string | null;
+    }
   | undefined {
   const log = game.messageLog;
   const WrapText = api.cls('core.hud.components.ui.WrapText');
@@ -181,6 +185,21 @@ export function installNativeChatMessages(
   });
   return {
     simpleRenderer: rows.get(log.simple.tf)!.renderer,
+    roleTagAtStagePoint(point, simple) {
+      const candidates = simple
+        ? [log.simple.tf]
+        : Array.from({ length: read(scroll, 'numChildren') }, (_, i) =>
+            scroll.getChildAt(i),
+          ).reverse();
+      for (const row of candidates) {
+        const renderer = rows.get(row)?.renderer;
+        if (!renderer || !read(row, 'visible') || read(row, 'alpha') <= 0) continue;
+        const local = renderer.globalToLocal(point);
+        const role = renderer.roleTagAtPoint(local.x, local.y);
+        if (role) return role;
+      }
+      return null;
+    },
     imageLinkAtStagePoint(point) {
       for (let index = read(scroll, 'numChildren') - 1; index >= 0; index--) {
         const row = scroll.getChildAt(index);

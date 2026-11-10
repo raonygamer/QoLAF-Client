@@ -21,6 +21,7 @@ import { RichBitmapEmojiMatch } from '../../src/chat/rich/RichBitmapEmojiMatch';
 import { RichBitmapEmojiResolver } from '../../src/chat/rich/RichBitmapEmojiResolver';
 import { RichBitmapTextNavigation } from '../../src/chat/rich/RichBitmapTextNavigation';
 import { createRichBitmapTextMetrics } from '../../src/ported/RichBitmapTextMetrics';
+import { createChatRoleTags } from '../../src/ported/ChatRoleTags';
 
 /** GPU-free layout fixture, using the original atlas's actual glyph metrics. */
 export function bitmapRendererFixture(
@@ -176,6 +177,7 @@ export function bitmapRendererFixture(
   };
   definitions['core.hud.components.ClientDeveloperTagColor'] =
     createClientDeveloperTagColor(resolve);
+  definitions['core.hud.components.chat.ChatRoleTags'] = createChatRoleTags(resolve);
   definitions['core.hud.components.EchoPulseColor'] = createEchoPulseColor(resolve);
   definitions['core.hud.components.RoomInvitePulseColor'] = createRoomInvitePulseColor(resolve);
   definitions['core.hud.components.PodRewardPulseColor'] = createPodRewardPulseColor(resolve);
