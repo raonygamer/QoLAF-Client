@@ -915,3 +915,29 @@ presentation cadence.
   Fallback visual verification is pending next reload.
 - TypeScript check and 176 tests pass, including real host-hook lifecycle tests
   for commands, drafts, bounded traversal and replacement game instances.
+
+
+## Rich editor document core — 2026-11-10
+
+- Added RichBitmapEditorModel, extracting the document/selection behavior from
+  original RichBitmapFontTextEditor.as rather than substituting browser HTML
+  editing. It reuses the already ported parser, serializer, typed-markup promoter
+  and UTF-16/emoji navigation.
+- Ported visible/source selection mapping, forward/backward atomic snapping,
+  copied artifact wire tokens, selected markup/color/size, source 12–48 size
+  clamp, style-preserving replacement, literal insertion, completed-fragment
+  promotion, continuation style, newline/restrict handling and serialized
+  maxChars behavior (including shortening an already over-limit value).
+- Preserved the source sameCommandPrefix check: promoting inert tags must not
+  turn a displayed example into an executable slash command. Global/restrict
+  paths still prohibit promotion. Artifact label refresh preserves source-range
+  selection even when the displayed label changes length.
+- Validation: typecheck, formatting and all 182 tests pass. New cases cover
+  selection formatting, typed closing fragments/continuation, command guarding,
+  Global/restrict paths, artifact copy/refresh/deletion, five emoji cluster forms,
+  serialized limits, disabled editing and newline removal. One initial expected
+  color string used uppercase; corrected to the existing source serializer's
+  lowercase hexadecimal output.
+- This is document-core work, not a completed live composer: native input events,
+  bitmap selection/caret rendering, IME, clipboard interactions and formatting
+  controls still need integration and original-vs-port visual verification.
