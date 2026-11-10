@@ -1314,3 +1314,41 @@ source mirrored/multipart target adaptation, full visual comparison across rarit
 types, and actual context-loss restoration. Pulse and shader paths now both honor
 the existing disable setting; its full appearance still depends on the remaining
 lightning integration.
+
+## Interior aura lightning and texture coverage (2026-11-10)
+
+Ported AuraTextureAnchors and AuraLightning, including source timing, geometry,
+endpoint selection and frame integration. Borrowed bitmap uploads are captured
+from native POT/rectangle textures; disposal and subsequent uploads invalidate
+cached point clouds by root revision without retaining disposed bitmap sources in
+cache entries. No GPU readback or guessed rectangular endpoints. Coverage uses
+actual atlas UV/position mapping, alpha>=48, at most 96x96 samples, four-neighbor
+components (preserving holes and diagonal separation), 32 components and 4096
+points. Rotated frames and trimmed positions follow texture setup coordinates.
+
+Native lightning mesh retains eight arcs, fourteen segments per arc, two glow/core
+quads per segment, 720ms bursts, source fade/jitter/travel and bounded endpoint
+selection within one opaque component. Source rarity frequency multipliers are
+preserved; only the first golden emitter owns bolts. Frame integration selects
+the highest-alpha actually drawn particle and follows its position, rotation,
+scale signs, radius and opacity. Disabled/stopped/offscreen/leaving/missing-owner
+frames hide the mesh. Mesh and cache lifecycle follow emitter/texture disposal.
+
+Typecheck and all 340 tests pass. Tests cover coverage threshold/holes/components,
+rotated mapping, cache invalidation, unreadable bitmap fallback, work limits,
+seeded native mesh geometry/timing, endpoint component identity, strongest-pulse
+selection, opacity ancestry, visibility gates and disposal. Final readability-only
+const/type cleanup was also typechecked and retested.
+
+Live reload/autologin succeeded. A temporary local blue aura produced one opaque
+component with 2054 anchor points and an 896-vertex native lightning mesh. During
+295 samples, lightning was visible in 212. Scheduled cleanup removed the one
+probe emitter and sampling interval; observed in /tmp/QoLAF-LightningCleanup.png.
+Preview remained connected=true, runtimeErrors=0. No transport sends or account
+changes. This proves native texture capture and bolt integration, not exact
+side-by-side visual equality across all ships and rarity types.
+
+Remaining: AuraTextureContours and AuraOutlineLightning's occasional crawling
+accent, mirrored/multipart targets, actual context-restoration checks and broad
+visual comparison. Interior lightning is implemented; the entire aura family and
+full port are not declared complete.

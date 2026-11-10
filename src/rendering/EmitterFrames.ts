@@ -1,3 +1,4 @@
+import { AuraLightningFrames, installAuraLightning } from './AuraLightningFrames';
 import { installAuraStyles } from './AuraStyles';
 import { AuraPulses, installAuraPulses } from './AuraPulses';
 import { installRarityAuraLayers } from './RarityAuraLayers';
@@ -71,6 +72,7 @@ export class EmitterFrames {
     private targets = new EmitterTargets(),
     private prepareFrame?: (emitter: Raw) => void,
     private auraPulses?: AuraPulses,
+    private lightning?: AuraLightningFrames,
   ) {}
 
   reset(emitter: Raw): void {
@@ -80,6 +82,7 @@ export class EmitterFrames {
 
   update(emitter: Raw, milliseconds: number): void {
     this.prepareFrame?.(emitter);
+    this.lightning?.begin(emitter);
     if (this.targets.stale(emitter)) {
       emitter.killEmitter();
       this.targets.release(emitter);
@@ -113,6 +116,7 @@ export class EmitterFrames {
     if (active > 0) this.emit(emitter, active, afterEmission);
     this.draw(emitter, delta);
     emitter.setBatchParent();
+    this.lightning?.finish(emitter, delta);
     this.time(emitter, delta);
   }
 
@@ -249,6 +253,7 @@ export class EmitterFrames {
           break;
         }
         emitter.collectiveMeshBatch.addMesh(particle, null, alpha, null, false);
+        this.lightning?.observe(emitter, particle, alpha);
       }
     }
     if (this.Emitter.IS_HIGH_GRAPHICS && vertices < 400) this.Emitter.setHighGraphics();
@@ -265,7 +270,16 @@ export function installEmitterFrames(api: API): void {
   const prepareAuras = installRarityAuraLayers(api);
   installAuraStyles(api);
   const pulses = installAuraPulses(api);
-  const frames = new EmitterFrames(Particle, Emitter, Color, targets, prepareAuras, pulses);
+  const lightning = installAuraLightning(api);
+  const frames = new EmitterFrames(
+    Particle,
+    Emitter,
+    Color,
+    targets,
+    prepareAuras,
+    pulses,
+    lightning,
+  );
   installEmitterDelays(api, targets);
   // Unit.reset reaches GameObject.reset; Engine.reset does not call its base.
   for (const name of ['core.GameObject', 'core.engine.Engine']) {
