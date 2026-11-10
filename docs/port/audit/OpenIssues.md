@@ -1679,3 +1679,43 @@ not yet been visually verified for this change.
 Still open: the original virtualized list, initial bottom reveal/settling and
 full advanced-history UI parity. This change retains the native ScrollBox and its
 initial load path; it does not establish complete chat parity.
+
+
+## QoLAF chat transport prerequisites (2026-11-10)
+
+Artifact share insertion defaults to the original QoLAF channel unless already
+in Private/Clan. The port has no ClientIpcService or ClientQolafChat integration;
+therefore adding only the sharing controls would not reproduce that flow.
+Original service uses a dedicated invisible Service-1409_24 room, not the gameplay
+connection. Authentication owns its lifetime; scenes only attach/detach receivers.
+
+Ported ClientIpcCodec, ClientIpcAssembler and ClientIpcMessagePack into src/ipc.
+Wire format is the original QIPC3 version-3 PlayerIO binary message, unpadded
+base64url, CRC32 and 150-character frames. Multipart END is the commit point.
+Preserved sender/channel isolation, duplicate/conflict handling, idle and absolute
+deadlines, replay limits, per-peer bounds and nonrecursive atomic message packs.
+Binary primitive encoding was checked against BinarySerializer decompiled from
+the original libs/PlayerIOClient.swc (signed int, uint, float, double order).
+No game connection or public chat sends were used by these checks.
+
+Typecheck and the full 371-test suite passed. Added seven protocol tests including
+independently specified SDK token bytes, UTF-8 and opaque payloads, base64url
+comparison against Node, known CRC32 vector, exact 65536-byte limit, multipart
+ordering, replay, expiry, mutation isolation and malformed packet rejection.
+A follow-up audit caught JavaScript regex end-anchor acceptance of trailing
+newlines; explicit source-equivalent ID length/type character checks and tests
+now cover it. Targeted protocol tests passed again after that correction.
+
+Runtime cross-language interoperability is NOT yet proven. An isolated AIR oracle
+using the unchanged original ClientIpcCodec compiled at /tmp/QoLAF-IpcOracle.
+The installed AIR runtime exited without producing its expected output.json;
+its commercial-license notice was the only output after resolving local runtime
+library loading. Do not treat the compiled oracle as a successful runtime test.
+The new protocol modules are not yet wired into the client bundle's runtime.
+
+Next required work: port ClientIpcService connection generation guards, authenticated
+receive envelope, discovery schema 4/presence, paced queue (Local 1s, Private 200ms),
+reconnect/expiry/cleanup and message-pack dispatch; then ClientQolafChat receiver,
+channel tab/send integration, reward notices and artifact sharing controls. Keep
+new gameplay connection semantics intact and verify actual interop before claiming
+QoLAF chat or artifact sharing complete.
