@@ -190,3 +190,22 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   visibility, stale texture completion, native landed access and locking. Expanded
   the Image fixture with real pivot/rotation semantics needed by the new feature.
   TypeScript/build pass and all 72 tests pass. Full original-SWF parity remains open.
+
+
+### Target debuff observations and native gameplay boundary
+
+- Added original debuff metadata, stacking/expiry observations, 21px icon grid,
+  countdown text and pooled native tooltips to the target HUD. Protected target
+  stats also suppress debuff icons. Reset/destroy clears observations.
+- The hook observes native doDOTEffect calls only. It does not replace the native
+  method, alter its arguments, or write shield/healing state. Current Haxe shield
+  behavior and gameplay calculations remain authoritative, as requested.
+- Original metadata has no icon for every native effect type; those types are not
+  given invented icons. Native ToolTip supplies its current tooltip style because
+  its constructor lacks the original seventh style argument. White text and
+  260px width are preserved; exact tooltip typography remains to be compared.
+- Audited native doDOTEffect, reset/destroy and ToolTip methods against the source.
+  Added tests for unchanged native state/arguments, stacking, refresh, expiry,
+  protected stats, icon geometry/reuse and tooltip cleanup. Extended the fixture
+  with native tooltip ownership APIs; TypeScript, bundle build and all 75 tests
+  pass. Live combat/debuff rendering and original-SWF visual parity are pending.

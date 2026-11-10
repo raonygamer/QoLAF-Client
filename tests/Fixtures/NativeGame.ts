@@ -529,6 +529,7 @@ export function registry() {
     'core.artifact.ArtifactBox': Box,
     'core.artifact.ArtifactOverview': Overview,
     'core.artifact.ArtifactSorting': class {},
+    'core.hud.components.ToolTip': ToolTip,
     'core.hud.components.Button': NativeButton,
     'core.ship.PlayerShip': PlayerShip,
     'core.ship.EnemyShip': EnemyShip,
@@ -548,4 +549,40 @@ export function registry() {
     'starling.events.Touch': class {},
     'starling.events.TouchEvent': class {},
   } as any;
+}
+
+// Native tooltip ownership and public setters; no renderer simulation.
+export class ToolTip {
+  static instances: ToolTip[] = [];
+  text = '';
+  color = 0;
+  hidden = false;
+  disposed = false;
+  constructor(
+    _game: any,
+    readonly target: Display,
+    text: string,
+    _images: any,
+    readonly type: string,
+    readonly width: number,
+  ) {
+    this.text = text;
+    ToolTip.instances.push(this);
+  }
+  set_text(text: string) {
+    this.text = text;
+  }
+  set_color(color: number) {
+    this.color = color;
+  }
+  hide() {
+    this.hidden = true;
+  }
+  static disposeType(type: string) {
+    for (const tooltip of this.instances.filter((item) => item.type === type)) {
+      tooltip.hide();
+      tooltip.disposed = true;
+    }
+    this.instances = this.instances.filter((item) => item.type !== type);
+  }
 }

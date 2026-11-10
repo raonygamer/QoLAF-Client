@@ -1,4 +1,6 @@
 import { read, type Raw } from '../Api/Types';
+import type { DebuffTracker } from '../Debuff/DebuffTracker';
+import { DebuffDisplay } from './DebuffDisplay';
 import { NativeUI } from './NativeUI';
 import { ProgressBar } from './ProgressBar';
 import { AuraText } from './AuraText';
@@ -23,15 +25,21 @@ export class TargetInfo {
   private nearby: Raw[] = [];
   private refresh = 0;
   private info: TargetPresentation;
+  private debuffs?: DebuffDisplay;
   constructor(
     private ui: NativeUI,
     private game: Raw,
     private target: TargetSystem,
     private config: Settings,
     private save: () => void,
+    debuffs?: DebuffTracker,
   ) {
     this.node = ui.sprite();
     this.info = new TargetPresentation(ui, game);
+    if (debuffs) {
+      this.debuffs = new DebuffDisplay(ui, game, debuffs);
+      this.node.addChild(this.debuffs.node);
+    }
     this.lockTexture = ui.texture('ti_cargo_protection', 'texture_gui1_test.png');
     this.unlockTexture = ui.texture('ti_cargo_protection_inactive', 'texture_gui1_test.png');
     this.lock = ui.image(this.unlockTexture);
@@ -147,6 +155,11 @@ export class TargetInfo {
         .slice(0, this.rows.length);
       this.refresh = 0.25;
     }
+    if (this.debuffs) {
+      this.debuffs.node.set_y(y);
+      this.debuffs.update(unit, hidden, unit ? this.info.name(unit) : '');
+      y += this.debuffs.height;
+    }
     y += 2;
     for (let i = 0; i < this.rows.length; i++) {
       const row = this.rows[i];
@@ -168,6 +181,7 @@ export class TargetInfo {
     }
   }
   dispose() {
+    this.debuffs?.dispose();
     for (const row of this.rows) row.dispose();
     this.shield.dispose();
     this.health.dispose();

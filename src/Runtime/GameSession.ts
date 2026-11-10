@@ -3,6 +3,7 @@ import { sessionSettings } from '../Settings/RuntimeSettings';
 import { installNativeSettings } from '../Settings/NativeSettings';
 import type { DeviceSettings } from '../Settings/DeviceSettings';
 import type { Settings } from '../Settings/Settings';
+import { installDebuffTracker } from '../Debuff/DebuffTracker';
 import { TargetSystem } from '../Target/TargetSystem';
 import { NativeUI } from '../UI/NativeUI';
 import { loadTargetAimIndicator, type TargetAimIndicator } from '../UI/TargetAimIndicator';
@@ -35,7 +36,8 @@ export function installGameSession(
     loadTargetAimIndicator(ui, game, target, targetIcon, (value) => {
       indicator = value;
     });
-  const panel = new TargetInfo(ui, game, target, config, save);
+  const debuffs = installDebuffTracker(session, game);
+  const panel = new TargetInfo(ui, game, target, config, save, debuffs);
   session.defer(() => panel.dispose());
   const telemetry = new RadarTelemetry(ui, game, config);
   session.defer(() => telemetry.dispose());
