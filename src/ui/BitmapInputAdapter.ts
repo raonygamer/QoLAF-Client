@@ -16,6 +16,8 @@ export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
     readonly textEditorProperties: Raw;
     readonly richEditor: Raw;
     styleName = '';
+    private idleColor = 0x191919;
+    private focusColor = 0x292929;
     private promptText = '';
 
     constructor() {
@@ -54,13 +56,29 @@ export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
 
     private readonly onChange = () => this.dispatchEventWith('change');
     private readonly onFocusIn = () => {
-      this.background.set_color(0x292929);
+      this.background.set_color(this.focusColor);
       this.dispatchEventWith('focusIn');
     };
     private readonly onFocusOut = () => {
-      this.background.set_color(0x191919);
+      this.background.set_color(this.idleColor);
       this.dispatchEventWith('focusOut');
     };
+
+    setBackgroundAppearance(color: number, focusedColor = color, alpha = 1): void {
+      this.idleColor = color;
+      this.focusColor = focusedColor;
+      this.background.set_color(this.hasFocus ? focusedColor : color);
+      this.background.set_alpha(alpha);
+    }
+
+    get isEnabled(): boolean {
+      return this.entry.get_isEnabled();
+    }
+    set isEnabled(value: boolean) {
+      this.entry.set_isEnabled(value);
+      this.touchable = value;
+      if (!value) this.clearFocus();
+    }
 
     get text(): string {
       return this.entry.get_text();

@@ -1,3 +1,4 @@
+import { installNativeClientDevVisual } from '../visuals/NativeClientDevVisual';
 import { installNativeMusicPlayer } from '../music/NativeMusicPlayer';
 import type { MusicPlayerService } from '../music/MusicPlayer';
 import { installNativePlayerInspect } from '../inspect/NativePlayerInspect';
@@ -75,6 +76,7 @@ export function installGameSession(
   installMapLiveMiniatures(session, game);
   installNexarWorldLabels(session, game);
   installNativeSettings(session, preferences);
+  installNativeClientDevVisual(session, game);
   installHealthAndShield(session, game);
   installRespawn(session, game);
   installDamageText(session, game);

@@ -112,6 +112,17 @@ export function settingsControls(resolve: Resolve) {
     }
   }
   class Slider extends NativeSlider {
+    private enabled = true;
+    get isEnabled(): boolean {
+      return this.enabled;
+    }
+    set isEnabled(value: boolean) {
+      if (this.enabled === value) return;
+      this.enabled = value;
+      this.touchable = value;
+      this.thumbState = null;
+      this.setThumbState('up');
+    }
     constructor() {
       super();
       this.track.removeFromParent(true);
@@ -123,14 +134,21 @@ export function settingsControls(resolve: Resolve) {
       return 14;
     }
     setThumbState(state: string) {
+      if (this.enabled === false) state = 'disabled';
       if (this.thumb && state === this.thumbState) return;
       this.thumbState = state;
       this.thumb?.removeFromParent(true);
       this.thumb = new Frame(
         10,
         14,
-        state === 'down' ? 0x282828 : state === 'hover' ? 0x181818 : 0x505050,
-        0x707070,
+        state === 'disabled'
+          ? 0x080808
+          : state === 'down'
+            ? 0x282828
+            : state === 'hover'
+              ? 0x181818
+              : 0x505050,
+        state === 'disabled' ? 0x282828 : 0x707070,
       );
       this.addChild(this.thumb);
       this.layout();

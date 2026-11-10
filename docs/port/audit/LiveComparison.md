@@ -1511,3 +1511,37 @@ bright pixels. GPU readback also found those pixels through final OpenFL stage
 composition. No experimental GL flush, buffer upload, cache-token or render
 replacement was retained. This closes that specific evidence trail, not every
 visual/lifecycle check for Music. Radio and hull editor remain unimplemented.
+
+## Native developer hull editor — 2026-11-10
+
+Ported ClientDevVisualPopup, its palette/coordinate model, the source AGAL hull
+and beam styles, and PhaseBladeBloomFilter. `/sv devvis` opens the native window
+with the source developer-ID checks. Draft edits never touch the live ship;
+Apply validates state, respects the two-second cooldown and saves per account.
+The local hull adapter restores previous styles/filters and limits application
+to source-supported Nexar, Crystal and Rapture textures. Gameplay is untouched.
+
+Opened the original SWF editor (`/tmp/QoLAF-OriginalHullEditor.png`) and compared
+it with the browser port (`/tmp/QoLAF-HullEditorCorrected.png`). Panel geometry,
+control positions, labels and preview structure match the source. Different
+accounts have different ships. The first pass exposed a truncated checkbox
+label, wrong input styling and ineffective native slider disabling; corrected
+all three. Original input background sampled as RGB(52,60,65). The input uses
+our bitmap editor at the original 12px with original padding. Disabled sliders
+now suppress pointer input and use the source dark thumb, including hover state.
+
+Live verification used the real `/sv devvis` sendMessage command path: it opens
+the window and clears the draft without sending chat. Exercised all nine
+non-default pattern/palette combinations across rendered frames: every preview
+retained the custom native style and valid settings, with zero reported runtime
+errors. Ice changes hull/blade preview colors. Invalid hex produces valid=false
+and native Apply alpha=0.2 with its touch handler disabled. Cancel disposes the
+popup; reopening restores default settings rather than the abandoned Ice draft.
+No live Apply or equipment change was performed. The original and port windows
+remain open for comparison; neither account's visual settings were changed.
+
+Not finished: live Apply on a supported hull, persistence/respawn/room transition
+verification, the actual phase-blade weapon rendering path, visual IPC sharing,
+and the broader /sv command family. The popup explicitly says sharing is still
+being ported rather than claiming that local Apply broadcasts. Radio remains
+unimplemented. The shader and beam preview do not prove live weapon parity.

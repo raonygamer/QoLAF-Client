@@ -1835,3 +1835,21 @@ The historical AS3 archive remains distinct from the port version used for persi
 Help preserves its 720×500 source layout, scaling the whole native window only when
 needed to keep tabs and Close inside the viewport. Radio and hull-editor screens
 are still missing; this work does not complete screen parity.
+
+## VISUAL-01 — native hull editor implemented; live weapon/sharing still open
+
+The original developer hull-editor screen is now ported and connected to
+`/sv devvis`, with source account checks, bitmap inputs, settings controls,
+source layout, draft isolation, presets, validation and original shader previews.
+Compared directly to the original running SWF, correcting checkbox width, input
+styling and disabled sliders. All nine pattern/palette preview combinations ran
+without reported runtime errors. Cancel/reopen preserves the original settings;
+invalid hex disables Apply. Details and screenshots are in LiveComparison.md.
+
+Local hull application and per-account persistence are implemented, but the
+current test ship is not a source-supported hull and live Apply was not tested.
+Do not mark application or full visual parity verified. Remaining: supported-hull
+Apply/restore, context/lifecycle transitions, actual phase-blade rendering,
+visual IPC sharing, other /sv features and the Radio screen. Cosmetic model,
+spatial transforms, palette boundaries, draft validation and disabled slider
+transitions have regression coverage.

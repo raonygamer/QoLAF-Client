@@ -135,6 +135,14 @@ test('settings slider retains upstream drag behavior with original skin geometry
   touch('ended', 79);
   assert.equal(oldThumb.disposed, true);
   assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x505050);
+  slider.isEnabled = false;
+  assert.equal(slider.touchable, false);
+  assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x080808);
+  slider.setThumbState('hover');
+  assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x080808);
+  slider.isEnabled = true;
+  assert.equal(slider.touchable, true);
+  assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x505050);
   const children = slider.children.slice();
   slider.dispose();
   assert.ok(children.every((child: any) => child.disposed));
