@@ -9,6 +9,7 @@ const properties = {
   nearby_enemy_radar_lines: 'nearbyEnemyRadarLines',
   show_radar_fps: 'showRadarFPS',
   show_radar_latency: 'showRadarLatency',
+  show_radar_dps: 'showRadarDPS',
   show_radar_speed: 'showRadarSpeed',
   radar_speed_in_mph: 'radarSpeedInMph',
   show_radar_service: 'showRadarService',

@@ -230,3 +230,31 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   check, so live aura hover and original-SWF visual comparison remain pending.
   Native ToolTip's current style remains the same known typography limitation as
   the debuff tooltip; this is not a complete target-HUD parity sign-off.
+
+### Radar direct-hit DPS estimate
+
+- Ported RollingDamageEstimate's fixed 100 buckets, 50ms granularity, full
+  five-second denominator, clock rollback reset and five-second partial flag.
+  Connected showRadarDPS to the runtime settings and original third radar row,
+  retaining the `Current DPS: ~N (partial)` wording and 15px line placement.
+- Uses current native Damage.dmg() and HEAL constant (6), not historical damage,
+  shield or corrosive formulas. Beam adapter counts successful existing heat
+  checks inside native shoot, including Haxe's eight-tick catch-up loop. It never
+  calls canFire again or changes the native method's arguments/result. Pet beams
+  without heat infer the native timer progression.
+- Added source instant-ray and homing swept-contact observers, bounded 512-unit
+  instant scan, nearest mine blast contact, and native MissileStuck entry hook.
+  Observations do not change projectiles, select targets or send damage. Unit
+  reset generations supplement the Haxe runtime's missing source lifecycle ID;
+  stale homing targets are rejected, and duplicate hits are suppressed.
+- Coverage is still incomplete: ProjectileBullet/Bouncing contact callbacks have
+  not yet been adapted, and those projectile families explicitly mark partial.
+  Source omissions (blastwave, splitting, splash and extra hits) remain partial.
+  Server-only modifiers, DOT and actual attacker attribution are not inferred.
+- TypeScript/build and all 84 tests pass. Tests cover rolling expiry, geometry,
+  native-field preservation, healing/foreign-weapon rejection, pooled targets,
+  duplicate contacts, beam heat/return preservation and DPS setting/row layout.
+- Live reload reached gameplay and rendered `Current DPS: ~0` above the radar in
+  /tmp/QoLAF-DpsRadar.png. Closed the sale dialog afterward. This verifies idle
+  rendering only; live hit estimates, pet beam timing and SWF combat comparison
+  remain pending. No combat input or purchase was performed for this check.

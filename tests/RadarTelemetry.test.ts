@@ -42,7 +42,7 @@ test('radar source wording, placement, timing, service room and ship lifecycle',
   telemetry.update(0.1);
   const node = telemetry.node as Node;
   assert.deepEqual(
-    node.children.map((label) => label.text),
+    node.children.filter((label) => label.visible).map((label) => label.text),
     ['Frames/sec: --', 'Latency: 22 ms', 'Current speed: 360 km/h', 'Service: service-test'],
   );
   assert.equal(node.x, 8);
@@ -62,4 +62,35 @@ test('radar source wording, placement, timing, service room and ship lifecycle',
   game.hud.radar.visible = false;
   telemetry.update(0.1);
   assert.equal(node.visible, false);
+});
+
+test('DPS occupies the original third radar row and responds to its source setting', () => {
+  const ui: any = { sprite: () => new Node(), text: () => new Node(), dispose() {} };
+  const game = {
+    me: { ship: { alive: true, course: { speed: { x: 0, y: 0 } } } },
+    clock: { latency: 10 },
+    hud: { radar: { x: 8, y: 600, visible: true } },
+  };
+  let partial = true;
+  const damage: any = {
+    now: () => 1000,
+    estimate: {
+      perSecond: () => 123.6,
+      isPartial: () => partial,
+    },
+  };
+  const config = { ...defaults };
+  const telemetry = new RadarTelemetry(ui, game, config, damage);
+  telemetry.update(0.1);
+  const node = telemetry.node as Node;
+  assert.equal(node.children[2].text, 'Current DPS: ~124 (partial)');
+  assert.equal(node.y, 600 - 75 - 18);
+  partial = false;
+  telemetry.update(0.1);
+  assert.equal(node.children[2].text, 'Current DPS: ~124');
+  config.show_radar_dps = false;
+  telemetry.update(0.1);
+  assert.equal(node.children[2].text, 'Current speed: 0 km/h');
+  assert.equal(node.children[4].visible, false);
+  assert.equal(node.y, 600 - 60 - 18);
 });

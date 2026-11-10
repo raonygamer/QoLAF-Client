@@ -5,6 +5,7 @@ export const defaults = {
   nearby_enemy_radar_lines: 5,
   show_radar_fps: true,
   show_radar_latency: true,
+  show_radar_dps: true,
   show_radar_speed: true,
   radar_speed_in_mph: false,
   show_radar_service: true,

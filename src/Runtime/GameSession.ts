@@ -1,3 +1,4 @@
+import { installDamageObserver } from '../Telemetry/DamageObserver';
 import { read, type API, type Raw } from '../Api/Types';
 import { sessionSettings } from '../Settings/RuntimeSettings';
 import { installNativeSettings } from '../Settings/NativeSettings';
@@ -39,7 +40,8 @@ export function installGameSession(
   const debuffs = installDebuffTracker(session, game);
   const panel = new TargetInfo(ui, game, target, config, save, debuffs);
   session.defer(() => panel.dispose());
-  const telemetry = new RadarTelemetry(ui, game, config);
+  const damage = installDamageObserver(session, game, config);
+  const telemetry = new RadarTelemetry(ui, game, config, damage);
   session.defer(() => telemetry.dispose());
 
   // The original HUD owns these nodes, so opening menus hides them too.

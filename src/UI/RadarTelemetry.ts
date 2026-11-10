@@ -1,3 +1,4 @@
+import type { DamageObserver } from '../Telemetry/DamageObserver';
 import { read, type Raw } from '../Api/Types';
 import { NativeUI } from './NativeUI';
 import { Telemetry } from '../Telemetry/Telemetry';
@@ -14,11 +15,12 @@ export class RadarTelemetry {
     private ui: NativeUI,
     private game: Raw,
     private config: Settings,
+    private damage?: DamageObserver,
   ) {
     this.node = ui.sprite();
     this.node.set_touchable(false);
-    for (let i = 0; i < 4; i++) {
-      const label = ui.text(i === 3 ? 420 : 200, 15, '', 10, 0xbfc4cc, 'left', 'QoLAF_Verdana16');
+    for (let i = 0; i < 5; i++) {
+      const label = ui.text(i >= 4 ? 420 : 200, 15, '', 10, 0xbfc4cc, 'left', 'QoLAF_Verdana16');
       label.set_alpha(0.85);
       this.node.addChild(label);
       this.labels.push(label);
@@ -47,6 +49,12 @@ export class RadarTelemetry {
     if (this.config.show_radar_fps) lines.push(`Frames/sec: ${format(this.metrics.fps)}`);
     if (this.config.show_radar_latency)
       lines.push(`Latency: ${format(this.game.clock?.latency)} ms`);
+    if (this.config.show_radar_dps && this.damage) {
+      const now = this.damage.now();
+      lines.push(
+        `Current DPS: ~${format(this.damage.estimate.perSecond(now))}${this.damage.estimate.isPartial(now) ? ' (partial)' : ''}`,
+      );
+    }
     if (this.config.show_radar_speed)
       lines.push(
         `Current speed: ${format(this.metrics.displaySpeed(this.config.radar_speed_in_mph))} ${this.config.radar_speed_in_mph ? 'mph' : 'km/h'}`,
