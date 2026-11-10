@@ -1,10 +1,10 @@
 import type { Raw } from '../Api/Types';
 import { AutomationEvent } from './AutomationEvent';
-import { AutomationInfo } from './AutomationInfo';
+import { AutomationInfo, type AutomationMetadata } from './AutomationInfo';
 import { EventBus, type AutomationCommands } from './EventBus';
 
 export interface AutomationScript {
-  getInfo(): AutomationInfo;
+  getInfo(): AutomationMetadata;
 }
 export type AutomationConstructor = new (bus: EventBus) => AutomationScript;
 
@@ -24,22 +24,28 @@ export class AutomationRuntime {
     private readonly game: () => Raw | null,
     private readonly releaseControls: () => void,
     private readonly reportError: (type: string, error: unknown) => void,
-  ) {}
+    initialRuntime?: { script: AutomationScript; bus: EventBus },
+  ) {
+    this.script = initialRuntime?.script ?? null;
+    this.bus = initialRuntime?.bus ?? null;
+  }
 
   initialize(): boolean {
     if (this.initialized) return true;
     if (!this.game()) return false;
-    const bus = new EventBus(this.id, this.commands);
-    try {
-      this.script = new this.Script(bus);
-      if (typeof this.script?.getInfo !== 'function')
-        throw new Error('AutomationScript must implement getInfo().');
-      this.bus = bus;
-    } catch (error) {
-      bus.dispose();
-      this.lastError = String(error instanceof Error ? error.message : error);
-      this.reportError('constructor', error);
-      return false;
+    if (!this.bus) {
+      const bus = new EventBus(this.id, this.commands);
+      try {
+        this.script = new this.Script(bus);
+        if (typeof this.script?.getInfo !== 'function')
+          throw new Error('AutomationScript must implement getInfo().');
+        this.bus = bus;
+      } catch (error) {
+        bus.dispose();
+        this.lastError = String(error instanceof Error ? error.message : error);
+        this.reportError('constructor', error);
+        return false;
+      }
     }
     this.initialized = true;
     if (this.dispatch(AutomationEvent.INITIALIZE)) return true;

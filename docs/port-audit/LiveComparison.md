@@ -351,3 +351,29 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   cannot execute directly in the browser runtime; modules need a JS/TS port.
 - Original repository has ongoing modified/untracked files; none were edited or
   reset. Source reads in this pass used the current worktree as authoritative.
+
+### Automation manager and browser I/O adapter (integration in progress)
+
+- Added installed-module manager with source SCRIPT_ID/getInfo contract, metadata
+  validation, duplicate/version rejection, initial script instance reuse,
+  start/stop/remove, control ownership, transient inactivity ownership and room
+  handoff. Imports/restores initialize when attached but never auto-start scripts.
+  Room changes construct fresh runtime instances while retaining installed code.
+- Added browser storage adapter for installed code snapshots (matching AIR's
+  persisted module bytes rather than silently refetching changed code on reload),
+  HTTPS/local-preview fetch and Blob-module compilation with URL cleanup. Modules
+  are bundled ES modules exporting a script class; plain metadata objects avoid
+  requiring an import of the client bundle. Relative module imports are not
+  supported by the Blob-based bundled-module contract.
+- Failed metadata validation/storage writes dispose pending module resources;
+  deletion failure leaves the stopped module recoverable. Imports completing
+  after disposal cannot install or persist. Settings listener errors are isolated
+  as in the original dispatchChanged path.
+- TypeScript/build and all 111 tests pass. Tests cover installed bytes, restore,
+  no auto-start, source lifecycle instance counts, control ownership, error/room
+  cleanup, storage failure, disposal races, plain module metadata and defensive
+  storage snapshots. Browser Blob execution itself still needs a live integration
+  check; loader tests currently inject compiled script classes.
+- The manager is not yet attached to the live game. Full command-registry adapter,
+  game tick/render wiring, import callback ownership and SettingsAutomations UI
+  remain next steps; the category stays absent until that integration works.
