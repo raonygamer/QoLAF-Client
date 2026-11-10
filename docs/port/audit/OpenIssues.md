@@ -350,3 +350,34 @@ This verifies Advanced PNG viewer integration, not full chat parity. Actual GIF
 playback visual comparison, Simple-chat image layout, alias expansion, external
 image-host CORS and comparison of this viewer against the running SWF remain
 open. Earlier upload-probe claims did not cover this canvas-backed PNG color bug.
+
+
+Simple-chat image layout is now integrated with the shared session cache. Source
+ChatSimple behavior retained: prefetch on receive, ten-message/100ms projection,
+first-link thumbnail, invisible spacer sized from actual bitmap-font line height,
+source-index positioning, newline before visible suffix text, secondary image
+links rendered as labels, reuse by message identity and release when no longer
+visible. Native WrapText owns text and thumbnails together so the same clipping,
+vertical shift and transforms apply; layout hooks reposition attachments after
+width/font reflow. Image completion queues the next refresh rather than mutating
+text during label validation.
+
+Regression uses original Verdana atlas metrics and actual rich renderer: checks
+channel policy, shared prefetch/load, spacer sizing, source positions, asynchronous
+reflow, suffix/link handling, reused entries and removal cleanup. Typecheck/build,
+all 249 tests, formatting and diff checks pass.
+
+Live local-only 220x140 two-frame GIF showed correct red/left-white and
+blue/right-white frames in Simple chat, with the author bottom-aligned and suffix
+on the following line. Screens: /tmp/QoLAF-SimpleGifOne.png and
+/tmp/QoLAF-SimpleGifTwo.png. Switching to Advanced retained the cached image;
+clicking opened the source viewer, whose actual playback showed both frames
+(/tmp/QoLAF-GifViewerThree.png and /tmp/QoLAF-GifViewerFour.png). This verifies
+native frame-driven playback, not exact timing against the SWF. The probe was
+inserted directly into the local display queue; no player message was sent.
+Removed probe from queue and both views, closed viewer, verified reference count
+zero and only the renderer remaining under Simple WrapText (SimpleCleanup.png).
+Temporary GIF deleted and console closed. Original SWF visual comparison,
+external-host CORS, alias expansion and remaining chat interaction parity remain
+open. Advanced suffix text can be covered by the thumbnail; compare its source
+layout before deciding whether that needs adaptation.

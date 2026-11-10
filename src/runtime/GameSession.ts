@@ -72,7 +72,13 @@ export function installGameSession(
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences);
   installNativeChatHistory(session, game);
-  installNativeSimpleChat(session, game);
+  installNativeSimpleChat(
+    session,
+    game,
+    messages
+      ? { resolve: bitmap.resolve, cache: images, renderer: messages.simpleRenderer }
+      : undefined,
+  );
   installNativeChatLayout(session, game, preferences);
   installNativeChatTheme(session, game, bitmap.resolve, preferences);
   const formatting = editor
