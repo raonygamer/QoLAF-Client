@@ -1,3 +1,4 @@
+import { installDisplayTexturePixels } from './ui/DisplayTexturePixels';
 import { installCombatTextFrames } from './rendering/CombatTextFrames';
 import { installEmitterFrames } from './rendering/EmitterFrames';
 import { installLocalClientCommands } from './chat/LocalClientCommands';
@@ -44,6 +45,7 @@ export default {
       installLocalClientCommands(api);
       installBossSpawnTimerHooks(api);
       installTorpedoCueHooks(api);
+      installDisplayTexturePixels(api);
       installMapTextureKeys(api);
       installNetherBlobBeamHooks(api);
       installInterpolation(api);

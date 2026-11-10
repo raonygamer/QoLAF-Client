@@ -14,7 +14,7 @@ screenshots are recorded in [LiveComparison.md](LiveComparison.md).
 | CHAT-01 | Actual chat renderer/composer is incomplete | Rich document, browser input transport and bitmap editor are now active on native TextEntry. Live formatted draft, Ctrl+A selection, pointer drag and command Tab completion verified. Source offsets, global restriction, serialized limits and font changes covered by native-hook tests. | Original Color/Size toolbar and popup are active, including bitmap hex input. Live FF6600 and 24px selection changes verified; original color popup visually compared. Context-menu/clipboard interactions and resize/focus cases need broader verification. Port original integrated Simple/Advanced panel, links/artifact tokens/images and sizing. Word navigation/double-click selection, live IME and full original comparison remain open. Preserve current game messaging rules. |
 | CHAT-02 | Chat autocomplete parity incomplete | Native command popup integrated with source model, supported command metadata, Tab/arrows/Escape, passive argument help, row clicks and scrolling. Live prefix and Tab completion verified; pooled-row anchor bug found and corrected. | Corrected anchor and drawing order verified after reload. Wheel scrolling and row-click completion verified live; clicking fills the editor without submitting. Verify scrollbar dragging, resize and custom registry updates live; compare original. Emoji/friend preview autocomplete remains unported. |
 | CHAT-03 | Remaining source commands absent | Local `/timers`, `/clearchat`, `/echo`, automation commands and custom help ported. `/resync` lacks native parallel-resync API. | Audit command inventory and implement supported client features honestly; do not advertise unimplemented commands. |
-| MAP-01 | Orbit colors differ from original | Native/source orbit drawing both request blue; port displays yellow. Cache-key parity implemented but did not resolve color. | Trace bitmap/vector rendering and color transform separately; verify against original Fulzar map. |
+| MAP-01 | Orbit colors differ from original | Fixed canvas-backed vector texture channel swap via DisplayTexturePixels. Live Fulzar map now renders blue orbits matching SWF; safe-zone ring tint also corrected. | Color defect verified in OrbitBefore/OriginalOrbits/OrbitCorrected screenshots. Actual graphics-context restoration still needs live verification; restoration draw path is regression-tested. |
 | PORT-01 | Other full-port gaps | Full parity remains incomplete: aim assist, additional projectile/boss presentation, reconnect/loading, desktop/IPC features and broader settings audit. | Continue requirement-by-requirement source diff and live comparison. This ledger is not a narrowed completion definition. |
 
 ## Gameplay invariant
@@ -594,3 +594,24 @@ Regression distinguishes rejected mouse versus Tab completions and checks passiv
 help highlighting/non-insertion. Typecheck/build/full suite: 267 pass; formatting
 and diff checks pass. This source/fixture verification did not require another
 live reload. Live wheel occlusion and longer gameplay audits remain open.
+
+
+Native vector texture upload audit resolved MAP-01. TextureManager draws OpenFL
+sprites into a BitmapData then uploads the canvas directly, reproducing the same
+red/blue swap previously confirmed in chat image decoding. DisplayTexturePixels
+marks factory source objects in a WeakSet and materializes pixels after their
+BitmapData.draw. The native restoration callback reuses the same source, so its
+fresh bitmap takes the same normalized upload path without replacing the native
+cache, geometry, transforms or restoration lifecycle. Unrelated draws are left
+alone. The first regression caught the host after-hook result argument before
+the source argument; corrected implementation passes the real host hook fixture.
+
+Live comparison: /tmp/QoLAF-OrbitBefore.png shows yellow orbit lines;
+/tmp/QoLAF-OriginalOrbits.png shows SWF blue lines;
+/tmp/QoLAF-OrbitCorrected.png shows corrected blue lines after build/reload.
+Safe-zone rings outside the map also regained their source blue tint. Both map
+windows were closed afterward. No chat messages or movement inputs were sent.
+Typecheck/build/full suite: 268 pass; formatting/diff checks pass. Regression
+covers initial upload, fresh-bitmap restoration, source/matrix/key preservation,
+unrelated draws and hook cleanup. Real GPU context-loss restoration and other
+map layout/miniature differences remain unverified, not covered by this color fix.
