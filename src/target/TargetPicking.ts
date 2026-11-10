@@ -18,7 +18,7 @@ export function installTargetPicking(
   const unbind = (unit: Raw, clearTarget: boolean) => {
     bindings.get(unit)?.dispose();
     bindings.delete(unit);
-    if (clearTarget && target.current === unit) target.clear(true);
+    if (clearTarget) target.remove(unit);
   };
   const bind = (unit: Raw) => {
     const clip = read(unit, 'movieClip');

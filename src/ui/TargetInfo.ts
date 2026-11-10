@@ -8,6 +8,7 @@ import { AuraInfo } from './AuraInfo';
 import { NearbyTargetBar } from './NearbyTargetBar';
 import { TargetPresentation, levelColor } from '../target/TargetPresentation';
 import type { TargetSystem } from '../target/TargetSystem';
+import { NearbyTargets } from '../target/NearbyTargets';
 import type { Settings } from '../settings/Settings';
 // TargetInfoElement.as: native display-list port; no HTML counterpart.
 export class TargetInfo {
@@ -24,7 +25,7 @@ export class TargetInfo {
   private shield: ProgressBar;
   private health: ProgressBar;
   private rows: NearbyTargetBar[] = [];
-  private nearby: Raw[] = [];
+  private nearby: NearbyTargets;
   private refresh = 0;
   private info: TargetPresentation;
   private debuffs?: DebuffDisplay;
@@ -38,6 +39,7 @@ export class TargetInfo {
   ) {
     this.node = ui.sprite();
     this.info = new TargetPresentation(ui, game);
+    this.nearby = new NearbyTargets(target, this.info, config);
     if (debuffs) {
       this.debuffs = new DebuffDisplay(ui, game, debuffs);
       this.node.addChild(this.debuffs.node);
@@ -85,13 +87,7 @@ export class TargetInfo {
     this.node.set_y(Math.round((read(stage, 'stageHeight') - 53) * this.config.target_info_y));
     while (this.rows.length < this.config.nearby_enemy_radar_lines) {
       const row = new NearbyTargetBar(this.ui, this.info, (u) => {
-        if (
-          this.target.valid(u) &&
-          u.isHostile &&
-          !this.target.excluded(u) &&
-          this.target.select(u, true)
-        )
-          this.target.locked = true;
+        this.nearby.select(u);
       });
       this.rows.push(row);
       this.node.addChild(row.node);
@@ -155,25 +151,7 @@ export class TargetInfo {
     }
     this.refresh = Math.max(0, this.refresh - Math.max(0, dt));
     if (this.config.target_list_expanded && this.refresh <= 0) {
-      const seen = new Set(),
-        active = unit ? this.info.identity(unit) : null;
-      this.nearby = this.game.unitManager.units
-        .filter((u: Raw) => {
-          if (
-            u === unit ||
-            !u.isHostile ||
-            !this.target.valid(u) ||
-            this.target.excluded(u) ||
-            this.target.distance(u) >= this.config.target_search_distance
-          )
-            return false;
-          const id = this.info.identity(u);
-          if (id === active || seen.has(id)) return false;
-          seen.add(id);
-          return true;
-        })
-        .sort((a: Raw, b: Raw) => this.info.compare(a, b, (u) => this.target.distance(u)))
-        .slice(0, this.rows.length);
+      this.nearby.refresh(this.game.unitManager.units, this.rows.length);
       this.refresh = 0.25;
     }
     if (this.debuffs) {
@@ -184,20 +162,9 @@ export class TargetInfo {
     y += 2;
     for (let i = 0; i < this.rows.length; i++) {
       const row = this.rows[i];
-      const u = this.nearby[i];
+      const u = this.nearby.at(i);
       row.node.set_y(y + i * 30);
-      row.show(
-        u &&
-          this.target.valid(u) &&
-          u.isHostile &&
-          !this.target.excluded(u) &&
-          u !== unit &&
-          this.target.distance(u) < this.config.target_search_distance
-          ? u
-          : null,
-        u ? this.target.distance(u) : 0,
-        dt,
-      );
+      row.show(u, u ? this.target.distance(u) : 0, dt);
       row.node.set_visible(this.config.target_list_expanded);
     }
   }

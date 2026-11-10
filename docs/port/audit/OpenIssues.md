@@ -855,3 +855,30 @@ disable stencil or ship an unconditional buffer reupload.
 All temporary render/draw wrappers automatically restored and restoration was
 observed in the console. No game reload, settings change, message send, movement,
 or firing occurred during these captures. Production code remains unchanged.
+
+
+## Nearby target lifetime parity (2026-11-10)
+
+Compared source TargetInfoElement.refreshNearbyTargets, updateNearbyTargetBars and
+onNearbyTargetSelected. The original re-sorts every 250ms by group/player/boss
+priority, level, distance and id; fixed slots would not match that source. The
+missing parity was its lifecycleId guard and immediate active boss-identity
+exclusion between refreshes.
+
+NearbyTargets now owns the same sorted snapshot, validates each cached entry's
+lifetime before showing/selecting it, and suppresses all parts of the active boss.
+TargetPicking increments a session-local WeakMap generation before native unit
+removal, including non-selected units, because Haxe units lack the source
+lifecycleId. Locked target removal still clears before native pooling. Reused
+objects become eligible again only after a fresh snapshot. This does not claim to
+eliminate intentional source distance/priority reordering or the independent text
+rendering defect.
+
+Verification: typecheck and full suite (286 passing). Regression cases cover
+remove/reuse without an intervening frame, stale clicks, snapshot membership,
+multipart bosses, source ordering, and live eligibility changes. Existing native
+manager hook test also asserts generation invalidation before reuse. Rebuilt the
+client bundle and reloaded the local preview once with separate F5 down/up calls;
+autologin returned to the game and nearby HUD rows rendered
+(/tmp/QoLAF-NearbyReload.png). Actual combat pool-reuse visual comparison remains
+unverified; no game units were artificially removed or reassigned during live QA.

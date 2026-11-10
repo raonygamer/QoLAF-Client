@@ -62,9 +62,12 @@ test('unit removal clears locked selection before pooled reuse, and new units ar
     click(first.movieClip);
     assert.equal(target.current, first, 'existing units bind immediately');
     target.locked = true;
+    const firstLifecycle = target.lifecycle(first);
     assert.equal(manager.remove(first), 72);
+    assert.equal(target.lifecycle(first), firstLifecycle + 1);
     assert.equal(first.movieClip.get_touchable(), false);
     assert.equal(manager.add(first), 71);
+    assert.equal(target.lifecycle(first), firstLifecycle + 1, 'add keeps the new lifetime');
     assert.equal(target.current, null, 'reused identity does not inherit the selection');
     click(first.movieClip);
     assert.equal(target.current, first);

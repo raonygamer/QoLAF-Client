@@ -1,6 +1,7 @@
 import { read, type Raw } from '../api/Types';
 import type { Settings } from '../settings/Settings';
 export class TargetSystem {
+  private lifecycles = new WeakMap<Raw, number>();
   current: Raw | null = null;
   previous: Raw | null = null;
   private lockedTarget = false;
@@ -11,6 +12,14 @@ export class TargetSystem {
     this.lockedTarget = value && this.valid(this.current);
   }
   private timeout = 0;
+  /** Haxe units are pooled but do not expose the source client's lifecycleId. */
+  lifecycle(unit: Raw): number {
+    return this.lifecycles.get(unit) ?? 0;
+  }
+  remove(unit: Raw): void {
+    this.lifecycles.set(unit, this.lifecycle(unit) + 1);
+    if (this.current === unit) this.clear(true);
+  }
   constructor(
     private game: Raw,
     private config: Settings,
