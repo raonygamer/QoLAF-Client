@@ -1222,3 +1222,33 @@ picker runtime parity until this is fixed and rechecked.
 boundaries; actual successful browser texture upload is still unverified. Still
 missing: received image thumbnails/viewer, shared cache across message views,
 :alias: expansion, save/reload/insertion live checks and runtime cleanup audit.
+
+
+Live image upload verification (after 29c5a4e): used a temporary local module
+bundling the real BrowserImagePlatform/ChatRemoteImageLoader, with a generated
+8x8 cyan PNG and the committed four-frame Disposal GIF fixture. Ran inside the
+game iframe, uploaded through native Texture.fromBitmapData, and attached native
+Starling Images to the stage. The PNG rendered cyan; CPU getPixel32(0,0) returned
+-14764836 (0xff1eb4dc), matching the fixture. GIF returned four 8x8 textures and
+[100,20,70,100] ms delays; frame 0 rendered red and switching to frame 2 rendered
+the expected blue square. Evidence: /tmp/QoLAF-ImageProbeGameRealm.png and
+/tmp/QoLAF-ImageProbeGifThird.png. Image assets reported 512 and 2048 bytes,
+respectively, including retained CPU pixels.
+
+The first probe was incorrectly imported in the launcher realm; that canvas
+failed the game's realm-specific OpenFL HTMLCanvasElement check. The static
+image was blank and getPixel32 threw. Running the same module inside the game
+iframe fixed it; production plugin imports already run there. Do not cite
+ImageProbeConsole/ ImageProbePixels as successful static-upload checks.
+
+Removed probe nodes, disposed assets, removed temporary aliases, deleted probe
+globals and temporary ignored dist files, closed the console. Cleanup screenshot:
+/tmp/QoLAF-ImageProbeCleaned.png. No player message or external image request.
+This verifies real native static/GIF texture upload and manual frame switching,
+not the as-yet-unported chat image view, playback clock, or external host CORS.
+
+Redraw issue follow-up: two fresh close cycles did not reproduce the prior
+missing labels, including typing then clearing the alias field. Evidence:
+/tmp/QoLAF-ImgNoTyping.png and /tmp/QoLAF-ImgTypedRepro.png. Issue remains open;
+no speculative renderer invalidation patch applied. Existing 241-test result
+still applies; no production code changed during this verification.
