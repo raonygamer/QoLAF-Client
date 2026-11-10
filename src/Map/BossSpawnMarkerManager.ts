@@ -1,3 +1,4 @@
+import { mapHeatViewport } from './NativeMapNavigation';
 import { read, type API, type Raw } from '../Api/Types';
 import { NativeUI } from '../UI/NativeUI';
 import { BossSpawnCatalog, type BossSpawnDescription } from './BossSpawnCatalog';
@@ -174,10 +175,7 @@ export function installBossSpawnMarkers(api: API, game: Raw): void {
     state.heatLayer.set_visible(manager.heatEnabled);
     state.legend?.set_visible(manager.heatEnabled && state.heat.length > 0);
     if (manager.enabled) for (const marker of state.markers) marker.update(state.scale);
-    const mask = read(map.mapContainer, 'mask');
-    const left = read(mask, 'x', -read(map.mapContainer, 'x')),
-      top = read(mask, 'y', -read(map.mapContainer, 'y'));
-    const viewport = { left, top, right: left + state.width, bottom: top + state.height };
+    const viewport = mapHeatViewport(map, state.width, state.height);
     if (manager.heatEnabled) for (const heat of state.heat) heat.update(state.scale, viewport);
   };
   if (typeof mapClass?.prototype.load === 'function')

@@ -615,3 +615,34 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   native area presentation also differ. These are open map-port tasks, not
   accepted substitutions. World encounter/gravity-boundary visual checks remain
   unverified away from the current safe-zone viewport.
+
+### Original system-map navigation and viewport
+
+- Ported Map.as Center, following-player state, 4px pan threshold, cancelled-touch
+  suppression, blank-area double-tap recentering and cursor-anchored 1.15x wheel
+  zoom clamped to 0.25–4. Center preserves zoom. Native planet clicks still run
+  for ordinary clicks, but a drag ending over a planet does not select it.
+- Wrapped native map content in the original padded viewport with its own
+  touchable mask/hit area. This fixes the former half-padding content offset
+  and the clipped Executor label at default zoom. Per-map geometry is restored
+  before native marker updates; mouse aiming yields while a map drag owns the
+  pointer. No shield, movement integration or damage calculation was replaced.
+- Wheel coordinates use the native Starling viewport and stage hit testing.
+  Outside hits fall through; handled wheel events do not reach game zoom.
+  Detachment, deactivation and disposal cancel gestures and remove listeners.
+  The native content/mask is restored when the adapter releases a map.
+- Heatmap culling now uses the zoomed viewport in map-local coordinates.
+- TypeScript and all 138 tests pass. Integration uses actual host hooks and
+  covers map padding/mask, click suppression before touch-end bubbling, normal
+  clicks, aim ownership, wheel hit testing/anchoring, independent map scales,
+  reattachment, mask cleanup and native passthrough for unrelated games.
+- Live port captures: /tmp/QoLAF-MapCentered.png, MapPanned.png, MapZoomed.png,
+  MapRecentered.png and MapReopened.png (all with QoLAF- prefix). Dragging, wheel
+  zoom, Center preserving zoom, close/reopen reset and the default-zoom Executor
+  label were observed. Initial Center testing caught the native button's
+  one-shot disable; added the source's explicit re-enable plus a regression.
+  Reloaded and completed two successive pan/Center cycles; the button remains
+  enabled (/tmp/QoLAF-MapCenterRepeat.png).
+- Original reference remains /tmp/QoLAF-OriginalSpawnMap.png. Dynamic miniboss
+  icons, live boss synchronization and orbit/area appearance still differ;
+  this is not full map or full-client parity.

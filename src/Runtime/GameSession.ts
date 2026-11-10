@@ -1,3 +1,4 @@
+import { installMapNavigation } from '../Map/NativeMapNavigation';
 import { installBossSpawnMarkers } from '../Map/BossSpawnMarkerManager';
 import { installNetherBlobBeamCountdown } from '../Ship/NetherBlobBeamCountdown';
 import { installTorpedoWarnings } from '../Projectile/XhersixTorpedoWarningBatch';
@@ -34,6 +35,7 @@ export function installGameSession(
   installTorpedoCue(session, game);
   installTorpedoWarnings(session, game);
   installNetherBlobBeamCountdown(session, game);
+  installMapNavigation(session, game);
   installBossSpawnMarkers(session, game);
   installNativeSettings(session, preferences);
   installHealthAndShield(session, game);
