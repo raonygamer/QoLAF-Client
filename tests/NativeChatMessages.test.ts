@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installNativeChatMessages } from '../src/chat/NativeChatMessages';
 import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
+import { ChatImageCache } from '../src/chat/ChatImageCache';
+import { ChatImageAsset } from '../src/chat/ChatImageAsset';
+import { Text } from './fixtures/NativeGame';
 import { DeviceSettings } from '../src/settings/DeviceSettings';
 // @ts-expect-error actual host hooks
 import { Hooks } from './fixtures/HostCore.js';
@@ -61,9 +64,9 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
   });
   const advanced = {
     scroll,
-    addText(text: string) {
+    addText(message: string | { text: string; type: string; playerName: string }) {
       const row = new WrapText();
-      row.set_text(text);
+      row.set_text(typeof message === 'string' ? message : message.text);
       scroll.addChild(row);
     },
   };
@@ -76,11 +79,19 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
       cleanup.push(hooks.add(object, key, 'after', fn)),
     defer: (fn: () => void) => cleanup.push(fn),
   };
+  const pending: ((asset: ChatImageAsset) => void)[] = [];
+  const images = new ChatImageCache(() => ({
+    loadCandidates(_urls, ok) {
+      pending.push(ok);
+    },
+  }));
+  t.after(() => images.dispose());
   installNativeChatMessages(
     api,
     { messageLog: { simple, advanced } },
-    fixture.resolve,
+    (name) => (name === 'starling.text.TextField' ? Text : fixture.resolve(name)),
     preferences,
+    images,
   );
   t.after(() => cleanup.reverse().forEach((fn) => fn()));
   simple.tf.set_text("A<font color='#ff0000' size='24'>B</font>C");
@@ -107,6 +118,27 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
   scroll.removeChild(row, true);
   assert.equal(row.field.disposed, true);
   assert.equal(rowRenderer.disposed, true);
+  const url = 'https://example.test/preview.png';
+  advanced.addText({ text: 'Pilot: ' + url, type: 'local', playerName: 'Pilot' });
+  assert.equal(pending.length, 0); // Preserve newer upstream channel restrictions.
+  advanced.addText({ text: 'Pilot: ' + url, type: 'clan', playerName: 'Pilot' });
+  const imageRow = scroll.getChildAt(1) as any;
+  const imageRenderer = imageRow.getChildAt(0);
+  const thumbnail = imageRow.getChildAt(1);
+  assert.equal(pending.length, 1);
+  assert.equal(imageRenderer.collapseImageLinks, true);
+  assert.equal(thumbnail.previewHeight, 16);
+  const asset = new ChatImageAsset([{ dispose() {} }], [100], 440, 280);
+  pending[0](asset);
+  assert.equal(imageRow.measuredHeight, 140);
+  assert.equal(thumbnail.previewWidth, 220);
+  assert.equal(thumbnail.get_y(), 0);
+  assert.equal(imageRenderer.get_y(), 140 - imageRenderer.get_height());
+  assert.ok(thumbnail.get_x() > 0);
+  assert.equal(asset.refCount, 1);
+  scroll.removeChild(imageRow, true);
+  assert.equal(asset.refCount, 0);
+  assert.equal(thumbnail.onPreviewSizeChanged, null);
   cleanup.reverse().forEach((fn) => fn());
   cleanup.length = 0;
   assert.equal(simple.tf.getChildAt(0), simple.tf.field);

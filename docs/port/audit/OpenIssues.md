@@ -289,3 +289,19 @@ typecheck/build and changed-file formatting pass. The thumbnail is not yet bound
 to chat message rows; this does not claim live playback or image-viewer parity.
 Next: share cache between composer and received-message views, port source row
 layout/image placement and viewer interaction, then verify actual chat rendering.
+
+Advanced received-message rows now share the composer's session image cache.
+New messages use the source channel policy and first image link, collapse that
+link in rich text, and position the thumbnail at the message body using the
+renderer source-index map. Text and preview align along the row's bottom edge;
+preview-size callbacks reflow the scroll container and retain its prior position
+or bottom-follow state. Row removal releases its cache reference; session cleanup
+restores the original fields and disposes the shared cache. Decoder creation is
+deferred until the first image request.
+
+The row regression verifies channel filtering, asynchronous preview dimensions,
+body offset, bottom alignment and reference cleanup. Typecheck, build, all 245
+tests and changed-file formatting pass. This integration has not yet been
+visually verified in live chat. Previously materialized rows lack source message
+metadata and deliberately do not infer channel permissions from text. Simple
+chat image placement, viewer interaction and alias expansion remain open.

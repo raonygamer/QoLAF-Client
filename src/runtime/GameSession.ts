@@ -1,3 +1,6 @@
+import { ChatImageCache } from '../chat/ChatImageCache';
+import { ChatRemoteImageLoader } from '../chat/ChatRemoteImageLoader';
+import { createBrowserImagePlatform } from '../chat/BrowserImagePlatform';
 import { installNativeChatHistory } from '../chat/NativeChatHistory';
 import { installNativeSimpleChat } from '../chat/NativeSimpleChat';
 import { installNativeChatLayout } from '../chat/NativeChatLayout';
@@ -59,7 +62,11 @@ export function installGameSession(
   installClanLabels(session, game);
   installNativeChatPreferences(session, game, preferences);
   const bitmap = createBitmapClasses(portedClasses(session).resolve);
-  installNativeChatMessages(session, game, bitmap.resolve, preferences);
+  const images = new ChatImageCache(
+    () => new ChatRemoteImageLoader(createBrowserImagePlatform(bitmap.resolve)),
+  );
+  session.defer(() => images.dispose());
+  installNativeChatMessages(session, game, bitmap.resolve, preferences, images);
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences);
   installNativeChatHistory(session, game);
@@ -67,7 +74,7 @@ export function installGameSession(
   installNativeChatLayout(session, game, preferences);
   installNativeChatTheme(session, game, bitmap.resolve, preferences);
   const formatting = editor
-    ? installNativeChatFormatting(session, game, editor, bitmap.resolve, preferences)
+    ? installNativeChatFormatting(session, game, editor, bitmap.resolve, preferences, images)
     : undefined;
   installCommandAutocomplete(session, game, () => formatting?.isOpen ?? false);
   const target = new TargetSystem(game, config, session.cls('core.ship.PlayerShip'));

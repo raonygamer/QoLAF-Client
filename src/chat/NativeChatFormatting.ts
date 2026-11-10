@@ -18,6 +18,7 @@ export function installNativeChatFormatting(
   editor: NativeBitmapInput,
   bitmapResolve: Resolve,
   preferences?: DeviceSettings,
+  sharedImages?: ChatImageCache,
 ) {
   const chat = game.chatInput;
   const input = chat.input;
@@ -30,9 +31,10 @@ export function installNativeChatFormatting(
   const popup = new Popup();
   const EmojiPicker = createChatEmojiPicker(resolve);
   const emoji = new EmojiPicker();
-  const imagePlatform = createBrowserImagePlatform(resolve);
-  const images = new ChatImageCache(() => new ChatRemoteImageLoader(imagePlatform));
-  api.defer(() => images.dispose());
+  const images =
+    sharedImages ??
+    new ChatImageCache(() => new ChatRemoteImageLoader(createBrowserImagePlatform(resolve)));
+  if (!sharedImages) api.defer(() => images.dispose());
   const prefetch = (link: ChatDiscordImageLink) => images.prefetch(link);
   const shortcuts = new ChatImageShortcutStore(api.storage, prefetch);
   const ImagePicker = createChatImageShortcutPicker(resolve, prefetch);

@@ -97,6 +97,12 @@ export class Display {
   getChildIndex(child: Display) {
     return this.children.indexOf(child);
   }
+  setChildIndex(child: Display, index: number) {
+    const previous = this.children.indexOf(child);
+    if (previous < 0) throw new Error('Child is not in this container');
+    this.children.splice(previous, 1);
+    this.children.splice(index, 0, child);
+  }
   contains(child: Display) {
     return this.children.includes(child);
   }

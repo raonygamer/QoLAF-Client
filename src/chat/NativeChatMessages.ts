@@ -1,3 +1,6 @@
+import type { ChatImageCache } from './ChatImageCache';
+import { ChatDiscordImageLink } from './ChatDiscordImageLink';
+import { createChatImageThumbnail } from '../ported/ChatImageThumbnail';
 import { read, type API, type Raw } from '../api/Types';
 import type { Resolve } from '../runtime/As3';
 import type { DeviceSettings } from '../settings/DeviceSettings';
@@ -8,23 +11,80 @@ export function installNativeChatMessages(
   game: Raw,
   resolve: Resolve,
   preferences?: DeviceSettings,
+  images?: ChatImageCache,
 ): void {
   const log = game.messageLog;
   const WrapText = api.cls('core.hud.components.ui.WrapText');
   if (!log?.simple?.tf || !log.advanced?.scroll || !WrapText) return;
   const Renderer = resolve('core.hud.components.chat.rich.RichBitmapFontTextRenderer');
   const BitmapFormat = resolve('feathers.text.BitmapFontTextFormat');
-  const rows = new Map<Raw, { renderer: Raw; field: Raw; alpha: number; index: number }>();
+  const Thumbnail = images ? createChatImageThumbnail(resolve, images) : null;
+  const rows = new Map<
+    Raw,
+    {
+      renderer: Raw;
+      field: Raw;
+      alpha: number;
+      index: number;
+      message?: Raw;
+      thumbnail?: Raw;
+    }
+  >();
+  const scroll = log.advanced.scroll;
+  const arrangePreservingPosition = () => {
+    const position = read(scroll, 'verticalScrollPosition', 0);
+    const followBottom = position >= read(scroll, 'maxVerticalScrollPosition', 0) - 2;
+    scroll.arrange();
+    scroll.scrollToPosition(
+      0,
+      followBottom ? read(scroll, 'maxVerticalScrollPosition', 0) : position,
+    );
+  };
   const font = () =>
     new BitmapFormat('verdana48_bitmap', preferences?.get('legacyChatFontSize') ?? 14, 0xffffff);
   const project = (row: Raw) => {
     const entry = rows.get(row)!;
-    entry.renderer.text = read(entry.field, 'text', '');
+    const text = String(read(entry.field, 'text', ''));
+    const allowImages = !!images && ChatDiscordImageLink.isEmbedChannel(entry.message?.type);
+    const link = allowImages ? ChatDiscordImageLink.firstIn(text) : null;
+    if (link && !entry.thumbnail && Thumbnail) {
+      const thumbnail = (entry.thumbnail = new Thumbnail());
+      thumbnail.set_touchable(false);
+      row.addChild(thumbnail);
+      thumbnail.onPreviewSizeChanged = () => {
+        if (!rows.has(row)) return;
+        project(row);
+        arrangePreservingPosition();
+      };
+    }
+    if (entry.thumbnail) {
+      entry.thumbnail.link = link;
+      entry.thumbnail.set_visible(!!link);
+    }
+    entry.renderer.collapseImageLinks = allowImages;
+    entry.renderer.text = text;
     entry.renderer.maxWidth = row.maxWidth > 0 ? row.maxWidth : Infinity;
     entry.renderer.set_width(row.hasWidth ? row.viewWidth : NaN);
     entry.renderer.validate();
     row.measuredWidth = entry.renderer.get_width();
-    row.measuredHeight = entry.renderer.get_height();
+    const labelHeight = entry.renderer.get_height();
+    row.measuredHeight = Math.max(labelHeight, link ? (entry.thumbnail?.previewHeight ?? 0) : 0);
+    entry.renderer.set_y(Math.max(0, row.measuredHeight - labelHeight));
+    if (link && entry.thumbnail) {
+      // ProfiledChatItemRenderer anchors the image at the message body, using
+      // the source-index map rather than guessing a character width.
+      const name = String(entry.message?.playerName ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      const marker = name + ': ';
+      const markerIndex = name ? text.lastIndexOf(marker, link.sourceBegin) : -1;
+      const sourceIndex = markerIndex < 0 ? link.sourceBegin : markerIndex + marker.length;
+      const x = entry.renderer.localXAtSourceIndex(sourceIndex);
+      entry.thumbnail.set_x(Number.isFinite(x) ? Math.max(0, x) : 0);
+      entry.thumbnail.set_y(Math.max(0, row.measuredHeight - entry.thumbnail.previewHeight));
+      row.setChildIndex(entry.thumbnail, read(row, 'numChildren') - 1);
+    }
   };
   const bind = (row: Raw) => {
     if (!row?.field || rows.has(row)) return;
@@ -62,15 +122,23 @@ export function installNativeChatMessages(
     const entry = rows.get(this);
     if (entry) {
       rows.delete(this);
+      if (entry.thumbnail) entry.thumbnail.onPreviewSizeChanged = null;
       // The detached upstream field still belongs to this row.
       entry.field.dispose();
     }
     return next(...args);
   });
-  const scroll = log.advanced.scroll;
-  const bindAdvanced = () => {
+  const bindAdvanced = (_result?: unknown, message?: Raw) => {
     for (let index = 0; index < read(scroll, 'numChildren'); index++)
       bind(scroll.getChildAt(index));
+    if (message && read(scroll, 'numChildren') > 0) {
+      const row = scroll.getChildAt(read(scroll, 'numChildren') - 1);
+      const entry = rows.get(row);
+      if (entry && read(entry.field, 'text') === message.text) {
+        entry.message = message;
+        project(row);
+      }
+    }
     scroll.arrange();
   };
   api.after(log.advanced, 'addText', bindAdvanced);
@@ -98,6 +166,10 @@ export function installNativeChatMessages(
   api.defer(() => {
     for (const [row, entry] of rows) {
       rows.delete(row);
+      if (entry.thumbnail) {
+        entry.thumbnail.onPreviewSizeChanged = null;
+        entry.thumbnail.removeFromParent(true);
+      }
       entry.renderer.removeFromParent(true);
       row.addChildAt(entry.field, Math.max(0, entry.index));
       row.set_alpha(entry.alpha);
