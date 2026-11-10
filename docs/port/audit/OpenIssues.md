@@ -401,3 +401,22 @@ original emoji/friend autocomplete popups and their command-help positioning
 remain unported. Next verify saving/typing/removing a temporary alias live and
 continue those suggestion popups; do not interpret alias support as completion
 of the autocomplete system.
+
+
+Emoji autocomplete catalog/model port added. EmojiShortcodeCatalog preserves all
+1,391 source CLDR 48 names, canonical shortcodes and keyword strings, picker order,
+Unicode/VS16 conversion, normalization cache, seven ranking levels and the four
+compatibility aliases. ChatEmojiAutocompleteModel preserves ranked buckets,
+suggestion caching, max-results cap, copied matches, wraparound selection and
+selected completion. ChatCommandSuggestion now accepts optional display text and
+emoji scalar while preserving existing command completion argument positions.
+
+Regression compares all three full catalog arrays against hashes independently
+computed from the original AS3 literals, resolves every canonical shortcode back
+to its original index, verifies scalar/renderable emoji mapping, all seven ranks,
+compatibility aliases, non-exact keywords, selection/caching and defensive copies.
+Typecheck/build, all 253 tests and diff checks pass. No live reload was needed for
+this unbound data/model addition. The shared suggestion popup still needs emoji
+preview rendering and integration with command precedence, caret tokens, closing
+colon selection, keyboard/mouse acceptance and command-argument help placement.
+Saved image alias live verification from the previous entry also remains open.
