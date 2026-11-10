@@ -141,3 +141,20 @@ it: `/tmp/QoLAF-PromptDraft.png` and `/tmp/QoLAF-PromptRestored.png` verify
 hide/restore behavior. No message sent. All 218 tests, typecheck and build pass.
 The missing Img control and QoLAF channel remain visible differences; full
 chat parity is not claimed.
+
+
+Image-shortcut dependency port: added the complete source ChatDiscordImageLink
+parser/fallback/label helpers and ChatImageShortcutStore. Storage uses plugin
+storage instead of SharedObject; preserves the original 64-entry cap, alias
+normalization, sorted entries, exact direct-image URL validation, updates at
+capacity, and memory-only operation when persistence fails. Prefetch is an
+explicit injected dependency for the upcoming image cache, not a fake loader.
+
+Four tests cover signed Discord query preservation, provider fallback order,
+source offsets, markup-attribute exclusion, channel policy, persistence/reload,
+malformed records, alias isolation and capacity. No network image fetches or
+player messages were performed. These dependencies are not wired into the live
+composer yet. Remaining required work: actual image cache/decoder and rendering,
+source picker with its two bitmap fields and pagination, channel gating,
+selection insertion, :alias: expansion, and live comparison. Do not count the
+Img feature as complete based on these helper tests.
