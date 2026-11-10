@@ -1,3 +1,4 @@
+import { getActiveBeamGeometry } from '../weapon/BeamRenderGeometry';
 import { read, type API, type Raw } from '../api/Types';
 import type { Resolve } from '../runtime/As3';
 import { ClientDevVisual } from './ClientDevVisual';
@@ -126,9 +127,10 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
         for (const particle of emitter.inactiveParticles ?? []) styleParticle(state, particle);
       }
     };
-    tint(weapon.startEffect, weapon.renderStartPos ?? weapon.startPos);
-    tint(weapon.startEffect2, weapon.renderStartPos2 ?? weapon.startPos2);
-    tint(weapon.endEffect, weapon.renderEndPos ?? weapon.endPos);
+    const geometry = getActiveBeamGeometry(weapon);
+    tint(weapon.startEffect, geometry?.start ?? weapon.renderStartPos ?? weapon.startPos);
+    tint(weapon.startEffect2, geometry?.second ?? weapon.renderStartPos2 ?? weapon.startPos2);
+    tint(weapon.endEffect, geometry?.end ?? weapon.renderEndPos ?? weapon.endPos);
   };
   const Emitter = api.cls('core.particle.Emitter')?.prototype;
   if (Emitter) {

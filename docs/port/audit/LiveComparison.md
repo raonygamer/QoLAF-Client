@@ -1582,3 +1582,32 @@ animated movement/twins/targets, actual emitter appearance, graphics-context
 restoration and comparison against the SWF in combat. Native beam endpoints still
 use the newer game's existing geometry path; the original full render-interpolated
 beam geometry is a separate remaining port requirement. Visual IPC is also pending.
+
+## Beam render interpolation — 2026-11-10
+
+Ported source render-only beam coordinates and authored phase-blade mounts.
+Beam.drawBeamEffect receives displayed muzzle/target/chain positions; the native
+shoot/update methods retain their original endpoints and gameplay. Objects not
+currently drawn fall back to simulation coordinates. Phase-blade mounts use the
+clip-to-effects-space matrix with the source base-scale/pivot/mirroring handling.
+The emitter palette adapter reads the same active render geometry; temporary
+context is cleared in finally, without writing render properties onto weapons.
+
+Regression coverage: sample at 60/120/180 FPS with fixed simulation positions;
+body radius contact and zero-distance handling; authored single/twin mounts;
+extracted native Beam.draw twin/secondary-target ordering; failure cleanup and
+other-game passthrough. Typecheck and all 434 tests passed.
+
+Live check after one explicit key-release reload: created an unregistered native
+Beam/BeamLine with a temporary displayed pose, rendered it in the overlay and
+moved that pose for 120 animation frames. Result: frames=120, mismatches=0,
+nativeChanges=0. The native start/end remained at 710/1000 while the displayed
+muzzle followed the moving pose plus the 10-unit authored offset. Snapshot:
+`/tmp/QoLAF-BeamRenderMotion.png`. Runtime errors remained zero. No shoot/fire or
+game message was invoked. Destroyed the probe, returned pooled segments, disposed
+the temporary clip/batch, and confirmed filter release plus detached display.
+
+This is a controlled browser rendering check, not real combat parity. Still
+compare equipped beams/twins and actual emitters against the SWF; port original
+visual target grace/hysteresis and multipart hull mounts. Radio, visual IPC and
+the broader ship-visual feature family remain unfinished.

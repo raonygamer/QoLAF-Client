@@ -1,3 +1,4 @@
+import { installNativeBeamGeometry } from '../weapon/NativeBeamGeometry';
 import { installNativeClientDevVisual } from '../visuals/NativeClientDevVisual';
 import { installNativeMusicPlayer } from '../music/NativeMusicPlayer';
 import type { MusicPlayerService } from '../music/MusicPlayer';
@@ -77,6 +78,7 @@ export function installGameSession(
   installNexarWorldLabels(session, game);
   installNativeSettings(session, preferences);
   installNativeClientDevVisual(session, game);
+  installNativeBeamGeometry(session, game);
   installHealthAndShield(session, game);
   installRespawn(session, game);
   installDamageText(session, game);

@@ -1864,3 +1864,19 @@ removed cleanly. This does not prove equipped-weapon combat parity. Still verify
 supported-hull Apply and persistence, actual twin-blade/target/emitter appearance,
 context restoration and room transitions. Port the original render-interpolated
 beam endpoints and visual IPC; Radio and the broader /sv family remain open.
+
+### Beam render coordinates — 2026-11-10
+
+Native beam drawing now uses displayed hull/target poses for muzzle points,
+twins, target/body contact, chained endpoints and emitter placement. The original
+phase-blade authored-mount transform is ported for ordinary player hulls, including
+base scale, pivot and mirroring. Native simulation endpoint objects, range, target
+selection and damage updates are not replaced. Palette emitters share the active
+render geometry without adding properties to native weapon objects.
+
+All 434 tests pass, including 60/120/180 FPS sampling without simulation updates,
+undrawn-object fallback, body-radius contacts, authored mounts, extracted native
+draw/chain order and failure cleanup. Remaining beam parity: original visual target
+hysteresis/grace, multipart visual mounts (depends on the missing multipart ship
+visual port), actual combat/twins/emitter comparison, and supported-hull Apply.
+Radio, visual IPC and other /sv screens/features remain outstanding.
