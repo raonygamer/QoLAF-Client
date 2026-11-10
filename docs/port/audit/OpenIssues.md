@@ -450,3 +450,19 @@ font selection, pooled-row hiding and keyboard completion. Full suite: 254 pass;
 typecheck/build, formatting and diff checks pass. Remaining: saved-image alias
 live check, more mouse/wheel/occlusion cases, small-stage help stacking and the
 friend/player suggestion system. This is not a claim of full chat parity.
+
+Friend/player autocomplete source parser and model are now ported as readable
+TypeScript. Parser uses decoded visible offsets, source punctuation/email
+boundaries and the 64-character limit. Model preserves exact/prefix/word/substring
+ranking, identity deduplication, status-first metadata, ship skin/context,
+wraparound selection and defensive match copies. Explicit rosters remain separate
+from friends: IDs disambiguate duplicate names and names containing @; spaces and
+quotes follow the original quoting/fallback rules. Suggestion metadata is appended
+to the existing constructor without changing existing call argument order.
+
+Three regressions cover token boundaries, Unicode/spaces/selection limits,
+ranking and metadata, duplicate identities, selection, roster isolation, quoted
+names and ID fallback. Typecheck and full build/test suite pass (257 tests).
+This is not yet user-visible: native popup friend previews, section headings,
+roster refresh/source selection and rich-editor replacement wiring remain open.
+No browser reload or game input was used for this change.
