@@ -1275,3 +1275,42 @@ after the toggle. Built but not yet reloaded/visually compared with the SWF.
 Shader reconstruction, grayscale/tint, flowing border and lightning are still
 unported, so pulse parity does not imply full remastered aura appearance or full
 implementation of the setting's shader behavior.
+
+## Native remastered aura shader and padded atlas geometry (2026-11-10)
+
+Ported GrayscaleAuraStyle/Effect using the native Starling MeshStyle/MeshEffect,
+VertexDataFormat and Program assembler. The actual AGAL instructions are retained:
+remastered four-read B-spline reconstruction, continuous coverage sharpening,
+grayscale/tint, synchronized flowing rim and bounded premultiplied output;
+vanilla five-read soft grayscale; constrained one-read bounded grayscale. Shader
+variants follow disableRemasteredAuras and the native context profile. Haxe class
+metadata gives styles distinct batching/clone identities and effects distinct
+program-cache keys. Uniforms use native FloatVector instances and fragment enum 0.
+The flowing phase uses the native server clock, with a local timer fallback.
+
+Quads rebuild from their texture before adding the original two-texel padding.
+Each vertex carries half-texel-inset frame bounds, including rotated atlas frames,
+so sampling outside the ship frame fades to transparent rather than reading its
+neighbors. Styles attach to active/inactive rarity particles; newly allocated
+particles and texture changes prepare geometry too. Pool disposal/unload restores
+native styles and original positions/UVs. Shared point scratch storage avoids
+per-particle geometry-helper allocations.
+
+Typecheck and all 334 tests pass. Regressions cover repeated padding, rotated
+frames, bounds, shader modes/read counts, live setting variants, native uniform
+vectors, server-clock phase and attribute cleanup. The native browser rendered a
+temporary six-particle/24-vertex aura with qolaf.rendering.GrayscaleAuraStyle and
+GrayscaleAuraEffect (#1 program). Vanilla variant #11 also compiled/uploaded and
+activated successfully; the prior setting was restored synchronously in finally.
+Cleanup was observed: probe emitter alive=false and every pooled particle back to
+starling.styles.MeshStyle. Screenshots /tmp/QoLAF-AuraShaderLive.png and
+/tmp/QoLAF-AuraShaderCleanup.png. The probe made no network sends or account
+changes. The final scratch-point allocation improvement is regression-tested but
+was made after that reload. Constrained mode is tested as generated AGAL but not
+live on a constrained GPU context. No full side-by-side aura appearance claim.
+
+Remaining aura work: lightning and outline meshes, texture anchors/contours,
+source mirrored/multipart target adaptation, full visual comparison across rarity
+types, and actual context-loss restoration. Pulse and shader paths now both honor
+the existing disable setting; its full appearance still depends on the remaining
+lightning integration.

@@ -1,3 +1,4 @@
+import { installAuraStyles } from './AuraStyles';
 import { AuraPulses, installAuraPulses } from './AuraPulses';
 import { installRarityAuraLayers } from './RarityAuraLayers';
 import { installEmitterDelays } from './EmitterDelays';
@@ -262,6 +263,7 @@ export function installEmitterFrames(api: API): void {
   if (!Emitter || !Particle || !Color || !Collective) return;
   const targets = new EmitterTargets(api.cls('core.engine.Engine'), api.cls('core.ship.EnemyShip'));
   const prepareAuras = installRarityAuraLayers(api);
+  installAuraStyles(api);
   const pulses = installAuraPulses(api);
   const frames = new EmitterFrames(Particle, Emitter, Color, targets, prepareAuras, pulses);
   installEmitterDelays(api, targets);
