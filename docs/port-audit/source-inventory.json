@@ -987,7 +987,7 @@
       "lines": 135,
       "change": "added",
       "status": "source-translated; integration and visual verification pending",
-      "typescript": "src/ported/LoginAccountTypePanel.ts"
+      "typescript": "src/Ported/LoginAccountTypePanel.ts"
     },
     {
       "path": "core/hud/components/LoginButton.as",
@@ -996,7 +996,7 @@
       "change": "changed",
       "status": "source-translated; integration and visual verification pending",
       "vanillaSha256": "ab6445987a4328efd64e27590b3899223d0e9e7f26c3d9b4f1a3f39980114e8d",
-      "typescript": "src/ported/LoginButton.ts"
+      "typescript": "src/Ported/LoginButton.ts"
     },
     {
       "path": "core/hud/components/LoginInput.as",
@@ -1012,7 +1012,7 @@
       "lines": 875,
       "change": "added",
       "status": "source-translated; integration and visual verification pending",
-      "typescript": "src/ported/LoginProfilePanel.ts"
+      "typescript": "src/Ported/LoginProfilePanel.ts"
     },
     {
       "path": "core/hud/components/LootItem.as",
@@ -1157,7 +1157,7 @@
       "lines": 55,
       "change": "added",
       "status": "source-translated; integration and visual verification pending",
-      "typescript": "src/ported/SettingsWindowChrome.ts"
+      "typescript": "src/Ported/SettingsWindowChrome.ts"
     },
     {
       "path": "core/hud/components/ShopIcons.as",
@@ -4095,7 +4095,7 @@
       "change": "changed",
       "status": "source-translated; integration and visual verification pending",
       "vanillaSha256": "f44a4bfa7150c2c046c7ab0f42fc9db03789dd6ef5e4b8cb44b7d592fff2b0d4",
-      "typescript": "src/ported/SettingsGeneral.ts"
+      "typescript": "src/Ported/SettingsGeneral.ts"
     },
     {
       "path": "core/states/gameStates/SettingsState.as",
@@ -4104,7 +4104,7 @@
       "change": "changed",
       "status": "source-translated; integration and visual verification pending",
       "vanillaSha256": "d6920e96da9ab7c76230f9134c0d225c971b9f462b883fa98dc9ade402d0628a",
-      "typescript": "src/ported/SettingsState.ts"
+      "typescript": "src/Ported/SettingsState.ts"
     },
     {
       "path": "core/states/gameStates/Shop.as",
@@ -4959,7 +4959,7 @@
       "lines": 872,
       "change": "added",
       "status": "source-translated; integration and visual verification pending",
-      "typescript": "src/ported/ClientSettings.ts"
+      "typescript": "src/Ported/ClientSettings.ts"
     },
     {
       "path": "qolaf/data/ClientVersion.as",
@@ -5121,7 +5121,7 @@
       "lines": 583,
       "change": "added",
       "status": "source-translated; integration and visual verification pending",
-      "typescript": "src/ported/SettingsQoLAF.ts"
+      "typescript": "src/Ported/SettingsQoLAF.ts"
     },
     {
       "path": "qolaf/target/TargetSystem.as",

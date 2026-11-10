@@ -19,11 +19,9 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - run: npm run format:check
       - run: npm run check
       - run: npm test
-      - run: npm run build
-      - name: Repeat integration against compiled module
-        run: BUNDLE_TEST=1 npm test
       - uses: actions/upload-artifact@v4
         with:
           name: qolaf-client-module

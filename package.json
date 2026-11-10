@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "check": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "build": "node scripts/build.mjs",
@@ -13,6 +15,7 @@
     "@types/node": "22.19.1",
     "esbuild": "0.25.12",
     "linkedom": "0.18.15",
+    "prettier": "3.6.2",
     "tsx": "4.20.6",
     "typescript": "5.9.3"
   }
