@@ -539,3 +539,20 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
 - Full live Xhersix encounter comparison remains unverified. Collision-circle
   visuals and other still-unported Settings behavior remain separate open work;
   current Haxe gameplay/shield/corrosive calculations remain authoritative.
+
+### Xhersix torpedo collision circles
+
+- Ported the original shared native MeshBatch geometry: 64 segments, faint red
+  disk and separate stronger border. Circle scale reads the current Haxe
+  projectile collisionRadius; weapon explosion radius is not substituted.
+- Observe native projectile drawing during the current game's manager update,
+  after it assigns rendered coordinates. Native simulation and drawing still
+  execute unchanged. Clear the batch each update, respect the saved Combat
+  setting, bound mesh capacity, and dispose geometry with the session.
+- TypeScript checking and all 129 tests pass, including the single-file build.
+  Tests cover geometry, alpha, live collision radius, eligibility, batching,
+  setting toggles, native draw passthrough, current-game scope and cleanup.
+- Live encounter/visual comparison of collision circles remains unverified;
+  the preceding rhythm-ring visual probe does not establish this feature's
+  browser parity. Current Haxe shields and all other gameplay mechanics remain
+  authoritative, as reiterated by the user.

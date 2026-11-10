@@ -1,3 +1,4 @@
+import { installTorpedoWarnings } from '../Projectile/XhersixTorpedoWarningBatch';
 import { installTorpedoCue } from '../Projectile/XhersixTorpedoCue';
 import { installInactivityPreference } from './Inactivity';
 import { installDamageObserver } from '../Telemetry/DamageObserver';
@@ -29,6 +30,7 @@ export function installGameSession(
   const { config, save } = sessionSettings(session, game);
   installInactivityPreference(session, game);
   installTorpedoCue(session, game);
+  installTorpedoWarnings(session, game);
   installNativeSettings(session, preferences);
   installHealthAndShield(session, game);
   installRespawn(session, game);
