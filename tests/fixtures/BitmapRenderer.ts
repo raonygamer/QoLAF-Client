@@ -15,9 +15,13 @@ import { RichBitmapMarkupParser } from '../../src/chat/rich/RichBitmapMarkupPars
 import { RichBitmapInlineAtom } from '../../src/chat/rich/RichBitmapInlineAtom';
 import { RichBitmapEmojiMatch } from '../../src/chat/rich/RichBitmapEmojiMatch';
 import { RichBitmapEmojiResolver } from '../../src/chat/rich/RichBitmapEmojiResolver';
+import { RichBitmapTextNavigation } from '../../src/chat/rich/RichBitmapTextNavigation';
+import { createRichBitmapTextMetrics } from '../../src/ported/RichBitmapTextMetrics';
 
 /** GPU-free layout fixture, using the original atlas's actual glyph metrics. */
-export function bitmapRendererFixture() {
+export function bitmapRendererFixture(
+  atlas: 'russo16_bitmap' | 'verdana16_bitmap' = 'russo16_bitmap',
+) {
   const cleanup: (() => void)[] = [];
   aliasProperties({ defer: (fn: () => void) => cleanup.push(fn) } as any, Display);
   class Sprite extends Display {
@@ -64,7 +68,7 @@ export function bitmapRendererFixture() {
     ) {}
   }
   const xml = new DOMParser().parseFromString(
-    readFileSync(new URL('../../src/assets/russo16_bitmap.fnt', import.meta.url), 'utf8'),
+    readFileSync(new URL(`../../src/assets/${atlas}.fnt`, import.meta.url), 'utf8'),
     'text/xml',
   );
   const glyphs = new Map<number, any>();
@@ -95,6 +99,7 @@ export function bitmapRendererFixture() {
     [richPrefix + 'RichBitmapInlineAtom']: RichBitmapInlineAtom,
     [richPrefix + 'RichBitmapEmojiMatch']: RichBitmapEmojiMatch,
     [richPrefix + 'RichBitmapEmojiResolver']: RichBitmapEmojiResolver,
+    [richPrefix + 'RichBitmapTextNavigation']: RichBitmapTextNavigation,
     [richPrefix + 'JapaneseCachedGlyph']: class {},
     [richPrefix + 'JapaneseGlyphCache']: {
       whenReady() {},
@@ -104,6 +109,14 @@ export function bitmapRendererFixture() {
       release() {},
     },
     'starling.display.Sprite': Sprite,
+    'starling.display.Quad': class extends Sprite {
+      constructor(width: number, height: number, color: number) {
+        super();
+        this.set_width(width);
+        this.set_height(height);
+        (this as any).color = color;
+      }
+    },
     'starling.display.DisplayObjectContainer': Sprite,
     'starling.display.DisplayObject': Sprite,
     'starling.display.Image': Image,
@@ -166,10 +179,12 @@ export function bitmapRendererFixture() {
   definitions['feathers.text.BitmapFontTextFormat'] = createBitmapFontTextFormat(resolve);
   definitions[richPrefix + 'RichBitmapGlyph'] = createRichBitmapGlyph(resolve);
   definitions[richPrefix + 'RichBitmapLine'] = createRichBitmapLine(resolve);
+  definitions[richPrefix + 'RichBitmapTextMetrics'] = createRichBitmapTextMetrics(resolve);
   const Renderer = createRichBitmapFontTextRenderer(resolve);
   definitions[richPrefix + 'RichBitmapFontTextRenderer'] = Renderer;
   const Text = createText(resolve);
   return {
+    resolve,
     Renderer,
     Sprite,
     Text,

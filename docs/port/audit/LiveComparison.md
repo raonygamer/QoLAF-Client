@@ -982,3 +982,23 @@ presentation cadence.
 - The binding is not activated in GameSession yet: native get/set/select hooks,
   bitmap rendering/caret/hit testing and channel restrictions must be connected
   together. Browser event tests do not prove live IME or visual parity.
+
+
+## Rich editor bitmap view — 2026-11-10
+
+- Added RichBitmapEditorView using the ported Starling rich renderer and source
+  RichBitmapTextMetrics. Ported blue selection skin (0x3b78c8, alpha 0.65), white
+  cursor, independent clipping mask, vertical centering, two-pixel caret margin,
+  bounded horizontal scroll and focus-dependent selection/cursor visibility.
+- Click/drag selection uses the same atlas metrics as cursor placement and adds
+  the current scroll offset; the document model then applies atomic snapping.
+  Password display masks clusters, not UTF-16 code units. The separate mask is
+  explicitly disposed without touching the registry-owned font texture.
+- Three tests use the actual Verdana 16 bitmap atlas: colored glyph rendering,
+  hit positions, selection/caret placement, scrolling, resize reset, focus,
+  emoji masking and mask/renderer disposal. Full suite passed 197 tests before
+  switching these three from Russo to the more relevant Verdana atlas; all three
+  passed again with Verdana. Typecheck and formatting passed.
+- Not yet activated on the live chat input. Native source-offset field hooks,
+  pointer transport, channel restrictions and preference changes still need
+  integration before browser comparison; this does not close CHAT-01.
