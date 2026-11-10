@@ -1,3 +1,4 @@
+import { automationCommandNames, dispatchAutomationChat } from '../Chat/AutomationCommands';
 import { installAutomationControls } from './AutomationControls';
 import { read, type API, type Raw } from '../Api/Types';
 import { AutomationManager } from './AutomationManager';
@@ -37,9 +38,9 @@ export function installNativeAutomations(
   } = {},
 ): AutomationManager {
   const registry = new ChatCommandRegistry();
-  const write = (message: string) => {
+  const write = (message: string, type?: string) => {
     const log = api.cls('core.hud.components.chat.MessageLog');
-    if (typeof log?.write === 'function') log.write(message);
+    if (typeof log?.write === 'function') log.write(message, type);
     else api.log(message);
   };
   const performedAction = () => api.cls('core.scene.Game')?.playerPerformedAction?.();
@@ -81,11 +82,23 @@ export function installNativeAutomations(
     const chat = api.cls('core.hud.components.chat.ChatInputText')?.prototype;
     if (typeof chat?.sendMessage === 'function') {
       reserveNativeCommands(registry, chat.sendMessage);
+      registry.reserveBuiltInCommands(automationCommandNames);
       api.around(chat, 'sendMessage', function (next, ...args) {
         const text = this.input.get_text();
         if (!text?.startsWith('/') || text.length < 2) return next(...args);
         // Preserve the native parser's command/mode boundary exactly.
         const parsed = this.parseCommand(text);
+        if (
+          dispatchAutomationChat(parsed, this.g, write, (message) => {
+            const log = api.cls('core.hud.components.chat.MessageLog');
+            if (typeof log?.writeChatMsg === 'function') log.writeChatMsg('death', message);
+            else write(message);
+          })
+        ) {
+          this.input.set_text('');
+          this.updateTab();
+          return;
+        }
         const result = registry.dispatch(parsed[0], parsed[1] ?? '', this.g);
         if (!result.matched) return next(...args);
         if (result.message) write(result.message);
@@ -93,6 +106,16 @@ export function installNativeAutomations(
         this.updateTab();
       });
     }
+    if (typeof chat?.listCommands === 'function')
+      api.after(chat, 'listCommands', function () {
+        if (this.g?.automationManager) {
+          write("''/script'' shows the currently running automation");
+          write(
+            "''/script automation-id command [arguments]'' invokes a legacy automation command",
+          );
+        }
+        write("''/dontkick'' toggles persistent inactivity protection");
+      });
     // Stop modules while their exported APIs and control methods still exist.
     // The earlier fallback also covers unloading before classesReady.
     api.defer(() => manager.dispose());

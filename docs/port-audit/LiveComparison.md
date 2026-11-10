@@ -483,3 +483,28 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   Screenshot: /tmp/QoLAF-ControlProbe.png.
 - Full-client command help/completion, aim-assist behavior, richer chat integration,
   remaining rendering/UI differences and comprehensive in-game parity remain open.
+
+### Legacy automation chat commands and persistent inactivity setting
+
+- Ported /script and /automation status and legacy command dispatch from the
+  current ChatInputText/MessageLog source. Kept original whitespace splitting
+  (separate from structured commands), usage/missing-module/unhandled errors,
+  escaped status names and singular/plural wording. The browser availability
+  message says runtime instead of Flash runtime. Commands clear native input and
+  update its tab without sending an account chat message.
+- Added /dontkick and reserved these client aliases against custom bare-name
+  registrations. Native help remains intact with the three original relevant
+  help lines appended. Full client help popup and autocomplete remain pending.
+- Fixed a verified Settings gap: onDontKickChanged called an absent game method.
+  Added the original setter/toggler and persistent/combined activity getters.
+  The per-account ClientSettings setter saves the preference, explicit toggles
+  refresh activity, and native inactivity handling runs unchanged when protection
+  is off. Temporary module ownership does not modify the saved setting.
+- TypeScript/build and all 122 tests pass, covering legacy parsing/status/errors,
+  local command consumption, native help preservation, saved vs transient
+  protection, room isolation and cleanup. No 30-minute live timeout was attempted;
+  gating of the native method is covered by the real host-hook fixture.
+- Live checkbox validation: initially off, enabled, closed/reopened Settings and
+  confirmed checked, restored off, reloaded the preview and confirmed unchecked.
+  Captures /tmp/QoLAF-InactivityBefore.png, InactivityEnabled.png and
+  InactivityRestored.png (each with QoLAF- prefix). No chat was sent in this pass.

@@ -44,6 +44,9 @@ test('native automation integration preserves chat routing, uses millisecond clo
     updateTab() {
       this.tabs++;
     }
+    listCommands() {
+      calls.push('native help');
+    }
     sendMessage() {
       calls.push('native chat:' + this.text);
       return 'native result';
@@ -55,6 +58,10 @@ test('native automation integration preserves chat routing, uses millisecond clo
       bus.subscribe('update', (event: AutomationEvent) => {
         calls.push('automation tick');
         deltas.push(event.deltaTime);
+      });
+      bus.subscribe('command', (event: AutomationEvent) => {
+        calls.push('legacy:' + event.commandName + ':' + event.commandArguments.join(','));
+        event.markHandled();
       });
       bus.subscribe('render', (event: AutomationEvent) => deltas.push(event.deltaTime));
       bus.subscribe('stop', () => {
@@ -86,7 +93,9 @@ test('native automation integration preserves chat routing, uses millisecond clo
     onGame: (fn: Function) => {
       onGame = fn;
     },
-    log() {},
+    log(message: string) {
+      calls.push(message);
+    },
     before: (target: any, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'before', fn)),
     after: (target: any, key: string, fn: Function) =>
@@ -131,6 +140,18 @@ test('native automation integration preserves chat routing, uses millisecond clo
   assert.deepEqual(calls.slice(-2), ['custom local', 'custom run']);
   assert.equal(chat.text, '');
   assert.equal(chat.tabs, 2);
+  chat.text = '/script probe RUN a b';
+  chat.sendMessage();
+  assert.equal(calls.at(-1), 'legacy:run:a,b');
+  assert.equal(chat.text, '');
+  assert.equal(chat.tabs, 3);
+  chat.listCommands();
+  assert.deepEqual(calls.slice(-4), [
+    'native help',
+    "''/script'' shows the currently running automation",
+    "''/script automation-id command [arguments]'' invokes a legacy automation command",
+    "''/dontkick'' toggles persistent inactivity protection",
+  ]);
   manager.setTransientDontKick('probe', true);
   game.disconnectIfInactive();
   assert.equal(actions, 2);

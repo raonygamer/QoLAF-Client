@@ -1,3 +1,4 @@
+import { installInactivityPreference } from './Inactivity';
 import { installDamageObserver } from '../Telemetry/DamageObserver';
 import { read, type API, type Raw } from '../Api/Types';
 import { sessionSettings } from '../Settings/RuntimeSettings';
@@ -25,6 +26,7 @@ export function installGameSession(
 ): void {
   const ui = new NativeUI(session);
   const { config, save } = sessionSettings(session, game);
+  installInactivityPreference(session, game);
   installNativeSettings(session, preferences);
   installHealthAndShield(session, game);
   installRespawn(session, game);
