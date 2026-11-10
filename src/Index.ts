@@ -1,3 +1,4 @@
+import { installArtifactPurify } from './artifacts/ArtifactPurify';
 import { installArtifactRecycleLayout } from './artifacts/ArtifactRecycleLayout';
 import { createArtifactSorting } from './artifacts/ArtifactSorting';
 import { loginControl } from './login/LoginControl';
@@ -107,7 +108,8 @@ export default {
         return result;
       });
       installArtifactUI(api, () => createArtifactSorting(portedClasses(api).resolve));
-      installNativeArtifactFavorites(api, portedClasses(api).resolve);
+      const artifactFavorites = installNativeArtifactFavorites(api, portedClasses(api).resolve);
+      installArtifactPurify(api, artifactFavorites);
       installArtifactRecycleLayout(api, portedClasses(api).resolve);
       installArtifactSetupSelection(api, setupScrollbarSkin(api, aeonImage));
       installArtifactCargo(api, () =>

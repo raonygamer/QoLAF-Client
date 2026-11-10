@@ -83,8 +83,7 @@ test('favorite recycle guards exclude protected items before selection and nativ
     recycleButton = button();
     toggleRecycleButton = button();
     cancelRecycleButton = button();
-    g = { myCargo: { isFull: false } };
-    artifactRecyclePending = false;
+    g = { myCargo: { isFull: false }, artifactRecyclePending: false };
     submissions: string[][] = [];
     onRecycleSelect(event: any) {
       this.markedForRecycle.push(event.target.a);
@@ -126,12 +125,17 @@ test('favorite recycle guards exclude protected items before selection and nativ
   view.onRecycle();
   assert.equal(view.submissions.length, 1);
   assert.equal(view.submissions[0].length, 40);
-  assert.equal(view.artifactRecyclePending, true);
+  assert.equal(view.g.artifactRecyclePending, true);
   view.toggleRecycle();
   view.selectAllForRecycle();
   view.onRecycle();
   assert.equal(view.markedForRecycle.length, 40);
   assert.equal(view.submissions.length, 1);
+  const reopened = new Overview();
+  reopened.g = view.g;
+  reopened.markedForRecycle = [reopened.cargoBoxes[1].a];
+  reopened.onRecycle();
+  assert.equal(reopened.submissions.length, 0, 'a reopened screen shares the room recycle lock');
   view.onRecycleMessage();
-  assert.equal(view.artifactRecyclePending, false);
+  assert.equal(view.g.artifactRecyclePending, false);
 });

@@ -5,7 +5,7 @@ import { createArtifactContextPopup } from './ArtifactContextPopup';
 import { installArtifactRecycleProtection } from './ArtifactRecycleProtection';
 
 /** Source favorite marker and overview right-click menu, with browser pointer transport. */
-export function installNativeArtifactFavorites(api: API, resolve: Resolve): void {
+export function installNativeArtifactFavorites(api: API, resolve: Resolve): ArtifactFavorites {
   const favorites = new ArtifactFavorites(api.storage);
   installArtifactRecycleProtection(api, favorites);
   const Overview = api.cls('core.artifact.ArtifactOverview')!.prototype;
@@ -62,7 +62,7 @@ export function installNativeArtifactFavorites(api: API, resolve: Resolve): void
     popup.addEventListener('artifactShareContextFavorite', (event: Raw) => {
       const artifact = read(event, 'data');
       if (!artifact || view.p.getArtifactById(artifact.id) !== artifact) return;
-      if (view.artifactRecyclePending) {
+      if (view.g.artifactRecyclePending) {
         view.g.showMessageDialog('Wait for recycling to finish before changing favorites.');
         return;
       }
@@ -147,4 +147,5 @@ export function installNativeArtifactFavorites(api: API, resolve: Resolve): void
     for (const marker of markers.values()) marker.removeFromParent(true);
     markers.clear();
   });
+  return favorites;
 }

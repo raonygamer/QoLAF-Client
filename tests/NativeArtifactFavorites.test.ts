@@ -35,6 +35,7 @@ test('favorite menu toggles source outline, prunes recycle selection and drafts 
   const actions: any[] = [];
   const game = {
     me: player,
+    artifactRecyclePending: false,
     chatInput: { insertArtifactLink: (...args: any[]) => actions.push(['draft', ...args]) },
     showMessageDialog: (message: string) => actions.push(['message', message]),
   };
@@ -44,7 +45,6 @@ test('favorite menu toggles source outline, prunes recycle selection and drafts 
     cargoBoxes = [new Box()];
     activeSlots: any[] = [];
     markedForRecycle = [artifact];
-    artifactRecyclePending = false;
     drawComponents() {}
     onRecycleSelect() {}
     selectAllForRecycle() {}
@@ -87,11 +87,11 @@ test('favorite menu toggles source outline, prunes recycle selection and drafts 
   assert.equal(marker.getChildAt(0).color, 0xffcc55);
   assert.equal(marker.getChildAt(0).get_x(), 3);
   assert.equal(marker.getChildAt(0).get_width(), 26);
-  view.artifactRecyclePending = true;
+  view.g.artifactRecyclePending = true;
   popup.dispatchEventWith('artifactShareContextFavorite', false, artifact);
   assert.equal(saved['account:p']['artifact:a'], true);
   assert.equal(actions[0][0], 'message');
-  view.artifactRecyclePending = false;
+  view.g.artifactRecyclePending = false;
   popup.dispatchEventWith('artifactShareContextFavorite', false, { ...artifact });
   assert.equal(saved['account:p']['artifact:a'], true, 'stale identity is ignored');
   popup.dispatchEventWith('artifactShareContextFavorite', false, artifact);

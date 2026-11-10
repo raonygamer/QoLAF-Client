@@ -34,7 +34,7 @@ export function installArtifactRecycleProtection(api: API, favorites: ArtifactFa
   });
   api.around(Overview, 'onRecycleSelect', function (next, event) {
     const box = event.target;
-    if (this.artifactRecyclePending) {
+    if (this.g.artifactRecyclePending) {
       if (this.markedForRecycle.includes(box.a)) box.setSelectedForRecycle();
       else clear(box);
       return;
@@ -47,12 +47,12 @@ export function installArtifactRecycleProtection(api: API, favorites: ArtifactFa
     return next(event);
   });
   api.around(Overview, 'toggleRecycle', function (next, ...args) {
-    if (!this.artifactRecyclePending) return next(...args);
+    if (!this.g.artifactRecyclePending) return next(...args);
     this.toggleRecycleButton.set_enabled(read(this.toggleRecycleButton, 'visible'));
     this.cancelRecycleButton.set_enabled(read(this.cancelRecycleButton, 'visible'));
   });
   api.around(Overview, 'selectAllForRecycle', function () {
-    if (!this.artifactRecyclePending) {
+    if (!this.g.artifactRecyclePending) {
       this.markedForRecycle.length = 0;
       for (const box of this.cargoBoxes) clear(box);
       for (const box of this.cargoBoxes) {
@@ -75,7 +75,7 @@ export function installArtifactRecycleProtection(api: API, favorites: ArtifactFa
     this.selectAllRecycleButton.set_enabled(true);
   });
   api.around(Overview, 'onRecycle', function (next, ...args) {
-    if (this.artifactRecyclePending) {
+    if (this.g.artifactRecyclePending) {
       this.recycleButton.set_enabled(true);
       return;
     }
@@ -85,15 +85,15 @@ export function installArtifactRecycleProtection(api: API, favorites: ArtifactFa
       return;
     }
     if (read(this.g.myCargo, 'isFull')) return next(...args);
-    this.artifactRecyclePending = true;
+    this.g.artifactRecyclePending = true;
     try {
       return next(...args);
     } catch (error) {
-      this.artifactRecyclePending = false;
+      this.g.artifactRecyclePending = false;
       throw error;
     }
   });
   api.before(Overview, 'onRecycleMessage', function () {
-    this.artifactRecyclePending = false;
+    this.g.artifactRecyclePending = false;
   });
 }

@@ -2323,3 +2323,25 @@ cancellation; Ctrl applies to countdown/site authentication. The live key arrive
 after authentication, so live cancellation is still unverified. No further
 reload was performed once active gameplay was visible. Recycle screen visual
 comparison remains pending. Full suite: 523 passes; TypeScript passes.
+
+### Purify controls and room-owned recycle state — 2026-11-10
+
+Ported source Purify/Save controls, numeric input restrictions, classic positions,
+and saved filter semantics (fitness 110, strength 90, lines 0 by default). Input
+edits affect selection only after Save. The selector preserves cargo order,
+caps requests at 40, checks unrevealed artifacts against any failed minimum,
+and excludes favorites, unique artifacts and the Recycle Generator. Fitness
+uses the existing source calculation. Requests use the current native bulkRecycle
+protocol; local inventory/cargo update only after a successful server response.
+
+Manual recycling, Purify and favorite changes now share g.artifactRecyclePending,
+as in the original, rather than separate view-owned flags. Retired Purify views
+accept authoritative responses without touching disposed controls; reopened views
+reconcile their tiles. Tests simulate empty/full cargo, server rejection,
+submission errors, duplicate replies, disposal, reopening, protection exclusions,
+40-item cap, classic/expanded control coordinates, persistence and unsaved edits.
+
+All 528 tests, TypeScript and formatting pass. No live Purify/recycle request was
+performed. Desktop was in use, so no reload or UI input was issued this turn.
+Visual comparison remains pending. Expanded geometry in this adapter prepares
+for the still-missing expanded overview; it does not implement that whole screen.
