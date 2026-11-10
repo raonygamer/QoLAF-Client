@@ -1,3 +1,4 @@
+import { readNativeMessage } from './NativeMessage';
 import { read, type Raw } from '../api/Types';
 import type { IpcClient, IpcServerMessage, IpcSocket } from './ClientIpcService';
 
@@ -44,12 +45,8 @@ class NativeIpcSocket implements IpcSocket {
     if (!handlers) this.handlers.set(type, (handlers = new Map()));
     if (handlers.has(handler)) return;
     const wrapped = (message: Raw) => {
-      // The Haxe Message lacks Flash's getObject. The SDK exposes its primitive
-      // values separately from type-specific getters; preserve those types for
-      // handshake validation instead of coercing strings/numbers/booleans.
-      const objects = message.raw._internal_('get-objects');
-      if (!Array.isArray(objects) || objects.length !== message.length) return;
-      handler({ type: message.type, fields: objects.slice() });
+      const decoded = readNativeMessage(message);
+      if (decoded) handler(decoded);
     };
     handlers.set(handler, wrapped);
     this.native.addMessageHandler(type, wrapped);

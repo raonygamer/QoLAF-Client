@@ -1,5 +1,6 @@
 import { createArtifactSorting } from './artifacts/ArtifactSorting';
 import { portedClasses } from './ported/Registry';
+import { installNativeRewardNotices } from './chat/NativeRewardNotices';
 import { installNativeIpcAuthentication } from './ipc/NativeIpcAuthentication';
 import { installMusicService } from './music/NativeMusicPlayer';
 import type { MusicPlayerService } from './music/MusicPlayer';
@@ -52,6 +53,7 @@ export default {
       }));
     api.on('classesReady', () => {
       installNativeIpcAuthentication(api);
+      installNativeRewardNotices(api);
       music = installMusicService(api);
       installLocalClientCommands(api);
       installBossSpawnTimerHooks(api);
