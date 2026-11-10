@@ -2236,3 +2236,21 @@ includes projectile reuse before first render, partial allocations, geometry and
 capacity limits, timer wrap, stale pending shots, and native Instant timing.
 Live encounter comparison remains pending. The separate Nether beam Chrono-style
 selection (NetherBlobAttackVisuals.instantStyle) is still unported.
+
+### Nether beam appearance and refreshed local upstream — 2026-11-10
+
+Ported AIStateFactory's Nether beam Chrono-style choice for the exact enemy
+faction and beam weapon key. Only appearance fields reach the native state
+constructor; source AI, range, TTL and shared cached records remain unchanged.
+Missing optional amplitude/frequency fields retain the native source defaults.
+Tests cover eligibility, fallback, immutable source data and physics fields.
+Full suite: 511 passes; TypeScript and formatting pass.
+
+Fetched a fresh official asset snapshot locally: client SHA256
+`a1c06864d50ab174e2fa9e5a036318c824727d59105073de717b40fcd9d6b013`.
+AIStateFactory, Instant and ProjectileManager definitions match the previous
+snapshot byte-for-byte. A fresh browser window showed the 1.1.23 (Public) identity
+and the local /Client/qolaf-client.js URL in Plugins. The older window showed an
+outdated-client notice. Screen comparison remains incomplete; the user was also
+actively switching windows, so input routing was unreliable. No gameplay parity
+claim is based on these screenshots.
