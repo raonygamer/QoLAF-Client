@@ -16,6 +16,7 @@ export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
     readonly textEditorProperties: Raw;
     readonly richEditor: Raw;
     styleName = '';
+    private promptText = '';
 
     constructor() {
       super();
@@ -66,6 +67,13 @@ export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
     }
     set text(value: string) {
       this.entry.set_text(value);
+    }
+    get prompt(): string {
+      return this.promptText;
+    }
+    set prompt(value: string) {
+      this.promptText = value ?? '';
+      this.editor.view.setPrompt(this.promptText);
     }
     get maxChars(): number {
       return this.entry.maxChars;

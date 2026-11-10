@@ -158,3 +158,19 @@ composer yet. Remaining required work: actual image cache/decoder and rendering,
 source picker with its two bitmap fields and pagination, channel gating,
 selection insertion, :alias: expansion, and live comparison. Do not count the
 Img feature as complete based on these helper tests.
+
+
+Image picker source port added: original 430x236 panel, two bitmap input
+contracts, validation feedback, five-row pagination, saved-entry selection,
+removal, prefetch callbacks, outside touch and focus cleanup. Fixed the AS3 int
+page-index conversion explicitly; tests exercise an entry on the second page.
+BitmapInputAdapter now forwards prompt properties to its bitmap editor view.
+Consolidated the previously existing rich/ChatDiscordImageLink with the tested
+chat-level class so the actual markup parser and picker share one implementation.
+
+224 tests and typecheck/build pass. Picker tests use a fake input boundary and
+real ported toolbar controls; they do not prove live DOM focus or glyph placement.
+The picker is not installed in NativeChatFormatting yet: cache/decoder/view
+integration and live comparison remain required. No fake cache or no-op loader
+has been attached to the game. Next: port ChatImageAsset/ChatImageCache and the
+browser decoding/upload boundary, then wire composer controls and image views.

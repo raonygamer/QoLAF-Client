@@ -4,7 +4,7 @@ import { RichBitmapMarkup } from './RichBitmapMarkup';
 import { RichBitmapInlineAtom } from './RichBitmapInlineAtom';
 
 import { ChatArtifactToken } from './ChatArtifactToken';
-import { ChatDiscordImageLink } from './ChatDiscordImageLink';
+import { ChatDiscordImageLink } from '../ChatDiscordImageLink';
 
 /**
  * Small, allocation-conscious parser for the subset of Flash HTML used by

@@ -4,7 +4,7 @@ import { RichBitmapTextNavigation as Navigation } from '../src/chat/rich/RichBit
 import { RichBitmapEmojiResolver as Emoji } from '../src/chat/rich/RichBitmapEmojiResolver';
 import { RichBitmapMarkupParser as Parser } from '../src/chat/rich/RichBitmapMarkupParser';
 import { RichBitmapTypedMarkup as TypedMarkup } from '../src/chat/rich/RichBitmapTypedMarkup';
-import { ChatDiscordImageLink } from '../src/chat/rich/ChatDiscordImageLink';
+import { ChatDiscordImageLink } from '../src/chat/ChatDiscordImageLink';
 
 const plain = (value: string) =>
   Parser.parse(
