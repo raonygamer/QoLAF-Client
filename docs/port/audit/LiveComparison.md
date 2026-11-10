@@ -1485,3 +1485,29 @@ QoLAF-MusicPausedRestored.png, QoLAF-MusicSeparateBatches.png (complete captures
 QoLAF-MusicForceUpload.png (remaining heading/Close failure). Runtime diagnostics
 reported zero caught runtime errors. No chat message was sent; only /music was
 entered. The latest implementation is on the port branch/local preview, not Pages.
+
+## Release startup and help viewport — 2026-11-10
+
+Built the automatic once-per-port-release sequence and reloaded once with F5
+explicitly released. The live game first displayed Sale; the changelog appeared
+automatically only after closing Sale. `/tmp/QoLAF-AutomaticRelease.png` records
+the result. Escape closed it. `/clienthelp` opened native Help, then opening the
+browser console reduced the stage from 1879×965 to 1879×415. All seven tabs and
+Close remained inside the viewport (`/tmp/QoLAF-HelpShortViewport.png`); closing
+console restored full-size geometry (`/tmp/QoLAF-HelpRestoredViewport.png`).
+
+Welcome now explicitly waits for the release sequence, independently of interval
+ordering. That final gate was added after the live reload and covered by the
+welcome lifecycle regression; it has not been exercised with a fresh live profile.
+Type checking and all 420 tests pass after the final change. Storage/reload and
+failed-open cases are regression-tested, not claimed as a second live reload.
+
+### Correction to the previous music rendering diagnosis
+
+The prior inference that the heading disappeared is contradicted by direct PNG
+inspection: `/tmp/QoLAF-CleanActive.png` and `QoLAF-CleanActiveChange.png` have
+identical RGB data in the heading rectangle (696,304)-(806,328), each with 422
+bright pixels. GPU readback also found those pixels through final OpenFL stage
+composition. No experimental GL flush, buffer upload, cache-token or render
+replacement was retained. This closes that specific evidence trail, not every
+visual/lifecycle check for Music. Radio and hull editor remain unimplemented.

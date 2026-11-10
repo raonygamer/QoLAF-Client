@@ -107,10 +107,19 @@ export function createClientHelpPopup(resolve: Resolve): any {
     @bound
     redraw(): void {
       if (!this.stage || !this.content) return;
+      // Keep source geometry at normal sizes and fit the whole native window,
+      // including its Close button, when the browser viewport is smaller.
+      this.box.scaleX = this.box.scaleY = 1;
       this.box.width = 720;
       this.box.height = 500;
-      this.box.x = Math.round((this.stage.stageWidth - 720) / 2);
-      this.box.y = Math.round((this.stage.stageHeight - 500) / 2);
+      const scale = Math.min(
+        1,
+        Math.max(1, this.stage.stageWidth - 32) / 720,
+        Math.max(1, this.stage.stageHeight - 32) / 500,
+      );
+      this.box.scaleX = this.box.scaleY = scale;
+      this.box.x = Math.round((this.stage.stageWidth - 720 * scale) / 2);
+      this.box.y = Math.round((this.stage.stageHeight - 500 * scale) / 2);
       this.closeButton.x = Math.round(360 - this.closeButton.width / 2);
       this.closeButton.y = 500 - this.closeButton.height - 8;
       this.bgr.width = this.stage.stageWidth;

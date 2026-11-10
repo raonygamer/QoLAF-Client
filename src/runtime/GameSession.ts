@@ -101,8 +101,8 @@ export function installGameSession(
     artifacts,
   );
   installNativeAdvancedChat(session, game);
-  installNativeClientChangelog(session, game);
-  installNativeClientHelp(session, game);
+  const waitingForRelease = installNativeClientChangelog(session, game);
+  installNativeClientHelp(session, game, waitingForRelease);
   if (messages) installNativeChatImageViewer(session, game, bitmap.resolve, images, messages);
   if (messages) installNativeChatRolePreview(session, game, bitmap.resolve, messages);
   if (messages)

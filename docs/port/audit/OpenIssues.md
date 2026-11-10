@@ -1811,13 +1811,27 @@ and ship-visual dialogs; short-viewport help layout remains open. Welcome
 geometry was compared to source, not a freshly reopened SWF welcome instance.
 
 
-## MUSIC-01 — native screen implemented, rendering parity still open
+## MUSIC-01 — native screen implemented, transition checks remain
 
 The native /music window and service-owned playback are ported and exercised live.
 Track selection, play/pause/resume/stop/next, automatic ownership and account reload
-persistence work. Unchanged labels/Close can disappear following interactions,
-sometimes affecting surrounding HUD text. Do not mark this screen exact from an
-initial screenshot. See the 2026-11-10 music entry in LiveComparison.md for failed
-render experiments and evidence. Browser autoplay unlocking, actual room/death
+persistence work. The earlier disappearing-heading diagnosis is not supported by
+pixel inspection: clean active-window captures before/after interaction contain
+identical heading pixels (422 bright pixels, zero differing pixels in the heading
+rectangle). The heading also survives the final OpenFL framebuffer composition.
+No experimental renderer patch was retained. Other labels and full visual parity
+still need direct comparison; this finding is limited to the inspected heading. Browser autoplay unlocking, actual room/death
 transitions, failed-audio loads and external radio takeover still need live checks.
 Radio and ship-visual windows remain separate outstanding screens.
+
+
+### Release startup sequence and short-viewport help — 2026-11-10
+
+Automatic changelog now waits for the active game, Sale/other modals, and recovery.
+It marks the port version after successful opening, including manual /changelog,
+and keeps an in-memory fallback when browser storage is denied. Welcome explicitly
+waits for the release sequence, rather than racing it on independent timers.
+The historical AS3 archive remains distinct from the port version used for persistence.
+Help preserves its 720×500 source layout, scaling the whole native window only when
+needed to keep tabs and Close inside the viewport. Radio and hull-editor screens
+are still missing; this work does not complete screen parity.

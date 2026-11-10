@@ -11,6 +11,7 @@ export function installNativeClientWelcome(
   game: Raw,
   resolve: Resolve,
   openHelp: () => void,
+  waitingForRelease: () => boolean = () => false,
 ): () => void {
   const storage = createClientWelcomeStorage(api);
   profileState.initialize(storage);
@@ -53,7 +54,7 @@ export function installNativeClientWelcome(
     const Popup = createClientHelpWelcomePopup(resolve);
     const Modal = resolve('core.hud.components.dialogs.PopupMessage');
     stopPolling = api.interval(() => {
-      if (stopped || !isCurrent() || !profileState.pending || popup) return;
+      if (stopped || !isCurrent() || !profileState.pending || popup || waitingForRelease()) return;
       if (!read(game, 'me') || game.isRecoveringGameConnection || game.blockHotkeys) return;
       const overlay = game.overlay;
       for (let index = 0; index < read(overlay, 'numChildren', 0); index++) {

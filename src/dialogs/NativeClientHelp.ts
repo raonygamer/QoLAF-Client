@@ -5,7 +5,11 @@ import { createClientHelpPopup } from './ClientHelpPopup';
 import { installNativeClientWelcome } from './NativeClientWelcome';
 import { installPopupKeyboard } from './NativePopupKeyboard';
 
-export function installNativeClientHelp(api: API, game: Raw): void {
+export function installNativeClientHelp(
+  api: API,
+  game: Raw,
+  waitingForRelease: () => boolean = () => false,
+): void {
   const chat = game.chatInput;
   if (!chat) return;
   const resolve = portedClasses(api).resolve;
@@ -34,7 +38,7 @@ export function installNativeClientHelp(api: API, game: Raw): void {
     popup!.addEventListener('close', close);
     game.addChildToOverlay(popup, true);
   };
-  const dismissWelcome = installNativeClientWelcome(api, game, resolve, open);
+  const dismissWelcome = installNativeClientWelcome(api, game, resolve, open, waitingForRelease);
   const original = Object.getOwnPropertyDescriptor(chat, 'openClientHelp');
   chat.openClientHelp = open;
   api.defer(installPopupKeyboard(window, () => popup !== null, close));

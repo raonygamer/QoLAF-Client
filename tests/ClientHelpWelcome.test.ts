@@ -98,11 +98,13 @@ test('welcome waits for modals and reconnects, survives teardown, and opens help
       },
     };
     let opened = 0;
+    let waitingForRelease = false;
     const dismiss = installNativeClientWelcome(
       api,
       game,
       () => NativePopup,
       () => opened++,
+      () => waitingForRelease,
     );
     return {
       game,
@@ -111,6 +113,9 @@ test('welcome waits for modals and reconnects, survives teardown, and opens help
       cleanup,
       tick: () => !stopped && poll(),
       opened: () => opened,
+      waitForRelease: (value: boolean) => {
+        waitingForRelease = value;
+      },
     };
   };
   const first = makeRoom();
@@ -126,6 +131,10 @@ test('welcome waits for modals and reconnects, survives teardown, and opens help
   first.tick();
   assert.equal(first.overlays.length, 0);
   first.game.overlay = { get_numChildren: () => 0 };
+  first.waitForRelease(true);
+  first.tick();
+  assert.equal(first.overlays.length, 0, 'welcome cannot race the pending release popup');
+  first.waitForRelease(false);
   first.tick();
   first.tick();
   assert.equal(first.overlays.length, 1);
