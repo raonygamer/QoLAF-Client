@@ -6,6 +6,9 @@ import type { Settings } from '../Settings/Settings';
 import { TargetSystem } from '../Target/TargetSystem';
 import { NativeUI } from '../UI/NativeUI';
 import { TargetInfo } from '../UI/TargetInfo';
+import { installHealthAndShield } from '../Hud/HealthAndShield';
+import { installDamageText } from '../Hud/DamageText';
+import { installRespawn } from './Respawn';
 import { RadarTelemetry } from '../UI/RadarTelemetry';
 
 /** Owns the native HUD nodes and hooks for one connected game session. */
@@ -13,6 +16,9 @@ export function installGameSession(game: Raw, session: API, preferences?: Device
   const ui = new NativeUI(session);
   const { config, save } = sessionSettings(session, game);
   installNativeSettings(session, preferences);
+  installHealthAndShield(session, game);
+  installRespawn(session, game);
+  installDamageText(session, game);
   const target = new TargetSystem(game, config, session.cls('core.ship.PlayerShip'));
   const panel = new TargetInfo(ui, game, target, config, save);
   session.defer(() => panel.dispose());

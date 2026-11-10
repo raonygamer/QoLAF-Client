@@ -36,3 +36,24 @@ The earlier single screenshots were insufficient: surrounding labels can remain 
 - Next investigation: compare cached versus uncached GPU submissions, including clip/stencil state and actual buffer contents. Do not describe the HTML path as finished based on the unit tests or an initial intact screenshot.
 
 User deferred further bitmap stress-test investigation to prioritize the important port work. No cache workaround was added. Live Settings screenshots: `/tmp/QoLAF-SettingsVisible.png`, `/tmp/QoLAF-SettingsGraphics.png`, `/tmp/QoLAF-SettingsBindingsLive.png`, `/tmp/QoLAF-SettingsAimLive.png`, `/tmp/QoLAF-SettingsChatLive.png`. Runtime diagnostics remained at zero uncaught errors through the page switches. General content placement was compared with `/tmp/QoLAF-OriginalNow.png`; viewport offsets and differing account preferences were excluded from that comparison.
+
+### Gameplay presentation/settings follow-up
+
+Compatibility rule clarified by the user: current Haxe gameplay and calculations
+are authoritative. Port original client presentation and optional features around
+those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
+
+- Added original health/shield display easing (12/sec exponential, 100ms frame
+  clamp, 0.05 snap), 120px bar clamping, integer display and compact amount
+  thresholds. Uses native HUD objects and leaves upstream warnings/tooltips intact.
+- Connected damage formatting to the current game's final damage/healing totals.
+  Retains its particle ownership, baseScale, timing, pooling and movement.
+- Connected optional automatic respawn and survival leaving prompt, retaining
+  readiness checks, manual Space when disabled, and PvP editor prompt exclusion.
+- Audited against original HealthAndShield.as, Util.as, RoamingState.as,
+  Killed.as and TextManager.as, then against current Haxe methods. Removed a
+  proposed historical shield-regeneration formula change per user instruction.
+- Automated coverage checks smoothing, compact rollover boundaries, settings
+  changes, unchanged text writes, readiness/manual respawn, survival/PvP prompts,
+  and preservation of damage totals/particle properties. Live visual matching of
+  these new changes is still pending; these checks do not certify full parity.
