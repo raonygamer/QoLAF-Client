@@ -270,15 +270,13 @@ test('live composer resolves artifact labels without changing wire tokens or sel
   const initialMeshes = renderer.characterBatch.meshes.length;
   pending.shift()!.complete({ key: 'player-1', name: 'Pilot', level: 42 });
   assert.equal(pending[0].table, 'Artifacts');
-  pending
-    .shift()!
-    .complete({
-      key: 'item',
-      id: 'item',
-      player: 'player-1',
-      revealed: true,
-      name: 'Long Purple Artifact',
-    });
+  pending.shift()!.complete({
+    key: 'item',
+    id: 'item',
+    player: 'player-1',
+    revealed: true,
+    name: 'Long Purple Artifact',
+  });
   assert.equal(element.value, 'A [Artifact: Long Purple Artifact] Z');
   assert.equal(input.get_text(), `A ${token} Z`);
   assert.equal(editor.model.selectedCopyText, token);
@@ -291,15 +289,13 @@ test('live composer resolves artifact labels without changing wire tokens or sel
   assert.equal(pending.length, 1);
   cleanup();
   assert.equal(renderer.disposed, true);
-  pending
-    .shift()!
-    .complete({
-      key: 'later',
-      id: 'later',
-      player: 'player-1',
-      revealed: true,
-      name: 'Late result',
-    });
+  pending.shift()!.complete({
+    key: 'later',
+    id: 'later',
+    player: 'player-1',
+    revealed: true,
+    name: 'Late result',
+  });
   assert.equal(
     editor.model.visibleText,
     '[Artifact]',

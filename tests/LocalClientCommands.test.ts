@@ -137,7 +137,7 @@ test('local commands preserve native dispatch, validate timers, and report port 
   assert.deepEqual(f.messages.at(-1), ['Timer settings are not available yet.', 'error']);
   f.send('/echo');
   assert.equal(f.messages.at(-1)?.[0], 'death');
-  assert.match(String(f.messages.at(-1)?.[1]), /TypeScript port 0\.2\.0-dev/);
+  assert.match(String(f.messages.at(-1)?.[1]), /TypeScript port 0\.3\.0-dev/);
   assert.equal(f.chat.input.text, '');
   assert.equal(f.tabsUpdated(), 5);
   assert.equal(f.chat.nativeCalls, 2);

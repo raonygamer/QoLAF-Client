@@ -2,7 +2,7 @@ import type { API, Raw } from '../api/Types';
 import { NativeUI } from '../ui/NativeUI';
 // Exact credit text and top-left placement from Login.as. Port version is
 // separate from the source release, so we do not falsely claim AS3 parity.
-export const PORT_VERSION = '0.2.0-dev';
+export const PORT_VERSION = '0.3.0-dev';
 export const SOURCE_VERSION = '1.1.22';
 export function loginIdentity(api: API, login: Raw) {
   const ui = new NativeUI(api);
