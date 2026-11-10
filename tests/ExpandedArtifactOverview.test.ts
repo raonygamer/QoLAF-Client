@@ -95,6 +95,19 @@ test('expanded native controls use source chrome, wrapping sort rows, guide and 
         this.addChild(this[name]);
       }
     }
+    recycleMode = false;
+    upgradeMode = false;
+    toggleRecycle() {
+      this.recycleMode = !this.recycleMode;
+      this.chooseSortingButton.set_visible(!this.chooseSortingButton.get_visible());
+    }
+    toggleUpgrade() {
+      this.upgradeMode = !this.upgradeMode;
+      this.chooseSortingButton.set_visible(!this.chooseSortingButton.get_visible());
+    }
+    onBuyArtifactConfirm() {
+      this.p.artifactCount = 5;
+    }
     reloadStats() {}
     onRecycleMessage() {}
     onSort(order: string) {
@@ -151,6 +164,26 @@ test('expanded native controls use source chrome, wrapping sort rows, guide and 
   assert.equal(strength.autoEnableAfterClick, true);
   assert.match(view.inventorySummary.text, /Artifact inventory/);
   assert.match(view.fitnessGuide.text, /Adequacy/);
+  for (const action of ['toggleRecycle', 'toggleUpgrade']) {
+    view[action]();
+    assert.equal(
+      view.chooseSortingButton.get_visible(),
+      false,
+      'expanded mode never exposes classic Sorting',
+    );
+    for (const node of [view.sortingBar, view.inventorySummary, view.fitnessGuide])
+      assert.equal(node.get_visible(), false);
+    view[action]();
+    assert.equal(view.chooseSortingButton.get_visible(), false);
+    for (const node of [view.sortingBar, view.inventorySummary, view.fitnessGuide])
+      assert.equal(node.get_visible(), true);
+  }
+  view.onBuyArtifactConfirm();
+  assert.match(view.inventorySummary.text, /Stored: 5 \/ 250/);
+  view.p.artifactCount = 3;
+  view.updateInventorySummary();
+  assert.match(view.inventorySummary.text, /Stored: 3 \/ 250/);
+
   let changes = 0,
     closes = 0;
   view.addEventListener('artifactOverviewLayoutChanged', () => changes++);

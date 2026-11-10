@@ -2373,3 +2373,25 @@ screen tests, TypeScript, formatting and build. The rich-text test uses original
 Verdana24 atlas metrics, but is not a browser/WebGL visual comparison. Live
 side-by-side screen verification, drag-scroller parity and remaining whole-client
 mismatches are still open. No live account actions or reloads this turn.
+
+### Expanded mode transitions and capacity response parity — 2026-11-10
+
+Compared native toggleRecycle/toggleUpgrade against the source overview. The
+native handlers invert the classic Sorting button and know nothing about the
+expanded sorting bar or information column. Added source visibility rules for
+both modes and their return transitions. Exposed the source inventory-summary
+refresh callback used by Purify, and refresh it after capacity responses/cargo
+rebuilds as well as ordinary stat/sort/recycle updates.
+
+Ported capacity confirmation cancellation/error recovery and the source
+footer-only success update. The native game currently clears and rebuilds the
+grid on success; the source preserves tile identity, selection and scroll.
+Capacity changes now refresh open overviews for the same player, re-enable the
+footer when applicable, hide the limit warning, and refresh credits. Maximum
+capacity does not open a purchase dialog. Late responses avoid retired controls.
+
+Tests cover both mode entry/exit paths, summary updates, cancellation without an
+RPC, failed/successful responses, maximum capacity, late failure and retained grid
+identity. All 533 tests, TypeScript and formatting pass. Transactions were simulated
+only. Current desktop capture shows other apps in use; no keys, clicks or reloads
+were issued. Browser visual comparison remains pending.

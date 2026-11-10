@@ -97,6 +97,51 @@ export function installArtifactCargo(api: API, createScroll: () => any): void {
     view.addEventListener('enterFrame', state.onFrame);
     refresh(view, state);
   });
+  const enableCapacity = (view: Raw) => states.get(view)?.button?.set_enabled(true);
+  if (typeof Overview.onUpgradeCapacity === 'function')
+    api.around(Overview, 'onUpgradeCapacity', function () {
+      if (this.p.artifactCapacityLevel >= Player.ARTIFACT_CAPACITY.length - 1) return;
+      const view = this;
+      const Credit = api.cls('core.credits.CreditManager')!;
+      const BuyBox = api.cls('core.hud.components.dialogs.CreditBuyBox') as any;
+      const cost = Credit.getCostArtifactCapacityUpgrade(view.p.artifactCapacityLevel + 1);
+      const box = new BuyBox(
+        view.g,
+        cost,
+        `${Localize.t('Increases artifact capacity to')} ${Player.ARTIFACT_CAPACITY[view.p.artifactCapacityLevel + 1]}`,
+      );
+      view.g.addChildToOverlay(box);
+      box.addEventListener('accept', () => {
+        view.g.removeChildFromOverlay(box, true);
+        view.g.rpc('upgradeArtifactCapacity', (response: Raw) =>
+          view.onBuyArtifactConfirm(response),
+        );
+      });
+      box.addEventListener('close', () => {
+        view.g.removeChildFromOverlay(box, true);
+        enableCapacity(view);
+      });
+    });
+  if (typeof Overview.onBuyArtifactConfirm === 'function')
+    api.around(Overview, 'onBuyArtifactConfirm', function (_next, response: Raw) {
+      if (!response.getBoolean(0)) {
+        this.g.showErrorDialog(response.getString(1));
+        enableCapacity(this);
+        return;
+      }
+      this.g.showErrorDialog(Localize.t('Success!'));
+      this.p.artifactCapacityLevel++;
+      // The original keeps selection, tile identities and scroll position.
+      // Reconcile the footer of any overview reopened while the RPC was pending.
+      for (const [view, state] of states) {
+        if (view.p !== this.p) continue;
+        refresh(view, state);
+        view.updateInventorySummary?.();
+        enableCapacity(view);
+      }
+      if (this.p.artifactCount < read(this.p, 'artifactLimit')) this.g.hud.hideArtifactLimitText();
+      this.g.creditManager.refresh();
+    });
   api.before(Overview, 'dispose', function () {
     detach(this);
   });

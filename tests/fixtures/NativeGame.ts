@@ -513,6 +513,7 @@ export function registry() {
     onRecycleSelect() {}
     selectAllForRecycle() {}
     toggleRecycle() {}
+    toggleUpgrade() {}
     onRecycle() {}
     onRecycleMessage() {}
     chooseSorting() {}

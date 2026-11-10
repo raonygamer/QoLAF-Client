@@ -18,6 +18,10 @@ function fixture(count: number, columns = 10) {
     width = 0;
     height = 28;
     text = '';
+    enabled = true;
+    set_enabled(value: boolean) {
+      this.enabled = value;
+    }
     disposed = false;
     set_x(v: number) {
       this.x = v;
@@ -72,12 +76,33 @@ function fixture(count: number, columns = 10) {
     }
   }
   class Overview extends Node {
-    g = { isLeaving: false };
+    g = {
+      isLeaving: false,
+      overlays: [] as any[],
+      errors: [] as string[],
+      requests: [] as any[],
+      addChildToOverlay(box: any) {
+        this.overlays.push(box);
+      },
+      removeChildFromOverlay(box: any) {
+        this.overlays.splice(this.overlays.indexOf(box), 1);
+      },
+      rpc(name: string, callback: Function) {
+        this.requests.push({ name, callback });
+      },
+      showErrorDialog(message: string) {
+        this.errors.push(message);
+      },
+      hud: { hideArtifactLimitText() {} },
+      creditManager: { refresh() {} },
+    };
     p = {
       artifacts: Array.from({ length: count }, (_, index) => ({ index })),
       artifactCount: count,
       artifactCapacityLevel: 0,
-      get_artifactLimit: () => 100,
+      get_artifactLimit() {
+        return [100, 150][this.artifactCapacityLevel];
+      },
     };
     cargoColumns = columns;
     cargoWidth = 375;
@@ -88,6 +113,9 @@ function fixture(count: number, columns = 10) {
     }
     onUpgradeCapacity() {
       assert.fail('verification must not purchase capacity');
+    }
+    onBuyArtifactConfirm(_response: any) {
+      assert.fail('native inventory rebuild must not run');
     }
     dispose() {
       this.disposed = true;
@@ -101,6 +129,8 @@ function fixture(count: number, columns = 10) {
     'core.hud.components.TextBitmap': Node,
     'core.player.Player': { ARTIFACT_CAPACITY: [100, 150] },
     'generics.Localize': { t: (text: string) => text },
+    'core.credits.CreditManager': { getCostArtifactCapacityUpgrade: () => 100 },
+    'core.hud.components.dialogs.CreditBuyBox': Node,
   };
   const api: any = {
     cls: (name: string) => classes[name],
@@ -153,13 +183,56 @@ test('capacity footer refreshes without rebuilding cargo and switches to count-o
   view.listeners.get('enterFrame')!();
   const count = view.cargoContainer!.children.at(-1)!;
   assert.equal(original.disposed, true);
-  assert.equal(count.text, '101 / 100');
+  assert.equal(count.text, '101 / 150');
   view.g.isLeaving = true;
   view.p.artifactCount = 102;
   view.listeners.get('enterFrame')!();
-  assert.equal(count.text, '101 / 100');
+  assert.equal(count.text, '101 / 150');
   view.dispose();
   assert.equal(view.listeners.size, 0);
+  assert.deepEqual(f.errors, []);
+  f.dispose();
+});
+
+test('capacity confirmation cancellation and failed responses re-enable the existing footer', () => {
+  const f = fixture(40);
+  const { view } = f;
+  const button = view.cargoContainer!.children.at(-1)!;
+  button.set_enabled(false);
+  view.onUpgradeCapacity();
+  assert.equal(view.g.requests.length, 0);
+  view.g.overlays[0].listeners.get('close')();
+  assert.equal(button.enabled, true);
+  assert.equal(view.g.requests.length, 0, 'cancelling never sends a purchase');
+  button.set_enabled(false);
+  view.onUpgradeCapacity();
+  view.g.overlays[0].listeners.get('accept')();
+  assert.equal(view.g.requests[0].name, 'upgradeArtifactCapacity');
+  view.g.requests[0].callback({ getBoolean: () => false, getString: () => 'rejected' });
+  assert.equal(button.enabled, true);
+  assert.deepEqual(view.g.errors, ['rejected']);
+  assert.equal(view.p.artifactCapacityLevel, 0);
+  assert.equal(f.created(), 100);
+  assert.deepEqual(f.errors, []);
+  f.dispose();
+});
+
+test('successful capacity response updates only footer and late response avoids disposed controls', () => {
+  const f = fixture(40);
+  const { view } = f;
+  const boxes = [...view.cargoBoxes];
+  const grid = view.cargoContainer;
+  view.onBuyArtifactConfirm({ getBoolean: () => true });
+  assert.equal(view.p.artifactCapacityLevel, 1);
+  assert.equal(view.cargoContainer, grid);
+  assert.deepEqual(view.cargoBoxes, boxes);
+  assert.equal(f.created(), 100);
+  assert.equal(grid!.children.at(-1)!.text, '40 / 150');
+  view.onUpgradeCapacity();
+  assert.equal(view.g.overlays.length, 0, 'maximum capacity does not open another purchase');
+  view.dispose();
+  view.onBuyArtifactConfirm({ getBoolean: () => false, getString: () => 'late failure' });
+  assert.equal(view.g.errors.at(-1), 'late failure');
   assert.deepEqual(f.errors, []);
   f.dispose();
 });

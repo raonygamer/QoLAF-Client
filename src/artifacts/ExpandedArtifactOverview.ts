@@ -197,7 +197,10 @@ export function installExpandedArtifactOverview(api: API, resolve: Resolve): voi
     };
     view.inventorySummary = make(120, 12, 0xd3d3d3);
     view.inventorySummary.y = view.statsY;
-    view.inventorySummary.text = artifactInventorySummary(view.p);
+    view.updateInventorySummary = () => {
+      if (!dead.has(view)) view.inventorySummary.text = artifactInventorySummary(view.p);
+    };
+    view.updateInventorySummary();
     view.fitnessGuide = make(265, 11, 0xcccccc);
     view.fitnessGuide.y = view.statsY + 125;
     view.fitnessGuide.text = artifactFitnessGuide;
@@ -332,11 +335,28 @@ export function installExpandedArtifactOverview(api: API, resolve: Resolve): voi
     information(this);
     controls(this);
   });
-  for (const method of ['reloadStats', 'onRecycleMessage', 'onSort'])
+  for (const method of ['toggleRecycle', 'toggleUpgrade']) {
+    api.after(Overview, method, function () {
+      if (dead.has(this)) return;
+      const choosing = !!this.recycleMode || !!this.upgradeMode;
+      this.chooseSortingButton.set_visible(!this.expandedView && !choosing);
+      for (const node of [this.sortingBar, this.inventorySummary, this.fitnessGuide])
+        node?.set_visible(!choosing);
+    });
+  }
+  for (const method of [
+    'reloadStats',
+    'onRecycleMessage',
+    'onSort',
+    'drawArtifactsInCargo',
+    'onBuyArtifactConfirm',
+  ]) {
+    if (typeof Overview[method] !== 'function') continue;
     api.after(Overview, method, function () {
       if (!dead.has(this) && this.inventorySummary)
         this.inventorySummary.text = artifactInventorySummary(this.p);
     });
+  }
   api.before(Overview, 'dispose', function () {
     clearLoading(this);
     dead.add(this);
