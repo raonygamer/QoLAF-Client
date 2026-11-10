@@ -2,7 +2,7 @@ import { read, type API, type Raw } from '../api/Types';
 import { portedClasses } from '../ported/Registry';
 import { ChatArtifactToken } from '../chat/rich/ChatArtifactToken';
 import type { ChatArtifactLinkResolver } from '../chat/ChatArtifactLinkResolver';
-import { ChatArtifactChannelPolicy } from '../chat/ChatArtifactChannelPolicy';
+import { installNativeArtifactDraft } from '../chat/NativeArtifactDraft';
 import type { NativeBitmapInput } from '../chat/rich/NativeBitmapInput';
 import { installPopupKeyboard } from '../dialogs/NativePopupKeyboard';
 import { installNativeCargoQueue } from './CargoReadQueue';
@@ -76,37 +76,8 @@ export function installNativePlayerInspect(
     Popup.open(game, argument);
   };
   const previousOpen = Object.getOwnPropertyDescriptor(chat, 'openPlayerInspect');
-  const previousInsert = Object.getOwnPropertyDescriptor(chat, 'insertArtifactLink');
   chat.openPlayerInspect = open;
-  chat.insertArtifactLink = (ownerId: string, artifact: Raw) => {
-    if (!editor || !artifact?.revealed || game.isLeaving) return;
-    const token = ChatArtifactToken.encode(ownerId, artifact.id);
-    if (!token) return;
-    // The IPC/QoLAF channel is still being ported. Never silently reroute a
-    // draft to another audience while that default destination is unavailable.
-    if (!ChatArtifactChannelPolicy.allows(chat.chatMode)) {
-      log?.write(
-        'Choose Private or Clan chat before inserting an artifact link; QoLAF chat is not available yet.',
-        'error',
-      );
-      return;
-    }
-    artifacts.registerLocal(ownerId, artifact);
-    if (!chat.isActive()) chat.toggleChatMode();
-    queueMicrotask(() => {
-      if (game.isLeaving || !chat.isActive()) return;
-      const model = editor.model;
-      const begin = model.sourceSelectionBegin,
-        end = model.sourceSelectionEnd;
-      let insertion = token;
-      if (begin > 0 && !/\s/.test(model.text.charAt(begin - 1))) insertion = ' ' + insertion;
-      if (end === model.text.length || !/\s/.test(model.text.charAt(end))) insertion += ' ';
-      if (!model.replaceSelection(insertion))
-        log?.write('The artifact link does not fit in the chat input.', 'error');
-      editor.binding.project();
-      chat.input.setFocus();
-    });
-  };
+  installNativeArtifactDraft(api, game, editor, artifacts);
   api.around(chat, 'sendMessage', (next, ...args) => {
     const value = chat.input.get_text();
     const [command, argument = ''] = value.startsWith('/') ? chat.parseCommand(value) : [];
@@ -127,7 +98,5 @@ export function installNativePlayerInspect(
     Popup?.dismissActive();
     if (previousOpen) Object.defineProperty(chat, 'openPlayerInspect', previousOpen);
     else delete chat.openPlayerInspect;
-    if (previousInsert) Object.defineProperty(chat, 'insertArtifactLink', previousInsert);
-    else delete chat.insertArtifactLink;
   });
 }

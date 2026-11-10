@@ -1962,3 +1962,39 @@ on the native receive path. Source Unicode boundaries are preserved. Native leng
 and PvP checks remain in place. Local rendering and physical role-card hover were
 verified; all 462 tests pass. See LiveComparison.md for evidence and remaining
 chat work. No production relay or cross-client send was performed in this pass.
+
+### Original-client diff refreshed — artifact review, 2026-11-10
+
+Regenerated the complete comparison from the current original-client working tree
+against the decompiled supplied Preload.swf. Local evidence is under
+`/home/raony/Documentos/astroflux-port-audit/current/` (inventory, method inventory,
+and per-file unified diffs). Counts remain 722 files: 288 added, 356 changed,
+78 unchanged. Normalized method review reports 4,564 added, 1,268 changed,
+40 removed and 2,852 unchanged. These counts describe source differences, not
+completed port coverage. Original source working-tree changes were left intact.
+
+Compared `ChatInputText.selectArtifactChannel` and `insertArtifactLink` directly:
+removed the stale rejection claiming QoLAF was unavailable. The native composer
+now selects QoLAF from unsupported tabs, retains Private/Clan/QoLAF, registers the
+artifact locally and inserts the token with the original spacing and selection
+replacement. It only opens a closed composer; no send operation is called.
+Deferred insertion is cancelled on session disposal, leaving or replacement.
+Seven focused draft/policy tests and all 470 suite tests pass; typecheck passes.
+Live draft interaction against the new release remains to be checked.
+
+Artifact screen mismatches confirmed from the refreshed diff (still open):
+
+- `ArtifactOverview`: classic/expanded layout toggle, expanded chrome and layout,
+  setup scrolling/layout, inline sorting and selection synchronization.
+- `ArtifactShareContextPopup` and overview/state handlers: native two-row context
+  menu and return-to-play draft insertion.
+- `ArtifactFavorites`, `ArtifactCargoBox`, `ArtifactBox`, overview recycling:
+  account-scoped annotations, markers, protected selection and recycle pruning.
+  Favoriting must not be exposed without the original recycling protection.
+- Purify minimum controls, unique/recycle-generator/favorite protections and
+  pending-operation guards; capacity footer and inventory summary refresh.
+- `ArtifactSorting`: original dialog chrome, close handling and sort options.
+
+`NativeArtifacts.ts` currently supplies fitness tooltip/sorting additions only;
+it is not a port of the full artifact overview. Preserve the current Haxe gameplay
+and server-operation contracts while implementing the original UI around them.
