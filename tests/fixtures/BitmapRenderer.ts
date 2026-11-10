@@ -24,7 +24,7 @@ import { createRichBitmapTextMetrics } from '../../src/ported/RichBitmapTextMetr
 
 /** GPU-free layout fixture, using the original atlas's actual glyph metrics. */
 export function bitmapRendererFixture(
-  atlas: 'russo16_bitmap' | 'verdana16_bitmap' = 'russo16_bitmap',
+  atlas: 'russo16_bitmap' | 'verdana16_bitmap' | 'verdana48_bitmap' = 'russo16_bitmap',
 ) {
   const cleanup: (() => void)[] = [];
   aliasProperties({ defer: (fn: () => void) => cleanup.push(fn) } as any, Display);
@@ -84,6 +84,7 @@ export function bitmapRendererFixture(
       yOffset: numeric('yoffset'),
       xAdvance: numeric('xadvance'),
       width: numeric('width'),
+      height: numeric('height'),
       texture: { width: numeric('width'), height: numeric('height'), frame: null },
       getKerning: (_previous: number) => 0,
     });

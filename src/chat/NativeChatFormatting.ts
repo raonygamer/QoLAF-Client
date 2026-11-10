@@ -3,6 +3,7 @@ import type { Resolve } from '../runtime/As3';
 import type { DeviceSettings } from '../settings/DeviceSettings';
 import type { NativeBitmapInput } from './rich/NativeBitmapInput';
 import { createChatFormattingClasses } from './ChatFormattingClasses';
+import { createChatEmojiPicker } from '../ported/ChatEmojiPicker';
 
 /** Source formatting selection lifecycle, using the original popup and toolbar controls. */
 export function installNativeChatFormatting(
@@ -21,9 +22,12 @@ export function installNativeChatFormatting(
   const color = new Button(48, 32, 'Color');
   const size = new Button(40, 32, 'Size');
   const popup = new Popup();
+  const EmojiPicker = createChatEmojiPicker(resolve);
+  const emoji = new EmojiPicker();
   chat.addChild(color);
   chat.addChild(size);
   chat.addChild(popup);
+  chat.addChild(emoji);
   const original = {
     width: read(input, 'width'),
     height: read(input, 'height'),
@@ -73,6 +77,22 @@ export function installNativeChatFormatting(
   const showSize = () => {
     if (prepare()) popup.showSizePanel();
   };
+  const selectEmoji = (event: Raw) => {
+    if (!chat.isActive() || typeof event.data !== 'string') return;
+    if (editor.model.replaceSelection(event.data)) {
+      editor.binding.project();
+      input.dispatchEventWith('change', true);
+      input.setFocus();
+    }
+  };
+  const emojiOpenChanged = (event: Raw) => {
+    if (event.data) {
+      input.setFocus();
+      chat.setChildIndex(emoji, read(chat, 'numChildren') - 1);
+    }
+  };
+  emoji.addEventListener(EmojiPicker.EVENT_EMOJI_SELECTED, selectEmoji);
+  emoji.addEventListener(EmojiPicker.EVENT_OPEN_CHANGED, emojiOpenChanged);
   const apply = (kind: 'color' | 'size', value: number) => {
     restore();
     const changed =
@@ -146,11 +166,15 @@ export function installNativeChatFormatting(
     const width =
       read(chat.tabs, 'width', original.width) + (integrated && game.messageLog ? 8 : 0);
     const show = integrated && width >= 280;
+    const showEmoji = integrated && width >= 120;
+    emoji.set_visible(showEmoji);
+    if (!showEmoji || !chat.isActive()) emoji.close();
     color.set_visible(show);
     size.set_visible(show);
     color.enabled = size.enabled = chat.chatMode !== 'global';
     if (!show || !color.enabled || !chat.isActive()) popup.close();
-    const inputWidth = show ? width - 96 : width;
+    const controlsWidth = show ? 96 + (showEmoji ? 38 : 0) : showEmoji ? 42 : 0;
+    const inputWidth = Math.max(1, width - controlsWidth);
     if (read(input, 'width') !== inputWidth) input.set_width(inputWidth);
     // Original integrated composer reserves a 39px editor row for 24px text.
     input.set_height(show ? 39 : original.height);
@@ -159,6 +183,8 @@ export function installNativeChatFormatting(
     const y = read(input, 'y') + (show ? 4 : 0);
     color.set_y(y);
     size.set_y(y);
+    emoji.set_x(Math.max(0, width - EmojiPicker.BUTTON_WIDTH));
+    emoji.set_y(y);
     editor.layout();
   };
   api.after(input, 'updatePlacement', layout);
@@ -170,13 +196,16 @@ export function installNativeChatFormatting(
     color.removeFromParent(true);
     size.removeFromParent(true);
     popup.removeFromParent(true);
+    emoji.removeEventListener(EmojiPicker.EVENT_EMOJI_SELECTED, selectEmoji);
+    emoji.removeEventListener(EmojiPicker.EVENT_OPEN_CHANGED, emojiOpenChanged);
+    emoji.removeFromParent(true);
     input.set_width(original.width);
     input.set_height(original.height);
   });
   layout();
   return {
     get isOpen(): boolean {
-      return popup.isOpen;
+      return popup.isOpen || emoji.isOpen;
     },
   };
 }

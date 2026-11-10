@@ -1,3 +1,4 @@
+import { EmojiGlyphLookup } from '../src/chat/rich/EmojiGlyphLookup';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installNativeRichChatInput } from '../src/chat/NativeRichChatInput';
@@ -38,7 +39,9 @@ class Element extends EventTarget {
 }
 
 function fixture() {
-  const bitmap = bitmapRendererFixture('verdana16_bitmap');
+  const bitmap = bitmapRendererFixture('verdana48_bitmap');
+  bitmap.resolve('starling.text.TextField').getBitmapFont = (name: string) =>
+    name === 'verdana48_bitmap' ? bitmap.font : null;
   const hooks = new Hooks();
   const cleanups: (() => void)[] = [];
   const element = new Element();
@@ -195,4 +198,19 @@ test('switching Global preserves the rich draft and sanitizes only the outbound 
   assert.equal(chat.submitted.length, 1);
   assert.equal(GlobalChatSanitizer.stripHTML('<scr<script>ipt>safe'), 'safe');
   assert.equal(GlobalChatSanitizer.stripHTML('broken<tag'), 'brokentag');
+});
+
+test('native composer paints inserted emoji from the source color atlas and deletes the whole cluster', (t) => {
+  const { input, element, cleanup } = fixture();
+  t.after(cleanup);
+  element.emit('beforeinput', { inputType: 'insertText', data: '😀' });
+  assert.equal(input.get_text(), '😀');
+  const view = input.getChildAt(0) as any;
+  const renderer = view.getChildAt(1);
+  const glyph = renderer.currentTextFormat.font.getChar(EmojiGlyphLookup.glyphIdForScalar(0x1f600));
+  assert.ok(glyph);
+  assert.equal(renderer.characterBatch.meshes.length, 1);
+  assert.equal(renderer.characterBatch.meshes[0].texture, glyph.texture);
+  element.emit('beforeinput', { inputType: 'deleteContentBackward' });
+  assert.equal(input.get_text(), '');
 });

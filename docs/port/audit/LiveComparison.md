@@ -1146,3 +1146,25 @@ draft with Ctrl+A/Backspace and verified empty (`/tmp/QoLAF-ContextCleared.png`)
 No player-facing message or ignore request was sent. Player metadata and block
 flows are implemented but not live-verified. Popup tests cover edge positioning,
 metadata-driven rows and action dispatch; 214 tests pass.
+
+### Emoji picker and composer atlas
+
+Ported the full source picker/catalog/model. Initial live checks found two
+integration defects: wheel handling lacked the Starling Haxe property aliases,
+and the rich composer selected a smaller Verdana atlas without emoji. Restored
+the bridge resolution and the source Verdana48 chat format. A native-input
+regression now checks the exact emoji texture and atomic Backspace behavior.
+
+Verified wheel movement (`/tmp/QoLAF-EmojiWheelRetest.png`), Animals category
+selection (`/tmp/QoLAF-EmojiAnimals.png`), full-color insertion into an unsent draft
+(`/tmp/QoLAF-EmojiInsertedFixed.png`) and one-Backspace clearing
+(`/tmp/QoLAF-EmojiCleared.png`). Opened the same source picker in the original
+client (`/tmp/QoLAF-OriginalEmojiPanel.png`): panel position, dimensions, category
+icons and first grid agree visually. Closed the original picker and returned to
+the port. No player-facing messages sent. All 217 tests pass; catalog coverage
+checks every source glyph against the actual atlas.
+
+The comparison also shows the original chat tabs have a larger minimum width
+than the port's natural text widths. Audit the inherited Feathers minimum before
+claiming tab geometry parity. Prompt, image shortcuts and emoji autocomplete
+remain open.

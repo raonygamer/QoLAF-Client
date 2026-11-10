@@ -95,3 +95,24 @@ Live right-click/copy verified with local /echo output. Copied text was pasted
 into an unsent draft and then cleared. Full player/clan lookup, block behavior,
 covered-panel rejection and resize/scroll cases need broader integration testing;
 no player was blocked. Source popup and metadata tests pass (214 total).
+
+## Emoji picker
+
+Ported the original ChatEmojiPicker, ChatEmojiPickerModel and EmojiPickerCatalog:
+1,391 atlas-backed emoji in eight source-ordered categories, 12×5 visible cells,
+category highlights, scrollbar dragging, wheel paging, variation selectors and
+source charcoal styling. Connected the picker to the rich editor's selection
+replacement and serialized length limits; the composer reserves its original
+36px button plus spacing. Native input retains focus after insertion.
+
+All catalog entries resolve against the actual Verdana48 atlas. Tests cover
+category/reset/clamping, scrollbar gestures, integer cell hit-testing, full-color
+mesh positions and emoji dispatch (216 tests total). Emoji autocomplete and image
+shortcuts are still separate open features. Live wheel and insertion verification
+is in progress.
+
+Emoji wheel/category selection/insertion now verified live after correcting the
+Starling wheel bridge and editor atlas choice. Original picker compared visually;
+217 tests pass. New comparison evidence: original chat tabs are roughly 100px
+wide, while the current adapter sizes them to text plus padding. Trace inherited
+Feathers minimum width and correct it; tab geometry parity is not yet established.
