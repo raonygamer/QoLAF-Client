@@ -22,6 +22,7 @@ export class RichBitmapInputBinding {
       // chat or activating game shortcuts through TextEntry's native listener.
       if (this.composition.isActive || (event as KeyboardEvent).isComposing)
         event.stopImmediatePropagation();
+      else this.navigate(event as KeyboardEvent);
     });
     this.listen(element, 'compositionstart', () => {
       this.readSelection();
@@ -88,6 +89,21 @@ export class RichBitmapInputBinding {
     if (anchor === this.model.selectionAnchor && active === this.model.selectionActive) return;
     this.model.select(anchor, active);
     this.selectionChanged();
+  }
+
+  private navigate(event: KeyboardEvent): void {
+    if (event.ctrlKey || event.altKey || event.metaKey) return;
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    this.readSelection();
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
+      this.model.moveHorizontal(event.key === 'ArrowLeft' ? -1 : 1, event.shiftKey);
+    else {
+      const target = event.key === 'Home' ? 0 : this.model.visibleText.length;
+      this.model.select(event.shiftKey ? this.model.selectionAnchor : target, target);
+    }
+    this.project();
   }
 
   private beforeInput(event: InputEvent): void {

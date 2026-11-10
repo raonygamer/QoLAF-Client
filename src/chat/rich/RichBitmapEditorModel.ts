@@ -19,8 +19,8 @@ export class RichBitmapEditorModel {
   filterText: ((text: string) => string) | null = null;
 
   constructor(
-    readonly defaultSize = 13,
-    readonly defaultColor = 0xffffff,
+    public defaultSize = 13,
+    public defaultColor = 0xffffff,
     private artifactResolver: Function | null = null,
   ) {}
 
@@ -96,6 +96,43 @@ export class RichBitmapEditorModel {
       this.anchor = this.snapForward(anchor);
       this.active = this.snapBackward(active);
     }
+  }
+
+  setDefaultFormat(size: number, color: number): void {
+    if (size === this.defaultSize && color === this.defaultColor) return;
+    this.defaultSize = size;
+    this.defaultColor = color;
+    this.continuationSize = NaN;
+    this.parse();
+  }
+
+  selectSource(begin: number, end = begin): void {
+    if (begin < 0 || end < 0 || begin > this.source.length || end > this.source.length)
+      throw new RangeError('Selection must be within the text.');
+    if (begin === end) this.select(this.document.visibleIndexAtSource(begin, true));
+    else {
+      const first = this.document.visibleIndexAtSource(Math.min(begin, end), false);
+      const last = this.document.visibleIndexAtSource(Math.max(begin, end), true);
+      this.select(begin < end ? first : last, begin < end ? last : first);
+    }
+  }
+
+  moveHorizontal(direction: -1 | 1, extend = false): void {
+    let target: number;
+    if (!extend && this.selectionBegin !== this.selectionEnd)
+      target = direction < 0 ? this.selectionBegin : this.selectionEnd;
+    else if (direction < 0) {
+      const atomic = this.document.previousAtomicBoundary(this.active);
+      target =
+        atomic >= 0
+          ? atomic
+          : RichBitmapTextNavigation.previousBoundary(this.visibleText, this.active);
+    } else {
+      const atomic = this.document.nextAtomicBoundary(this.active);
+      target =
+        atomic >= 0 ? atomic : RichBitmapTextNavigation.nextBoundary(this.visibleText, this.active);
+    }
+    this.select(extend ? this.anchor : target, target);
   }
 
   /** Resolver changes preserve source positions even when displayed token labels change. */

@@ -116,3 +116,25 @@ test('disabled editing, empty selection formatting and newline stripping follow 
   assert.equal(editor.backspace(), false);
   assert.equal(editor.text, 'abcd');
 });
+
+test('native source selections and arrow navigation preserve whole artifact and emoji ranges', () => {
+  const editor = new Editor(13, 0xffffff, () => ({ label: 'Artifact', color: 0xffaa44 }));
+  editor.text = `A${token}👨‍👩‍👧Z`;
+  editor.selectSource(editor.text.length);
+  assert.equal(editor.selectionActive, editor.visibleText.length);
+  editor.moveHorizontal(-1);
+  editor.moveHorizontal(-1);
+  assert.equal(editor.selectionActive, 9);
+  editor.moveHorizontal(-1, true);
+  assert.equal(editor.selectedCopyText, token);
+  editor.moveHorizontal(1);
+  assert.equal(editor.selectionActive, 9);
+  assert.throws(() => editor.selectSource(editor.text.length + 1), RangeError);
+  editor.selectSource(1, 1 + token.length);
+  assert.equal(editor.selectedCopyText, token);
+  editor.setDefaultFormat(24, 0x123456);
+  assert.equal(editor.visibleText, 'AArtifact👨‍👩‍👧Z');
+  editor.select(0, 1);
+  assert.equal(editor.selectedSize, 24);
+  assert.equal(editor.selectedColor, 0x123456);
+});

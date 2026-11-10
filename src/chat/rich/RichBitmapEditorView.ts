@@ -63,6 +63,11 @@ export class RichBitmapEditorView {
     this.refresh();
   }
 
+  setFormat(format: Raw): void {
+    this.format = format;
+    this.refresh();
+  }
+
   refresh(): void {
     if (this.disposed) return;
     RichBitmapMarkupParser.parse(

@@ -1,4 +1,7 @@
 import { installNativeChatHistory } from '../chat/NativeChatHistory';
+import { installNativeRichChatInput } from '../chat/NativeRichChatInput';
+import { portedClasses } from '../ported/Registry';
+import { createBitmapClasses } from '../ui/BitmapClasses';
 import { installCommandAutocomplete } from '../chat/ChatCommandAutocompletePopup';
 import { installNexarWorldLabels } from '../ship/NexarWorldLabel';
 import { installMapLiveMiniatures } from '../map/NativeMapLiveMiniatures';
@@ -49,6 +52,11 @@ export function installGameSession(
   installDamageText(session, game);
   installClanLabels(session, game);
   installNativeChatPreferences(session, game, preferences);
+  installNativeRichChatInput(
+    session,
+    game,
+    createBitmapClasses(portedClasses(session).resolve).resolve,
+  );
   installNativeChatHistory(session, game);
   installCommandAutocomplete(session, game);
   const target = new TargetSystem(game, config, session.cls('core.ship.PlayerShip'));

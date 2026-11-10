@@ -1002,3 +1002,35 @@ presentation cadence.
 - Not yet activated on the live chat input. Native source-offset field hooks,
   pointer transport, channel restrictions and preference changes still need
   integration before browser comparison; this does not close CHAT-01.
+
+
+## Native bitmap composer activation — 2026-11-10
+
+- Activated NativeRichChatInput in GameSession after native chat preferences and
+  before history/autocomplete. Native TextEntry identity and events are retained;
+  get_text/get_length use serialized markup, set_text uses the document model,
+  and selectRange maps original source offsets to visible atomic boundaries.
+- DOM input remains the focus/clipboard/IME transport with transparent drawing.
+  Starling draws the original Verdana bitmap text, selection and caret. Pointer
+  capture converts CSS coordinates to the bitmap viewport for click/drag.
+- Preserved source global-only restriction, serialized maxChars and per-session
+  hook cleanup. Preference font size/color changes update metrics and renderer.
+  Added whole-atom/emoji arrow navigation so left-arrow cannot become stuck
+  inside an artifact label. Original word-navigation and multi-click behavior
+  still need porting; live IME/candidate placement remains unverified.
+- One explicit F5 down/up reload reconnected with zero diagnostic runtime errors.
+  Live unsent draft `Bitmap <font color="#ff6600">orange</font> draft` painted
+  orange text correctly; Ctrl+A drew the source blue selection highlight.
+  Replacing it with /ec and pressing Tab produced /echo with passive help.
+  Mouse drag selected the displayed command using bitmap geometry. Cleared the
+  draft with Ctrl+A/Backspace; no player-facing chat message was sent.
+- Screenshots: /tmp/QoLAF-RichInputDraft.png,
+  /tmp/QoLAF-RichInputSelection.png, /tmp/QoLAF-RichInputAutocomplete.png,
+  /tmp/QoLAF-RichInputDrag.png. Original comparison captured in
+  /tmp/QoLAF-OriginalChatState.png: original has a left integrated chat panel,
+  broader channel row and Color/Size/Img/emoji controls absent from this port.
+  This is a working native bitmap input, not full chat parity.
+- Added real-host-hook tests for markup/visible separation, source selection,
+  exactly one change event, channel restrictions, serialized limits, font changes
+  and unload restoration, plus model atomic navigation/source selection tests.
+- Validation: TypeScript and all 201 tests pass. Formatting corrected and rechecked.
