@@ -2156,3 +2156,22 @@ Listeners detach on login/plugin teardown. Regressions cover a brief tap between
 timer ticks, a native callback bound before patching, startup-before-panel input,
 modifier combinations, blur and cleanup. Live cancellation still needs a browser
 check; automated coverage does not establish whole-client parity.
+
+### Artifact setup selection and source skin investigation — 2026-11-10
+
+Ported syncSetupSelection label/sizing rules and AstroTheme's isToggle=false
+ownership for overview setup buttons. The current Haxe syncSetupButtons writes
+selected directly; the adapter invokes native setters so the selected skin is
+updated regardless of property aliases. Active setups use “Setup N” at 72px,
+inactive setups use their number at 32px, the buy control remains 34px, and gaps
+are 6px. Native safe-zone/recycle checks and change/buy callbacks are retained.
+Only overview-owned buttons stop self-toggling; other native toggle controls are
+unchanged. Full suite 496 passes, including rejected changes, accepted changes,
+selected appearance, dimensions and unrelated controls. No live setup change or
+purchase was performed.
+
+Horizontal overflow is NOT yet ported. Source review located its Aeon horizontal
+thumb up/hover/down/icon textures and scale9 geometry in BaseAeonDesktopTheme.
+The original AeonDesktopTheme.swc assets were extracted to /tmp/QoLAF-Aeon/export
+for the next implementation, avoiding a substitute scrollbar design. Expanded
+overview layout, row overflow and visual comparison remain open.
