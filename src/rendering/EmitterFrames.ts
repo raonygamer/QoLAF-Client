@@ -1,3 +1,4 @@
+import { installEmitterDelays } from './EmitterDelays';
 import { EmitterTargets } from './EmitterTargets';
 import { read, type API, type Raw } from '../api/Types';
 
@@ -254,6 +255,7 @@ export function installEmitterFrames(api: API): void {
   if (!Emitter || !Particle || !Color || !Collective) return;
   const targets = new EmitterTargets(api.cls('core.engine.Engine'), api.cls('core.ship.EnemyShip'));
   const frames = new EmitterFrames(Particle, Emitter, Color, targets);
+  installEmitterDelays(api, targets);
   // Unit.reset reaches GameObject.reset; Engine.reset does not call its base.
   for (const name of ['core.GameObject', 'core.engine.Engine']) {
     const prototype = api.cls(name)?.prototype;

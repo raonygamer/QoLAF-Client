@@ -1193,3 +1193,25 @@ factory callbacks. This commit guards already-created effects; delayed factory
 callback capture remains to be ported. ProjectileThrustAnchor's custom validity
 path is also dependent on that source class being ported. Neither is claimed
 complete by these guards.
+
+## Delayed emitter target lifetime (2026-11-10)
+
+Closed the delayed multiple-effect capture gap from the preceding audit.
+EmitterDelays records the target generation while native EmitterFactory.create
+schedules its TweenMax callback, then checks that snapshot before the callback
+runs. Recycled targets, invalid engine/enemy attachments and leaving games do not
+create follow-up effects. New effects capture the new target life. Targetless
+factory calls and timers outside the factory retain their native callbacks.
+Nested factories restore their previous scope in finally, including exceptions;
+delay, callback receiver/arguments, timer parameters and native returned handle
+are preserved. No factory definition, rainbow configuration or particle physics
+was replaced.
+
+The extracted actual Haxe factory method is exercised with empty emitter
+configuration to isolate its real delayed recursion. Tests cover valid one-shot
+follow-up, recycle before callback, new-life scheduling, targetless effects,
+leaving games, unrelated timers, nested factories, exception cleanup, callback
+arguments and hook restoration. Typecheck and all 324 tests pass. This change is
+built and source/runtime-boundary tested, but has not yet been reloaded into the
+running browser or observed during combat. Remastered auras and custom projectile
+thrust-anchor validity remain separate unfinished work.
