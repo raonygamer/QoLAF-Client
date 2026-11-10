@@ -414,6 +414,7 @@ export class Game extends Display {
   hud = { container: new Display(), radar: new Display(), bossHealth: new Display() };
   frames = 0;
   blockHotkeys = false;
+  projectileManager = {};
   unitManager = { units: [new EnemyShip()] };
   clock = { latency: 25 };
   serviceConnection = { get_connected: () => true };

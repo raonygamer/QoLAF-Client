@@ -1,3 +1,4 @@
+import { installTorpedoCue } from '../Projectile/XhersixTorpedoCue';
 import { installInactivityPreference } from './Inactivity';
 import { installDamageObserver } from '../Telemetry/DamageObserver';
 import { read, type API, type Raw } from '../Api/Types';
@@ -27,6 +28,7 @@ export function installGameSession(
   const ui = new NativeUI(session);
   const { config, save } = sessionSettings(session, game);
   installInactivityPreference(session, game);
+  installTorpedoCue(session, game);
   installNativeSettings(session, preferences);
   installHealthAndShield(session, game);
   installRespawn(session, game);

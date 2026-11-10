@@ -508,3 +508,34 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   confirmed checked, restored off, reloaded the preview and confirmed unchecked.
   Captures /tmp/QoLAF-InactivityBefore.png, InactivityEnabled.png and
   InactivityRestored.png (each with QoLAF- prefix). No chat was sent in this pass.
+
+### Xhersix torpedo visual rhythm and Settings callback
+
+- Fixed the missing setTorpedoCueEnabled method used by the Combat settings page.
+  Ported the original visual-only controller, 2500ms clock, 50ms realignment,
+  strict >3000ms silence expiry, monotonic pulse age and unsigned timer wrapping.
+  The source's complete behavioral clock cases run against the TypeScript port;
+  AS3 syntax-inspection assertions are intentionally excluded from those fixtures.
+- Ported all three native Mesh rings: original 64 segments, colors/alpha, fixed and
+  shrinking red radii, expanding/fading yellow pulse, and zoom-compensated 2px
+  strokes. Uses the current rendered ship pose in canvasTexts, not simulation pose.
+- Observe original weapon key and raw spawn time before native factory culling or
+  catch-up. Install packet hooks at classesReady, before Haxe caches bound message
+  handlers. Incoming packets, factory calls, headings and projectile physics stay
+  unchanged. No predicted shots or historical positioning corrections are added.
+- Added sidecar pooled-life and raw server-target revisions, including A->B->A,
+  stopped-weapon aggro preservation, encoded target clears and pre-session initial
+  sync. Read existing native packet formats without changing target assignments.
+  Menus/landing/death/target changes invalidate the clock; duplicates cannot rearm
+  an expired volley. This is a rhythm reminder, not a collision warning.
+- TypeScript/build and all 127 tests pass. Coverage includes original clock cases,
+  controller invalidation, geometry/fade/zoom, cached-handler observation, native
+  factory passthrough and actual Haxe readEnemyEntry parsing. Updated the general
+  integration fixture with the native game's projectileManager field.
+- Live synthetic browser view rendered three native meshes for 3589 frames and
+  disposed them cleanly. Captures: /tmp/QoLAF-TorpedoRings.png and
+  /tmp/QoLAF-TorpedoDisposed.png. Temporary script/HTML injection removed and clean
+  preview reloaded; no saved setting or gameplay state changed by the probe.
+- Full live Xhersix encounter comparison remains unverified. Collision-circle
+  visuals and other still-unported Settings behavior remain separate open work;
+  current Haxe gameplay/shield/corrosive calculations remain authoritative.

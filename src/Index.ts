@@ -1,3 +1,4 @@
+import { installTorpedoCueHooks } from './Projectile/XhersixTorpedoCue';
 import { installNativeAutomations } from './Automation/NativeAutomations';
 import targetIcon from './Assets/Images/TargetIcon.png';
 import { read, type API } from './Api/Types';
@@ -34,6 +35,7 @@ export default {
         }
       }));
     api.on('classesReady', () => {
+      installTorpedoCueHooks(api);
       installInterpolation(api);
       installDisplayScale(api, deviceSettings);
       const login = api.cls('Login')!.prototype;
