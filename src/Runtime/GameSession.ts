@@ -1,3 +1,4 @@
+import { installNetherBlobBeamCountdown } from '../Ship/NetherBlobBeamCountdown';
 import { installTorpedoWarnings } from '../Projectile/XhersixTorpedoWarningBatch';
 import { installTorpedoCue } from '../Projectile/XhersixTorpedoCue';
 import { installInactivityPreference } from './Inactivity';
@@ -31,6 +32,7 @@ export function installGameSession(
   installInactivityPreference(session, game);
   installTorpedoCue(session, game);
   installTorpedoWarnings(session, game);
+  installNetherBlobBeamCountdown(session, game);
   installNativeSettings(session, preferences);
   installHealthAndShield(session, game);
   installRespawn(session, game);

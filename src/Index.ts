@@ -1,3 +1,4 @@
+import { installNetherBlobBeamHooks } from './Ship/NetherBlobBeamCountdown';
 import { installTorpedoCueHooks } from './Projectile/XhersixTorpedoCue';
 import { installNativeAutomations } from './Automation/NativeAutomations';
 import targetIcon from './Assets/Images/TargetIcon.png';
@@ -36,6 +37,7 @@ export default {
       }));
     api.on('classesReady', () => {
       installTorpedoCueHooks(api);
+      installNetherBlobBeamHooks(api);
       installInterpolation(api);
       installDisplayScale(api, deviceSettings);
       const login = api.cls('Login')!.prototype;

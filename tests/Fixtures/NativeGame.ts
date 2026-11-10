@@ -88,7 +88,8 @@ export class Display {
       this.removeChild(c, dispose);
   }
   removeFromParent(dispose = false) {
-    this.parent?.removeChild(this, dispose);
+    if (this.parent) this.parent.removeChild(this, dispose);
+    else if (dispose) this.dispose();
   }
   getChildAt(index: number) {
     return this.children[index];

@@ -556,3 +556,30 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   the preceding rhythm-ring visual probe does not establish this feature's
   browser parity. Current Haxe shields and all other gameplay mechanics remain
   authoritative, as reiterated by the user.
+
+### Collision-circle renderer check and Nether Blob beam estimate
+
+- Live synthetic collision probe rendered three original warning meshes (588
+  vertices total) in canvasProjectiles. Screenshot /tmp/QoLAF-CollisionVisible.png
+  shows the faint disks and stronger borders at runtime radius 25. Reached 8109
+  rendered frames before the preview was reloaded; temporary injection removed.
+  This establishes native mesh rendering, not a real Xhersix encounter.
+- Ported NetherBlobBeamCountdown from the original EnemyShip/ProjectileManager
+  integration: only observed shots of the exact weapon from unowned Nether
+  enemies, before native factory catch-up/culling. Runtime reloadTime wins over
+  the cached weapon definition, re-read per fresh shot. Duplicate/older shots
+  are ignored; expiry stays at “Beam ready (est.)” without invented attacks.
+- Native 180x24 combat bitmap text uses the source font, color, pivot and ship
+  offset. It follows the drawn movieClip and uses the port's existing fractional
+  fixed-step clock. Hidden/off-canvas enemies detach the label; pooled resets,
+  destruction and session disposal remove it. Early packets retain observations
+  while label allocation waits for the session's font initialization.
+- TypeScript, formatting and all 131 tests pass. Added packet-hook, source timing,
+  fresh runtime/cached reload, render eligibility, no repeated text updates,
+  lifecycle and cleanup cases. Corrected the shared Display fixture to match
+  actual Starling removeFromParent(true), which disposes detached objects too.
+- Live synthetic label check displayed the original combat bitmap styling and
+  ready wording: /tmp/QoLAF-BeamVisible.png. Disposed cleanly after 3594 frames
+  (/tmp/QoLAF-BeamDisposed.png); removed the temporary injection and reloaded.
+  Actual Nether Blob encounter timing
+  and full screen-by-screen original-client parity remain unverified.
