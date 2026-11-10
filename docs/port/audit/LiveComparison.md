@@ -1125,3 +1125,14 @@ No player-facing message was sent. All 211 tests, typecheck and formatting pass.
 
 The adapter does not yet supply the artifact resolver, image overlays, original
 context interactions or Advanced virtualization; these remain tracked in CHAT-01.
+
+### Chat control skins
+
+Reloaded the local client with NativeChatTheme. `/tmp/QoLAF-ChatTheme.png`
+shows source charcoal skins, muted inactive labels, white selected Local label,
+Russo font, 12px tab padding and the focused input background.
+`/tmp/QoLAF-ChatThemeGlobal.png` verifies selection moves to Global and formatting
+controls disable there. Returned to Local with an empty composer; no messages
+sent. Tests cover hover/down/disabled/focus colors, preference restoration and
+cleanup. All 212 tests, typecheck and format checks pass. Source prompt and
+emoji/image controls are still missing; full chat parity remains open.

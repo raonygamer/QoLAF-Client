@@ -68,3 +68,14 @@ rows and disposal. All 211 tests pass.
 This does not finish Advanced's virtual list, artifact label resolver, embedded
 images, role/link hover or context menus. The source-rendered rows are the next
 foundation for those features, not a claim that the chat port is complete.
+
+## Chat control theme
+
+`NativeChatTheme` applies the original AstroTheme integrated tab colors, 0.86
+skin opacity, Russo 12px labels, selected/disabled label colors and 12px horizontal
+padding to existing native channel buttons. Native selection and event behavior
+remain intact. Bitmap input uses the source idle/focused/disabled skin colors,
+0.86 opacity and right/bottom padding. Disabling integration restores the native
+tab appearance. The regression covers all these visual state transitions and
+cleanup; all 212 tests pass. Remaining theme work includes the original prompt
+and missing emoji/image controls, alongside the broader CHAT-01 work.
