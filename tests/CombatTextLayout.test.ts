@@ -100,3 +100,59 @@ test('combat layout uses the source atlas before measuring and disposes the comp
     cleanups.reverse().forEach((cleanup) => cleanup());
   }
 });
+
+test('handler initialization extends the native pool to the original 80 particles only once', () => {
+  class Particle {
+    static created = 0;
+    constructor(
+      public id: number,
+      public g: Raw,
+    ) {
+      Particle.created++;
+    }
+    set_text() {}
+    reset() {}
+  }
+  const Handler = makeTextHandler();
+  class Manager {
+    inactiveTexts: Particle[];
+    textHandler: Raw | null = null;
+    constructor(public g: Raw) {
+      this.inactiveTexts = Array.from({ length: 40 }, (_, id) => new Particle(id, g));
+      g.textManager = this;
+    }
+    loadHandlers() {
+      this.textHandler = new Handler(this.g);
+    }
+  }
+  const classes: Raw = {
+    'core.text.TextHandler': Handler,
+    'core.text.TextParticle': Particle,
+    'core.text.TextManager': Manager,
+    'starling.text.TextField': Text,
+  };
+  const hooks = new Hooks(),
+    cleanups: Array<() => void> = [];
+  installCombatTextLayout({
+    cls: (name: string) => classes[name],
+    around: (object: Raw, key: string, fn: Function) =>
+      cleanups.push(hooks.add(object, key, 'around', fn)),
+    before: (object: Raw, key: string, fn: Function) =>
+      cleanups.push(hooks.add(object, key, 'before', fn)),
+  } as any);
+  try {
+    const manager = new Manager({});
+    manager.loadHandlers();
+    assert.equal(Particle.created, 80);
+    assert.equal(manager.inactiveTexts.length, 80);
+    assert.equal(manager.textHandler!.inactiveTexts, manager.inactiveTexts);
+    assert.deepEqual(
+      manager.inactiveTexts.map((p) => p.id),
+      Array.from({ length: 80 }, (_, i) => i),
+    );
+    manager.loadHandlers();
+    assert.equal(Particle.created, 80);
+  } finally {
+    cleanups.reverse().forEach((cleanup) => cleanup());
+  }
+});

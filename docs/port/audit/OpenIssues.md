@@ -1461,3 +1461,43 @@ mission completion or XP event occurred; these were local display samples only.
 The bundled russo64 bitmap and metrics SHA256 hashes match the source files
 exactly. Full moving-combat comparison, text tooltip corruption, and remaining
 TextManager-specific source presentation still require audit.
+
+## Damage formatting before measurement and original pool capacity (2026-11-10)
+
+TextManager source audit found initial damage/healing strings were still laid
+out as raw digits, then formatted by an after hook. Source formats before add
+and requests no wrapping for combat numbers. DamageText now scopes a synchronous
+formatter around the native createDmgText call. CombatTextLayout consumes it
+before measuring and sets noWrap=true. The existing after hook handles aggregated
+updates. Nested calls restore their previous context in finally; exceptions and
+other game sessions cannot affect later notifications. Native damage/heal totals,
+250ms aggregation, velocity adjustments, baseScale and createdZoom are retained.
+
+TextManager's native pool starts with 40 particles. Before loadHandlers borrows
+that array, CombatTextLayout extends it to the original 80, without replacing
+the array or repeatedly allocating on subsequent initialization.
+
+Typecheck and all 350 tests pass. The inspected native createDmgText method is
+used to verify formatted initial values, aggregation, healing speed, setting
+toggles, zoom, nonwrapping, exception cleanup and foreign-session isolation.
+Pool regression verifies 80 unique IDs and shared array identity with no repeat
+allocation. These changes do not change combat calculations or newer shield
+mechanics.
+
+The first live run caught a hook-order failure: a later handler.add around hook
+was bypassed by the earlier layout replacement. Replaced that approach with a
+shared WeakMap scope consumed by CombatTextLayout itself, then replaced the
+isolated regression with both production hooks installed in their actual order
+and the inspected native manager/handler methods. All 350 tests pass again.
+
+Live retest: 12.5k measured width 192.861328125, exactly matching a separate
+field using the same font/format plus source padding; wordWrap=false. The second
+hit reused that particle and displayed 13k with total=13000. Native baseScale=1.5
+and createdZoom=0.25 were retained. Pool count was 80 before and after cleanup,
+and the temporary owner reference was released. No real damage event or transport
+send occurred. Evidence: /tmp/QoLAF-DamageLayoutFixed.png.
+
+Intermittent UI text corruption reproduced again on the sale panel before the
+retest probe (/tmp/QoLAF-DamageRetestBefore.png) and recovered by the next capture.
+This is still unresolved; the damage-layout fix does not establish a cause or
+a fix for missing UI glyphs.

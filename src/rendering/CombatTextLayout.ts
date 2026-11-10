@@ -1,5 +1,26 @@
 import { read, type API, type Raw } from '../api/Types';
 
+type CombatFormatter = (value: number) => string;
+const combatFormats = new WeakMap<Raw, CombatFormatter>();
+
+/** Scope formatting to the actual layout path, independent of host hook order. */
+export function withCombatTextFormat<T>(
+  handler: Raw | undefined,
+  format: CombatFormatter | undefined,
+  run: () => T,
+): T {
+  if (!handler) return run();
+  const previous = combatFormats.get(handler);
+  if (format) combatFormats.set(handler, format);
+  else combatFormats.delete(handler);
+  try {
+    return run();
+  } finally {
+    if (previous) combatFormats.set(handler, previous);
+    else combatFormats.delete(handler);
+  }
+}
+
 /** TextHandler/TextParticle source layout, using the original combat atlas. */
 export function installCombatTextLayout(api: API): void {
   const handler = api.cls('core.text.TextHandler')?.prototype;
@@ -7,6 +28,18 @@ export function installCombatTextLayout(api: API): void {
   const field = api.cls('starling.text.TextField')?.prototype;
   if (!handler || !particle || !field?.set_text) return;
   const setText = field.set_text;
+  const manager = api.cls('core.text.TextManager')?.prototype;
+  const Particle = api.cls('core.text.TextParticle') as any;
+  if (typeof manager?.loadHandlers === 'function') {
+    api.before(manager, 'loadHandlers', function () {
+      // TextManager's constructor preallocates 40 native particles; the source
+      // uses 80. Grow the existing pool before its handler borrows the array.
+      const active = this.textHandler?.texts?.length ?? 0;
+      while (active + this.inactiveTexts.length < 80) {
+        this.inactiveTexts.push(new Particle(active + this.inactiveTexts.length, this.g));
+      }
+    });
+  }
 
   // Native TextParticle.set_text remeasures with autoWidth on every assignment.
   // The source prepares generous bounds first and measures exactly once in add.
@@ -39,6 +72,11 @@ export function installCombatTextLayout(api: API): void {
       _blendMode = 'normal',
       noWrap = false,
     ) {
+      const combatFormat = combatFormats.get(this);
+      if (combatFormat) {
+        value = combatFormat(Number(value));
+        noWrap = true;
+      }
       let text: Raw;
       if (this.inactiveTexts.length) text = this.inactiveTexts.pop();
       else {
