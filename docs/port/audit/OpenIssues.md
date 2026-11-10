@@ -793,3 +793,24 @@ Evidence: /tmp/QoLAF-CacheBefore.png, /tmp/QoLAF-CacheDisabled.png,
 /tmp/QoLAF-BufferCounts.png. Remaining investigation: batch/index-buffer contents,
 upload reuse and draw ordering. The buffer probe does not exclude every GL state
 or index-data problem. Font metrics/layout are not established as the cause.
+
+Index upload follow-up: forcing a second upload after Effect.uploadIndexData made
+the sampled popup/background render fully (IndexUploads.png), but this experiment
+is NOT a valid fix or clean A/B proof. OpenFL uploadFromTypedArray uses bufferData,
+which shrinks storage to the supplied payload. The extra upload could shrink a
+quad buffer below Effect's remembered capacity; restoring native reuse then caused
+new WebGL index-buffer-too-small warnings (IndexReuseRestored.png). Removed the
+probe and reloaded to discard its GPU state. Do not ship that upload override.
+
+After the clean reload, an observation-only three-second probe wrapped native
+IndexBuffer3D.uploadFromTypedArray and Effect.uploadIndexData without changing their
+arguments or results. It recorded 14 uploads, 55,906 quad-reuse decisions and zero
+known undersized reuse cases. Only buffers uploaded during the sample had known
+sizes, so this does not prove all reused buffers were correctly sized. The sample
+still showed missing label prefixes (IndexSizeAudit.png). Both methods restored
+automatically after the capture; console and popup closed afterward.
+
+Next evidence needed: actual index contents/draw offsets versus expected quad data,
+including buffers already allocated before capture. Reuse-size arithmetic alone
+has not explained the original prefix loss. No production rendering change or
+additional reload-loop workaround was introduced.
