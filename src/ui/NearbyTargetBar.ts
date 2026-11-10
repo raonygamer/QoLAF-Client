@@ -1,3 +1,4 @@
+import { createTargetBossIcon } from './TargetBossIcon';
 import type { Raw } from '../api/Types';
 import { NativeUI } from './NativeUI';
 import { AuraText } from './AuraText';
@@ -23,10 +24,7 @@ export class NearbyTargetBar {
     this.health = ui.quad(1, 27, 0x8b1524, 0.72);
     this.shield = ui.quad(1, 4, 0x2769d8, 0.95);
     this.shield.set_y(23);
-    this.boss = ui.image(ui.texture('radar_boss'));
-    const scale = 16 / Math.max(this.boss.get_width(), this.boss.get_height());
-    this.boss.set_scaleX(scale);
-    this.boss.set_scaleY(scale);
+    this.boss = createTargetBossIcon(ui, 16);
     ui.place(this.boss, 6, (27 - this.boss.get_height()) / 2);
     this.level = ui.text(50, 27, '', 12);
     this.level.set_autoSize('horizontal');
@@ -63,8 +61,8 @@ export class NearbyTargetBar {
   show(unit: Raw | null, distance: number, dt: number) {
     this.unit = unit;
     this.node.set_visible(true);
-    this.background.set_color(0x050505);
     if (!unit) {
+      this.background.set_color(0x050505);
       this.level.set_text('');
       this.boss.set_visible(false);
       this.name.label.get_format().set_color(0x777777);

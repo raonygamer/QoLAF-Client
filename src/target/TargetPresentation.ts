@@ -1,3 +1,4 @@
+import { samePlayerGroup } from './PlayerGroup';
 import { read, type Raw } from '../api/Types';
 import { NativeUI } from '../ui/NativeUI';
 export class TargetPresentation {
@@ -9,9 +10,7 @@ export class TargetPresentation {
     return !!unit && unit instanceof this.ui.cls('core.ship.PlayerShip');
   }
   sameGroup(unit: Raw) {
-    const mine = read(read(this.game, 'me'), 'group'),
-      theirs = read(unit?.player, 'group');
-    return !!(mine && theirs && mine.id === theirs.id);
+    return samePlayerGroup(read(this.game, 'me'), unit?.player);
   }
   boss(unit: Raw | null) {
     let p = unit?.parentObj;

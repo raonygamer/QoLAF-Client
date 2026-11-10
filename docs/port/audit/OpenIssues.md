@@ -1082,3 +1082,38 @@ SoundChannel. /tmp/QoLAF-PingAudio.png captures those values. The temporary mess
 was removed synchronously in finally. A 10-second temporary play observer restores
 the original method automatically; this verifies native loading/channel creation,
 not a claim that the physical speaker output was heard.
+
+## Target HUD group identity and presentation audit (2026-11-10)
+
+Side-by-side HUD captures showed Series as an obscured gray row in the original
+but a red/blue stats row in the port. Source rules were equivalent, but the Haxe
+boundary was wrong: Group exposes get_id(), not a plain id field. Both target
+presentation and automatic priority compared undefined===undefined and treated
+all non-null groups as the same. Live read-only inspection confirmed raw ID type
+undefined for every group, while actual get_id() distinguished Series from the
+current group (/tmp/QoLAF-TargetGroups.png and TargetGroupGetters.png).
+
+A shared samePlayerGroup helper now reads the actual native getter and rejects
+absent IDs. This fixes both hostile-player stat obscuring and groupmate priority
+without changing game relationships or native gameplay. Regression checks use
+getter-backed groups and cover hostile priority during cooldown, nearby sorting,
+matching groups, nonmatching groups, missing IDs, friendly players and NPCs.
+
+Also restored the source white RGB/unchanged-alpha boss-icon filter for the
+18px active-target and 16px nearby icons. Native concatValues supplies the Haxe
+Vector expected by ColorMatrixFilter; attached filter disposal belongs to the
+native DisplayObject and leaves atlas textures borrowed. Nearby row refreshes
+now retain the source pressed background until touch ends instead of erasing it
+every render frame. Tests cover retained press, release selection, empty-row
+reset, known/obscured fills and white-filter alpha preservation.
+
+Typecheck and all 314 tests pass. Integration fixture now includes the inspected
+native ColorMatrixFilter dependency; initial suite failure was that missing test
+dependency, not a live runtime missing class.
+
+Live follow-up: one reload/autologin succeeded with runtimeErrors=0. Series now
+renders gray while Glafira and TheException retain red/blue known-stat fills,
+matching the actual group relationships and original HUD capture. Screenshot
+/tmp/QoLAF-TargetGroupFixed.png. No account/group membership was changed. The boss
+filter and held-row presentation are regression-tested; an actual boss encounter
+and live held-row comparison remain additional visual checks.

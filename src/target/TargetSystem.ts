@@ -1,3 +1,4 @@
+import { samePlayerGroup } from './PlayerGroup';
 import { read, type Raw } from '../api/Types';
 import type { Settings } from '../settings/Settings';
 export class TargetSystem {
@@ -52,9 +53,7 @@ export class TargetSystem {
   }
   private priority(unit: Raw | null) {
     if (!unit || !this.player(unit)) return 0;
-    const mine = read(this.me(), 'group'),
-      theirs = read(unit.player, 'group');
-    return mine && theirs && mine.id === theirs.id ? -1 : 1;
+    return samePlayerGroup(this.me(), unit.player) ? -1 : 1;
   }
   clear(force = false) {
     if (this.locked && !force) return;

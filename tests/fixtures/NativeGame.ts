@@ -531,6 +531,11 @@ export function registry() {
     'starling.text.TextFormat': Format,
     'starling.filters.GlowFilter': Filter,
     'starling.filters.BlurFilter': Filter,
+    'starling.filters.ColorMatrixFilter': class extends Filter {
+      concatValues(...values: number[]) {
+        this.matrix = values;
+      }
+    },
     'openfl.display.BitmapData': Bitmap,
     'starling.text.BitmapFont': class {
       set_smoothing() {}

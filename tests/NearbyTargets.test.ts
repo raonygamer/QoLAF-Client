@@ -28,7 +28,7 @@ function fixture() {
     'core.boss.Boss': Boss,
   };
   const config = { ...defaults };
-  const game = { me: { ship: new Unit(0), group: { id: 1 } } };
+  const game = { me: { ship: new Unit(0), group: { get_id: () => 1 } } };
   game.me.ship.pos.x = 0;
   const target = new TargetSystem(game, config, PlayerShip);
   const info = new TargetPresentation({ cls: (name: string) => classes[name] } as any, game);
@@ -126,4 +126,24 @@ test('cached rows and clicks revalidate range, hostility and alive state', () =>
     assert.equal(nearby.at(0), null);
     assert.equal(nearby.select(unit), false);
   }
+});
+
+test('Haxe group ID getters distinguish groupmates in radar sorting and automatic priority', () => {
+  const { PlayerShip, target, nearby } = fixture();
+  const groupmate = new PlayerShip(10),
+    hostile = new PlayerShip(11);
+  groupmate.player.group = { get_id: () => 1 };
+  hostile.player.group = { get_id: () => 2 };
+  target.select(groupmate, true);
+  assert.equal(
+    target.auto(hostile),
+    true,
+    'hostile player outranks groupmate even during target cooldown',
+  );
+  assert.equal(target.current, hostile);
+  assert.equal(target.auto(groupmate), false);
+  target.clear(true);
+  nearby.refresh([groupmate, hostile], 2);
+  assert.equal(nearby.at(0), hostile);
+  assert.equal(nearby.at(1), groupmate);
 });

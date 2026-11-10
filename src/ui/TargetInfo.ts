@@ -1,3 +1,4 @@
+import { createTargetBossIcon } from './TargetBossIcon';
 import { read, type Raw } from '../api/Types';
 import type { DebuffTracker } from '../debuff/DebuffTracker';
 import { DebuffDisplay } from './DebuffDisplay';
@@ -53,11 +54,7 @@ export class TargetInfo {
     ui.touch(this.lock, () => {
       if (target.current && target.valid(target.current)) target.locked = !target.locked;
     });
-    this.boss = ui.image(ui.texture('radar_boss'));
-    const scale = 18 / Math.max(this.boss.get_width(), this.boss.get_height());
-    this.boss.set_scaleX(scale);
-    this.boss.set_scaleY(scale);
-    this.boss.set_touchable(false);
+    this.boss = createTargetBossIcon(ui, 18);
     this.node.addChild(this.boss);
     this.level = ui.text(55, 20, '', 14);
     this.level.set_autoSize('horizontal');
