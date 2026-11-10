@@ -6,6 +6,8 @@ import { loginIdentity, PORT_VERSION } from './Login/LoginIdentity';
 import { loginProfiles } from './Login/LoginProfiles';
 import { installArtifactUI } from './Artifacts/NativeArtifacts';
 import { installInterpolation } from './Rendering/Interpolation';
+import { DeviceSettings } from './Settings/DeviceSettings';
+import { installBackgroundLayers } from './Rendering/BackgroundLayers';
 
 export default {
   id: 'qolaf.client',
@@ -14,6 +16,8 @@ export default {
   apiVersion: 1,
   activate(api: API) {
     const history = new ChatHistory();
+    const deviceSettings = new DeviceSettings(api.storage);
+    api.defer(() => deviceSettings.flush());
     let fonts: Promise<void> | undefined;
     const ensureFonts = () => (fonts ??= loadFonts(api));
     api.on('classesReady', () => {
@@ -50,6 +54,7 @@ export default {
       installArtifactUI(api);
     });
     api.onGame((game, session) => {
+      installBackgroundLayers(game, session, deviceSettings);
       let alive = true;
       session.defer(() => {
         alive = false;
