@@ -305,3 +305,18 @@ tests and changed-file formatting pass. This integration has not yet been
 visually verified in live chat. Previously materialized rows lack source message
 metadata and deliberately do not infer channel permissions from text. Simple
 chat image placement, viewer interaction and alias expansion remain open.
+
+
+ChatImageViewerWindow source class port added, preserving native display-list
+controls, 700x520 default / 320x220 minimum geometry, stage constraints, staggered
+placement, URL deduplication and bring-to-front, title-bar movement, grip resizing,
+non-upscaled centered image layout, GIF deadlines, loading/failure labels and
+cache-reference disposal. Its factory accepts the session cache and native clock;
+AS3 vector initialization and uninitialized primitive fields were adapted explicitly.
+
+Two regression tests exercise geometry, deduplication, animation boundaries,
+small-stage resize constraints, pointer identity, move/resize, close listeners,
+failed requests and late delivery after disposal. Typecheck/build and all 247
+tests pass. This class is not yet wired into message clicks and has not been
+visually compared live. Next integrate hit testing, session ownership and viewer
+opening with Advanced/Simple chat; preserve existing context/scroll interactions.
