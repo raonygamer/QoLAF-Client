@@ -567,3 +567,19 @@ No messages were sent; console is closed and composer empty. The live bundle
 used the same hook body before its extraction into a dedicated module; extraction
 was typechecked, built and tested without a redundant reload. Longer gameplay
 sampling and non-text separate-mesh interactions remain verification work.
+
+Autocomplete wheel routing now follows the source's explicit display-list hit
+check. Previously it selected the first visible popup and used only CSS bounds,
+so covered suggestions could steal wheel events and command argument help above
+another popup could not receive them. ChatAutocompleteWheel checks each visible
+candidate, maps CSS coordinates to native stage coordinates, verifies the topmost
+hit belongs to that popup and then consumes the event. Zero deltas, hidden/alpha-0
+ancestors, detached nodes and right/bottom boundary points are excluded.
+Regression covers scaled/offset coordinates, stacked popups, covering windows,
+exclusive edges, zero delta and hidden ancestors. Typecheck/build/full suite:
+266 pass. Live wheel occlusion check is still pending; no reload performed.
+
+Follow-up live screenshot /tmp/QoLAF-BitmapFollowup.png still shows all target,
+empty-target and safe-zone labels after the previous broader batching fix,
+with the chat composer empty. This is another sampled observation, not exhaustive
+continuous rendering verification.

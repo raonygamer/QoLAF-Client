@@ -1,3 +1,4 @@
+import { routeAutocompleteWheel } from './ChatAutocompleteWheel';
 import { ChatFriendRoster } from './ChatFriendRoster';
 import { ChatFriendAutocompleteModel } from './ChatFriendAutocompleteModel';
 import { ChatFriendAutocompleteParser } from './ChatFriendAutocompleteParser';
@@ -619,26 +620,7 @@ export function installCommandAutocomplete(
   window.addEventListener('keydown', keydown, true);
   const wheel = (event: WheelEvent) => {
     if (!chat.isActive()) return;
-    const activePopup = [emojiPopup, friendPopup, popup].find(
-      (candidate) => candidate && read(candidate.node, 'visible'),
-    );
-    if (!activePopup) return;
-    if (!read(activePopup.node, 'visible')) return;
-    const overlay = api.cls('core.hud.components.ui.DomOverlay');
-    const bounds = overlay?.globalRect(activePopup.node);
-    if (bounds) bounds.height = activePopup.height;
-    const rect = bounds ? overlay?.toCss(bounds) : null;
-    if (
-      !rect ||
-      event.clientX < rect.x ||
-      event.clientX > rect.x + rect.width ||
-      event.clientY < rect.y ||
-      event.clientY > rect.y + rect.height
-    )
-      return;
-    activePopup.scroll(event.deltaY);
-    event.preventDefault();
-    event.stopImmediatePropagation();
+    routeAutocompleteWheel(api, [emojiPopup, friendPopup, popup], event);
   };
   window.addEventListener('wheel', wheel, { capture: true, passive: false });
   api.on('frame', () => {
