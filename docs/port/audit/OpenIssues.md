@@ -126,3 +126,18 @@ layout can shrink below 100. Regression covers short/long labels, background
 width and narrow distributed tabs. Typecheck and build pass. This change has
 not yet been rechecked in the live browser; prompt and image shortcuts remain
 open.
+
+
+Bitmap composer prompt ported from AstroTheme.bitmapChatInput and
+ChatInputText.resize: localized text, source Verdana48 format, alpha 0.55,
+no wrapping, truncation to input width, visible only when the source document
+is empty, including while focused. Integration preference removes the prompt
+in legacy mode. It never enters the editor document or serialized message.
+
+One automatic reload (explicit F5 release) reconnected successfully. Live
+`/tmp/QoLAF-PromptLive.png` confirms the 100px tabs and prompt against
+`/tmp/QoLAF-OriginalEmojiComposer.png`. Typed one unsent character and deleted
+it: `/tmp/QoLAF-PromptDraft.png` and `/tmp/QoLAF-PromptRestored.png` verify
+hide/restore behavior. No message sent. All 218 tests, typecheck and build pass.
+The missing Img control and QoLAF channel remain visible differences; full
+chat parity is not claimed.

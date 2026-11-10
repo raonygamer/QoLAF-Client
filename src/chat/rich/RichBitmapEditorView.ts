@@ -10,6 +10,8 @@ export class RichBitmapEditorView {
   readonly node: Raw;
   private readonly renderer: Raw;
   private readonly metrics: Raw;
+  private readonly promptRenderer: Raw;
+  private prompt = '';
   private readonly selection: Raw;
   private readonly cursor: Raw;
   private readonly mask: Raw;
@@ -33,6 +35,7 @@ export class RichBitmapEditorView {
     this.node = new Sprite();
     this.renderer = new Renderer();
     this.metrics = new Metrics();
+    this.promptRenderer = new Renderer();
     this.selection = new Quad(1, 1, 0x3b78c8);
     this.selection.set_alpha(0.65);
     this.cursor = new Quad(1, 1, 0xffffff);
@@ -40,6 +43,13 @@ export class RichBitmapEditorView {
     this.node.addChild(this.selection);
     this.node.addChild(this.renderer);
     this.node.addChild(this.cursor);
+    this.node.addChild(this.promptRenderer);
+    this.promptRenderer.set_alpha(0.55);
+    this.promptRenderer.textureSmoothing = 'bilinear';
+    this.promptRenderer.pixelSnapping = false;
+    this.promptRenderer.wordWrap = false;
+    this.promptRenderer.truncateToFit = true;
+    this.promptRenderer.useSeparateBatch = false;
     this.node.set_mask(this.mask);
     this.node.set_touchable(false);
     this.renderer.textureSmoothing = 'bilinear';
@@ -48,6 +58,12 @@ export class RichBitmapEditorView {
     this.renderer.useSeparateBatch = false;
     this.renderer.wordWrap = false;
     this.renderer.artifactTokenLabelResolver = artifactResolver;
+  }
+
+  setPrompt(text: string): void {
+    if (this.prompt === text) return;
+    this.prompt = text;
+    this.refresh();
   }
 
   setBounds(width: number, height: number): void {
@@ -83,6 +99,18 @@ export class RichBitmapEditorView {
     this.renderer.set_width(NaN);
     this.renderer.set_height(this.metrics.height);
     this.renderer.validate();
+
+    const showPrompt = this.prompt.length > 0 && this.model.text.length === 0;
+    this.promptRenderer.set_visible(showPrompt);
+    if (showPrompt) {
+      this.promptRenderer.textFormat = this.format;
+      this.promptRenderer.text = this.prompt;
+      this.promptRenderer.set_width(this.width);
+      this.promptRenderer.validate();
+      this.promptRenderer.set_y(
+        Math.max(0, Math.round((this.height - this.promptRenderer.height) / 2)),
+      );
+    }
 
     const caretX = this.metrics.xAt(this.model.selectionActive);
     if (caretX - this.scrollX > this.width - 2) this.scrollX = caretX - this.width + 2;

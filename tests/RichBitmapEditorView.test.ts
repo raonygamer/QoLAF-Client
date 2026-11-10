@@ -89,3 +89,36 @@ test('password view masks whole clusters and disposes its separate clipping mask
   assert.equal(renderer.disposed, true);
   assert.equal(view.node.get_mask(), null);
 });
+
+test('source prompt stays visible on empty focused input without entering the document', (t) => {
+  const fixture = bitmapRendererFixture('verdana48_bitmap');
+  t.after(fixture.cleanup);
+  const model = new RichBitmapEditorModel(14);
+  const view = new RichBitmapEditorView(
+    fixture.resolve,
+    model,
+    new fixture.BitmapFormat(fixture.font, 14),
+  );
+  t.after(() => view.dispose());
+  view.setBounds(300, 33);
+  view.setPrompt('Type text here...');
+  view.setFocus(true);
+  const prompt = view.node.children[3];
+  assert.equal(prompt.get_visible(), true);
+  assert.equal(prompt.get_alpha(), 0.55);
+  assert.equal(prompt.text, 'Type text here...');
+  assert.ok(prompt.characterBatch.meshes.length > 0);
+  assert.ok(Number.isFinite(prompt.get_y()));
+  assert.equal(model.text, '');
+  assert.equal(model.selectionActive, 0);
+  model.text = 'draft';
+  view.refresh();
+  assert.equal(prompt.get_visible(), false);
+  model.text = '';
+  view.refresh();
+  assert.equal(prompt.get_visible(), true);
+  view.setBounds(70, 33);
+  assert.equal(prompt.width, 70);
+  view.setPrompt('');
+  assert.equal(prompt.get_visible(), false);
+});

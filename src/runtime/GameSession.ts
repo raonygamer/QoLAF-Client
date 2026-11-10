@@ -61,7 +61,7 @@ export function installGameSession(
   const bitmap = createBitmapClasses(portedClasses(session).resolve);
   installNativeChatMessages(session, game, bitmap.resolve, preferences);
   installNativeChatContext(session, game, bitmap.resolve);
-  const editor = installNativeRichChatInput(session, game, bitmap.resolve);
+  const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences);
   installNativeChatHistory(session, game);
   installNativeSimpleChat(session, game);
   installNativeChatLayout(session, game, preferences);
