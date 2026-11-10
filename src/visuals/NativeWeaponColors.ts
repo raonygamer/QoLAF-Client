@@ -189,7 +189,7 @@ export function installNativeWeaponColors(
   for (const manager of [game.projectileManager, game.ribbonTrailPool]) {
     if (!manager?.meshBatch) continue;
     let batch: Raw | null = null;
-    api.before(manager, 'update', () => {
+    api.before(manager.meshBatch, 'clear', () => {
       batch?.clear();
     });
     api.around(manager.meshBatch, 'addMesh', function (next, mesh, ...args) {

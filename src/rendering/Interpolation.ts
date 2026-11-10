@@ -1,6 +1,10 @@
+import { installProjectileFrames } from './ProjectileFrames';
+import { installRenderPosition } from './RenderPosition';
 import { installWorldLabels } from './WorldLabels';
 import { read, type API, type Raw } from '../api/Types';
 import { installRemoteShips } from './RemoteShips';
+import { installCameraView } from './CameraView';
+import { installBodyVisibility } from './BodyVisibility';
 
 export interface RenderPose {
   x: number;
@@ -163,6 +167,10 @@ export function installInterpolation(api: API): void {
   const ship = api.cls('core.ship.Ship')?.prototype;
   const game = api.cls('core.scene.Game')?.prototype;
   if (!machine || !ship || !game) throw Error('Interpolation runtime classes are missing');
+  installRenderPosition(api);
+  installCameraView(api);
+  installBodyVisibility(api);
+  installProjectileFrames(api);
   const previous = new WeakMap<Raw, RenderPose>();
   const remoteShips = installRemoteShips(api);
   installWorldLabels(api);
@@ -209,8 +217,11 @@ export function installInterpolation(api: API): void {
     // Game.update is already bound as an enterFrame listener before onGame.
     // Read the frame delta at its direct parallax call instead of replacing
     // the instance method behind that cached listener. Haxe passes seconds.
-    session.before(instance.parallaxManager, 'update', function (seconds: number) {
+    // EmitterFrames runs in the before phase. An around hook keeps the original
+    // frame order (emitters, camera, parallax), independent of install order.
+    session.around(instance.parallaxManager, 'update', function (next, seconds: number, ...args) {
       updateCamera(camera, seconds * 1000);
+      return next(seconds, ...args);
     });
     // The original client's shake() is deliberately empty.
     session.around(camera, 'shake', function () {});

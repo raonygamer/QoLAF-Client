@@ -1962,3 +1962,161 @@ on the native receive path. Source Unicode boundaries are preserved. Native leng
 and PvP checks remain in place. Local rendering and physical role-card hover were
 verified; all 462 tests pass. See LiveComparison.md for evidence and remaining
 chat work. No production relay or cross-client send was performed in this pass.
+
+### Original-client diff refreshed — artifact review, 2026-11-10
+
+Regenerated the complete comparison from the current original-client working tree
+against the decompiled supplied Preload.swf. Local evidence is under
+`/home/raony/Documentos/astroflux-port-audit/current/` (inventory, method inventory,
+and per-file unified diffs). Counts remain 722 files: 288 added, 356 changed,
+78 unchanged. Normalized method review reports 4,564 added, 1,268 changed,
+40 removed and 2,852 unchanged. These counts describe source differences, not
+completed port coverage. Original source working-tree changes were left intact.
+
+Compared `ChatInputText.selectArtifactChannel` and `insertArtifactLink` directly:
+removed the stale rejection claiming QoLAF was unavailable. The native composer
+now selects QoLAF from unsupported tabs, retains Private/Clan/QoLAF, registers the
+artifact locally and inserts the token with the original spacing and selection
+replacement. It only opens a closed composer; no send operation is called.
+Deferred insertion is cancelled on session disposal, leaving or replacement.
+Seven focused draft/policy tests and all 470 suite tests pass; typecheck passes.
+Live draft interaction against the new release remains to be checked.
+
+Artifact screen mismatches confirmed from the refreshed diff (still open):
+
+- `ArtifactOverview`: classic/expanded layout toggle, expanded chrome and layout,
+  setup scrolling/layout, inline sorting and selection synchronization.
+- `ArtifactShareContextPopup` and overview/state handlers: native two-row context
+  menu and return-to-play draft insertion.
+- `ArtifactFavorites`, `ArtifactCargoBox`, `ArtifactBox`, overview recycling:
+  account-scoped annotations, markers, protected selection and recycle pruning.
+  Favoriting must not be exposed without the original recycling protection.
+- Purify minimum controls, unique/recycle-generator/favorite protections and
+  pending-operation guards; capacity footer and inventory summary refresh.
+- `ArtifactSorting`: original dialog chrome, close handling and sort options.
+
+`NativeArtifacts.ts` currently supplies fitness tooltip/sorting additions only;
+it is not a port of the full artifact overview. Preserve the current Haxe gameplay
+and server-operation contracts while implementing the original UI around them.
+
+The same artifact diff review also corrected fitness sort ordering among
+unrevealed entries and restored `onSort`'s scroll-to-top after rebuilding cargo
+rows. A native-hook regression checks both directions, revealed-first grouping,
+row disposal/rebuild order and delegation of unrelated sort types.
+
+### Rendering omissions found by source diff — 2026-11-10
+
+The port omitted `GameObject.hasRenderPosition` lifecycle semantics. Original
+`renderX/renderY/renderRotation` use a clip only after drawAt has positioned it;
+reset/addToCanvas invalidate that state. Port emitter targeting instead trusted
+isAddedToCanvas alone. Added the lifecycle guard and applied it to emitter and
+floating-text positions, with a regression for undrawn body anchors and reused
+clips at the origin. This is a confirmed semantic discrepancy relevant to the
+reported missing sun; the sun's actual live appearance still requires verification.
+
+`Projectile.draw` frame prediction and `ProjectileManager.draw` per-frame vertex
+copies were also missing. Native Game.draw moved projectile clips every frame,
+but native manager.update only copied them into MeshBatch on 33 ms ticks. Added
+source position/rotation prediction and a per-display-frame batch rebuild after
+the existing draw traversal. Projectile physics are untouched. Grayscale batch
+clearing now follows primary batch clearing, and torpedo warnings follow render
+frames instead of simulation updates. Regression samples copied vertices at
+60/120/180 Hz without simulation ticks, and checks pooled/dead-object handling.
+
+Full local suite: 476 passing; typecheck and formatting pass. Not a claim of
+complete rendering parity: source renderState attachments, timestamp-aligned
+server bullet drawing, ribbon-head refresh, body culling/distortion integration
+and the remaining changed rendering methods still need semantic review and live
+comparison. User specifically requires this review across ALL changed client code.
+
+### Ribbon heads and attached-projectile rendering — 2026-11-10
+
+Ported `RibbonTrail.updateHead` and `Projectile.positionRibbonHead` from the
+original source. Heads now use the final displayed projectile transform every
+frame, including the authored radius offset. Tail history still advances only
+through the native tick path. Native RibbonTrailPool.update already copies these
+vertices after Game.draw; it does not need a second history update.
+
+Ported `Projectile.drawAttachedTo`, `ProjectileStuck` render-state entry/exit,
+and `MissileStuck.draw` fractional convergence. Attachment state is discarded on
+exit and projectile pool reset. Drawing changes clip transforms only, leaving
+course positions, TTL and newer native gameplay intact. Ribbon heads are updated
+after attachment transforms, matching the original draw ordering.
+
+Typecheck and the full local suite pass (479 tests). Regressions cover ribbon
+heads at 60/120/180 Hz, unchanged tail history/physics, radius offsets, inactive
+trails, host rotation, fractional convergence, state exit and pool reset. These
+changes have not been visually verified in the live game. Instant/InstantSplitting
+render states, timestamp-aligned server bullet drawing and the other previously
+listed omissions remain open. Neither the missing sun nor whole-client parity is
+marked resolved. The required scope remains every original client change across
+all files, including non-rendering code and screens.
+
+### Instant ray presentation — 2026-11-10
+
+`InstantFrames` ports the original Instant/InstantSplitting frame fade, thickness,
+fixed fired-world origin, displayed rotation, renderTimeToLive rule, and line
+release on exit/reset. Native live execute still owns simulation TTL and course
+time. Dead execution retains its native clock advance but releases lines once;
+the native splitting path previously detached lines without returning them to
+the pool. Game.exit also releases tracked lines before native room teardown.
+
+Four integration regressions run extracted Service1412 state methods through the
+host hook dispatcher and test 60/120/180 Hz fade, non-drifting origins, unchanged
+simulation positions/lifetimes, state exit, death and projectile reuse. Full suite
+483 passes before the room-exit cleanup addition. Original orbit lightning,
+instant-ray color/grayscale integration and room-owned Nether Blob tentacle
+visuals remain unported; this does not close full projectile presentation parity.
+
+Live preview server was reachable and reported a connected canvas with zero
+runtime errors. That status predates reloading this change and does not verify it.
+Desktop comparison was interrupted by active user focus changes; no reload or
+combat input was issued. Latest changes are built locally for the next comparison.
+
+Room-exit cleanup now has two additional native-hook regressions (one per state).
+Final full suite: 485 passing. Typecheck passes. Live visual comparison remains
+outstanding for these changes.
+
+### Camera bounds and large-body visibility — 2026-11-10
+
+Found another concrete missing source correction relevant to the sun: native
+StarlingCameraFocus.isCircleOnScreen tests whether any bounding-box corner is
+inside the view. An effect enclosing the viewport has no corner inside and is
+incorrectly rejected. `CameraView` ports the original overlap predicate. The
+regression demonstrates native rejection and source acceptance of that case.
+
+Ported source updateViewRectangle using all four corners through the actual
+stage-container globalToLocal transform, rather than requested destination zoom.
+World culling radius includes portrait height; persistent size revisions survive
+multiple render frames between simulation ticks. `BodyVisibility` ports the
+original visual/zone extent, center, distance scheduling and zoom/resize cache
+invalidation. Hidden/boss anchors and body course updates remain native.
+
+Also restored original emitter→camera→parallax frame ordering. Camera movement
+now uses the hook around phase after emitter before-hooks, regardless of module
+installation order. Cached native enter-frame listeners still reach this path.
+
+Five new culling regressions pass; full suite was 490 passing before the frame
+ordering change, whose cached-listener regression was then extended and passed.
+Typecheck/build and diff whitespace checks pass. These corrections are built in
+the local preview. No live sun-appearance claim: browser connector inventory is
+empty, and active desktop focus changes previously interrupted comparison.
+
+### Original artifact sorting dialog — 2026-11-10
+
+Reviewed the pending ArtifactSorting implementation against the complete source
+class and the original overview chooseSorting/onSort/refreshArtifactAdequacy.
+The port now uses its 665×520 native-display panel, theme/borders, bitmap headline,
+scrolling stat rows, source tooltips and ten sort controls. Original comparator
+semantics include revealed grouping, potential, fitness, adequacy with equipped
+modifier-family counts, modifier count, upgrade count, names, and native stat
+values. The actual Service1412 Artifact initializes levelPotential and provides
+the recycle-rate constant used by the dialog.
+
+Lifecycle integration toggles the popup, centers it in expanded mode, keeps
+source overview controls above it, closes on overview disposal/plugin cleanup,
+and restores the sort button. Sorting rebuilds cargo and resets scroll. Four
+regressions cover comparators, controls, theme/geometry, popup lifecycle and
+cleanup; typecheck passes. Expanded ArtifactOverview layout, overview stat rows,
+and broader artifact screens remain unfinished. This dialog has not yet been
+visually compared in the running client.

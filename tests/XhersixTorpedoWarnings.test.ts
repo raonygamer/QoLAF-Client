@@ -158,6 +158,7 @@ test('warning hook observes native drawing exactly once and clears on settings c
     }
   }
   game.projectileManager = new Manager();
+  game.draw = () => game.projectileManager.update();
   const classes: any = {
     'core.projectile.ProjectileManager': Manager,
     'core.projectile.Projectile': Projectile,
@@ -192,24 +193,24 @@ test('warning hook observes native drawing exactly once and clears on settings c
       } as any;
     },
   );
-  assert.equal(game.projectileManager.update(), 'native update');
+  assert.equal(game.draw(), 'native update');
   assert.equal(draws, 1);
   assert.equal(created, 1);
   assert.deepEqual(items, [[-4, 6]]);
   projectile.draw();
   assert.equal(items.length, 1, 'outside manager draw does not append stale geometry');
   enabled = false;
-  game.projectileManager.update();
+  game.draw();
   assert.deepEqual(items, []);
   enabled = true;
   projectile.isAddedToCanvas = false;
-  game.projectileManager.update();
+  game.draw();
   assert.deepEqual(items, []);
   projectile.isAddedToCanvas = true;
-  game.projectileManager.update();
+  game.draw();
   assert.equal(items.length, 1);
   assert.equal(created, 1);
   cleanups.reverse().forEach((fn) => fn());
   assert.equal(disposed, 1);
-  assert.equal(game.projectileManager.update(), 'native update');
+  assert.equal(game.draw(), 'native update');
 });

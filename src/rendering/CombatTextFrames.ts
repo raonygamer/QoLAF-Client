@@ -139,7 +139,7 @@ export class CombatTextFrames {
   }
 
   private pose(owner: Raw): { x: number; y: number } {
-    const clip = owner.isAddedToCanvas ? owner._mc : null;
+    const clip = owner.isAddedToCanvas && owner.hasRenderPosition !== false ? owner._mc : null;
     const position = read(owner, 'pos');
     return { x: read(clip, 'x', position.x), y: read(clip, 'y', position.y) };
   }
