@@ -7,6 +7,7 @@ interface Attachment {
   y: number;
   renderX: number;
   renderY: number;
+  minimumY: number;
 }
 
 /** TextParticle.as: retain independent rise while following the rendered owner. */
@@ -22,12 +23,15 @@ export class CombatTextFrames {
     this.attachments.delete(particle);
   }
 
-  attach(particle: Raw, owner: Raw): void {
+  attach(particle: Raw, owner: Raw, anchorOffset?: number): void {
     if (!particle || this.attachments.has(particle)) return;
     const pose = this.pose(owner);
     const position = read(owner, 'pos');
     const x = read(particle, 'x') + pose.x - position.x;
-    const y = read(particle, 'y') + pose.y - position.y;
+    const y =
+      anchorOffset === undefined
+        ? read(particle, 'y') + pose.y - position.y
+        : pose.y + anchorOffset;
     this.attachments.set(particle, {
       owner,
       generation: this.generations.get(owner) ?? 0,
@@ -35,6 +39,7 @@ export class CombatTextFrames {
       y,
       renderX: pose.x,
       renderY: pose.y,
+      minimumY: y - 120,
     });
     particle.set_x(x);
     particle.set_y(y);
@@ -62,6 +67,7 @@ export class CombatTextFrames {
           const pose = this.pose(owner);
           x += pose.x - attachment.renderX;
           y += pose.y - attachment.renderY;
+          attachment.minimumY += pose.y - attachment.renderY;
           attachment.renderX = pose.x;
           attachment.renderY = pose.y;
         } else {
@@ -83,6 +89,7 @@ export class CombatTextFrames {
       }
       x += (particle.speed.x * delta) / 1000;
       y += (particle.speed.y * delta) / 1000;
+      if (attachment) y = Math.max(attachment.minimumY, y);
       particle.set_x(x);
       particle.set_y(y);
       if (attachment) {
@@ -101,6 +108,15 @@ export class CombatTextFrames {
   }
 }
 
+/** Offsets from Ship/Spawner/Turret.drawAttachedCombatText in the source client. */
+export function combatTextAnchor(owner: Raw, healing: boolean): number {
+  for (let cls = owner.__class__; cls; cls = cls.__super__) {
+    if (cls.__name__ === 'core.turret.Turret') return healing ? -5 : -20;
+    if (cls.__name__ === 'core.spawner.Spawner') return healing ? -10 : -25;
+  }
+  return -15;
+}
+
 export function installCombatTextFrames(api: API): void {
   const handler = api.cls('core.text.TextHandler')?.prototype;
   const manager = api.cls('core.text.TextManager')?.prototype;
@@ -112,7 +128,12 @@ export function installCombatTextFrames(api: API): void {
     frames.update(this, seconds);
   });
   api.after(manager, 'createDmgText', function (_result, amount: number, owner: Raw) {
-    if (amount !== 0) frames.attach(amount > 0 ? owner.lastDmgText : owner.lastHealText, owner);
+    if (amount !== 0)
+      frames.attach(
+        amount > 0 ? owner.lastDmgText : owner.lastHealText,
+        owner,
+        combatTextAnchor(owner, amount < 0),
+      );
   });
   api.before(particle, 'reset', function () {
     frames.reset(this);

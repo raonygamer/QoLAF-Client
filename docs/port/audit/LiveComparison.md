@@ -821,3 +821,27 @@ presentation cadence.
   at 30/60/120/180 FPS, intervening tick writes, pooling and cleanup.
 - Remaining parity work includes combat-text anchor offsets/rise limits, other
   world attachments, emitter visual limits and the existing open-issue ledger.
+
+
+## Combat-text follow-up and reported text screens — 2026-11-10
+
+- Added original Ship (-15/-15), Turret (-20/-5), Spawner (-25/-10)
+  damage/healing offsets, including subclasses. Added the original 120-unit
+  rise limit, whose origin follows the rendered owner. Sustained-hit regression
+  verifies the limit while the owner moves; total 168 tests pass and typecheck passes.
+- Synthetic live native-particle probe passed 360 frames, including 298 without
+  simulation ticks: zero position mismatches, maximum floating-point error
+  5.003e-12. This checks the actual native TextManager/TextHandler/TextParticle
+  path using a temporary fake visual owner and intentional tick-coordinate
+  overwrites. No real unit, combat action or network message was used. Native
+  update restored and temporary particle returned to its pool afterward.
+  Evidence: `/tmp/QoLAF-CombatTextProbe.png`. Real combat comparison remains open.
+- Players tooltip checked after reload: text is `Players P` (green P shortcut),
+  not a truncated word. Measured and rendered text width both 49.124; container
+  width 62.124, positioned within the right screen edge. Evidence:
+  `/tmp/QoLAF-TextProbe3.png`. Multiline artifact tooltip remains to verify.
+- Reopened the exact reported timed mission, Pickup 10 Polyhedric Fabric.
+  XP 2093 (+628) and boost icon now render on one horizontal line. Evidence:
+  `/tmp/QoLAF-TimedText.png`. Daily mission XP rows also render horizontally:
+  `/tmp/QoLAF-MissionText.png`. No mission was skipped or claimed.
+- Temporary probe file removed, local game HTML restored, clean reload requested.

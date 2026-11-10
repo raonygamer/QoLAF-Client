@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { CombatTextFrames } from '../src/rendering/CombatTextFrames';
+import { CombatTextFrames, combatTextAnchor } from '../src/rendering/CombatTextFrames';
 import type { Raw } from '../src/api/Types';
 
 function fixture() {
@@ -103,4 +103,26 @@ test('merged hits keep rise, owner reuse detaches and particle reuse starts a fr
   particle.y = 185;
   frames.attach(particle, owner);
   near(particle.x, 900);
+});
+
+test('source anchor offsets survive subclassing and sustained hits stop rising after 120 units', () => {
+  const { frames, owner, particle, handler } = fixture();
+  owner.__class__ = {
+    __name__: 'core.spawner.Boss',
+    __super__: { __name__: 'core.spawner.Spawner' },
+  };
+  assert.equal(combatTextAnchor(owner, false), -25);
+  assert.equal(combatTextAnchor(owner, true), -10);
+  owner.__class__ = { __name__: 'core.turret.Turret' };
+  assert.equal(combatTextAnchor(owner, false), -20);
+  assert.equal(combatTextAnchor(owner, true), -5);
+  frames.attach(particle, owner, combatTextAnchor(owner, false));
+  near(particle.y, 190);
+  for (let step = 0; step < 400; step++) {
+    particle.ttl = 1000; // Sustained merged damage renews the same particle.
+    owner._mc.y += 0.25;
+    frames.update(handler, 0.01);
+  }
+  near(particle.y, 170); // initial 190 + owner movement 100 - maximum rise 120
+  near(particle.x, 125);
 });
