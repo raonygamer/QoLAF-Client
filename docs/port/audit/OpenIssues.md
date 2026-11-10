@@ -955,3 +955,20 @@ account's first revealed inventory artifact resolved live to
 BigDB requests were made; no chat message or database write was sent. The display
 probe restores its prior text after 20 seconds unless normal chat updates already
 replaced it. Intermittent unrelated bitmap drawing corruption remains open.
+
+## Artifact hover card implementation (2026-11-10)
+
+Ported ChatArtifactPreviewPopup's 390px card, 64px icon area, owner line,
+fitness, upgrade count and wrapped native stat markup. Advanced chat maps rendered
+label glyphs back to raw artifact tokens. Only verified resolver data opens the
+card. Delayed results revalidate the row, token, scroll position, visibility and
+actual stage hit; clicking, covering chat, replacing rows or leaving closes it.
+Atlas textures remain borrowed and are not disposed with the popup.
+
+Verification: typecheck and 300 tests passed. Focused renderer coverage additionally
+checks raw-token offsets after label projection and rejection of hidden rows.
+Popup tests cover geometry, icon sizing, stat wrapping and borrowed texture
+ownership; lifecycle tests cover delayed callbacks, scroll, covering UI and
+cleanup. Live visual comparison of this card is still pending. This does not close
+artifact sharing/outgoing channel policy, ping previews, virtualization or the
+intermittent bitmap corruption issue.

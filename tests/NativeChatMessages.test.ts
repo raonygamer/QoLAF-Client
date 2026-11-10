@@ -216,7 +216,16 @@ test('verified artifact resolution reprojects existing chat tokens without repla
       cleanup.push(hooks.add(object, key, 'after', fn)),
     defer: (fn: () => void) => cleanup.push(fn),
   };
-  installNativeChatMessages(api, game, fixture.resolve, undefined, undefined, artifacts);
+  const advancedRow = new WrapText();
+  scroll.addChild(advancedRow);
+  const messages = installNativeChatMessages(
+    api,
+    game,
+    fixture.resolve,
+    undefined,
+    undefined,
+    artifacts,
+  );
   t.after(() => cleanup.reverse().forEach((fn) => fn()));
   const raw = '$artifact:pilot:artifact$';
   row.set_text(raw);
@@ -235,4 +244,16 @@ test('verified artifact resolution reprojects existing chat tokens without repla
   assert.equal(renderer.markup.atoms[0].displayColor, 0x55ccff);
   assert.equal(renderer.characterBatch.meshes[0].color, 0x55ccff);
   assert.equal(row.get_text(), raw, 'history retains the exact token');
+  advancedRow.set_text('Before ' + raw + ' after');
+  const advancedRenderer: any = advancedRow.getChildAt(0);
+  advancedRenderer.globalToLocal = (point: any) => point;
+  const artifactGlyph = advancedRenderer.activeGlyphs[9];
+  const point = { x: artifactGlyph.hitX + 1, y: artifactGlyph.hitY + 1 };
+  const hit = messages!.artifactAtStagePoint(point);
+  assert.equal(hit?.row, advancedRow);
+  assert.equal(hit?.token.playerId, 'pilot');
+  assert.equal(hit?.token.artifactId, 'artifact');
+  assert.equal(hit?.token.sourceBegin, 7, 'projected label maps to the raw token offset');
+  advancedRow.set_visible(false);
+  assert.equal(messages!.artifactAtStagePoint(point), null, 'hidden rows cannot open cards');
 });

@@ -38,6 +38,7 @@ import { installHealthAndShield } from '../hud/HealthAndShield';
 import { installNativeChatPreferences } from '../chat/NativeChatPreferences';
 import { installNativeChatRolePreview } from '../chat/NativeChatRolePreview';
 import { ChatArtifactLinkResolver } from '../chat/ChatArtifactLinkResolver';
+import { installNativeChatArtifactPreview } from '../chat/NativeChatArtifactPreview';
 import { installClanLabels } from '../ui/ClanLabel';
 import { installDamageText } from '../hud/DamageText';
 import { installRespawn } from './Respawn';
@@ -88,6 +89,8 @@ export function installGameSession(
   );
   if (messages) installNativeChatImageViewer(session, game, bitmap.resolve, images, messages);
   if (messages) installNativeChatRolePreview(session, game, bitmap.resolve, messages);
+  if (messages)
+    installNativeChatArtifactPreview(session, game, bitmap.resolve, messages, artifacts);
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences);
   installNativeChatHistory(session, game);

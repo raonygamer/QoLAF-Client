@@ -5,6 +5,7 @@ import { read, type API, type Raw } from '../api/Types';
 import type { Resolve } from '../runtime/As3';
 import type { DeviceSettings } from '../settings/DeviceSettings';
 import type { ChatArtifactLinkResolver } from './ChatArtifactLinkResolver';
+import { ChatArtifactToken } from './rich/ChatArtifactToken';
 
 /** Project received messages with the original rich bitmap renderer. */
 export function installNativeChatMessages(
@@ -19,6 +20,7 @@ export function installNativeChatMessages(
       simpleRenderer: Raw;
       imageLinkAtStagePoint(point: Raw): ChatDiscordImageLink | null;
       roleTagAtStagePoint(point: Raw, simple: boolean): string | null;
+      artifactAtStagePoint(point: Raw): { row: Raw; token: ChatArtifactToken } | null;
     }
   | undefined {
   const log = game.messageLog;
@@ -198,6 +200,20 @@ export function installNativeChatMessages(
   });
   return {
     simpleRenderer: rows.get(log.simple.tf)!.renderer,
+    artifactAtStagePoint(point) {
+      for (let index = read(scroll, 'numChildren') - 1; index >= 0; index--) {
+        const row = scroll.getChildAt(index);
+        const entry = rows.get(row);
+        if (!entry || !read(row, 'visible') || read(row, 'alpha') <= 0) continue;
+        const local = entry.renderer.globalToLocal(point);
+        const visibleIndex = entry.renderer.visibleTextIndexAtPoint(local.x, local.y);
+        const sourceIndex = entry.renderer.sourceTextIndexAtVisibleIndex(visibleIndex);
+        if (sourceIndex < 0) continue;
+        const token = ChatArtifactToken.parseAt(String(read(entry.field, 'text', '')), sourceIndex);
+        if (token) return { row, token };
+      }
+      return null;
+    },
     roleTagAtStagePoint(point, simple) {
       const candidates = simple
         ? [log.simple.tf]
