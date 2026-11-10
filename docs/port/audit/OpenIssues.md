@@ -1384,3 +1384,29 @@ removed its one created emitter and sampling interval, observed in
 /tmp/QoLAF-OutlineCleanup.png. Preview remained connected=true, runtimeErrors=0.
 No transport sends or account changes. This verifies native contour/outline
 integration and cleanup, not complete visual parity.
+
+## Self-effect reflection and pooled emitters (2026-11-10)
+
+Source EmitterFactory.create uses abs(movieClip.scaleX) for self texture sizes
+and renderMirrored for a separate Y reflection. Native Haxe create uses signed
+scaleX, and the port previously reflected only remastered blue pulses. Added
+EmitterMirroring to correct the native size sign through native setters, retain
+authored size signs, honor an explicit composed renderMirrored getter, and reset
+reflection for non-self/pool reuse and disposal. EmitterFrames now applies the
+reflection to ordinary particles and to the disabled-remastered path too.
+
+Typecheck and 346 tests pass. The inspected native factory fixture exercises
+all four scale-sign combinations, authored negative sizes, getter precedence,
+non-self reuse and disposal. Frame regression checks both enabled blue breathing
+and disabled remastered rendering remain mirrored.
+
+Live reload/autologin succeeded. Temporary target wrappers borrowed the existing
+ship texture without modifying the ship. The real factory returned expected
+start/finish sizes 3.66/2.64 for all four sign combinations, with mirrorY
+true,true,false,false. Every created emitter was removed synchronously in finally.
+Evidence: /tmp/QoLAF-MirrorNative.png. This verifies native factory integration;
+it is not a full visual comparison of multipart ships.
+
+MultipartAuraTarget and PlayerShip's experimental multipart/aura lifecycle still
+need porting as a complete feature; generic mirroring support does not close that
+remaining scope.

@@ -386,6 +386,7 @@ test('frame rendering restores native size, tint and alpha immediately when aura
   Object.assign(emitter, {
     isEmitting: false,
     timeElapsed: 1500,
+    mirrorY: true,
     _startSize: 2,
     _finishSize: 4,
     particles: [particle],
@@ -399,17 +400,19 @@ test('frame rendering restores native size, tint and alpha immediately when aura
   pulses.prepare(emitter, 1);
   frames.update(emitter, 0);
   close(particle.scaleX, 3.054);
+  close(particle.scaleY, -3.054);
   assert.equal(particle.color, 42);
   close(alpha, 1.05);
   enabled = false;
   frames.update(emitter, 0);
   close(particle.scaleX, 0.5);
-  close(particle.scaleY, 0.5);
+  close(particle.scaleY, -0.5);
   assert.equal(particle.color, 50);
   close(alpha, 0.5);
   enabled = true;
   frames.update(emitter, 0);
   close(particle.scaleX, 3.054);
+  close(particle.scaleY, -3.054);
   close(alpha, 1.05);
   pulses.release(emitter);
   frames.update(emitter, 0);

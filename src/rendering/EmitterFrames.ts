@@ -4,6 +4,7 @@ import { AuraPulses, installAuraPulses } from './AuraPulses';
 import { installRarityAuraLayers } from './RarityAuraLayers';
 import { installEmitterDelays } from './EmitterDelays';
 import { EmitterTargets } from './EmitterTargets';
+import { installEmitterMirroring } from './EmitterMirroring';
 import { read, type API, type Raw } from '../api/Types';
 
 /** Render-only mount lookup; never writes ship/engine course or simulation position. */
@@ -233,7 +234,7 @@ export class EmitterFrames {
       particle.set_scaleX(
         emitter.rainbow ? particle.rainbowLength / read(emitter._txt, 'width') : size,
       );
-      particle.set_scaleY(size);
+      particle.set_scaleY(emitter.mirrorY ? -size : size);
       if (!emitter.rainbow)
         particle.set_color(
           this.Color.interpolateColor(emitter._startColor, emitter._finishColor, 1 - fraction),
@@ -267,6 +268,7 @@ export function installEmitterFrames(api: API): void {
   const Collective = api.cls('core.particle.CollectiveMeshBatch');
   if (!Emitter || !Particle || !Color || !Collective) return;
   const targets = new EmitterTargets(api.cls('core.engine.Engine'), api.cls('core.ship.EnemyShip'));
+  installEmitterMirroring(api);
   const prepareAuras = installRarityAuraLayers(api);
   installAuraStyles(api);
   const pulses = installAuraPulses(api);
