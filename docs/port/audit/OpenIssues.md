@@ -767,3 +767,29 @@ persisting after debug was disabled. Compare AimDebugCorrected/AimDebugOff again
 the earlier DebugPaste screenshot. Cause not yet established; investigate native
 OpenFL/Starling rendering handoff and existing bitmap batching/cache issue rather
 than treating the overlay display check as full rendering parity.
+
+## Live bitmap draw-path investigation
+
+Reopened the sale popup: its text initially rendered fully, then prefixes vanished
+again without the debug overlay being enabled. This rules out treating the debug
+panel as the necessary trigger. Painter.cacheEnabled was already false; explicitly
+setting false did not resolve it (CacheBefore/CacheDisabled screenshots).
+Temporarily setting 193 existing TextField mesh batches to separate draws restored
+the description and stat labels (TextSeparateDraw screenshot). Restoring their
+original batching values brought corruption back; a later sample recovered again
+without changing layout. Keep the earlier global batching workaround under review,
+but do not simply invert it: earlier live target/safe-zone tests showed missing
+labels on separate draws too.
+
+A one-second temporary Context3D binding probe checked actual GL ARRAY_BUFFER and
+ELEMENT_ARRAY_BUFFER bindings against the runtime's cached bindings for the first
+600 bind calls. Both mismatch counts were zero (BufferCounts screenshot; total
+calls observed 157848). It restored the original methods on completion. All text
+batch flags and the prior cache flag were restored; probe globals were deleted.
+Console and sale popup were closed. No production rendering change was made.
+
+Evidence: /tmp/QoLAF-CacheBefore.png, /tmp/QoLAF-CacheDisabled.png,
+/tmp/QoLAF-TextSeparateDraw.png, /tmp/QoLAF-BufferAudit.png,
+/tmp/QoLAF-BufferCounts.png. Remaining investigation: batch/index-buffer contents,
+upload reuse and draw ordering. The buffer probe does not exclude every GL state
+or index-data problem. Font metrics/layout are not established as the cause.
