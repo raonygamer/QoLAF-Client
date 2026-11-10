@@ -701,3 +701,22 @@ turn-control integration are not ported yet.
 Live initialization after one reload also succeeds: connected, rendered game/HUD,
 zero reported runtime errors. Screenshot /tmp/QoLAF-TargetLifecycleLoaded.png.
 This confirms initialization only, not pooled-target combat behavior.
+
+## Aim-assist source port in progress
+
+Added AimAssistTarget and AimAssist under src/aim. These port PlayState's actual
+eligibility, projectile leading, player-guided acquisition, locked profile,
+stationary tracking, manual override, correction/deadzone crossing and tracking
+settle/restart hysteresis. Eligibility takes DamageObserver-compatible confirmed
+contacts and preserves player/beam/missile/teleport exclusions, exact hit-window
+boundaries, pinned-target behavior and minimum distances. Lead uses the current
+native EnemyShip.calculateOrbitSpeed for AIOrbit and respects TTL/max lead time.
+The controller tests consume the real ported ClientSettings defaults.
+
+Typecheck and eight targeted regressions pass. These modules are not yet wired
+into GameSession: no claim of working live aim assist. Next required work is the
+native PlayState adapter, automation/map-navigation ownership, currentAimAngle
+exposure, original debug overlay and live comparison. Upstream updateMouseAim
+currently coalesces to one command with a 66 ms send interval; retain that newer
+transport behavior while adapting the original assist around it. Native weapon
+properties mix fields and get_* accessors, so the boundary uses read().
