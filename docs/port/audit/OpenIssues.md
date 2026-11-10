@@ -532,3 +532,38 @@ while bars stayed visible; subsequent cleanup screenshot showed them restored.
 This may relate to the earlier intermittent label redraw issue; cause remains
 unproven. Preserve this observation for renderer/cache investigation rather than
 claiming the full scene matches based on the popup alone.
+
+Investigated intermittent target/vanilla label loss in the live Haxe renderer.
+Read-only scene inspection found affected text still had glyph geometry (for
+example 52 vertices for 'No nearby enemy' and 100 for the safe-zone message), no
+pending recomposition, and unbatched meshes. Parent exclusion tokens were already
+-1, so the observed failure is not proved to be a stale parent token or missing
+layout. Runtime probe evidence: /tmp/QoLAF-LabelCacheAudit.png and
+/tmp/QoLAF-LabelCacheDetails.png. Switching seven affected labels to batchable
+restored visible labels (/tmp/QoLAF-LabelBatched.png), motivating a batching fix.
+
+First attempt covered only port-owned font instances; reload reproduced the loss.
+Runtime inspection then confirmed port target labels were batchable but vanilla
+safe-zone text still used upstream font26 with batchable=false. That attempt was
+not sufficient (/tmp/QoLAF-LabelFixSettled.png, /tmp/QoLAF-LabelFixAudit.png).
+Final implementation hooks native BitmapFont.fillMeshBatch so upstream fonts and
+port font aliases share the batching path while retaining native plain layout.
+The source rich compositor also sets batchable for plain as well as rich output.
+TrueType compositors are untouched. Temporary runtime state was removed by reload.
+
+Typecheck/build and full 264-test suite passed before extracting the native hook
+into BitmapFontBatching.ts; afterward typecheck/build and the added hook regression
+passed. Regression verifies upstream instances, native argument preservation and
+cleanup. Existing compositor test now verifies batching for both plain and HTML.
+This is a renderer workaround supported by the live isolation, not a claim that
+the deeper Haxe/WebGL defect or all previous rendering issues are resolved.
+
+Final live check after the broader hook: automatic login succeeded; target and
+safe-zone labels remained visible while showing friend suggestions, after the
+scene settled, and after Tab completion/clearing the draft. Screenshots:
+/tmp/QoLAF-AllBitmapLoaded.png, /tmp/QoLAF-AllBitmapSettled.png,
+/tmp/QoLAF-AllBitmapCleanup.png. Diagnostics connected=true/runtimeErrors=0.
+No messages were sent; console is closed and composer empty. The live bundle
+used the same hook body before its extraction into a dedicated module; extraction
+was typechecked, built and tested without a redundant reload. Longer gameplay
+sampling and non-text separate-mesh interactions remain verification work.

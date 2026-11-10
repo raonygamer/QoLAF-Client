@@ -17,6 +17,9 @@ export function createRichBitmapFontCompositor(resolve: Resolve): any {
       format: any,
       options: any = null,
     ): void {
+      // Both plain and rich bitmap output use the cached batching path.
+      // Haxe's separate-mesh path intermittently omits labels with valid glyphs.
+      meshBatch.set_batchable(true);
       if (options == null || !options.isHtmlText) {
         super.fillMeshBatch(meshBatch, width, height, text, format, options);
         return;
@@ -28,10 +31,6 @@ export function createRichBitmapFontCompositor(resolve: Resolve): any {
         this.htmlRenderer.useSeparateBatch = false;
         this.htmlRenderer.pixelSnapping = true;
       }
-      // Haxe's separate-mesh path corrupts surrounding cached draw ranges
-      // for copied rich geometry. Keep this bitmap output in the batching
-      // path, matching the source renderer's useSeparateBatch=false policy.
-      meshBatch.set_batchable(true);
       this.htmlRenderer.fillExternalMeshBatch(
         meshBatch,
         width,

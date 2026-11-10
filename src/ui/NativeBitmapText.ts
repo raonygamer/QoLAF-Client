@@ -1,3 +1,4 @@
+import { installBitmapFontBatching } from './BitmapFontBatching';
 import { installWrapTextMeasurement } from './NativeWrapTextMeasurement';
 import { installBitmapCompositionQueue } from './BitmapCompositionQueue';
 import { fontAssets } from './FontAssets';
@@ -16,6 +17,7 @@ export function installNativeBitmapText(api: API): void {
   installWrapTextMeasurement(api);
   const Compositor = bitmap.resolve('core.text.RichBitmapFontCompositor');
   const TextField = api.cls('starling.text.TextField')!;
+  installBitmapFontBatching(api);
   for (const asset of fontAssets) {
     const font = TextField.getBitmapFont(asset.owner);
     if (!font) throw Error('Missing bitmap font: ' + asset.owner);

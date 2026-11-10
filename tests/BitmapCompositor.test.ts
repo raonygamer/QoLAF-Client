@@ -42,6 +42,8 @@ test('Starling HTML uses bitmap glyph colors while plain text retains the native
   };
   font.fillMeshBatch(target, 100, 60, 'plain', format, { isHtmlText: false });
   assert.equal(plainCalls, 1);
+  assert.equal(target.batchable, true, 'plain labels use the same stable batch path');
+  target.batchable = false;
   assert.equal(font.htmlRenderer, null);
   font.fillMeshBatch(target, 100, 60, '<font color="#123456">A</font>B', format, {
     isHtmlText: true,
