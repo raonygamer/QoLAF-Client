@@ -1,3 +1,5 @@
+import { installNativeMusicPlayer } from '../music/NativeMusicPlayer';
+import type { MusicPlayerService } from '../music/MusicPlayer';
 import { installNativePlayerInspect } from '../inspect/NativePlayerInspect';
 import { installNativeClientHelp } from '../dialogs/NativeClientHelp';
 import { installNativeClientChangelog } from '../dialogs/NativeClientChangelog';
@@ -59,9 +61,11 @@ export function installGameSession(
   session: API,
   preferences?: DeviceSettings,
   targetIcon?: string,
+  music?: MusicPlayerService,
 ): void {
   const ui = new NativeUI(session);
   const { client, config, save } = sessionSettings(session, game);
+  if (music) installNativeMusicPlayer(session, game, music);
   installInactivityPreference(session, game);
   installTorpedoCue(session, game);
   installTorpedoWarnings(session, game);

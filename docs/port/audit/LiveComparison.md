@@ -1446,3 +1446,42 @@ the active replacement is the Preview.mjs tool session 44684 on port 8087.
 Remaining screen work includes music/radio and ship-visual dialogs. The automatic
 once-per-release changelog sequence also still needs wiring; the source v1.1.0
 farewell is historical and not shown by the current v1.1.22 source.
+
+
+## Music screen and playback — 2026-11-10
+
+Ported the original MusicPlayerPopup, MusicPlayer and cached MusicTrackCatalog
+into src/music, with a root-lifetime sound adapter and session-lifetime /music
+window. Uses the native PopupMessage, CheckBox, Slider, ScrollBox, Buttons and
+bitmap Text, original 600x550 content geometry, source labels and track metadata.
+The original SWF music popup was opened for comparison (MusicOriginal.png).
+Settings-only skins initially differed: replaced them with native Aeon controls,
+restored Russo checkbox labels, left alignment and the 14px check icon. Native
+Slider inherited set_height scaled the entire control repeatedly; the adapter now
+lays out a 24px logical height without changing scale.
+
+Verified live: /music opens, manual track selection/play, Pause/Resume, Next and
+scroll positioning, Stop, return to Automatic, closing/reopening, and playing and
+paused account preferences across page reloads. Browser autoplay warnings remain;
+restored Playing status does not establish audible playback before a user gesture.
+Unit coverage verifies late loads after Stop/replacement cannot start, automatic
+requests cannot override manual silence, loop completion, paused restore without
+preloading, service replacement and detached catalog validation. Full 416 tests
+passed; subsequent targeted music/integration tests and type checking passed.
+
+**Visual parity is not complete.** Repeated interaction still causes unchanged
+labels (notably heading and Close) to disappear; sometimes only the first glyph
+remains. This can also affect surrounding HUD labels. Earlier images showing a
+complete window are not proof this is fixed. Recursive display invalidation,
+per-frame invalidation, painter exclusion, separate batch boundaries, temporary
+frame-zero traversal and forcing separate text batches/uploads did not reliably
+solve it. Removed these unsuccessful render-time workarounds rather than retain
+per-frame traversal/upload overhead. The minimal state-change invalidation remains.
+Investigate native draw/batch ownership and text geometry with a focused runtime
+reproduction before marking music or other modal visual parity complete.
+
+Evidence under /tmp: QoLAF-MusicOriginal.png, QoLAF-MusicRestored.png,
+QoLAF-MusicPausedRestored.png, QoLAF-MusicSeparateBatches.png (complete captures),
+QoLAF-MusicForceUpload.png (remaining heading/Close failure). Runtime diagnostics
+reported zero caught runtime errors. No chat message was sent; only /music was
+entered. The latest implementation is on the port branch/local preview, not Pages.

@@ -1809,3 +1809,15 @@ storage replaces the absent AS3 sharedObj. Login credits were already ported.
 Still missing: the automatic once-per-release changelog sequence, music/radio
 and ship-visual dialogs; short-viewport help layout remains open. Welcome
 geometry was compared to source, not a freshly reopened SWF welcome instance.
+
+
+## MUSIC-01 — native screen implemented, rendering parity still open
+
+The native /music window and service-owned playback are ported and exercised live.
+Track selection, play/pause/resume/stop/next, automatic ownership and account reload
+persistence work. Unchanged labels/Close can disappear following interactions,
+sometimes affecting surrounding HUD text. Do not mark this screen exact from an
+initial screenshot. See the 2026-11-10 music entry in LiveComparison.md for failed
+render experiments and evidence. Browser autoplay unlocking, actual room/death
+transitions, failed-audio loads and external radio takeover still need live checks.
+Radio and ship-visual windows remain separate outstanding screens.

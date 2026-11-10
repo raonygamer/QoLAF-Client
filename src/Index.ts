@@ -1,3 +1,5 @@
+import { installMusicService } from './music/NativeMusicPlayer';
+import type { MusicPlayerService } from './music/MusicPlayer';
 import { installMapDisposal } from './map/MapDisposal';
 import { installMapDeathLineLifecycle } from './map/MapDeathLineLifecycle';
 import { installMapPlayerLifecycle } from './map/MapPlayerLifecycle';
@@ -32,6 +34,7 @@ export default {
   apiVersion: 1,
   activate(api: API) {
     const history = new ChatHistory();
+    let music: MusicPlayerService | undefined;
     installNativeAutomations(api);
     const deviceSettings = new DeviceSettings(api.storage);
     api.defer(() => deviceSettings.flush());
@@ -45,6 +48,7 @@ export default {
         }
       }));
     api.on('classesReady', () => {
+      music = installMusicService(api);
       installLocalClientCommands(api);
       installBossSpawnTimerHooks(api);
       installTorpedoCueHooks(api);
@@ -99,7 +103,7 @@ export default {
       void ensureFonts()
         .then(() => {
           if (!alive) return;
-          installGameSession(game, session, deviceSettings, targetIcon);
+          installGameSession(game, session, deviceSettings, targetIcon, music);
         })
         .catch((error) => session.log('Native client initialization failed', error));
     });

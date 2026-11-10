@@ -514,6 +514,16 @@ export function registry() {
   }
   const texture = { width: 32, height: 32, get_root: () => ({}), dispose() {} };
   return {
+    'data.DataLocator': { getService: () => null },
+    'sound.SoundLocator': { getService: () => null, register() {} },
+    'sound.SoundManager': class {
+      playMusic() {}
+      internalPlay() {}
+      stopMusic() {}
+      stop() {}
+      stopAllMusicExcept() {}
+      stopAll() {}
+    },
     'core.scene.Game': Game,
     'core.states.GameStateMachine': GameStateMachine,
     'core.ship.Ship': Ship,
