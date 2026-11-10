@@ -1,3 +1,4 @@
+import { AuraPulses, installAuraPulses } from './AuraPulses';
 import { installRarityAuraLayers } from './RarityAuraLayers';
 import { installEmitterDelays } from './EmitterDelays';
 import { EmitterTargets } from './EmitterTargets';
@@ -68,6 +69,7 @@ export class EmitterFrames {
     private Color: Raw,
     private targets = new EmitterTargets(),
     private prepareFrame?: (emitter: Raw) => void,
+    private auraPulses?: AuraPulses,
   ) {}
 
   reset(emitter: Raw): void {
@@ -231,7 +233,9 @@ export class EmitterFrames {
         particle.set_color(
           this.Color.interpolateColor(emitter._startColor, emitter._finishColor, 1 - fraction),
         );
-      const alpha = (particle.startAlpha - particle.finishAlpha) * fraction + particle.finishAlpha;
+      const nativeAlpha =
+        (particle.startAlpha - particle.finishAlpha) * fraction + particle.finishAlpha;
+      const alpha = this.auraPulses?.apply(emitter, particle, fraction, nativeAlpha) ?? nativeAlpha;
       if (particle.ticks === 0) particle.set_blendMode('add');
       particle.ticks++;
       if (emitter.useFriction) particle.speed *= Math.pow(0.98, delta / 33);
@@ -258,7 +262,8 @@ export function installEmitterFrames(api: API): void {
   if (!Emitter || !Particle || !Color || !Collective) return;
   const targets = new EmitterTargets(api.cls('core.engine.Engine'), api.cls('core.ship.EnemyShip'));
   const prepareAuras = installRarityAuraLayers(api);
-  const frames = new EmitterFrames(Particle, Emitter, Color, targets, prepareAuras);
+  const pulses = installAuraPulses(api);
+  const frames = new EmitterFrames(Particle, Emitter, Color, targets, prepareAuras, pulses);
   installEmitterDelays(api, targets);
   // Unit.reset reaches GameObject.reset; Engine.reset does not call its base.
   for (const name of ['core.GameObject', 'core.engine.Engine']) {

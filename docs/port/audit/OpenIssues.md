@@ -1250,3 +1250,28 @@ targets, and the disableRemasteredAuras setting's complete rendering behavior.
 Current texture/color/pulse appearance is still native, not full aura parity.
 The delayed-target guard from aa50dfe was also loaded by this reload; its combat
 trigger remains covered by the native-factory test rather than visual observation.
+
+## Rarity aura pulse and blue breathing (2026-11-10)
+
+Ported Emitter.softAuraAlpha and applyBlueAuraBreathing into AuraPulses. Rarity
+factory results are classified without changing their native authored colors,
+particle generation or timing. Non-blue rarities fade in over the first 20% of
+life and out over the final 80% with the source smoothstep. Blue uses the source
+six-second clock, 1.8% size breath, 5% brightness breath, cosine lifetime envelope
+and fixed 0.42 color interpolation. Native mirrorY is honored when present; full
+source mirrored/multipart target adaptation remains separate work.
+
+The frame renderer applies this after native size/tint/alpha calculations.
+SceneBase.clientSettings.disableRemasteredAuras is read dynamically; disabling
+restores the native per-particle size, tint and alpha on the next frame, and
+re-enabling needs no emitter recreation. Disposal drops rarity classification so
+pooled exhaust or other effects cannot inherit it. Non-rarity effects are untouched.
+
+All 331 tests pass. Typecheck passes after adding explicit receiver types to the
+new test fixture's setters. Regressions cover pulse endpoints/midpoints, all rarity
+classifications, six-second phase samples, color weight, mirror flag, pool reuse,
+actual host factory hooks, live setting reads and full EmitterFrames output before/
+after the toggle. Built but not yet reloaded/visually compared with the SWF.
+Shader reconstruction, grayscale/tint, flowing border and lightning are still
+unported, so pulse parity does not imply full remastered aura appearance or full
+implementation of the setting's shader behavior.

@@ -1,3 +1,4 @@
+import { AuraPulses } from '../src/rendering/AuraPulses';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
@@ -355,4 +356,63 @@ test('large effects stay visible beyond the native 100-unit origin radius', () =
   assert.equal(emitter.nextDistanceCalculation, 1000);
   Object.assign(emitter, { sourceVarianceX: 0, sourceVarianceY: 0, speed: 0, ttl: 0 });
   assert.equal(emitterCullingRadius(emitter), 100);
+});
+
+test('frame rendering restores native size, tint and alpha immediately when aura breathing is disabled', () => {
+  const { emitter } = fixture();
+  let enabled = true;
+  const Color = {
+    interpolateColor: (_start: number, _end: number, fraction: number) =>
+      fraction === 0.42 ? 42 : 50,
+  };
+  const pulses = new AuraPulses(() => enabled, Color);
+  const frames = new EmitterFrames(Particle, {}, Color, undefined, undefined, pulses);
+  const particle = new Particle() as Raw;
+  Object.assign(particle, {
+    ttl: 1000,
+    totalTtl: 2000,
+    speed: 0,
+    set_scaleX(this: Raw, value: number) {
+      this.scaleX = value;
+    },
+    set_scaleY(this: Raw, value: number) {
+      this.scaleY = value;
+    },
+    set_color(this: Raw, value: number) {
+      this.color = value;
+    },
+  });
+  let alpha = 0;
+  Object.assign(emitter, {
+    isEmitting: false,
+    timeElapsed: 1500,
+    _startSize: 2,
+    _finishSize: 4,
+    particles: [particle],
+    collectiveMeshBatch: {
+      clear() {},
+      addMesh(_particle: Raw, _matrix: Raw, opacity: number) {
+        alpha = opacity;
+      },
+    },
+  });
+  pulses.prepare(emitter, 1);
+  frames.update(emitter, 0);
+  close(particle.scaleX, 3.054);
+  assert.equal(particle.color, 42);
+  close(alpha, 1.05);
+  enabled = false;
+  frames.update(emitter, 0);
+  close(particle.scaleX, 0.5);
+  close(particle.scaleY, 0.5);
+  assert.equal(particle.color, 50);
+  close(alpha, 0.5);
+  enabled = true;
+  frames.update(emitter, 0);
+  close(particle.scaleX, 3.054);
+  close(alpha, 1.05);
+  pulses.release(emitter);
+  frames.update(emitter, 0);
+  close(particle.scaleX, 0.5);
+  close(alpha, 0.5);
 });
