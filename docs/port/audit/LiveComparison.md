@@ -1309,3 +1309,46 @@ Local evidence: `/tmp/QoLAF-OriginalChangelog.png`,
 Type checking and all 396 tests pass. Preview reported zero uncaught runtime
 errors. Narrow-window fitting and graphics-context restoration remain unverified
 live. Other missing screens and complete parity remain open.
+
+## Tabbed client guide — 2026-11-10
+
+Ported ClientHelpPopup and its source content into the native game display tree:
+720×500 panel, 24px Russo tabs, Verdana HTML reading area, original blue scroll
+thumb and close control. `/clienthelp` was entered through the actual composer
+and opened the popup locally. All seven tabs were clicked; the long Commands
+page scrolled, and switching to Aim Assist reset to its heading.
+
+Compared Targeting against the running SWF: title, paragraph wrapping, spacing
+and panel geometry agree after accounting for the different stage dimensions.
+The first build clipped Ship visuals and QoL / settings: native PressButton
+wrapped before final sizing. Disabling wrapping fixed the labels. Opening the
+browser console resized the viewport and the popup recentered correctly. Escape
+closed the guide without opening the underlying game menu.
+
+The Start page identifies the TypeScript build and explicitly notes that the
+guide describes the original client, with unfinished port features and original
+AS3 automation examples. Those examples still need conversion to the port's
+JavaScript module API; a rendered reference guide is not evidence that all its
+described features work. This remains a full-port gap.
+
+Evidence: `/tmp/QoLAF-OriginalHelp.png`,
+`/tmp/QoLAF-OriginalHelpTargeting.png`, `/tmp/QoLAF-HelpTargetingSettled.png`,
+`/tmp/QoLAF-HelpCommandsScroll.png`, `/tmp/QoLAF-HelpAim.png`,
+`/tmp/QoLAF-HelpShip.png`, `/tmp/QoLAF-HelpAutomations.png`,
+`/tmp/QoLAF-HelpSettings.png`, `/tmp/QoLAF-HelpClosed.png`.
+Type checking and 398 tests pass, including long-page markup retention and
+escaping custom-command descriptions, aliases, argument labels and defaults.
+
+During the final reload check, upstream transitioned from Service-1409 to
+Service-1410. The old sector reported a new version and closing down. Refreshed
+only the local preview's upstream snapshot using the host's existing snapshot
+script (195 resources, 64,379,619 bytes); preserved the prior snapshot at
+`/tmp/QoLAF-Upstream1409-20261110`. New official bundle SHA-256:
+`0dd2468978a7ec1c5c889fa8c95e5b82bd09cd092903792f4ecb13fa82677d59`.
+All five host bridge tests pass against it. The asset version remained 14298435,
+so the bundle hash and server version are required to distinguish this update.
+
+The fresh 1410 preview connected successfully. Opened the guide through the
+`/chelp` dispatch path after reload: all labels were complete without a live
+patch, and the heading correctly showed server 1410. Evidence:
+`/tmp/QoLAF-Help1410.png`. The new official gameplay bundle remained intact.

@@ -1780,3 +1780,9 @@ key-binding labels are fixed and visually verified. Still audit narrow-window
 layout, reopening/context restoration, the tabbed client help, welcome/credits,
 player inspection, music/radio and ship-visual dialogs against original source
 and running UI. These remain full-port requirements, not optional follow-ups.
+
+The tabbed help window is now ported and exercised in-game across all tabs.
+Its source reference text remains explicitly marked as describing the original
+client. Convert the automation examples to the actual JavaScript module API and
+review feature availability as each remaining port feature lands. Welcome,
+inspection, music/radio and visual-editor dialogs remain outstanding.

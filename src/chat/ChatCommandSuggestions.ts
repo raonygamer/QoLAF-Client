@@ -4,6 +4,7 @@ import type { ChatCommandRegistry } from './ChatCommandRegistry';
 // Original descriptions for commands actually implemented by this runtime.
 const definitions: readonly (readonly [string, string, string])[] = [
   ['echo', '', 'Show the client version'],
+  ['chelp clienthelp', '', 'Open the tabbed client guide'],
   ['changelog', '', 'Open the original client release history'],
   ['clearchat', '', 'Clear both chat views locally; keep sent-message history and settings'],
   [
