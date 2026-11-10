@@ -34,6 +34,8 @@ const defaults: DevicePreferences = {
   showPlayerClanIdentification: true,
   disableSpaceToRespawn: true,
 };
+
+export const devicePreferenceKeys = Object.keys(defaults) as (keyof DevicePreferences)[];
 const ranges = {
   renderFrameRate: [30, 241],
   dpiScale: [0.5, 2],

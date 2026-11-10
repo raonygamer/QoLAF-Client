@@ -47,6 +47,10 @@ export function bound(
   return { configurable: true, get: getter };
 }
 
+export function isBoundMethod(descriptor: PropertyDescriptor): boolean {
+  return !!descriptor.get && boundGetters.has(descriptor.get);
+}
+
 /** Let native Haxe callers use an AS3 port's explicit ES property overrides. */
 export function bridgeNativeProperties(ctor: Raw): void {
   const prototype = ctor.prototype;

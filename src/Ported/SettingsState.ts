@@ -7,16 +7,10 @@ export function createSettingsState(resolve: Resolve): any {
   type SettingsChat = any;
   const SettingsBindings: any = resolve('core.states.gameStates.SettingsBindings');
   type SettingsBindings = any;
-  const SettingsAutomations: any = resolve('core.states.gameStates.SettingsAutomations');
-  type SettingsAutomations = any;
   const SettingsGeneral: any = resolve('core.states.gameStates.SettingsGeneral');
   type SettingsGeneral = any;
-  const AutomationManager: any = resolve('af.AutomationManager');
-  type AutomationManager = any;
   const Button: any = resolve('core.hud.components.Button');
   type Button = any;
-  const SettingsPageStyle: any = resolve('core.hud.components.SettingsPageStyle');
-  type SettingsPageStyle = any;
   const SettingsWindowChrome: any = resolve('core.hud.components.SettingsWindowChrome');
   type SettingsWindowChrome = any;
   const Text: any = resolve('core.hud.components.Text');
@@ -61,6 +55,28 @@ export function createSettingsState(resolve: Resolve): any {
       this.settings = SceneBase.settings;
     }
 
+    static initializeNative(state: any): void {
+      state.categories = [];
+      state.panel = null;
+      state.activePage = null;
+      state.activeCategory = null;
+      state.closing = false;
+      state.settings = SceneBase.settings;
+      // The upstream constructor creates its tab controls before enter().
+      // Their listeners and textures must not survive the replacement window.
+      for (const key of [
+        'bg',
+        'generalButton',
+        'bindingsButton',
+        'chatButton',
+        'closeButton',
+        'exitButton',
+      ]) {
+        state[key]?.dispose();
+        state[key] = null;
+      }
+    }
+
     @bound
     private buildPanel(): void {
       this.panel = new Sprite();
@@ -94,7 +110,7 @@ export function createSettingsState(resolve: Resolve): any {
       this.addCategory('chat', 'Chat');
       this.addCategory('bindings', 'Key bindings');
       this.addCategory('aim', 'Aim Assist');
-      if (AutomationManager.isSupported && this.g.automationManager != null) {
+      if (this.g.automationManager != null) {
         this.addCategory('automations', 'Automations');
       }
 
@@ -195,7 +211,7 @@ export function createSettingsState(resolve: Resolve): any {
     @bound
     private showCategory(id: string): void {
       // Old per-account navigation preferences must not revive a suspended page.
-      if (id == 'automations' && !AutomationManager.isSupported) id = 'general';
+      if (id == 'automations' && this.g.automationManager == null) id = 'general';
       var selected: any = null;
       for (const category of this.categories) {
         if (category.id == id) {
@@ -217,7 +233,7 @@ export function createSettingsState(resolve: Resolve): any {
           this.activePage = new SettingsQoLAF(this.g, 'aim');
           break;
         case 'automations':
-          this.activePage = new SettingsAutomations(this.g);
+          this.activePage = new (resolve('core.states.gameStates.SettingsAutomations'))(this.g);
           break;
         default:
           this.activePage = new SettingsGeneral(this.g, selected.id);
@@ -226,7 +242,7 @@ export function createSettingsState(resolve: Resolve): any {
       this.activeCategory = selected.id;
       this.activePage.x = SettingsState.SIDEBAR_WIDTH;
       this.activePage.y = 8;
-      SettingsPageStyle.apply(this.activePage);
+      // NativeControls applies the original settings skins at construction.
       this.panel.addChild(this.activePage);
       this.pageTitle.text = selected.label;
       // Leave a 5px gap beside the button, inside the sidebar's left border.

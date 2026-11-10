@@ -1,6 +1,7 @@
 import { read, type API } from './Api/Types';
 import { installGameSession } from './Runtime/GameSession';
 import { ChatHistory } from './Chat/ChatHistory';
+import { installNativeBitmapText } from './UI/NativeBitmapText';
 import { loadFonts } from './UI/Fonts';
 import { loginIdentity, PORT_VERSION } from './Login/LoginIdentity';
 import { loginProfiles } from './Login/LoginProfiles';
@@ -19,7 +20,14 @@ export default {
     const deviceSettings = new DeviceSettings(api.storage);
     api.defer(() => deviceSettings.flush());
     let fonts: Promise<void> | undefined;
-    const ensureFonts = () => (fonts ??= loadFonts(api));
+    const ensureFonts = () =>
+      (fonts ??= loadFonts(api).then(() => {
+        // This bridge targets the OpenFL-backed Haxe Text ABI. Starling's own
+        // TextField has a different constructor and must never be patched here.
+        if (typeof api.cls('core.hud.components.Text')?.prototype.set_htmlText === 'function') {
+          installNativeBitmapText(api);
+        }
+      }));
     api.on('classesReady', () => {
       installInterpolation(api);
       const login = api.cls('Login')!.prototype;
@@ -62,7 +70,7 @@ export default {
       void ensureFonts()
         .then(() => {
           if (!alive) return;
-          installGameSession(game, session);
+          installGameSession(game, session, deviceSettings);
         })
         .catch((error) => session.log('Native client initialization failed', error));
     });

@@ -1,4 +1,5 @@
 import { createFontRegistries } from '../UI/FontRegistries';
+import { createButtonAdapter } from '../UI/ButtonAdapter';
 import { createSettingsBindings } from './SettingsBindings';
 import { createSettingsChat } from './SettingsChat';
 import { createSettingsKeybind } from './SettingsKeybind';
@@ -62,6 +63,15 @@ export function portedClasses(api: API) {
     // Importing Sprite also needs inherited DisplayObject properties.
     for (let current: Raw | undefined = cls; current; current = current.__super__)
       aliasProperties(api, current);
+    if (name === 'core.hud.components.Button')
+      return (cache[name] = createButtonAdapter(cls, resolve));
+    if (name === 'RymdenRunt') {
+      return (cache[name] = Object.assign(Object.create(cls), {
+        UNLIMITED_FRAME_RATE: 241,
+        MIN_DPI_SCALE: 0.5,
+        MAX_DPI_SCALE: 2,
+      }));
+    }
     return (cache[name] = cls);
   };
   cache['core.hud.components.LoginButton'] = createLoginButton(resolve);

@@ -75,3 +75,19 @@ test('Text htmlText sends color spans through bitmap glyphs while plain text sta
     [0xff0000],
   );
 });
+
+test('bitmap control bounds retain the full layout box under parent transforms', (t) => {
+  const fixture = bitmapRendererFixture();
+  t.after(fixture.cleanup);
+  const renderer = new fixture.Renderer();
+  t.after(() => renderer.dispose());
+  renderer.textFormat = new fixture.BitmapFormat(fixture.font, 16, 0xffffff);
+  renderer.text = 'A';
+  renderer.width = 100;
+  renderer.height = 30;
+  const bounds = renderer.getBounds(renderer);
+  assert.deepEqual([bounds.x, bounds.y, bounds.width, bounds.height], [0, 0, 100, 30]);
+  renderer.getTransformationMatrix = () => ({ a: 0, b: 2, c: -2, d: 0, tx: 5, ty: 7 });
+  renderer.getBounds({}, bounds);
+  assert.deepEqual([bounds.x, bounds.y, bounds.width, bounds.height], [-55, 7, 60, 200]);
+});

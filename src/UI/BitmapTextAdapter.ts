@@ -3,6 +3,7 @@ import type { Resolve } from '../Runtime/As3';
 /** Feathers' measurement/invalidation boundary, backed by native Starling nodes. */
 export function createBitmapTextAdapter(resolve: Resolve): any {
   const Sprite = resolve('starling.display.Sprite');
+  const Rectangle = resolve('openfl.geom.Rectangle');
   abstract class BitmapTextAdapter extends Sprite {
     protected _text = '';
     protected _wordWrap = false;
@@ -88,6 +89,31 @@ export function createBitmapTextAdapter(resolve: Resolve): any {
         this.invalidate('size');
       }
       return value;
+    }
+
+    /** FeathersControl bounds describe the layout box, not only the visible ink. */
+    getBounds(targetSpace: any, result: any = null): any {
+      result ??= new Rectangle();
+      const width = this.get_width();
+      const height = this.get_height();
+      if (targetSpace === this) {
+        result.setTo(0, 0, width, height);
+      } else {
+        const matrix = this.getTransformationMatrix(targetSpace);
+        const ax = matrix.a * width;
+        const ay = matrix.b * width;
+        const bx = matrix.c * height;
+        const by = matrix.d * height;
+        const left = Math.min(0, ax, bx, ax + bx);
+        const top = Math.min(0, ay, by, ay + by);
+        result.setTo(
+          matrix.tx + left,
+          matrix.ty + top,
+          Math.max(0, ax, bx, ax + bx) - left,
+          Math.max(0, ay, by, ay + by) - top,
+        );
+      }
+      return result;
     }
 
     initializeNow(): void {

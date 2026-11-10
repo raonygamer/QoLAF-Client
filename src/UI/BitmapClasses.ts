@@ -1,3 +1,4 @@
+import { createRichBitmapFontCompositor } from '../Ported/RichBitmapFontCompositor';
 import type { Resolve } from '../Runtime/As3';
 import { createBitmapTextAdapter, createBitmapFontTextFormat } from './BitmapTextAdapter';
 import { RichBitmapMarkup } from '../Chat/Rich/RichBitmapMarkup';
@@ -41,6 +42,7 @@ export function createBitmapClasses(nativeResolve: Resolve) {
     'core.hud.components.chat.rich.JapaneseGlyphPage': createJapaneseGlyphPage,
     'core.hud.components.chat.rich.JapaneseCachedGlyph': createJapaneseCachedGlyph,
     'core.hud.components.Text': createText,
+    'core.text.RichBitmapFontCompositor': createRichBitmapFontCompositor,
     'core.hud.components.ClientDeveloperTagColor': createClientDeveloperTagColor,
     'core.hud.components.EchoPulseColor': createEchoPulseColor,
     'core.hud.components.RoomInvitePulseColor': createRoomInvitePulseColor,

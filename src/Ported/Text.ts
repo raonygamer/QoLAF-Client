@@ -76,6 +76,51 @@ export function createText(resolve: Resolve): any {
     private metrics: Point = new Point();
     private _disposed: boolean = false;
 
+    /** Initialize the original renderer on an existing Haxe Text instance. */
+    public static initializeNative(instance: any): void {
+      const field = instance.tf;
+      const format = instance.format;
+      const content = field.get_text() ?? '';
+      const html = field.get_htmlText() ?? '';
+      const isHtml = instance.oldText !== content;
+      const width = field.get_width();
+      const height = field.get_height();
+      const wrap = field.get_wordWrap();
+      if (instance.finalLayer) instance.removeChild(instance.finalLayer, true);
+      if (instance.texture) instance.texture.dispose();
+      instance.texture = null;
+      instance._wordWrap = wrap;
+      instance._fieldWidth = width;
+      instance._fieldHeight = height;
+      instance._measuredHeight = 0;
+      instance._htmlText = '';
+      instance._plainText = '';
+      instance.renderedText = '';
+      instance.oldText = '';
+      instance.isHtml = false;
+      instance.autoWidthOnNextDraw = false;
+      instance.autoHeightOnNextDraw = false;
+      instance._sharpness = 0;
+      instance.glowFilter = null;
+      instance.markup = new RichBitmapMarkup();
+      instance.metrics = new Point();
+      instance._disposed = false;
+      instance.format = format;
+      instance.finalLayer = new RichBitmapFontTextRenderer();
+      instance.finalLayer.touchable = false;
+      instance.finalLayer.wordWrap = wrap;
+      instance.finalLayer.truncateToFit = false;
+      instance.finalLayer.useSeparateBatch = false;
+      instance.finalLayer.textureSmoothing = TextureSmoothing.BILINEAR;
+      instance.finalLayer.pixelSnapping = false;
+      instance.addChild(instance.finalLayer);
+      instance.applyFormat();
+      if (content.length || html.length) {
+        if (isHtml) instance.htmlText = html;
+        else instance.text = content;
+      }
+    }
+
     constructor(
       param1: number = 0,
       param2: number = 0,

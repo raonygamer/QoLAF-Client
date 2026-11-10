@@ -119,7 +119,15 @@ export function bitmapRendererFixture() {
       dispose() {}
     },
     'openfl.geom.Point': Point,
-    'openfl.geom.Rectangle': class {},
+    'openfl.geom.Rectangle': class {
+      x = 0;
+      y = 0;
+      width = 0;
+      height = 0;
+      setTo(x: number, y: number, width: number, height: number) {
+        Object.assign(this, { x, y, width, height });
+      }
+    },
     'openfl.text.TextFormat': Format,
     'starling.utils.Align': {
       LEFT: 'left',
@@ -163,6 +171,7 @@ export function bitmapRendererFixture() {
   const Text = createText(resolve);
   return {
     Renderer,
+    Sprite,
     Text,
     font,
     BitmapFormat: definitions['feathers.text.BitmapFontTextFormat'],
