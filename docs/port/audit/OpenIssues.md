@@ -1916,3 +1916,15 @@ only its disabled-color mismatch was corrected.
 The input-placement follow-up also excludes masked/offscreen glyphs from DOM
 bounds. Live long-draft content measured 1040px while its input remained 508px;
 the draft was discarded without sending. Full suite: 442 passing tests.
+
+### IPC runtime connection installed — current service version required
+
+Native authentication now owns the IPC service and excludes its reserved room
+from normal joins. Live legacy room attempts disconnected before handshake; the
+current Service-1410_24 address passed the handshake and stayed online. Address
+and client_version now follow native JoinRoomManager instead of hardcoded 1409.
+This corrects the earlier inventory note that IPC was entirely uninstalled.
+
+Still pending: commit/verify ClientQolafChat inbox, scene receiver and QoLAF tab/send
+integration, then reward/visual sharing and Radio applications. No live human chat
+or original-AS3 interoperability was tested; zero peers were present.

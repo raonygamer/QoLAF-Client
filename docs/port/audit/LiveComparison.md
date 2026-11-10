@@ -1667,3 +1667,30 @@ with getTransformationMatrix(stage), rather than using descendant bounds.
 Live unsent chat draft verification measured content bounds of 1040.117px while
 the actual DOM input correctly stayed 508×39. The draft was cleared with closeChat;
 nothing was sent. Added regression covers this case; all 442 tests pass.
+
+## Authentication-owned IPC connection — 2026-11-10
+
+Installed NativeIpcAuthentication at classesReady. One NativeIpcClient adapter is
+retained per authenticated client, across primary service reconnects and game
+scenes. Login reset, duplicate login, root exit and plugin disposal shut IPC down;
+pagehide/pageshow support bfcache restoration. Reserved service selection and
+explicit game-room destinations are rejected. The service is exposed through
+the source-compatible core.ipc.ClientIpcService class path, restored on cleanup.
+
+Live connection investigation: Service-1409_24 accepted a socket then disconnected
+before a joined handshake, using either client_version 1410 or 1409. The same
+account connected successfully to Service-1410_24 with client_version 1410 and
+passed the existing strict 19-field handshake validator. Status became online
+with zero peers. This establishes current-server transport, not old-AS3 interop.
+No human chat message, reward announcement, purchase or equipment change was sent.
+
+ClientIpcService now derives its reserved address and join version from the current
+native JoinRoomManager service version, preserving slot 24 and the original QIPC3
+wire protocol. Changing configured version shuts down the old connection before
+moving addresses. Native authentication cleanup restores the previous configuration.
+
+Four authentication tests cover adapter reuse, account changes, primary reconnect,
+reserved destinations, logout, duplicate login, bfcache, hot activation, timer and
+class-registry cleanup. Existing native SDK and IPC protocol tests remain in place.
+QoLAF inbox/scene receiver, visible channel/send UI and application features are
+still pending; this connection alone does not complete QoLAF chat or Radio.

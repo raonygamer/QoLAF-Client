@@ -86,7 +86,21 @@ const browserEnvironment: IpcEnvironment = {
 /** Authentication-owned hidden Service socket; never retains a Game or scene timer. */
 export class ClientIpcService {
   static readonly serviceIndex = 24;
-  static readonly roomId = 'Service-1409_24';
+  private static activeServerVersion = 1409;
+  static get serverVersion(): number {
+    return this.activeServerVersion;
+  }
+  static get roomId(): string {
+    return `Service-${this.activeServerVersion}_${this.serviceIndex}`;
+  }
+  /** A game release moves the service address as well as its handshake version. */
+  static setServerVersion(version: number): void {
+    if (!Number.isSafeInteger(version) || version <= 0)
+      throw new Error('Invalid IPC server version');
+    if (version === this.activeServerVersion) return;
+    this.shutdown();
+    this.activeServerVersion = version;
+  }
   static readonly reservedMessage = 'This service room is reserved for IPC.';
   static readonly discoverySchema = 4;
   private static singleton: ClientIpcService | null = null;
@@ -382,7 +396,7 @@ export class ClientIpcService {
         'service',
         false,
         {},
-        { client_version: 1409 },
+        { client_version: ClientIpcService.serverVersion },
         (next) => {
           if (!this.current() || attempt !== this.generation || !this.joining) {
             this.close(next);

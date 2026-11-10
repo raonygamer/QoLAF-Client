@@ -1,3 +1,4 @@
+import { installNativeIpcAuthentication } from './ipc/NativeIpcAuthentication';
 import { installMusicService } from './music/NativeMusicPlayer';
 import type { MusicPlayerService } from './music/MusicPlayer';
 import { installMapDisposal } from './map/MapDisposal';
@@ -48,6 +49,7 @@ export default {
         }
       }));
     api.on('classesReady', () => {
+      installNativeIpcAuthentication(api);
       music = installMusicService(api);
       installLocalClientCommands(api);
       installBossSpawnTimerHooks(api);
