@@ -1,6 +1,6 @@
 import type { Raw } from '../Api/Types';
 
-/** Original af.AutomationEvent; UPDATE uses milliseconds, RENDER uses seconds. */
+/** Original af.AutomationEvent; UPDATE and RENDER both use milliseconds. */
 export class AutomationEvent {
   static readonly INITIALIZE = 'initialize';
   static readonly START = 'start';

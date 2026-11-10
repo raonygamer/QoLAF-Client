@@ -79,9 +79,9 @@ export class AutomationRuntime {
   update(tickLength: number): void {
     if (this.running) this.dispatch(AutomationEvent.UPDATE, tickLength);
   }
-  render(seconds: number): void {
+  render(milliseconds: number): void {
     if (this.running || this.bus?.renderWhileStopped)
-      this.dispatch(AutomationEvent.RENDER, seconds);
+      this.dispatch(AutomationEvent.RENDER, milliseconds);
   }
   command(name: string, args: readonly string[] = []): boolean {
     if (!this.game() || !name || !this.initialize()) return false;

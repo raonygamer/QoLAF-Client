@@ -45,6 +45,8 @@ export class AutomationModule {
 /** Original installed-module/control ownership semantics with browser I/O boundaries. */
 export class AutomationManager {
   static readonly CHANGED = 'automationManagerChanged';
+  // Enabled with the source Settings page once its browser controls are connected.
+  readonly settingsAvailable = false;
   static readonly MODULE_ALREADY_IMPORTED = 'Module already imported.';
   private readonly installed = new Map<string, AutomationModule>();
   private readonly listeners = new Set<() => void>();
@@ -239,12 +241,12 @@ export class AutomationManager {
       if (wasRunning !== module.running) this.changed();
     }
   }
-  render(seconds: number): void {
+  render(milliseconds: number): void {
     if (this.disposed || !this.game) return;
     for (const module of this.modules) {
       const wasRunning = module.running,
         oldError = module.lastError;
-      module.runtime.render(seconds);
+      module.runtime.render(milliseconds);
       if (wasRunning !== module.running || oldError !== module.lastError) this.changed();
     }
   }

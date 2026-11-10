@@ -1,3 +1,4 @@
+import { installNativeAutomations } from './Automation/NativeAutomations';
 import targetIcon from './Assets/Images/TargetIcon.png';
 import { read, type API } from './Api/Types';
 import { installGameSession } from './Runtime/GameSession';
@@ -20,6 +21,7 @@ export default {
   apiVersion: 1,
   activate(api: API) {
     const history = new ChatHistory();
+    installNativeAutomations(api);
     const deviceSettings = new DeviceSettings(api.storage);
     api.defer(() => deviceSettings.flush());
     let fonts: Promise<void> | undefined;

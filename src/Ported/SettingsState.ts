@@ -110,7 +110,10 @@ export function createSettingsState(resolve: Resolve): any {
       this.addCategory('chat', 'Chat');
       this.addCategory('bindings', 'Key bindings');
       this.addCategory('aim', 'Aim Assist');
-      if (this.g.automationManager != null) {
+      if (
+        this.g.automationManager != null &&
+        this.g.automationManager.settingsAvailable !== false
+      ) {
         this.addCategory('automations', 'Automations');
       }
 

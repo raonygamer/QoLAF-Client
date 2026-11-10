@@ -122,17 +122,17 @@ test('automation lifecycle retains stopped commands/rendering and creates fresh 
   assert.equal(runtime.start(), true);
   assert.equal(runtime.start(), false);
   runtime.update(33);
-  runtime.render(0.016);
+  runtime.render(16);
   assert.equal(runtime.stop(), true);
   runtime.update(33);
-  runtime.render(0.02);
+  runtime.render(20);
   assert.equal(runtime.command('HELLO', ['world']), true);
   assert.deepEqual(
     events.map((event) => event.type),
     ['initialize', 'start', 'update', 'render', 'stop', 'render', 'command'],
   );
   assert.equal(events[2].deltaTime, 33);
-  assert.equal(events[3].deltaTime, 0.016);
+  assert.equal(events[3].deltaTime, 16);
   assert.equal(events.at(-1)!.commandName, 'hello');
   game = null;
   runtime.suspend(); // Cleanup is allowed after detaching the game.
@@ -228,8 +228,8 @@ test('runtime errors stop running scripts and suppress repeated stopped-render f
   assert.equal(stops, 1);
   assert.equal(releases, 1);
   assert.equal(runtime.lastError, 'tick failed');
-  runtime.render(0.016);
-  runtime.render(0.016);
+  runtime.render(16);
+  runtime.render(16);
   assert.equal(renderCalls, 1);
   assert.deepEqual(errors, ['update', 'render']);
   runtime.suspend();

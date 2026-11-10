@@ -343,7 +343,7 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   Cleanup remains possible after the game detaches, and cleanup errors cannot
   prevent room control release. Native game objects are passed through unchanged.
 - TypeScript/build and all 103 tests pass, including lifecycle ordering and
-  milliseconds-vs-seconds delta semantics, callback mutation, namespace ownership,
+  delta dispatch, callback mutation, namespace ownership,
   room handoff/restart and constructor/event cleanup paths.
 - These classes are not yet wired into the active game or Settings category.
   Browser import/persistence, full command registry integration, manager-level
@@ -399,3 +399,25 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
 - Native chat routing, built-in command inventory registration, live automation
   import/execution, game tick/render wiring and SettingsAutomations remain pending.
   No command was sent through a live account during these tests.
+
+### Native automation integration and live execution
+
+- Attached the shared manager to native game sessions, with per-session tick,
+  render, chat and cleanup integration. Existing native chat commands are reserved
+  using the current handler cases plus a fallback inventory; unmatched commands
+  and ordinary messages continue through the original handler unchanged.
+- Corrected the earlier render-unit interpretation: original Game.as passes
+  passedTime * 1000. UPDATE and RENDER both deliver milliseconds. The earlier
+  runtime test's seconds expectation was wrong and has been corrected.
+- Exposed original af automation API names through QoLAF.cls. Stored modules
+  restore only after a game exists and do not auto-start. Inactivity ownership
+  refreshes native player activity only while explicitly claimed.
+- TypeScript checking, bundle build and all 117 tests pass. A real browser Blob
+  module imported, initialized and started, received 55 updates (33 ms each) and
+  319 renders (last delta 6 ms) during a 1.8-second observation, then removed
+  successfully. Screenshot: /tmp/QoLAF-AutomationProbe.png. Temporary module,
+  probe script and HTML injection were removed afterward. No chat was sent.
+- SettingsAutomations UI, browser file picker and command help/completion remain
+  pending. The category stays hidden until its actual page is available.
+- Current Haxe gameplay stays authoritative, including shields and corrected
+  corrosive calculations. Automation wiring does not replace game simulation.
