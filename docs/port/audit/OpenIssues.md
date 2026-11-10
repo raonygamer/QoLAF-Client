@@ -1853,3 +1853,14 @@ Apply/restore, context/lifecycle transitions, actual phase-blade rendering,
 visual IPC sharing, other /sv features and the Radio screen. Cosmetic model,
 spatial transforms, palette boundaries, draft validation and disabled slider
 transitions have regression coverage.
+
+### VISUAL-01 phase-blade rendering follow-up
+
+The live weapon rendering adapter and emitter tint path are now implemented.
+Extracted native beam-code regressions cover geometry, palettes, pooling, cleanup
+and other-weapon passthrough. A temporary visual-only native beam rendered with
+source bloom/blending and exact final-segment length in the browser, then was
+removed cleanly. This does not prove equipped-weapon combat parity. Still verify
+supported-hull Apply and persistence, actual twin-blade/target/emitter appearance,
+context restoration and room transitions. Port the original render-interpolated
+beam endpoints and visual IPC; Radio and the broader /sv family remain open.

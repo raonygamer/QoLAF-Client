@@ -8,6 +8,7 @@ import { ClientDevVisual } from './ClientDevVisual';
 import { createClientDevVisualStyles } from './ClientDevVisualStyle';
 import { createClientDevVisualPopup } from './ClientDevVisualPopup';
 
+import { installNativePhaseBlade, type HullPalette } from './NativePhaseBlade';
 import { isClientDeveloper } from './ClientVisualAuthority';
 
 /** Draft-only native editor. Hull application never modifies course, hitboxes or weapons. */
@@ -20,6 +21,7 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
   let popup: any = null;
   let mode = 'default';
   let settings = ClientDevVisual.defaults();
+  let palette: HullPalette | null = null;
   let lastApplied = -Infinity;
   let clip: any = null;
   let ownedStyle: any = null;
@@ -40,6 +42,28 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
   } catch {
     /* A storage failure must not block entering the game. */
   }
+
+  const refreshPalette = () => {
+    palette =
+      mode === 'default'
+        ? null
+        : {
+            mode: ClientDevVisual.MODES.indexOf(mode),
+            settings,
+          };
+  };
+  refreshPalette();
+  installNativePhaseBlade(api, game, resolve, (ship) => {
+    if (
+      !ship ||
+      ship !== game.me?.ship ||
+      !isClientDeveloper(game.me?.id) ||
+      !ship._mc ||
+      !ClientDevVisual.supportsTexture(ship.imgObj?.textureName)
+    )
+      return null;
+    return palette;
+  });
 
   const clear = () => {
     if (clip) {
@@ -104,6 +128,7 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
     }
     mode = normalized;
     settings = validated;
+    refreshPalette();
     clear();
     update();
     lastApplied = performance.now();

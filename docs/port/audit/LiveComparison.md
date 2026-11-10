@@ -1545,3 +1545,40 @@ verification, the actual phase-blade weapon rendering path, visual IPC sharing,
 and the broader /sv command family. The popup explicitly says sharing is still
 being ported rather than claiming that local Apply broadcasts. Radio remains
 unimplemented. The shader and beam preview do not prove live weapon parity.
+
+## Phase-blade rendering adapter — 2026-11-10
+
+Connected the ported hull palette to native Beam/BeamLine/Line rendering. The
+adapter retains native weapon updates, endpoints, targeting and damage. It sets
+source blade batch blending/bloom, applies thickness before segment overlap,
+stops the last segment at the tip, and maps segment vertices into the same
+normalized hull coordinates as the preview. Styles and tint on pooled Line
+instances are restored immediately after MeshBatch copies their vertices.
+
+Emitter start/twin-start/end tints now use the source color-at-position and
+original-brightness fade. Added the source grayscale tint shader. Tinted effects
+use a separate native collective batch: upstream's ordinary shared effects batch
+cannot safely mix custom styles. Ownership cleanup restores particle styles and
+batch membership, handles the manager's remove-before-dispose order, clears empty
+batches and removes the owned collective batch on session teardown.
+
+Five regressions exercise extracted official server-1410 beam geometry/draw code
+with display/GPU boundary doubles. They cover tip/inner overlap, continuous hull
+coordinates, pooled restoration, other-weapon passthrough, injected draw failures,
+existing filter ownership, new emitted particles, brightness and isolated-batch
+cleanup. The complete suite passed 429 tests; after adding the empty-original-
+batch ghost guard, typecheck and all five affected tests passed again.
+
+Live probe: constructed a temporary native Beam and BeamLine, called draw only,
+and attached its batch to the overlay. No shoot/fire/game-message action occurred.
+It rendered six blue segments with the ported bloom, normal blend mode, and a
+50-unit final segment (`/tmp/QoLAF-PhaseBladeProbe.png`). Runtime errors stayed at
+zero. Destroying the probe released the filter; its lines were returned to the
+pool and the diagnostic display objects detached/disposed. The later emitter
+batch-isolation change was tested, not exercised with a live equipped blade.
+
+Full live parity remains open: equipped phase blade on a supported developer hull,
+animated movement/twins/targets, actual emitter appearance, graphics-context
+restoration and comparison against the SWF in combat. Native beam endpoints still
+use the newer game's existing geometry path; the original full render-interpolated
+beam geometry is a separate remaining port requirement. Visual IPC is also pending.
