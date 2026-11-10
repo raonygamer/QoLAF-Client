@@ -2051,3 +2051,28 @@ render states, timestamp-aligned server bullet drawing and the other previously
 listed omissions remain open. Neither the missing sun nor whole-client parity is
 marked resolved. The required scope remains every original client change across
 all files, including non-rendering code and screens.
+
+### Instant ray presentation — 2026-11-10
+
+`InstantFrames` ports the original Instant/InstantSplitting frame fade, thickness,
+fixed fired-world origin, displayed rotation, renderTimeToLive rule, and line
+release on exit/reset. Native live execute still owns simulation TTL and course
+time. Dead execution retains its native clock advance but releases lines once;
+the native splitting path previously detached lines without returning them to
+the pool. Game.exit also releases tracked lines before native room teardown.
+
+Four integration regressions run extracted Service1412 state methods through the
+host hook dispatcher and test 60/120/180 Hz fade, non-drifting origins, unchanged
+simulation positions/lifetimes, state exit, death and projectile reuse. Full suite
+483 passes before the room-exit cleanup addition. Original orbit lightning,
+instant-ray color/grayscale integration and room-owned Nether Blob tentacle
+visuals remain unported; this does not close full projectile presentation parity.
+
+Live preview server was reachable and reported a connected canvas with zero
+runtime errors. That status predates reloading this change and does not verify it.
+Desktop comparison was interrupted by active user focus changes; no reload or
+combat input was issued. Latest changes are built locally for the next comparison.
+
+Room-exit cleanup now has two additional native-hook regressions (one per state).
+Final full suite: 485 passing. Typecheck passes. Live visual comparison remains
+outstanding for these changes.

@@ -1,6 +1,7 @@
 import { read, type API, type Raw } from '../api/Types';
 import { drawProjectileRibbon } from './RibbonFrames';
 import { drawProjectileAttachment } from './ProjectileAttachments';
+import { installInstantFrames } from './InstantFrames';
 
 /** Source Projectile.draw: predict presentation between fixed 33 ms updates. */
 export function drawProjectileFrame(
@@ -38,6 +39,7 @@ export function installProjectileFrames(api: API): void {
   const projectile = api.cls('core.projectile.Projectile')?.prototype;
   const game = api.cls('core.scene.Game')?.prototype;
   if (!projectile || !game) return;
+  const drawInstant = installInstantFrames(api);
   const rotations = new WeakMap<Raw, number>();
   const attachments = new WeakMap<Raw, { state: Raw; missile: boolean }>();
   for (const name of ['ProjectileStuck', 'MissileStuck']) {
@@ -63,11 +65,10 @@ export function installProjectileFrames(api: API): void {
   });
   api.after(projectile, 'draw', function () {
     const attached = attachments.get(this);
-    drawProjectileFrame(
-      this,
-      rotations.get(this) ?? 0,
-      attached ? () => drawProjectileAttachment(attached.state, attached.missile) : undefined,
-    );
+    drawProjectileFrame(this, rotations.get(this) ?? 0, () => {
+      if (attached) drawProjectileAttachment(attached.state, attached.missile);
+      drawInstant(this);
+    });
   });
   // Haxe Game.draw already visits each visible projectile after the fixed ticks.
   // Its manager copied vertices only during update, leaving that draw invisible.
