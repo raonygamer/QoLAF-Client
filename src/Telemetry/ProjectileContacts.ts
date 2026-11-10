@@ -28,7 +28,7 @@ export function installProjectileContacts(api: API, game: Raw, observer: DamageO
     if (scan?.projectile !== projectile || !scan.candidate) return;
     const target = scan.candidate;
     scan.candidate = null;
-    observer.hit(projectile.weapon, target);
+    observer.contact(projectile.weapon, target);
   };
   // destroy() can call explode(): consume the candidate before either callback.
   for (const name of ['destroy', 'explode'])
@@ -51,7 +51,7 @@ export function installProjectileContacts(api: API, game: Raw, observer: DamageO
     if (name === 'ProjectileBullet' && typeof stuck?.enter !== 'function') continue;
     for (const family of families) observer.contactFamilies.add(family);
     api.around(state, 'execute', function (next, ...args) {
-      if (this.m !== game || !observer.canEstimate(this.p?.weapon)) return next(...args);
+      if (this.m !== game || !observer.isPersonalWeapon(this.p?.weapon)) return next(...args);
       if (this.isEnemy) {
         // This native branch does not call canBeDamage, so candidate attribution is absent.
         observer.partial(this.p.weapon);

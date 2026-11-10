@@ -40,7 +40,7 @@ export function installGameSession(
   const debuffs = installDebuffTracker(session, game);
   const panel = new TargetInfo(ui, game, target, config, save, debuffs);
   session.defer(() => panel.dispose());
-  const damage = installDamageObserver(session, game, config);
+  const damage = installDamageObserver(session, game, config, (unit) => target.auto(unit));
   const telemetry = new RadarTelemetry(ui, game, config, damage);
   session.defer(() => telemetry.dispose());
 

@@ -134,7 +134,15 @@ function setup(family = 'bullet', hits = 1, bomb = false, positions = [5]) {
       });
     },
   };
-  const observer = new DamageObserver(game, { ...defaults }, 6, () => 1000);
+  const config = { ...defaults };
+  const contacts: any[] = [];
+  const observer = new DamageObserver(
+    game,
+    config,
+    6,
+    () => 1000,
+    (target) => contacts.push(target),
+  );
   const snapshot = () => ({
     pos: { ...projectile.course.pos },
     alive: projectile.alive,
@@ -146,6 +154,8 @@ function setup(family = 'bullet', hits = 1, bomb = false, positions = [5]) {
     nextGlobalUpdate: state.nextGlobalUpdate,
   });
   return {
+    config,
+    contacts,
     state,
     projectile,
     targets,
@@ -237,4 +247,18 @@ test('disposing contact hooks restores native methods and stops recording subseq
   observed.state.execute();
   assert.equal(observed.projectile.removals, 1);
   assert.equal(observed.observer.estimate.perSecond(1000), 0);
+});
+
+test('native bullet hits offer auto-targets with the DPS display disabled', () => {
+  const observed = setup();
+  observed.config.show_radar_dps = false;
+  observed.install();
+  observed.state.execute();
+  assert.deepEqual(observed.contacts, [observed.targets[0]]);
+  assert.deepEqual(observed.observer.lastContact(observed.projectile.weapon), {
+    unit: observed.targets[0],
+    time: 1000,
+  });
+  assert.equal(observed.observer.estimate.perSecond(1000), 0);
+  observed.cleanup();
 });

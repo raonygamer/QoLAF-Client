@@ -283,3 +283,24 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   be compared against the original SWF; these native-method tests establish
   collision behavior preservation, not server damage accuracy or visual parity.
   Splash, splitting, blastwave and other unobservable effects remain partial.
+
+### Hit-based automatic targeting
+
+- Restored the local-personal-contact path from Weapon.registerSimulatedHit into
+  the port's TargetSystem.auto. Native beam, bullet/bouncing, sticking missile
+  and nearest mine-blast contacts now offer targets even with showRadarDPS off.
+  Owner/pet checks exclude foreign weapons and healing; source target locks,
+  cooldown, priority, range, AF exclusion and autoTarget preference still decide
+  whether a candidate is selected.
+- Kept recordEstimatedHit separate: inferred instant-ray/homing geometry does
+  not select a target or update last-contact history. Native sticking after an
+  already estimated homing hit offers the target without duplicating damage.
+- Added per-weapon last-contact unit/time observations in a WeakMap and clear them
+  on native Weapon.reset, matching pooled source weapon reset. No fields are
+  written onto native weapon/projectile objects. Incoming NPC hit history used
+  by other original client features is not included in this change.
+- All 97 tests, TypeScript and bundle build pass. Tests include actual native
+  bullet execution with DPS disabled, beam heat checks with DPS toggled, target
+  locks/cooldown/settings, pets/healing/foreign ownership, display-only geometry,
+  sticking after an estimate, duplicate mine explosions and weapon history reset.
+  Live combat auto-selection and original-SWF comparison remain pending.

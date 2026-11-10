@@ -15,6 +15,7 @@ type ProjectileState = {
 export class DamageObserver {
   readonly estimate = new RollingDamageEstimate();
   readonly contactFamilies = new Set<string>();
+  private readonly lastContacts = new WeakMap<Raw, { unit: Raw; time: number }>();
   private readonly unitGenerations = new WeakMap<Raw, number>();
   private readonly projectiles = new WeakMap<Raw, ProjectileState>();
   constructor(
@@ -22,23 +23,42 @@ export class DamageObserver {
     private readonly config: Settings,
     private readonly healType: number,
     readonly now: () => number = () => performance.now(),
+    private readonly onContact?: (target: Raw) => void,
   ) {}
 
-  canEstimate(weapon: Raw): boolean {
+  isPersonalWeapon(weapon: Raw): boolean {
     const ship = read(this.game, 'me')?.ship;
-    if (
-      !weapon ||
-      !ship ||
-      !weapon.unit ||
-      this.game.isLeaving ||
-      !this.config.show_radar_dps ||
-      (weapon.unit !== ship && weapon.unit.owner !== ship) ||
-      !weapon.dmg ||
-      weapon.dmg.type === this.healType
-    )
-      return false;
+    return !!(
+      weapon &&
+      ship &&
+      weapon.unit &&
+      !this.game.isLeaving &&
+      (weapon.unit === ship || weapon.unit.owner === ship) &&
+      weapon.dmg &&
+      weapon.dmg.type !== this.healType
+    );
+  }
+
+  canEstimate(weapon: Raw): boolean {
+    if (!this.config.show_radar_dps || !this.isPersonalWeapon(weapon)) return false;
     const amount = weapon.dmg.dmg();
     return Number.isFinite(amount) && amount > 0;
+  }
+
+  /** Original registerSimulatedHit: only actual local contacts may offer a target. */
+  contact(weapon: Raw, target: Raw | null, includeEstimate = true, count = 1): void {
+    if (!target || !this.isPersonalWeapon(weapon)) return;
+    this.lastContacts.set(weapon, { unit: target, time: this.now() });
+    if (includeEstimate) this.hit(weapon, target, count);
+    this.onContact?.(target);
+  }
+
+  resetWeapon(weapon: Raw): void {
+    this.lastContacts.delete(weapon);
+  }
+
+  lastContact(weapon: Raw): Readonly<{ unit: Raw; time: number }> | undefined {
+    return this.lastContacts.get(weapon);
   }
 
   hit(weapon: Raw, target: Raw | null, count = 1): void {
@@ -69,9 +89,16 @@ export class DamageObserver {
   }
 
   stuck(projectile: Raw, target: Raw): void {
-    if (!this.canObserve(projectile) || this.state(projectile).hit) return;
-    this.state(projectile).hit = true;
-    this.hit(projectile.weapon, target);
+    if (
+      projectile.g !== this.game ||
+      projectile.isHeal ||
+      !this.isPersonalWeapon(projectile.weapon)
+    )
+      return;
+    const state = this.state(projectile);
+    const includeEstimate = !state.hit;
+    state.hit = true;
+    this.contact(projectile.weapon, target, includeEstimate);
   }
 
   reset(projectile: Raw): void {
@@ -212,7 +239,13 @@ export class DamageObserver {
   }
 
   explode(projectile: Raw): void {
-    if (!this.canObserve(projectile) || projectile.ai !== 'mine') return;
+    if (
+      projectile.g !== this.game ||
+      projectile.isHeal ||
+      projectile.ai !== 'mine' ||
+      !this.isPersonalWeapon(projectile.weapon)
+    )
+      return;
     const state = this.state(projectile);
     if (state.hit) return;
     state.hit = true;
@@ -231,12 +264,28 @@ export class DamageObserver {
         nearest = distance;
       }
     }
-    if (closest) this.hit(projectile.weapon, closest);
+    if (closest) this.contact(projectile.weapon, closest);
   }
 }
 
-export function installDamageObserver(api: API, game: Raw, config: Settings): DamageObserver {
-  const observer = new DamageObserver(game, config, api.cls('core.weapon.Damage')?.HEAL ?? 6);
+export function installDamageObserver(
+  api: API,
+  game: Raw,
+  config: Settings,
+  onContact?: (target: Raw) => void,
+): DamageObserver {
+  const observer = new DamageObserver(
+    game,
+    config,
+    api.cls('core.weapon.Damage')?.HEAL ?? 6,
+    undefined,
+    onContact,
+  );
+  const weapon = api.cls('core.weapon.Weapon')?.prototype;
+  if (typeof weapon?.reset === 'function')
+    api.before(weapon, 'reset', function () {
+      observer.resetWeapon(this);
+    });
   const unit = api.cls('core.unit.Unit')?.prototype;
   if (typeof unit?.reset === 'function')
     api.before(unit, 'reset', function () {
@@ -282,7 +331,7 @@ export function installDamageObserver(api: API, game: Raw, config: Settings): Da
   const beam = api.cls('core.weapon.Beam')?.prototype;
   if (typeof beam?.shoot === 'function')
     api.around(beam, 'shoot', function (next, ...args) {
-      if (this.g !== game || !observer.canEstimate(this)) return next(...args);
+      if (this.g !== game || !observer.isPersonalWeapon(this)) return next(...args);
       const previous = beamContext;
       const context = { heat: this.unit.weaponHeat, count: 0 };
       beamContext = context;
@@ -308,7 +357,7 @@ export function installDamageObserver(api: API, game: Raw, config: Settings): Da
           );
         }
         if (count > 0) {
-          observer.hit(this, this.target, count);
+          observer.contact(this, this.target, true, count);
           if (this.secondaryTargets?.length) observer.partial(this);
         }
         return result;

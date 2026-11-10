@@ -172,12 +172,21 @@ test('beam adapter counts actual successful heat checks without consuming extra 
       });
     },
   };
-  const observer = installDamageObserver(api, f.game, f.config);
+  const contacts: unknown[] = [];
+  const observer = installDamageObserver(api, f.game, f.config, (target) => contacts.push(target));
   const beam = new Beam();
   assert.equal(beam.shoot(), 'overheated');
   assert.equal(beam.unit.weaponHeat.calls, 4);
   assert.equal(observer.estimate.perSecond(observer.now()), 300);
   assert.equal(observer.estimate.isPartial(observer.now()), true);
+  assert.deepEqual(contacts, [f.target]);
+  contacts.length = 0;
+  f.config.show_radar_dps = false;
+  beam.unit.weaponHeat.calls = 0;
+  assert.equal(beam.shoot(), 'overheated');
+  assert.equal(beam.unit.weaponHeat.calls, 4);
+  assert.deepEqual(contacts, [f.target]);
+  assert.equal(observer.estimate.perSecond(observer.now()), 300);
   cleanups.reverse().forEach((cleanup) => cleanup());
 });
 
