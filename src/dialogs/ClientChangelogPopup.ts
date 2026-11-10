@@ -28,7 +28,7 @@ export function createClientChangelogPopup(resolve: Resolve): any {
     constructor() {
       super('Close');
       this.closeButton.removeFromParent(true);
-      this.closeButton = new Button(this.close, 'Close');
+      this.closeButton = new Button(() => this.close(), 'Close');
       this.box.addChild(this.closeButton);
       this.textField.x = 4;
       this.textField.y = 2;

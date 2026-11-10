@@ -1786,3 +1786,16 @@ Its source reference text remains explicitly marked as describing the original
 client. Convert the automation examples to the actual JavaScript module API and
 review feature availability as each remaining port feature lands. Welcome,
 inspection, music/radio and visual-editor dialogs remain outstanding.
+
+
+### Inspection follow-up — 2026-11-10
+
+The seven-tab native inspector is now implemented and live-tested, including
+ship/artifact details, paging, cargo, stats, Close and reopening by @name.
+See LiveComparison.md for failures found and corrected during the runtime pass.
+Still verify remote-account read failures, online-friend lookup, artifact Share
+draft insertion and scroll-versus-click cancellation. Automatic QoLAF sharing
+remains dependent on the unfinished IPC/chat port. Welcome/credits, music/radio
+and visual-editor screens remain outstanding. The Help popup also needs its
+short-viewport layout bounded; its fixed 500px content currently exceeds a
+415px stage with a large browser console open.

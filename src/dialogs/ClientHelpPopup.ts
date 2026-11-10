@@ -26,7 +26,7 @@ export function createClientHelpPopup(resolve: Resolve): any {
       super('Close');
       this.textField.visible = false;
       this.closeButton.removeFromParent(true);
-      this.closeButton = new Button(this.close, 'Close');
+      this.closeButton = new Button(() => this.close(), 'Close');
       this.box.addChild(this.closeButton);
       this.content = new Scroll();
       this.content.x = 0;

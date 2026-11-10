@@ -3,6 +3,7 @@ import type { ChatCommandRegistry } from './ChatCommandRegistry';
 
 // Original descriptions for commands actually implemented by this runtime.
 const definitions: readonly (readonly [string, string, string])[] = [
+  ['inspect', ' <@PlayerName|player_id>', 'Open read-only player inspection'],
   ['echo', '', 'Show the client version'],
   ['chelp clienthelp', '', 'Open the tabbed client guide'],
   ['changelog', '', 'Open the original client release history'],

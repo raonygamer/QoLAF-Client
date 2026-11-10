@@ -1352,3 +1352,62 @@ The fresh 1410 preview connected successfully. Opened the guide through the
 `/chelp` dispatch path after reload: all labels were complete without a live
 patch, and the heading correctly showed server 1410. Evidence:
 `/tmp/QoLAF-Help1410.png`. The new official gameplay bundle remained intact.
+
+
+## Player inspection and popup Close buttons — 2026-11-10
+
+Ported the source PlayerInspectPopup, PlayerInspectCard, projection and detached
+view model into `src/inspect`, connected through `/inspect` and the room-owned
+chat input. The seven original tabs are Fleet, Weapons, Stats, Artifact sets,
+Artifacts, Resources and Overview. The source card geometry, bitmap fonts,
+colors, ship previews, paging, selection/back controls and artifact detail
+markup use native Haxe display objects. No simulated gameplay ship is created.
+
+Compared the running original inspector (TheException, Service-1409) against
+the browser port (TheNull, Service-1410). Different accounts have different
+inventories; layout comparisons account for the different viewport dimensions.
+Original fleet and artifact-set references: `/tmp/QoLAF-OriginalInspect.png`
+and `/tmp/QoLAF-OriginalSets.png`.
+
+The first live pass caught problems that the earlier model-only checks missed:
+wrong lazy dependency namespace; PlayerManager getter access; null room fleet
+slots; the removed Feathers `invalidate` method; getter-only health maxima and
+weapon heat; absent custom artifact fitness property; missing numeric upgrade
+defaults; the plain Share-button skin; and AS3 rest arguments crossing the Haxe
+RPC array boundary. Corrected each and retested. Cargo now returns actual server
+cards. Fleet/weapon snapshots and current shield values remain native gameplay
+values, with no old corrosion-as-all-damage behavior introduced.
+
+Switching pages also exposed stale Starling render-cache ranges: unchanged
+header/footer controls disappeared while new cards rendered. Invalidating the
+popup's display-tree cache when replacing page content fixes this without a
+per-frame workaround. Verified Stats after Fleet, artifact pagination to page 2,
+ship and artifact drilldowns, tab transitions, Close, and reopening by @name.
+
+Evidence: `/tmp/QoLAF-InspectFull2.png`, `/tmp/QoLAF-InspectWeapons.png`,
+`/tmp/QoLAF-InspectShip.png`, `/tmp/QoLAF-InspectFinalStats.png`,
+`/tmp/QoLAF-InspectSetsFixed.png`, `/tmp/QoLAF-InspectResourcesFixed.png`,
+`/tmp/QoLAF-InspectPageTwo.png`, `/tmp/QoLAF-InspectClosed.png`,
+`/tmp/QoLAF-InspectReopened.png`. Earlier files containing NaN, missing headers
+or white Share buttons are failure evidence, not final acceptance images.
+
+Fixed Help and Changelog Close callbacks binding to the native Button instead
+of the popup. Added a regression for that recursion and clicked Help's Close in
+the game: `/tmp/QoLAF-HelpCloseFull.png`, `/tmp/QoLAF-HelpCloseVerified.png`.
+Changelog uses the same corrected callback binding; its Close was not separately
+clicked in this pass. Help still exceeds the very short viewport with the large
+browser console open; narrow/short guide layout remains an open issue.
+
+Validation: type checking and the full 405-test suite passed, followed by eight
+focused passing tests after extracting the native cargo bridge and adding its
+argument-array regression (406 total test cases now). The native queue handles
+ordinary cargo and inspector reads together, with stale-room and duplicate
+response checks. No live chat messages, equipment changes or purchases were
+performed. The preview remained connected; Firefox logged file-URL source-map
+security warnings independently of the repaired inspector exceptions.
+
+Limits: Share inserts drafts only in supported channels; the original automatic
+QoLAF destination awaits IPC/chat integration. This pass did not test sending a
+share, remote-account authorization outcomes, friend-refresh lookup or every
+artifact record. Full-port parity is not complete. Changes are on the port
+branch/local preview, not a claim of deployment to the Pages main branch.

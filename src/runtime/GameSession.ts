@@ -1,3 +1,4 @@
+import { installNativePlayerInspect } from '../inspect/NativePlayerInspect';
 import { installNativeClientHelp } from '../dialogs/NativeClientHelp';
 import { installNativeClientChangelog } from '../dialogs/NativeClientChangelog';
 import pingSoundUrl from '../assets/sounds/Ping.mp3';
@@ -109,6 +110,7 @@ export function installGameSession(
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences, artifacts);
   installNativeChatArtifactPolicy(session, game);
+  installNativePlayerInspect(session, game, editor, artifacts);
   installNativeChatHistory(session, game);
   installNativeSimpleChat(
     session,
