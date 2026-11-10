@@ -117,7 +117,10 @@ test('native pings run after length/filter checks, preserve supporter/sender/rol
     around: (object: any, key: string, fn: Function) =>
       cleanup.push(hooks.add(object, key, 'around', fn)),
   };
-  installNativeFriendPings(api, game);
+  let notifications = 0;
+  installNativeFriendPings(api, game, () => {
+    notifications++;
+  });
   log.writeChatMsg('local', '@Pilot profanity', 'sender', '@Pilot', 'mod', true);
   const row = received[0];
   assert.match(
@@ -125,8 +128,27 @@ test('native pings run after length/filter checks, preserve supporter/sender/rol
     /\[mod\] <font color='#ffff66'>&#9733;<\/font>@Pilot: <font color='#66aaff'>@Pilot<\/font> \*{9}$/,
   );
   assert.equal(row.pings.at(-1).playerId, 'self');
+  assert.equal(notifications, 1);
+  log.writeChatMsg('local', '@Pilot', 'self', 'Another Name');
+  log.writeChatMsg('local', '@Pilot', 'sender', 'PILOT');
+  log.writeChatMsg('local', '@Pilot', null, null);
+  log.writeChatMsg('local', '@PilotSuffix', 'sender', 'Other');
+  assert.equal(
+    notifications,
+    1,
+    'own identity, own name, system messages and partial matches are silent',
+  );
+  log.writeChatMsg('local', '@Pilot', 'sender', 'Other');
+  assert.equal(notifications, 2);
+  const acceptedCount = received.length;
+
   log.writeChatMsg('local', '@Pilot '.repeat(40), 'sender', 'Sender');
-  assert.equal(received.length, 1, 'native length rejection happens before markup expansion');
+  assert.equal(
+    received.length,
+    acceptedCount,
+    'native length rejection happens before markup expansion',
+  );
+  assert.equal(notifications, 2);
   game.messageLog.updateTexts({ text: '@Pilot system message' });
   assert.equal(received.at(-1).pings, undefined, 'receive context cannot leak to system messages');
   cleanup.reverse().forEach((fn) => fn());

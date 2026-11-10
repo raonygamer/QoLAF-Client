@@ -1,3 +1,5 @@
+import pingSoundUrl from '../assets/sounds/Ping.mp3';
+import { ChatPingSound } from '../chat/ChatPingSound';
 import { installNativeChatPingPreview } from '../chat/NativeChatPingPreview';
 import { installNativeFriendPings } from '../chat/NativeFriendPings';
 import { installNativeAimAssist } from '../aim/NativeAimAssist';
@@ -94,7 +96,9 @@ export function installGameSession(
   if (messages)
     installNativeChatArtifactPreview(session, game, bitmap.resolve, messages, artifacts);
   if (messages) installNativeChatPingPreview(session, game, bitmap.resolve, messages);
-  installNativeFriendPings(session, game);
+  const pingSound = new ChatPingSound(session, pingSoundUrl);
+  session.defer(() => pingSound.dispose());
+  installNativeFriendPings(session, game, () => pingSound.play());
   installNativeChatContext(session, game, bitmap.resolve);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve, preferences);
   installNativeChatHistory(session, game);

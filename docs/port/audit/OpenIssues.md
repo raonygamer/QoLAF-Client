@@ -1051,3 +1051,34 @@ layout (/tmp/QoLAF-FriendHover.png). Moving off closes the card. The probe remov
 its queue entry synchronously and its temporary display row after 60 seconds;
 no transport send is invoked. This verifies one live card, not all ship paints or
 an exact SWF screenshot comparison. Self-ping audio and other chat gaps remain.
+
+## Self-ping notification audio (2026-11-10)
+
+Ported the source receive-side self-ping notification. The filtered body must
+contain a complete ping of the current player; messages from their own persistent
+ID, live ID, case-insensitive name, or a missing sender name stay silent. Playback
+runs only after native receive processing accepts/delivers the message. Optional
+audio errors cannot interrupt chat delivery.
+
+Bundled the exact original assets/sounds/ping.mp3 (SHA-256
+ e8fa9a746fbee2c6026e02b9add525935bc12e4e95aed188e21f5ec1c2fbf03c)
+as src/assets/sounds/Ping.mp3. Esbuild embeds it into the single JS module.
+ChatPingSound uses native OpenFL Sound/SoundTransform and the existing SoundMixer,
+with the source's 1× effect-volume multiplier. Lazy loading retains overlapping
+notifications, rechecks mute on completion, retries after loading failures, and
+releases loading listeners/channels/buffer on session disposal.
+
+Verification: typecheck, 309 passing tests, source/ported asset hashes identical,
+and single-module build guard passed. New checks cover current effect volume,
+muting before/during loading, finished-channel cleanup, disposal during loading,
+load-failure retry, own-message/system-message suppression, and native length
+rejection before any ping. Existing friend hover/source layout work remains;
+this does not close unrelated chat, rendering or overall parity gaps.
+
+Live verification: reload/autologin succeeded. A local receive-only self-mention
+probe (no transport send) loaded the embedded MP3 and invoked native Sound.play
+once with duration=1320ms, volume=0.1 (the current effect setting), and a non-null
+SoundChannel. /tmp/QoLAF-PingAudio.png captures those values. The temporary message
+was removed synchronously in finally. A 10-second temporary play observer restores
+the original method automatically; this verifies native loading/channel creation,
+not a claim that the physical speaker output was heard.
