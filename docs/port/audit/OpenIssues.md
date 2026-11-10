@@ -2270,3 +2270,17 @@ check exact output, localization, native stat flags, upgrade timing, cargo/activ
 differences and changed setup scores. All 513 tests, TypeScript and formatting
 checks pass. Live hover comparison remains pending. Expanded overview layout and
 favorite protection are still separate unported requirements.
+
+### Artifact favorites foundation, not yet activated — 2026-11-10
+
+Ported account-scoped local favorite storage and source recycle guards. Guards
+cover tile selection, Select Max (including its 40-item cap), final selection
+pruning, protected tooltip text, and frozen selection while the recycle response
+is pending. Clearing a recycle highlight preserves upgrade highlights. Tests use
+only simulated requests; no live artifact was recycled or modified.
+
+Full suite: 515 passes; targeted favorite tests rerun after tightening malformed
+storage handling. TypeScript and formatting pass. These modules are intentionally
+not installed in Index yet: the source context menu and inset gold markers still
+need integration before this can be considered a player-usable feature. No star
+icon is in the original marker; it is a four-sided inset outline.
