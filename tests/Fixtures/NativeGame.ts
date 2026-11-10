@@ -212,6 +212,9 @@ for (const key of ['font', 'size', 'color', 'horizontalAlign', 'verticalAlign'])
 export class Text extends Display {
   static __super__: any = Display;
   static fonts = new Map();
+  static unregisterBitmapFont(name: string, _dispose = true) {
+    this.fonts.delete(name);
+  }
   static getBitmapFont(name: string) {
     return this.fonts.get(name);
   }
@@ -396,7 +399,7 @@ export class EnemyShip extends Ship {
   static RARE_TYPE_UNIQUE = 5;
 }
 export class Game extends Display {
-  camera = { _switch: false, update() {} };
+  camera = { _switch: false, update() {}, shake() {} };
   parallaxManager = { update() {} };
   stage = new Stage();
   overlay = new Display();

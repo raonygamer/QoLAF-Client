@@ -203,13 +203,16 @@ export function installInterpolation(api: API): void {
   // The camera used to run inside tickUpdate. Move it to the render-frame path.
   api.onGame((instance, session) => {
     const camera = instance.camera;
-    let frameMilliseconds = 0;
     session.around(camera, 'update', function () {});
-    session.before(instance, 'update', function (event) {
-      frameMilliseconds = read(event, 'passedTime', 0) * 1000;
+    // Game.update is already bound as an enterFrame listener before onGame.
+    // Read the frame delta at its direct parallax call instead of replacing
+    // the instance method behind that cached listener. Haxe passes seconds.
+    session.before(instance.parallaxManager, 'update', function (seconds: number) {
+      updateCamera(camera, seconds * 1000);
     });
-    session.before(instance.parallaxManager, 'update', function () {
-      updateCamera(camera, frameMilliseconds);
-    });
+    // The original client's shake() is deliberately empty.
+    session.around(camera, 'shake', function () {});
+    camera.isShaking = false;
+    camera._shakeTimer = 0;
   });
 }

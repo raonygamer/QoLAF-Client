@@ -84,3 +84,64 @@ test('camera easing has the same result at 30 Hz and 180 Hz', () => {
   assert.ok(Math.abs(slow._focusTracker.x - fast._focusTracker.x) < 1e-10);
   assert.ok(Math.abs(slow._focusTracker.y - fast._focusTracker.y) < 1e-10);
 });
+
+test('camera follows the cached game listener using the render delta and disables original shake', async () => {
+  // @ts-expect-error actual host JavaScript fixture
+  const { Hooks } = await import('./Fixtures/HostCore.js');
+  const { installInterpolation } = await import('../src/Rendering/Interpolation');
+  const errors: unknown[] = [];
+  const hooks = new Hooks((error: unknown) => errors.push(error));
+  const cleanups: (() => void)[] = [];
+  const tracked = Object.assign(camera(), {
+    _shakeTimer: 200,
+    isShaking: true,
+    update() {
+      throw Error('simulation must not update the camera');
+    },
+    shake() {
+      this.isShaking = true;
+    },
+  });
+  const instance = {
+    camera: tracked,
+    parallaxManager: { update(_seconds: number) {} },
+    update(event: { get_passedTime(): number }) {
+      this.camera.update();
+      this.parallaxManager.update(event.get_passedTime());
+    },
+  };
+  // Haxe registers this callback before the plugin receives onGame.
+  const cachedListener = instance.update.bind(instance);
+  const classes: Record<string, any> = {
+    'core.states.GameStateMachine': { prototype: { update() {}, set_clock() {} } },
+    'core.ship.Ship': { prototype: { update() {}, reset() {}, draw() {} } },
+    'core.scene.Game': { prototype: { runGameLoop() {} } },
+  };
+  const api: any = {
+    cls: (name: string) => classes[name],
+    log() {},
+    onGame: (callback: Function) => callback(instance, api),
+  };
+  for (const kind of ['before', 'after', 'around']) {
+    api[kind] = (target: any, key: string, callback: Function) => {
+      const remove = hooks.add(target, key, kind, callback);
+      cleanups.push(remove);
+      return remove;
+    };
+  }
+  try {
+    installInterpolation(api);
+    cachedListener({ get_passedTime: () => 0.0165 });
+    assert.ok(tracked._focusTracker.x > 0, 'already-bound frame callback still follows the ship');
+    const first = tracked._focusTracker.x;
+    tracked.focusTarget.x = 300;
+    cachedListener({ get_passedTime: () => 0.0165 });
+    assert.ok(tracked._focusTracker.x > first);
+    tracked.shake();
+    assert.equal(tracked.isShaking, false);
+    assert.equal(tracked._shakeTimer, 0);
+    assert.deepEqual(errors, []);
+  } finally {
+    for (const cleanup of cleanups.reverse()) cleanup();
+  }
+});
