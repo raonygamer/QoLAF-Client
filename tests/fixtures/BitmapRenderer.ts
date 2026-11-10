@@ -1,3 +1,7 @@
+import { createPodRewardPulseColor } from '../../src/ported/PodRewardPulseColor';
+import { createRoomInvitePulseColor } from '../../src/ported/RoomInvitePulseColor';
+import { createEchoPulseColor } from '../../src/ported/EchoPulseColor';
+import { createClientDeveloperTagColor } from '../../src/ported/ClientDeveloperTagColor';
 import { readFileSync } from 'node:fs';
 import { DOMParser } from 'linkedom';
 import { Display, Format } from './NativeGame';
@@ -164,17 +168,16 @@ export function bitmapRendererFixture(
     },
     'core.text.VerdanaBitmapFontRegistry': { fontNameForSize: () => 'verdana16_bitmap' },
   };
-  for (const name of [
-    'ClientDeveloperTagColor',
-    'EchoPulseColor',
-    'RoomInvitePulseColor',
-    'PodRewardPulseColor',
-  ])
-    definitions['core.hud.components.' + name] = {};
+  definitions['core.scene.Game'] = { instance: null };
   const resolve = (name: string) => {
     if (!(name in definitions)) throw Error('Missing test dependency ' + name);
     return definitions[name];
   };
+  definitions['core.hud.components.ClientDeveloperTagColor'] =
+    createClientDeveloperTagColor(resolve);
+  definitions['core.hud.components.EchoPulseColor'] = createEchoPulseColor(resolve);
+  definitions['core.hud.components.RoomInvitePulseColor'] = createRoomInvitePulseColor(resolve);
+  definitions['core.hud.components.PodRewardPulseColor'] = createPodRewardPulseColor(resolve);
   definitions['feathers.controls.text.BaseTextRenderer'] = createBitmapTextAdapter(resolve);
   definitions['feathers.text.BitmapFontTextFormat'] = createBitmapFontTextFormat(resolve);
   definitions[richPrefix + 'RichBitmapGlyph'] = createRichBitmapGlyph(resolve);

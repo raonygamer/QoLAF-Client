@@ -1,6 +1,7 @@
 import { installNativeChatHistory } from '../chat/NativeChatHistory';
 import { installNativeSimpleChat } from '../chat/NativeSimpleChat';
 import { installNativeChatLayout } from '../chat/NativeChatLayout';
+import { installNativeChatMessages } from '../chat/NativeChatMessages';
 import { installNativeRichChatInput } from '../chat/NativeRichChatInput';
 import { installNativeChatFormatting } from '../chat/NativeChatFormatting';
 import { portedClasses } from '../ported/Registry';
@@ -56,6 +57,7 @@ export function installGameSession(
   installClanLabels(session, game);
   installNativeChatPreferences(session, game, preferences);
   const bitmap = createBitmapClasses(portedClasses(session).resolve);
+  installNativeChatMessages(session, game, bitmap.resolve, preferences);
   const editor = installNativeRichChatInput(session, game, bitmap.resolve);
   installNativeChatHistory(session, game);
   installNativeSimpleChat(session, game);

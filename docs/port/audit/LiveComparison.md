@@ -1112,3 +1112,16 @@ were sent. Reloads used separate F5 down/up calls with release in finally.
 All 210 tests, typecheck and formatting pass. This verifies panel placement and
 view ownership, not full chat appearance: original tab skin, rich message rows,
 virtualization, emoji/image controls and contextual interactions remain open.
+
+### Received rich bitmap text
+
+After loading NativeChatMessages, executed the local-only `/echo` command and
+checked its rendered output in Simple (`/tmp/QoLAF-BitmapMessageSimple.png`) and
+Advanced (`/tmp/QoLAF-BitmapMessageAdvanced.png`). White text and violet inline
+formatting render through the source bitmap renderer at the original base size.
+Advanced also received and displayed a live red game death notice. Opening
+Advanced rebuilt its rows successfully. The game and target HUD remained active.
+No player-facing message was sent. All 211 tests, typecheck and formatting pass.
+
+The adapter does not yet supply the artifact resolver, image overlays, original
+context interactions or Advanced virtualization; these remain tracked in CHAT-01.

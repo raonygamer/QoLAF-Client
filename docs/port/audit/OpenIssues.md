@@ -52,3 +52,19 @@ Remaining CHAT-01 gaps include the original tab skin, bitmap message renderer,
 virtualized Advanced rows, rich links/images/context interactions, and emoji and
 image controls. Current toolbar reserves space only for implemented Color/Size
 controls. Geometry work does not establish complete chat parity.
+
+## Received bitmap chat projection
+
+`NativeChatMessages` now draws Simple and Advanced rows through the ported
+`RichBitmapFontTextRenderer`, using the original Verdana48 bitmap format, default
+14px (or the stored font-size setting), full opacity, wrapping, inline styles and
+source animation flags. Native queue/filtering and message delivery remain in
+place. The adapter keeps the upstream field only as the native text-property
+boundary, detaches it from rendering, and disposes it with its row. Cleanup
+restores surviving native fields. Tests use actual atlas metrics and source
+animation helpers, covering colored/sized glyphs, wrapping, font changes, new
+rows and disposal. All 211 tests pass.
+
+This does not finish Advanced's virtual list, artifact label resolver, embedded
+images, role/link hover or context menus. The source-rendered rows are the next
+foundation for those features, not a claim that the chat port is complete.
