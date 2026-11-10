@@ -990,3 +990,37 @@ on a touch event. A stationary pointer could leave a stale card after a modal
 appeared or its role label changed. Visible role cards now revalidate stage hit
 and the role under the stored pointer each frame, including Advanced scroll
 ownership. Regression tests exercise these transitions without another touch.
+
+## Friend ping receive formatting and snapshots (2026-11-10)
+
+Ported ChatFriendPingFormatter's longest-name, case-insensitive matching, ASCII
+identifier boundaries and visible-text/source-range conversion. Colored wrappers
+split at existing tag boundaries, preserving HTML style stacks and entities.
+Known targets follow own player, online friends, then offline friends precedence;
+live records hydrate ID-only friends, ambiguous name matches are rejected, and
+message-time snapshots retain identity, ship/paint, clan and location after a
+player leaves. Source files remain read-only (the original worktree has unrelated
+user changes).
+
+Native integration observes writeChatMsg's receive scope and formats the filtered
+body at colorRights, after the native length/team/profanity checks. Supporter and
+sender prefixes remain outside the added markup; updateTexts captures ping ranges
+before either chat view consumes the message. No messages are sent. The scoped
+context restores in finally, including nested receives, and ordinary system
+updates are unaffected. Existing history is not retroactively recolored.
+
+Typecheck and 303 tests pass. New cases check matching boundaries and overlapping
+names, tag/entity preservation, exact per-character colors, live/offline target
+precedence, snapshot independence, native size rejection, supporter/role prefixes,
+system-message isolation and hook cleanup. Friend ping hover cards, room-type
+lookup and self-ping sound remain incomplete; this is the receive data path for
+those source features, not a claim of full chat parity.
+
+Live receive-path check: one controlled reload/autologin completed with canvas,
+bridge and connection active and runtimeErrors=0. A synchronous display-only
+writeChatMsg probe for the account's own name produced the expected #66aaff markup
+and a ping snapshot (visible range 8..16 and current skin); its new queue row was
+removed in finally and Simple chat refreshed. No transport send was invoked.
+/tmp/QoLAF-PingReceive.png records the returned row data. The immediate renderer
+sample was empty, so this confirms native receive projection/snapshot wiring,
+not a visual assertion of the resulting glyph color.
