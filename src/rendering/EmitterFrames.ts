@@ -24,6 +24,37 @@ export function emitterTargetPose(target: Raw): { x: number; y: number; rotation
   };
 }
 
+/** Emitter.as includes the authored particle footprint and travel in culling. */
+export function emitterCullingRadius(emitter: Raw): number {
+  const spread = Math.max(Math.abs(emitter.sourceVarianceX), Math.abs(emitter.sourceVarianceY));
+  const travel = (Math.abs(emitter.speed) * (emitter.ttl + Math.abs(emitter.ttlVariance))) / 1000;
+  return Math.max(100, read(emitter, 'radius') + spread + travel);
+}
+
+export function updateEmitterVisibility(emitter: Raw): void {
+  emitter.forceUpdate = false;
+  emitter.isOnScreen = emitter.canvasTarget != null;
+  if (!emitter.isOnScreen) {
+    emitter.isOnScreen = emitter.g.camera.isCircleOnScreen(
+      emitter.posX,
+      emitter.posY,
+      emitterCullingRadius(emitter),
+    );
+  }
+  if (emitter.isOnScreen) {
+    emitter.nextDistanceCalculation = 1000;
+    return;
+  }
+  const center = emitter.g.camera.getCameraCenter();
+  emitter.distanceToCameraX = emitter.posX - center.x;
+  emitter.distanceToCameraY = emitter.posY - center.y;
+  emitter.distanceToCamera = Math.hypot(emitter.distanceToCameraX, emitter.distanceToCameraY);
+  emitter.nextDistanceCalculation = emitter.distanceToCamera;
+  if (emitter.nextDistanceCalculation > emitter.MAX_CALC_DELAY) {
+    emitter.nextDistanceCalculation = emitter.MAX_CALC_DELAY + Math.random() * 200;
+  }
+}
+
 /** Original elapsed-time emission/motion rules, adapted to native particle pools. */
 export class EmitterFrames {
   private pendingDelta = new WeakMap<Raw, number>();
@@ -214,6 +245,9 @@ export function installEmitterFrames(api: API): void {
   const Collective = api.cls('core.particle.CollectiveMeshBatch');
   if (!Emitter || !Particle || !Color || !Collective) return;
   const frames = new EmitterFrames(Particle, Emitter, Color);
+  api.around(Emitter.prototype, 'updateOnScreen', function () {
+    updateEmitterVisibility(this);
+  });
   api.before(Emitter.prototype, 'dispose', function () {
     frames.reset(this);
   });

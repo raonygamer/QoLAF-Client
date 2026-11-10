@@ -1135,3 +1135,33 @@ position and pool length. Typecheck and all 315 tests pass. Preview remained
 connected with runtimeErrors=0 before reload; this change is built but has not
 been visually verified in the running browser. This does not resolve or explain
 the separate intermittent bitmap corruption or establish full animation parity.
+
+## Emitter visibility footprint (2026-11-10)
+
+Source Emitter.cullingRadius includes rendered particle radius, maximum absolute
+spawn spread and speed times maximum authored lifetime, with a 100-unit floor.
+The native Haxe updateOnScreen still hard-codes 100. Ported the source visibility
+method, including canvas-target bypass, one-second visible refresh, fractional
+distance scheduling and the source maximum-delay jitter. Large effects now stay
+eligible for rendering when their origin is outside the old fixed-radius check.
+Particle simulation and current native rainbow behavior are unchanged.
+
+Regression exercises a 280-unit footprint with origin 250 units outside the
+camera boundary: the old check rejects it, while the adapter retains emission.
+It also covers offscreen fractional distance, delay cap, canvas effects and the
+100-unit minimum. Typecheck and all 316 tests pass.
+
+Live: one reload/autologin succeeded. A standalone object using the actual hooked
+native Emitter prototype returned radius=280, visible=true, next=1000. A real
+native TextParticle/handler reuse probe also confirmed right/left/center/left
+pivots (170.769/0/85.385/0) at constant width, closing the prior text-boundary
+runtime verification gap. Probe particle was never added to the game display and
+was disposed in finally; no game objects or messages were changed. Evidence:
+/tmp/QoLAF-RenderBoundary.png. Preview reports connected=true, runtimeErrors=0.
+An actual large combat effect at the screen edge still needs visual comparison.
+
+Further source difference found during this audit: the original's remastered
+aura rendering includes grayscale textures/layers, breathing/pulse alpha and
+AuraLightning/AuraOutlineLightning. Those paths are not yet implemented in the
+port's emitter adapter; SettingsGeneral already exposes related wording. This
+remains an explicit fidelity gap, not an implemented feature inferred from UI.

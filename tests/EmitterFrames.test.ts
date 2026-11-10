@@ -4,6 +4,8 @@ import {
   EmitterFrames,
   emitterTargetPose,
   installEmitterFrames,
+  emitterCullingRadius,
+  updateEmitterVisibility,
 } from '../src/rendering/EmitterFrames';
 import { installWorldLabels } from '../src/rendering/WorldLabels';
 import type { Raw } from '../src/api/Types';
@@ -239,6 +241,7 @@ test('manager runs emitters once per render frame, suppresses tick calls, and re
     batches = 0;
   class Emitter {
     static POOL_SIZE_MAX = 100;
+    updateOnScreen() {}
     dispose() {}
   }
   const manager = {
@@ -297,4 +300,59 @@ test('offscreen finite emitters age without spawning and native rainbow columns 
   assert.equal(columns, 2);
   close(emitter.particles[0].ttl, 4967);
   close(emitter.particles[1].ttl, 5000);
+});
+
+test('large effects stay visible beyond the native 100-unit origin radius', () => {
+  const { frames, emitter } = fixture();
+  Object.assign(emitter, {
+    posX: 250,
+    posY: 0,
+    sourceVarianceX: -20,
+    sourceVarianceY: 5,
+    speed: -100,
+    ttl: 1500,
+    ttlVariance: -500,
+    get_radius: () => 60,
+    nextDistanceCalculation: 0,
+    isOnScreen: false,
+    forceUpdate: true,
+    MAX_CALC_DELAY: 500,
+    g: {
+      camera: {
+        isCircleOnScreen: (x: number, _y: number, radius: number) => x <= radius,
+        getCameraCenter: () => ({ x: 0, y: 0 }),
+      },
+    },
+    updateOnScreen() {
+      updateEmitterVisibility(this);
+    },
+  });
+  assert.equal(emitterCullingRadius(emitter), 280);
+  assert.equal(emitter.g.camera.isCircleOnScreen(250, 0, 100), false);
+  frames.update(emitter, 33);
+  assert.equal(emitter.isOnScreen, true);
+  assert.equal(emitter.forceUpdate, false);
+  assert.equal(emitter.nextDistanceCalculation, 1000);
+  assert.equal(emitter.particles.length, 1, 'visible particle footprint must not be discarded');
+
+  emitter.posX = 300.5;
+  emitter.posY = 0.25;
+  updateEmitterVisibility(emitter);
+  assert.equal(emitter.isOnScreen, false);
+  assert.equal(emitter.distanceToCameraX, 300.5);
+  assert.equal(emitter.distanceToCameraY, 0.25);
+  close(emitter.nextDistanceCalculation, Math.hypot(300.5, 0.25));
+  emitter.posX = 2000;
+  updateEmitterVisibility(emitter);
+  assert.ok(emitter.nextDistanceCalculation >= 500 && emitter.nextDistanceCalculation < 700);
+
+  emitter.canvasTarget = {};
+  emitter.g.camera.isCircleOnScreen = () => {
+    throw Error('canvas effects bypass camera culling');
+  };
+  updateEmitterVisibility(emitter);
+  assert.equal(emitter.isOnScreen, true);
+  assert.equal(emitter.nextDistanceCalculation, 1000);
+  Object.assign(emitter, { sourceVarianceX: 0, sourceVarianceY: 0, speed: 0, ttl: 0 });
+  assert.equal(emitterCullingRadius(emitter), 100);
 });
