@@ -57,7 +57,10 @@ test('native automation integration preserves chat routing, uses millisecond clo
         deltas.push(event.deltaTime);
       });
       bus.subscribe('render', (event: AutomationEvent) => deltas.push(event.deltaTime));
-      bus.subscribe('stop', () => calls.push('stopped'));
+      bus.subscribe('stop', () => {
+        calls.push('stopped');
+        calls.push('stop API:' + typeof classes['af.AutomationEvent']);
+      });
       bus.registerCommand('probe:local', { description: 'Custom namespaced local' }, () =>
         calls.push('custom local'),
       );
@@ -135,7 +138,16 @@ test('native automation integration preserves chat routing, uses millisecond clo
   assert.equal((game as any).automationManager, undefined);
   assert.equal(manager.getModule('probe')!.running, false);
   assert.ok(calls.includes('stopped'));
+  const nextSessionCleanups: Function[] = [];
+  onGame!(new Game(), makeAPI(nextSessionCleanups, new Map()));
+  manager.start('probe');
+  calls.length = 0;
   rootCleanups.reverse().forEach((cleanup) => cleanup());
+  assert.ok(
+    calls.includes('stop API:function'),
+    'module STOP runs before its APIs are uninstalled',
+  );
+  nextSessionCleanups.reverse().forEach((cleanup) => cleanup());
   assert.equal(classes['af.AutomationStopError'], undefined);
   chat.text = '/run';
   assert.equal(chat.sendMessage(), 'native result');

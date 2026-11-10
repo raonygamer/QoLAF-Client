@@ -454,3 +454,32 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   callback tests and file picker selection, cancellation and abort cleanup tests.
   Full automation control arbitration against native input, command help and
   completion, and the remaining full-client port still need work.
+
+### Automation input ownership and native steering boundary
+
+- Connected manager control ownership to PlayState.updateCommands and
+  checkAccelerate. Unowned physical input calls the current Haxe methods unchanged;
+  owned input uses the original automation steering loop. The native roaming chat
+  branch retains automation steering without enabling physical acceleration.
+- Ported setAutomationAimAngle/clearAutomationAimAngle, owner/finite-angle checks,
+  native angle normalization, source 0.6-step threshold and serialized-course
+  throttling. Channeling/teleport/boost/no-angle states release turns through the
+  native command method. No rotation, shield, damage or simulation state is written.
+  Added original control-mode constants and readable aim/mode getters. Ordinary
+  aim getter reflects native mouse/keyboard aim; full aim-assist logic is still pending.
+- Fixed plugin teardown ordering: modules receive STOP/DISPOSE while exported
+  APIs and control methods still exist. Session transitions and unload restore
+  installed methods/properties; module aim cannot cross state exit or another owner.
+- TypeScript/build and all 120 tests pass. Tests cover native passthrough, ownership,
+  invalid angles, tick throttling, opposite-turn release, settled aim, teleport,
+  chat vs Settings behavior, transfer, normalization and cleanup. Corrected the
+  test double to native Util.angleDifference's rotation-minus-target convention;
+  production already calls that actual native utility.
+- Live browser probe claimed controls, rejected another ID, accepted an owned aim,
+  generated native turn command [2,true], cleared aim and returned to
+  PlayerControlled. Commands were captured locally instead of sent to the server;
+  this verifies the live adapter path, not in-flight steering accuracy. Probe
+  module and temporary HTML/script were removed; clean preview reloaded.
+  Screenshot: /tmp/QoLAF-ControlProbe.png.
+- Full-client command help/completion, aim-assist behavior, richer chat integration,
+  remaining rendering/UI differences and comprehensive in-game parity remain open.

@@ -1,3 +1,4 @@
+import { installAutomationControls } from './AutomationControls';
 import { read, type API, type Raw } from '../Api/Types';
 import { AutomationManager } from './AutomationManager';
 import {
@@ -57,6 +58,7 @@ export function installNativeAutomations(
   let restore: Promise<void> | undefined;
 
   api.on('classesReady', () => {
+    installAutomationControls(api);
     const classes = api.raw.classes;
     if (classes) {
       // Expose original API names through QoLAF.cls; modules need no imports of the host bundle.
@@ -91,6 +93,9 @@ export function installNativeAutomations(
         this.updateTab();
       });
     }
+    // Stop modules while their exported APIs and control methods still exist.
+    // The earlier fallback also covers unloading before classesReady.
+    api.defer(() => manager.dispose());
   });
   api.onGame((game, session) => {
     const previous = Object.getOwnPropertyDescriptor(game, 'automationManager');
