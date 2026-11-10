@@ -2,6 +2,7 @@ import { read, type API, type Raw } from '../api/Types';
 import { NativeUI } from '../ui/NativeUI';
 import { portedClasses } from '../ported/Registry';
 import { LoginAttempt } from './LoginAttempt';
+import { loginControl } from './LoginControl';
 export type Provider = 'simple' | 'kongregate' | 'armor';
 export interface Profile {
   id: string;
@@ -426,7 +427,17 @@ export function loginProfiles(api: API, login: Raw) {
     }),
   );
   show();
-  if (panel.autoLogin && state.selected && !Rymden.controlKeyDown) {
+  cleanups.push(
+    loginControl.onControl(() => {
+      if (!disposed && countdown > 0) show();
+    }),
+  );
+  if (
+    panel.autoLogin &&
+    state.selected &&
+    !Rymden.controlKeyDown &&
+    !loginControl.startupOverride
+  ) {
     const p = profiles.find((p) => p.id === state.selected);
     if (p) {
       hide();
@@ -435,7 +446,7 @@ export function loginProfiles(api: API, login: Raw) {
       login.updateStatus('Auto-login in 3...');
       login.connectStatus.set_subText('(press CTRL to cancel...)');
       timer = setInterval(() => {
-        if (Rymden.controlKeyDown) {
+        if (Rymden.controlKeyDown || loginControl.startupOverride) {
           show();
           return;
         }

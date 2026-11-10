@@ -2140,3 +2140,19 @@ passes. Regression coverage includes empty inventories, exact and partial rows,
 configurable columns, unchanged artifact identity, live count updates, maximum
 capacity transitions, leaving the room and cleanup. Full expanded layout and
 live visual comparison remain open.
+
+### Public 1.1.23 naming and login Control cancellation — 2026-11-10
+
+Restored the requested public version convention: QoLAF v1.1.23 (Public), with
+original credits and no TypeScript/port suffix in login, /echo, help, IPC version
+or module metadata. Archived 1.1.22 release notes retain their historical version.
+
+Login cancellation previously relied on an instance onKeyPress hook installed
+after native code cached its callback, plus a once-per-second Control poll.
+`LoginControl` now observes browser capture-phase keyboard input from plugin
+activation, preserves the source startup override after key release/blur, and
+immediately cancels a pending countdown and restores the profile chooser.
+Listeners detach on login/plugin teardown. Regressions cover a brief tap between
+timer ticks, a native callback bound before patching, startup-before-panel input,
+modifier combinations, blur and cleanup. Live cancellation still needs a browser
+check; automated coverage does not establish whole-client parity.

@@ -1,4 +1,5 @@
 import { createArtifactSorting } from './artifacts/ArtifactSorting';
+import { loginControl } from './login/LoginControl';
 import { installArtifactCargo } from './artifacts/ArtifactCargo';
 import { portedClasses } from './ported/Registry';
 import { installNativeRewardNotices } from './chat/NativeRewardNotices';
@@ -23,7 +24,7 @@ import { installGameSession } from './runtime/GameSession';
 import { ChatHistory } from './chat/ChatHistory';
 import { installNativeBitmapText } from './ui/NativeBitmapText';
 import { loadFonts } from './ui/Fonts';
-import { loginIdentity, PORT_VERSION } from './login/LoginIdentity';
+import { loginIdentity, CLIENT_VERSION } from './login/LoginIdentity';
 import { loginProfiles } from './login/LoginProfiles';
 import { installArtifactUI } from './artifacts/NativeArtifacts';
 import { installInterpolation } from './rendering/Interpolation';
@@ -35,9 +36,11 @@ import { installBackgroundLayers } from './rendering/BackgroundLayers';
 export default {
   id: 'qolaf.client',
   name: 'QoLAF Client',
-  version: PORT_VERSION,
+  version: CLIENT_VERSION,
   apiVersion: 1,
   activate(api: API) {
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function')
+      api.defer(loginControl.observe(window));
     const history = new ChatHistory();
     let music: MusicPlayerService | undefined;
     installNativeAutomations(api);

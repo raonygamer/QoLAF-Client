@@ -1,16 +1,16 @@
-import { PORT_VERSION, SOURCE_VERSION } from '../login/LoginIdentity';
+import { CLIENT_VERSION, SOURCE_VERSION } from '../login/LoginIdentity';
 import type { CommandHelpEntry, CommandField } from '../chat/ChatCommandRegistry';
 export interface ClientHelpPage {
   label: string;
   content: string;
 }
-/** Original client guide; its source release is separate from the running port version. */
+/** Original client guide and running client version. */
 export class ClientHelpContent {
   constructor(
     private readonly serverVersion: string,
     private readonly automationsSupported: boolean,
     private readonly commandEntries: CommandHelpEntry[] = [],
-    private readonly clientVersion = `${SOURCE_VERSION} (TypeScript port ${PORT_VERSION})`,
+    private readonly clientVersion = `${CLIENT_VERSION} (Public)`,
   ) {}
   createPages(): ClientHelpPage[] {
     const pages = [

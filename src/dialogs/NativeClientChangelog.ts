@@ -3,7 +3,7 @@ import { portedClasses } from '../ported/Registry';
 import { createClientChangelogPopup } from './ClientChangelogPopup';
 import { installPopupKeyboard } from './NativePopupKeyboard';
 import { ClientReleaseSequence } from './ClientReleaseSequence';
-import { PORT_VERSION } from '../login/LoginIdentity';
+import { CLIENT_VERSION } from '../login/LoginIdentity';
 
 const releases = new ClientReleaseSequence();
 
@@ -23,7 +23,7 @@ export function installNativeClientChangelog(api: API, game: Raw): () => boolean
       if (recovering) game.blockHotkeys = true;
     } else previous.dispose();
   };
-  const open = releases.install(api, game, PORT_VERSION, () => {
+  const open = releases.install(api, game, CLIENT_VERSION, () => {
     if (api.game !== game || game.isLeaving || game.isRecoveringGameConnection) return false;
     if (popup) return true;
     popup = new Popup();
@@ -54,5 +54,5 @@ export function installNativeClientChangelog(api: API, game: Raw): () => boolean
     if (original) Object.defineProperty(chat, 'openClientChangelog', original);
     else delete chat.openClientChangelog;
   });
-  return () => popup !== null || !releases.hasSeen(api, PORT_VERSION);
+  return () => popup !== null || !releases.hasSeen(api, CLIENT_VERSION);
 }

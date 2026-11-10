@@ -18,7 +18,7 @@ test('source guide retains its tabs and long colored pages within bitmap limits'
       'QoL / settings',
     ],
   );
-  assert.match(pages[0].content, /TypeScript port/);
+  assert.match(pages[0].content, /1\.1\.23 \(Public\)/);
   assert.match(pages[0].content, /server 1409/);
   assert.match(pages[0].content, /Port in development/);
   for (const page of pages) {

@@ -1,7 +1,7 @@
 import { ClientQolafChat } from '../chat/ClientQolafChat';
 import { ensureNativeQolafChat } from '../chat/NativeQolafChat';
 import { read, type API, type Raw } from '../api/Types';
-import { PORT_VERSION } from '../login/LoginIdentity';
+import { CLIENT_VERSION } from '../login/LoginIdentity';
 import { ClientIpcService, type IpcEnvironment } from './ClientIpcService';
 import { NativeIpcClient } from './NativeIpcClient';
 
@@ -45,7 +45,7 @@ export function installNativeIpcAuthentication(
   let disposed = false;
   // QIPC discovery accepts release triples. Do not advertise the AS3 source
   // version: development status remains explicit in the port's login label.
-  const version = `${PORT_VERSION.split('-')[0]} (Public)`;
+  const version = `${CLIENT_VERSION.split('-')[0]} (Public)`;
   const serviceEnvironment: IpcEnvironment = environment ?? {
     now: () => performance.now(),
     random: () => Math.random(),

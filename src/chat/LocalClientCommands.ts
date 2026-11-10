@@ -1,5 +1,5 @@
 import type { API, Raw } from '../api/Types';
-import { PORT_VERSION, SOURCE_VERSION } from '../login/LoginIdentity';
+import { CLIENT_VERSION } from '../login/LoginIdentity';
 import type { CommandHelpEntry } from './ChatCommandRegistry';
 
 export const localClientCommandNames = ['timers', 'clearchat', 'echo'] as const;
@@ -83,10 +83,10 @@ export function installLocalClientCommands(api: API): void {
       }
     } else if (name === 'clearchat') clearLocalChat(this.g, log);
     else if (name === 'echo') {
-      // Retain the source presentation while identifying this port honestly.
+      // Original public client release convention.
       log.writeChatMsg(
         'death',
-        `Your client is: <font color='#9B5CFF'>QoLAF (TypeScript port ${PORT_VERSION} / source v${SOURCE_VERSION})</font>`,
+        `Your client is: <font color='#9B5CFF'>QoLAF v${CLIENT_VERSION} (Public)</font>`,
       );
     } else return next(...args);
     this.input.set_text('');
