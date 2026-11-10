@@ -466,3 +466,17 @@ names and ID fallback. Typecheck and full build/test suite pass (257 tests).
 This is not yet user-visible: native popup friend previews, section headings,
 roster refresh/source selection and rich-editor replacement wiring remain open.
 No browser reload or game input was used for this change.
+
+Shared native autocomplete popup now supports the original 20px section heading
+(bitmap Verdana 12, cyan), including row capacity, row/preview offsets, scrollbar
+placement and drag math. Optional ship texture resolver adds pooled native images
+in the source 40px visual column, fitting 36x30 without upscaling, centered with
+rounded offsets. Texture changes readjust the image; absent/failed textures hide
+old previews and restore the full text width. Shared textures are not disposed.
+
+Regression tests cover heading changes and constrained capacity, scrollbar top
+press without jumping, thumbnail dimensions/position/reuse and resolver failure.
+Typecheck, build/full suite (259 tests), formatting and diff checks pass. These
+capabilities are not wired to friend completion yet. Friend paint filters and
+metadata hydration, native roster source/refresh logic, insertion/keyboard/wheel
+integration and live comparison remain open. No live reload was needed here.

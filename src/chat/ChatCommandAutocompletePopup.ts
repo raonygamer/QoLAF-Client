@@ -1,3 +1,4 @@
+import type { ChatCommandSuggestion } from './ChatCommandSuggestion';
 import type { Resolve } from '../runtime/As3';
 import type { NativeBitmapInput } from './rich/NativeBitmapInput';
 import type { DeviceSettings } from '../settings/DeviceSettings';
@@ -29,6 +30,8 @@ interface Row {
   command: Raw;
   description: Raw;
   emoji?: Raw;
+  preview?: Raw;
+  texture?: Raw;
 }
 
 /** Native Starling command rows, using the source popup's dimensions and colors. */
@@ -39,6 +42,9 @@ export class ChatCommandAutocompletePopup {
   private offset = 0;
   private width = 400;
   private capacity = 8;
+  private availableHeight = Number.POSITIVE_INFINITY;
+  private sectionField: Raw;
+  private title = '';
   private track: Raw;
   private thumb: Raw;
   private scrollHit: Raw;
@@ -50,6 +56,7 @@ export class ChatCommandAutocompletePopup {
     readonly model: AutocompleteModel,
     private complete: (text: string) => void,
     createEmoji?: () => Raw,
+    private resolvePreviewTexture?: (skin: string) => Raw | null,
   ) {
     this.node = ui.sprite();
     this.node.set_name('qolaf.commandAutocomplete');
@@ -87,6 +94,14 @@ export class ChatCommandAutocompletePopup {
         ),
       );
     }
+    this.sectionField = ui.place(
+      ui.text(380, 20, '', 12, 0x8dd8ef, 'left', 'verdana16_bitmap'),
+      10,
+      5,
+      this.node,
+    );
+    this.sectionField.set_touchable(false);
+    this.sectionField.set_visible(false);
     this.track = ui.quad(3, 1, 0x444444, 0.7);
     this.thumb = ui.quad(3, 18, 0xbcbcbc, 0.9);
     this.scrollHit = ui.quad(12, 1, 0, 0.001);
@@ -109,7 +124,10 @@ export class ChatCommandAutocompletePopup {
         this.offset =
           travel > 0
             ? Math.round(
-                Math.max(0, Math.min(1, (point.y - 5 - this.dragOffset) / travel)) * maximum,
+                Math.max(
+                  0,
+                  Math.min(1, (point.y - 5 - this.sectionHeight - this.dragOffset) / travel),
+                ) * maximum,
               )
             : 0;
         this.redraw(false);
@@ -119,6 +137,21 @@ export class ChatCommandAutocompletePopup {
     this.scrollHit.addEventListener('touch', onScrollTouch);
     this.cleanups.push(() => this.scrollHit.removeEventListener('touch', onScrollTouch));
     this.node.set_visible(false);
+  }
+
+  get sectionTitle(): string {
+    return this.title;
+  }
+
+  set sectionTitle(value: string) {
+    if (this.title === value) return;
+    this.title = value;
+    this.layout(this.width, this.availableHeight);
+    this.redraw();
+  }
+
+  private get sectionHeight(): number {
+    return this.title ? 20 : 0;
   }
 
   get height(): number {
@@ -132,8 +165,12 @@ export class ChatCommandAutocompletePopup {
   }
 
   layout(width: number, availableHeight: number): void {
+    this.availableHeight = availableHeight;
     const nextWidth = Math.max(80, width);
-    const capacity = Math.max(0, Math.min(8, Math.floor((availableHeight - 10) / 34)));
+    const capacity = Math.max(
+      0,
+      Math.min(8, Math.floor((availableHeight - 10 - this.sectionHeight) / 34)),
+    );
     if (nextWidth === this.width && capacity === this.capacity) return;
     this.width = nextWidth;
     this.capacity = capacity;
@@ -174,25 +211,35 @@ export class ChatCommandAutocompletePopup {
     }
     this.offset = Math.max(0, Math.min(matches.length - count, this.offset));
     this.background.set_width(this.width);
-    this.background.set_height(count * 34 + 10);
+    this.background.set_height(this.sectionHeight + count * 34 + 10);
+    this.sectionField.set_text(this.title);
+    this.sectionField.set_width(this.width - 20);
+    this.sectionField.set_visible(this.sectionHeight > 0);
     for (let index = 0; index < this.rows.length; index++) {
       const row = this.rows[index],
         match = index < count ? matches[this.offset + index] : null;
       for (const field of [row.background, row.command, row.description])
         field.set_visible(!!match);
       row.emoji?.set_visible(!!match?.emojiScalar);
+      row.preview?.set_visible(false);
       if (!match) continue;
+      const rowY = 5 + this.sectionHeight + index * 34;
+      row.background.set_y(rowY);
+      row.command.set_y(rowY);
+      row.description.set_y(rowY + 18);
       row.background.set_width(this.width - 10);
       row.background.set_alpha(
         !this.model.argumentMode && this.offset + index === this.model.selectedIndex ? 0.88 : 0.001,
       );
-      const inset = match.emojiScalar ? 40 : 0;
+      const texture = this.previewTexture(match);
+      const inset = match.emojiScalar || texture ? 40 : 0;
+      this.updatePreview(row, texture, rowY);
       row.command.set_x(10 + inset);
       row.description.set_x(10 + inset);
       if (row.emoji && match.emojiScalar) {
         row.emoji.text = match.completionText;
         row.emoji.set_x(10);
-        row.emoji.set_y(5 + index * 34 + Math.round((34 - read(row.emoji, 'height')) / 2));
+        row.emoji.set_y(rowY + Math.round((34 - read(row.emoji, 'height')) / 2));
       }
       row.command.set_width(this.width - 20 - inset);
       row.command.set_text(match.displayCommand);
@@ -204,17 +251,49 @@ export class ChatCommandAutocompletePopup {
     if (scrolling) {
       const height = count * 34;
       const thumbHeight = Math.max(18, (height * count) / matches.length);
-      this.ui.place(this.track, this.width - 6, 5);
+      this.ui.place(this.track, this.width - 6, 5 + this.sectionHeight);
       this.track.set_height(height);
       this.ui.place(
         this.thumb,
         this.width - 6,
-        5 + ((height - thumbHeight) * this.offset) / (matches.length - count),
+        5 + this.sectionHeight + ((height - thumbHeight) * this.offset) / (matches.length - count),
       );
       this.thumb.set_height(thumbHeight);
-      this.ui.place(this.scrollHit, this.width - 15, 5);
+      this.ui.place(this.scrollHit, this.width - 15, 5 + this.sectionHeight);
       this.scrollHit.set_height(height);
     }
+  }
+
+  private previewTexture(suggestion: ChatCommandSuggestion): Raw | null {
+    if (!suggestion.previewSkinKey || !this.resolvePreviewTexture) return null;
+    try {
+      return this.resolvePreviewTexture(suggestion.previewSkinKey);
+    } catch {
+      return null;
+    }
+  }
+
+  private updatePreview(row: Row, texture: Raw | null, rowY: number): void {
+    if (!texture) {
+      row.texture = undefined;
+      return;
+    }
+    if (!row.preview) {
+      row.preview = this.ui.image(texture);
+      row.preview!.set_touchable(false);
+      this.node.addChild(row.preview);
+    } else if (row.texture !== texture) {
+      row.preview.set_texture(texture);
+      row.preview.readjustSize();
+    }
+    row.texture = texture;
+    const preview = row.preview!;
+    const scale = Math.min(1, 36 / read(texture, 'width'), 30 / read(texture, 'height'));
+    preview.set_scaleX(scale);
+    preview.set_scaleY(scale);
+    preview.set_x(10 + Math.round((40 - read(preview, 'width')) / 2));
+    preview.set_y(rowY + Math.round((34 - read(preview, 'height')) / 2));
+    preview.set_visible(true);
   }
 
   private fitDescription(field: Raw, text: string): void {

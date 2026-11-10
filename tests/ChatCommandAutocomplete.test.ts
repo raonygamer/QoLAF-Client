@@ -104,9 +104,28 @@ class Node {
     this.listeners.delete(key);
   }
 }
-function popupFixture(emoji = false) {
+function popupFixture(emoji = false, previews = false) {
   let cleanupCount = 0;
   const ui = {
+    image: (texture: Node) =>
+      Object.assign(new Node(texture.width, texture.height), {
+        texture,
+        width: texture.width,
+        height: texture.height,
+        set_texture(value: Node) {
+          this.texture = value;
+        },
+        readjustSize() {
+          this.width = this.texture.width;
+          this.height = this.texture.height;
+        },
+        set_scaleX(value: number) {
+          this.width = this.texture.width * value;
+        },
+        set_scaleY(value: number) {
+          this.height = this.texture.height * value;
+        },
+      }),
     sprite: () => new Node(),
     quad: (w: number, h: number) => new Node(w, h),
     text: (
@@ -151,6 +170,12 @@ function popupFixture(emoji = false) {
       popup.update(text);
     },
     emoji ? () => new Node(20, 20) : undefined,
+    previews
+      ? (key) => {
+          if (key === 'broken') throw new Error('missing texture');
+          return new Node(72, 40);
+        }
+      : undefined,
   );
   return { popup, model, completions, cleanupCount: () => cleanupCount };
 }
@@ -214,5 +239,67 @@ test('emoji popup uses source preview column and resets pooled rows on query cha
   popup.update('thumbsup');
   assert.equal(node.children[2].text, ':thumbs_up:');
   assert.equal(node.children[8].visible, false);
+  popup.dispose();
+});
+
+test('roster section heading reserves source height and offsets rows and scrollbar dragging', () => {
+  const { popup } = popupFixture();
+  popup.layout(400, 100);
+  popup.update('/cmd');
+  popup.sectionTitle = 'IPC Peers Online';
+  const node = popup.node as Node;
+  assert.equal(popup.height, 98);
+  assert.equal(node.children[1].y, 25);
+  assert.equal(node.children[2].y, 25);
+  assert.equal(node.children[3].y, 43);
+  const heading = node.children.find((child) => child.text === 'IPC Peers Online')!;
+  assert.equal(heading.y, 5);
+  assert.equal(heading.font, 'verdana16_bitmap');
+  const track = node.children.at(-3)!;
+  const thumb = node.children.at(-2)!;
+  const hit = node.children.at(-1)!;
+  assert.equal(track.y, 25);
+  assert.equal(thumb.y, 25);
+  assert.equal(hit.y, 25);
+  hit.listeners.get('touch')!({
+    getTouch: () => ({ phase: 'began', getLocation: () => ({ y: 26 }) }),
+  });
+  assert.equal(
+    node.children[2].text,
+    '/cmd00 [value]',
+    'pressing thumb top must not jump past first row',
+  );
+  hit.listeners.get('touch')!({
+    getTouch: () => ({ phase: 'ended', getLocation: () => ({ y: 26 }) }),
+  });
+  popup.layout(400, 78);
+  assert.equal(popup.height, 64, 'heading reduces row capacity');
+  popup.sectionTitle = '';
+  assert.equal(popup.height, 78);
+  assert.equal(node.children[1].y, 5);
+  assert.equal(heading.visible, false);
+  popup.dispose();
+});
+
+test('ship previews fit source bounds, reuse images and clear missing textures', () => {
+  const { popup, model } = popupFixture(false, true);
+  const matches = [new ChatCommandSuggestion('Pilot', '', 'Online', '@Pilot', '@Pilot', 0, 'ship')];
+  Object.defineProperty(model, 'matches', { get: () => matches });
+  popup.update('/cmd');
+  const node = popup.node as Node;
+  const preview = node.children.at(-1)!;
+  assert.equal(preview.width, 36);
+  assert.equal(preview.height, 20);
+  assert.equal(preview.x, 12);
+  assert.equal(preview.y, 12);
+  assert.equal(node.children[2].x, 50);
+  const count = node.children.length;
+  matches[0] = new ChatCommandSuggestion('Other', '', '', '@Other', '@Other', 0, 'other');
+  popup.update('/cmd');
+  assert.equal(node.children.length, count);
+  matches[0] = new ChatCommandSuggestion('Missing', '', '', '@Missing', '@Missing', 0, 'broken');
+  popup.update('/cmd');
+  assert.equal(preview.visible, false);
+  assert.equal(node.children[2].x, 10);
   popup.dispose();
 });
