@@ -799,3 +799,25 @@ confirms EmitterManager is called from Game.tickUpdate and Emitter uses fixed
 receives frame seconds from Game.update, so its motion issue needs separate
 rounding/attachment analysis. Do not accelerate the native simulation to fix
 presentation cadence.
+
+
+## Render attachments and frame timing — 2026-11-10
+
+- AF/pet names previously read physics coordinates before Ship.draw. They now
+  copy the rendered clip after drawing, matching original EnemyShip.as ordering.
+- Emitters moved from tick updates to the render path. Elapsed emission, particle
+  lifetime and movement retain fractional time; engine mounts use rendered poses.
+  Native rainbow creation remains supported.
+- Read-only live probe: 1,950 frames, 1,618 without a simulation tick, 195,100
+  particle advances on those frames; 10,147 AF/pet label checks, zero mismatches.
+  Evidence: `/tmp/QoLAF-EmitterProbe.png`. Temporary probe removed afterward.
+- Further source audit found combat text missing original rendered-owner
+  attachment. Native turret/spawner ticks also overwrite text coordinates, while
+  TextHandler scales seconds by 1,980 and TextParticle rounds milliseconds.
+  CombatTextFrames now uses seconds × 1,000, saved rendered attachment positions,
+  independent rise, fractional lifetime and pooled-owner generation guards.
+  Newer native zoom scaling is retained. Live combat verification remains pending.
+- Validation: TypeScript check and 167 tests pass, including timing comparisons
+  at 30/60/120/180 FPS, intervening tick writes, pooling and cleanup.
+- Remaining parity work includes combat-text anchor offsets/rise limits, other
+  world attachments, emitter visual limits and the existing open-issue ledger.

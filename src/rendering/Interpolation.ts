@@ -1,3 +1,4 @@
+import { installWorldLabels } from './WorldLabels';
 import { read, type API, type Raw } from '../api/Types';
 import { installRemoteShips } from './RemoteShips';
 
@@ -164,6 +165,7 @@ export function installInterpolation(api: API): void {
   if (!machine || !ship || !game) throw Error('Interpolation runtime classes are missing');
   const previous = new WeakMap<Raw, RenderPose>();
   const remoteShips = installRemoteShips(api);
+  installWorldLabels(api);
 
   api.around(machine, 'update', function () {
     updateSimulation(this);

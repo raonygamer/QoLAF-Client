@@ -1,3 +1,5 @@
+import { installCombatTextFrames } from './rendering/CombatTextFrames';
+import { installEmitterFrames } from './rendering/EmitterFrames';
 import { installLocalClientCommands } from './chat/LocalClientCommands';
 import { installBossSpawnTimerHooks } from './boss/NativeBossSpawnTimers';
 import { installMapTextureKeys } from './map/MapTextureKeys';
@@ -45,6 +47,8 @@ export default {
       installMapTextureKeys(api);
       installNetherBlobBeamHooks(api);
       installInterpolation(api);
+      installEmitterFrames(api);
+      installCombatTextFrames(api);
       installDisplayScale(api, deviceSettings);
       const login = api.cls('Login')!.prototype;
       api.around(login, 'connectSteam', function (next, ...args) {
