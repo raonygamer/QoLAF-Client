@@ -26,3 +26,18 @@ test('login timeout allows retry without accepting late callbacks from the previ
   context.mock.timers.tick(30_000);
   assert.equal(timeouts, 1, 'leaving the login screen cancels the timeout');
 });
+
+test('Control cancellation retires authentication before a retry and rejects late success or failure', (context) => {
+  context.mock.timers.enable({ apis: ['setTimeout'] });
+  const attempts = new LoginAttempt();
+  let timeouts = 0;
+  const cancelled = attempts.start(() => timeouts++);
+  attempts.cancel();
+  assert.equal(attempts.finish(cancelled), false);
+  const retry = attempts.start(() => timeouts++);
+  assert.equal(attempts.finish(cancelled), false);
+  assert.equal(attempts.isCurrent(retry), true);
+  assert.equal(attempts.finish(retry), true);
+  context.mock.timers.tick(30_000);
+  assert.equal(timeouts, 0);
+});

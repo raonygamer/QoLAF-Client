@@ -144,6 +144,16 @@ export function loginProfiles(api: API, login: Raw) {
     panel.setProfiles(profiles, state.selected);
     layout();
   };
+  const cancelLogin = () => {
+    if (disposed) return;
+    if (countdown <= 0 && !(inFlight && pending?.type === 'site')) return;
+    // Retire the authentication callback before showing the chooser. A response
+    // already in transit must not connect this account after cancellation.
+    attempts.cancel();
+    inFlight = false;
+    pending = null;
+    show();
+  };
   const fail = (error: any) => {
     if (disposed) return;
     attempts.cancel();
@@ -166,6 +176,7 @@ export function loginProfiles(api: API, login: Raw) {
       login.connectSteam();
       return;
     }
+    login.connectStatus.set_subText('(press CTRL to cancel...)');
     const attempt = attempts.start(() => {
       fail('The server did not answer in time. Please try again.');
     });
@@ -394,6 +405,7 @@ export function loginProfiles(api: API, login: Raw) {
     api.before(login, 'handleConnect', () => {
       attempts.cancel();
       inFlight = false;
+      login.connectStatus.set_subText('');
       hide();
       if (pending) {
         state.selected = pending.id;
@@ -422,16 +434,12 @@ export function loginProfiles(api: API, login: Raw) {
   cleanups.push(api.before(login, 'hideLogin', hide));
   cleanups.push(
     api.after(login, 'onKeyPress', (_result, event: Raw) => {
-      if (read(event, 'keyCode') === 17 && countdown > 0) show();
+      if (read(event, 'keyCode') === 17) cancelLogin();
       if (read(event, 'keyCode') === 13 && Login.currentState === 'profiles') panel.loginSelected();
     }),
   );
   show();
-  cleanups.push(
-    loginControl.onControl(() => {
-      if (!disposed && countdown > 0) show();
-    }),
-  );
+  cleanups.push(loginControl.onControl(cancelLogin));
   if (
     panel.autoLogin &&
     state.selected &&
