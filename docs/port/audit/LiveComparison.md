@@ -941,3 +941,24 @@ presentation cadence.
 - This is document-core work, not a completed live composer: native input events,
   bitmap selection/caret rendering, IME, clipboard interactions and formatting
   controls still need integration and original-vs-port visual verification.
+
+
+## Rich editor composition sessions — 2026-11-10
+
+- Ported provisional IME revisions into RichBitmapComposition, preserving the
+  source snapshot, reversed selection, formatting, atomic boundaries and the
+  accepted revision range when restrictions or serialized limits reject input.
+- Confirmation restores the original range before one final literal insertion.
+  Browser compositionend will own that insertion (unlike AIR, whose subsequent
+  TEXT_INPUT owns it). Session invalidation rejects late updates, duplicate
+  confirmation and cancellation after external text assignment or disposal.
+- Read source channel rules: only the global channel excludes <>=&#[]{}; the
+  eventual browser binding must preserve those rules rather than removing the
+  native restriction globally.
+- Validation: typecheck, formatting and all 187 tests pass. Five new tests cover
+  Japanese revisions with styled suffixes, rejected/filtered revisions, exact
+  cancellation with backward selection, literal markup/emoji replacement and
+  stale sessions after external assignment.
+- This is not yet connected to browser events or the bitmap composer, so no
+  visible input parity or real IME behavior is claimed. Browser event ordering,
+  clipboard, bitmap selection/caret and formatting controls remain open.
