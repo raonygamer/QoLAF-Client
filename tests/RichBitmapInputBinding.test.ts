@@ -158,3 +158,56 @@ test('password fields cannot copy or cut and read-only fields cannot paste', () 
   input.emit('paste', { clipboardData });
   assert.equal(model.text, 'secret');
 });
+
+test('Ctrl and Alt word movement use source boundaries and keep artifact labels atomic', () => {
+  const token = '$artifact:player:item$';
+  const { model, input, binding } = fixture(`A ${token} Z`, () => ({
+    label: 'Purple Artifact',
+    color: 0xffaa44,
+  }));
+  model.select(2);
+  binding.project();
+  assert.equal(input.emit('keydown', { key: 'ArrowRight', ctrlKey: true }).defaultPrevented, true);
+  assert.equal(model.selectionActive, 17);
+  input.emit('keydown', { key: 'ArrowLeft', altKey: true, shiftKey: true });
+  assert.equal(model.selectedCopyText, token);
+  assert.equal(input.selectionDirection, 'backward');
+  // Source collapses an existing selection before traversing another word.
+  input.emit('keydown', { key: 'ArrowRight', ctrlKey: true });
+  assert.equal(model.selectionBegin, 17);
+  assert.equal(model.selectionEnd, 17);
+  input.emit('keydown', { key: 'ArrowLeft', ctrlKey: true });
+  assert.equal(model.selectionActive, 2);
+  assert.equal(input.emit('keydown', { key: 'a', ctrlKey: true }).defaultPrevented, false);
+  binding.dispose();
+});
+
+test('word deletion preserves markup and atomic links through keyboard and beforeinput', () => {
+  const token = '$artifact:player:item$';
+  const { model, input, binding, changes } = fixture(
+    `A ${token} <font color='#ff0000'>Z</font>`,
+    () => ({ label: 'Purple Artifact', color: 0xffaa44 }),
+  );
+  model.select(17);
+  binding.project();
+  input.emit('keydown', { key: 'Backspace', ctrlKey: true });
+  assert.equal(model.visibleText, 'A  Z');
+  assert.equal(model.text.includes('$artifact:'), false);
+  model.select(3, 4);
+  assert.equal(model.selectedColor, 0xff0000);
+  assert.equal(changes(), 1);
+  binding.setText('one, two 👨‍👩‍👧 three');
+  model.select(0);
+  binding.project();
+  input.emit('beforeinput', { inputType: 'deleteWordForward' });
+  assert.equal(model.visibleText, 'two 👨‍👩‍👧 three');
+  model.select(input.value.length);
+  binding.project();
+  input.emit('beforeinput', { inputType: 'deleteWordBackward' });
+  assert.equal(model.visibleText, 'two 👨‍👩‍👧 ');
+  model.editable = false;
+  const before = model.text;
+  input.emit('keydown', { key: 'Backspace', altKey: true });
+  assert.equal(model.text, before);
+  binding.dispose();
+});

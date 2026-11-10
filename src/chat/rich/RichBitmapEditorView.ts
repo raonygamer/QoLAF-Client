@@ -138,9 +138,11 @@ export class RichBitmapEditorView {
   }
 
   /** Coordinates are in the clipped bitmap viewport, including its horizontal scroll. */
-  selectAt(x: number, extend = false): void {
+  selectAt(x: number, extend = false, clicks = 1): void {
     const index = this.metrics.indexAt(x + this.scrollX);
-    this.model.select(extend ? this.model.selectionAnchor : index, index);
+    if (clicks > 2) this.model.select(0, this.model.visibleText.length);
+    else if (clicks === 2) this.model.selectWordAt(index);
+    else this.model.select(extend ? this.model.selectionAnchor : index, index);
     this.refresh();
   }
 

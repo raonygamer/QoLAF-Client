@@ -122,3 +122,43 @@ test('source prompt stays visible on empty focused input without entering the do
   view.setPrompt('');
   assert.equal(prompt.get_visible(), false);
 });
+
+test('double and triple clicks select source words and the complete formatted line', (t) => {
+  const fixture = bitmapRendererFixture('verdana16_bitmap');
+  t.after(fixture.cleanup);
+  const model = new RichBitmapEditorModel(16);
+  model.text = "one <font color='#ff0000'>two</font> three";
+  const view = new RichBitmapEditorView(
+    fixture.resolve,
+    model,
+    new fixture.BitmapFormat(fixture.font, 16),
+  );
+  t.after(() => view.dispose());
+  view.setBounds(400, 30);
+  view.setFocus(true);
+  const x = [...'one t'].reduce(
+    (sum, c) => sum + fixture.font.getChar(c.charCodeAt(0)).xAdvance,
+    0,
+  );
+  view.selectAt(x, false, 2);
+  assert.equal(model.selectedVisibleText, 'two');
+  assert.equal(model.selectedColor, 0xff0000);
+  assert.equal(view.node.children[0].get_visible(), true);
+  view.selectAt(x, false, 3);
+  assert.equal(model.selectedVisibleText, 'one two three');
+  assert.equal(model.text, "one <font color='#ff0000'>two</font> three");
+});
+
+test('double-click word selection expands to complete artifact labels and emoji clusters', () => {
+  const token = '$artifact:player:item$';
+  const model = new RichBitmapEditorModel(13, 0xffffff, () => ({
+    label: 'Purple Artifact',
+    color: 0xffaa44,
+  }));
+  model.text = `A ${token} Z`;
+  model.selectWordAt(11);
+  assert.equal(model.selectedCopyText, token);
+  model.text = '👨‍👩‍👧';
+  model.selectWordAt(3);
+  assert.equal(model.selectedVisibleText, '👨‍👩‍👧');
+});

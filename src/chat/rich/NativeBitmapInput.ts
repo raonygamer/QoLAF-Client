@@ -130,12 +130,12 @@ export function bindNativeBitmapInput(
   api.after(input, 'set_textFormat', layout);
   listen(element, 'focus', layout);
   listen(element, 'blur', layout);
-  const selectPointer = (event: PointerEvent, extend: boolean) => {
+  const selectPointer = (event: MouseEvent, extend: boolean, clicks = 1) => {
     const rect = element.getBoundingClientRect();
     if (rect.width <= 0) return;
     const x =
       ((event.clientX - rect.left) * read(input, 'width')) / rect.width - (input.paddingLeft ?? 0);
-    view.selectAt(x, extend);
+    view.selectAt(x, extend, clicks);
     binding.project();
   };
   listen(element, 'pointerdown', (raw) => {
@@ -150,6 +150,19 @@ export function bindNativeBitmapInput(
   listen(element, 'pointermove', (raw) => {
     const event = raw as PointerEvent;
     if (pointer === event.pointerId) selectPointer(event, true);
+  });
+  // PointerEvent.detail is not a portable click count. Mouse click detail
+  // supplies the source Touch.tapCount behavior after pointer release.
+  listen(element, 'click', (raw) => {
+    const event = raw as MouseEvent;
+    if (event.button !== 0 || event.detail < 2 || element.disabled || binding.isComposing) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    selectPointer(event, false, event.detail);
+  });
+  listen(element, 'dblclick', (event) => {
+    // The bitmap model already selected the word; prevent a second DOM range.
+    event.preventDefault();
   });
   const releasePointer = (raw: Event) => {
     const event = raw as PointerEvent;

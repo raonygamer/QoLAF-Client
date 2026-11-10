@@ -96,13 +96,23 @@ export class RichBitmapInputBinding {
   }
 
   private navigate(event: KeyboardEvent): void {
-    if (event.ctrlKey || event.altKey || event.metaKey) return;
+    if (!this.model.enabled || event.metaKey) return;
+    const byWord = event.ctrlKey || event.altKey;
+    if (byWord && ['Backspace', 'Delete'].includes(event.key)) {
+      this.readSelection();
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      this.publish(
+        event.key === 'Backspace' ? this.model.backspace(true) : this.model.deleteForward(true),
+      );
+      return;
+    }
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
     this.readSelection();
     event.preventDefault();
     event.stopImmediatePropagation();
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
-      this.model.moveHorizontal(event.key === 'ArrowLeft' ? -1 : 1, event.shiftKey);
+      this.model.moveHorizontal(event.key === 'ArrowLeft' ? -1 : 1, event.shiftKey, byWord);
     else {
       const target = event.key === 'Home' ? 0 : this.model.visibleText.length;
       this.model.select(event.shiftKey ? this.model.selectionAnchor : target, target);
@@ -124,6 +134,12 @@ export class RichBitmapInputBinding {
         break;
       case 'deleteContentForward':
         edit = () => this.model.deleteForward();
+        break;
+      case 'deleteWordBackward':
+        edit = () => this.model.backspace(true);
+        break;
+      case 'deleteWordForward':
+        edit = () => this.model.deleteForward(true);
         break;
       case 'insertLineBreak':
       case 'insertParagraph':

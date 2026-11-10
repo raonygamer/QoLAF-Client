@@ -3,6 +3,7 @@ import { RichBitmapMarkupParser } from './RichBitmapMarkupParser';
 import { RichBitmapMarkupSerializer } from './RichBitmapMarkupSerializer';
 import { RichBitmapTextNavigation } from './RichBitmapTextNavigation';
 import { RichBitmapTypedMarkup } from './RichBitmapTypedMarkup';
+import { TextInputNavigation } from './TextInputNavigation';
 
 /** Document/selection operations from RichBitmapFontTextEditor.as, without Flash focus/rendering. */
 export class RichBitmapEditorModel {
@@ -117,11 +118,16 @@ export class RichBitmapEditorModel {
     }
   }
 
-  moveHorizontal(direction: -1 | 1, extend = false): void {
+  moveHorizontal(direction: -1 | 1, extend = false, byWord = false): void {
     let target: number;
     if (!extend && this.selectionBegin !== this.selectionEnd)
       target = direction < 0 ? this.selectionBegin : this.selectionEnd;
-    else if (direction < 0) {
+    else if (byWord) {
+      target =
+        direction < 0
+          ? this.snapBackward(TextInputNavigation.previousWordStart(this.visibleText, this.active))
+          : this.snapForward(TextInputNavigation.nextWordStart(this.visibleText, this.active));
+    } else if (direction < 0) {
       const atomic = this.document.previousAtomicBoundary(this.active);
       target =
         atomic >= 0
@@ -133,6 +139,14 @@ export class RichBitmapEditorModel {
         atomic >= 0 ? atomic : RichBitmapTextNavigation.nextBoundary(this.visibleText, this.active);
     }
     this.select(extend ? this.anchor : target, target);
+  }
+
+  selectWordAt(index: number): void {
+    index = Math.max(0, Math.min(this.visibleText.length, index));
+    this.select(
+      this.snapBackward(TextInputNavigation.currentWordStart(this.visibleText, index)),
+      this.snapForward(TextInputNavigation.currentWordEnd(this.visibleText, index)),
+    );
   }
 
   /** Resolver changes preserve source positions even when displayed token labels change. */
@@ -237,22 +251,26 @@ export class RichBitmapEditorModel {
     return this.commit(candidate, caret, caret, color, keepContinuation ? size : NaN);
   }
 
-  backspace(): boolean {
+  backspace(byWord = false): boolean {
     if (this.selectionBegin !== this.selectionEnd) return this.replaceSelection('', true);
     if (this.active <= 0) return false;
     const atomic = this.document.previousAtomicBoundary(this.active);
-    const begin =
-      atomic >= 0
+    const begin = byWord
+      ? TextInputNavigation.previousWordStart(this.visibleText, this.active)
+      : atomic >= 0
         ? atomic
         : RichBitmapTextNavigation.previousBoundary(this.visibleText, this.active);
     return this.replaceRange(begin, this.active, '', true);
   }
-  deleteForward(): boolean {
+  deleteForward(byWord = false): boolean {
     if (this.selectionBegin !== this.selectionEnd) return this.replaceSelection('', true);
     if (this.active >= this.visibleText.length) return false;
     const atomic = this.document.nextAtomicBoundary(this.active);
-    const end =
-      atomic >= 0 ? atomic : RichBitmapTextNavigation.nextBoundary(this.visibleText, this.active);
+    const end = byWord
+      ? TextInputNavigation.nextWordStart(this.visibleText, this.active)
+      : atomic >= 0
+        ? atomic
+        : RichBitmapTextNavigation.nextBoundary(this.visibleText, this.active);
     return this.replaceRange(this.active, end, '', true);
   }
 

@@ -1588,3 +1588,40 @@ implementation: XP, score, PvP, level, bonus XP, frag score, mission/boss/uber
 messages, drop aggregation, map entry and reputation retain source text, timing,
 position, color and size paths. They use the already-ported shared text layout.
 This source inspection does not establish live animation or full visual parity.
+
+## Rich editor word operations and click selection (2026-11-10)
+
+The artifact sharing source path also depends on rich-editor selection semantics.
+Before adding its UI, audited those dependencies: Ctrl/Alt navigation and word
+deletion were delegated to browser defaults, and native pointer input did not
+implement the source double/triple-click behavior. Extracted
+feathers.utils.text.TextInputNavigation from the original repository's
+libs/feathers.swc with ffdec and ported its exact word/punctuation rules. These
+are the library's ASCII word rules, not ChatWordBoundary's separate Unicode
+moderation rules. RichBitmapFontTextEditor.as supplies the subsequent snapping
+to complete emoji clusters and artifact spans.
+
+Ctrl/Alt+Left/Right now use those rules, including selection collapse and Shift
+extension. Ctrl/Alt+Backspace/Delete and browser deleteWord input events edit the
+rich document rather than a partially edited DOM projection. Double click selects
+the source word; triple click selects the line. Native click counts use MouseEvent
+detail after pointer release, with default DOM double-click selection suppressed.
+Markup formatting, atomic artifact tokens and emoji sequences remain intact.
+
+Typecheck and all 359 tests pass. Added coverage for native click integration,
+bitmap selection geometry, all-word selection, reverse selection, both keyboard
+modifiers, beforeinput deletion, unchanged surrounding formatting, whole artifact
+tokens/emoji, disabled input and read-only deletion.
+
+Reloaded once with explicit F5 release. The prior session had reached the native
+idle-disconnect dialog. Autologin completed; the new game session reported canvas,
+bridge and connection present with zero preview runtime errors. In the actual
+composer, a temporary unsent formatted draft produced word-right [4,4], extended
+word [4,8], double-click [0,3], triple-click [0,13], and word-delete [8,8] with red
+"two" formatting preserved. A physical double-click separately selected and
+highlighted "one". Temporary drafts were cleared and chat visibility restored.
+Evidence: /tmp/QoLAF-WordLive.png, /tmp/QoLAF-WordCleanup.png,
+/tmp/QoLAF-NativeWordClick.png and /tmp/QoLAF-NativeWordCleanup.png.
+
+Artifact share UI/channel selection and QoLAF transport remain separate unfinished
+work; this closes the editor operations needed to edit those references faithfully.

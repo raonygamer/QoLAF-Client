@@ -31,10 +31,14 @@ class Element extends EventTarget {
     this.selectionEnd = end;
     this.selectionDirection = direction;
   }
+  getBoundingClientRect() {
+    return { left: 0, width: 400 };
+  }
   emit(name: string, data: Record<string, unknown> = {}) {
     const event = new Event(name, { cancelable: true });
     Object.assign(event, data);
     this.dispatchEvent(event);
+    return event;
   }
 }
 
@@ -213,4 +217,19 @@ test('native composer paints inserted emoji from the source color atlas and dele
   assert.equal(renderer.characterBatch.meshes[0].texture, glyph.texture);
   element.emit('beforeinput', { inputType: 'deleteContentBackward' });
   assert.equal(input.get_text(), '');
+});
+
+test('native click counts select bitmap words and lines without DOM selection overriding them', (t) => {
+  const { input, element, cleanup } = fixture();
+  t.after(cleanup);
+  input.set_text('one two');
+  const click = element.emit('click', { button: 0, detail: 2, clientX: 10 });
+  assert.equal(click.defaultPrevented, true);
+  assert.deepEqual([element.selectionStart, element.selectionEnd], [0, 3]);
+  assert.equal(element.emit('dblclick').defaultPrevented, true);
+  element.emit('click', { button: 0, detail: 3, clientX: 10 });
+  assert.deepEqual([element.selectionStart, element.selectionEnd], [0, 7]);
+  element.disabled = true;
+  element.emit('click', { button: 0, detail: 2, clientX: 10 });
+  assert.deepEqual([element.selectionStart, element.selectionEnd], [0, 7]);
 });
