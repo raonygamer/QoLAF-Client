@@ -962,3 +962,23 @@ presentation cadence.
 - This is not yet connected to browser events or the bitmap composer, so no
   visible input parity or real IME behavior is claimed. Browser event ordering,
   clipboard, bitmap selection/caret and formatting controls remain open.
+
+
+## Rich editor browser transport — 2026-11-10
+
+- Added RichBitmapInputBinding: visible browser buffer with markup-owned document,
+  cancellable typing/deletion, plain clipboard transport with artifact wire
+  tokens, atomic selection, provisional composition and external assignment.
+- Composition revisions do not rewrite the platform's active IME buffer. Final
+  confirmation publishes once; its subsequent input notification is ignored.
+  Composition keys retain browser defaults but cannot reach the native submit
+  listener. Source-disabled/password copy rules are preserved.
+- Non-cancelable edits reconcile against the source model and restore rejected
+  values. Regression exposed common emoji-prefix diff boundaries; replacement
+  now includes whole emoji/artifact ranges rather than isolated surrogate units.
+- Seven transport tests cover formatted typing/continuation, composition event
+  ordering, artifact copy/cut/paste, fallback edits/limits, external assignment,
+  disposal, emoji/artifact diffs, password copy and read-only paste.
+- The binding is not activated in GameSession yet: native get/set/select hooks,
+  bitmap rendering/caret/hit testing and channel restrictions must be connected
+  together. Browser event tests do not prove live IME or visual parity.
