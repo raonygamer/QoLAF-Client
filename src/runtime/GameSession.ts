@@ -1,3 +1,4 @@
+import { installCommandAutocomplete } from '../chat/ChatCommandAutocompletePopup';
 import { installNexarWorldLabels } from '../ship/NexarWorldLabel';
 import { installMapLiveMiniatures } from '../map/NativeMapLiveMiniatures';
 import { installMapNavigation } from '../map/NativeMapNavigation';
@@ -47,6 +48,7 @@ export function installGameSession(
   installDamageText(session, game);
   installClanLabels(session, game);
   installNativeChatPreferences(session, game, preferences);
+  installCommandAutocomplete(session, game);
   const target = new TargetSystem(game, config, session.cls('core.ship.PlayerShip'));
   let indicator: TargetAimIndicator | undefined;
   if (targetIcon)

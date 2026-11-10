@@ -861,3 +861,29 @@ presentation cadence.
   recycling effect and Fitness without clipping. Screenshots:
   `/tmp/QoLAF-ArtifactTooltip2.png`, `/tmp/QoLAF-ArtifactTooltip3.png`.
   Exact Phase Nullifier tooltip and broader DPI/image cases remain unverified.
+
+
+## Native command autocomplete — 2026-11-10
+
+- Ported source ChatCommandAutocompleteModel and command metadata for commands
+  implemented by this runtime, with live registry suggestions and preserved
+  native getId/warpToId completion casing. Unsupported commands remain absent.
+- Added native Starling popup with original 34px rows, 18px command and 16px
+  description fields, Verdana 12/10, source colors/padding, maximum eight visible
+  rows, selection, ellipsis measurement, scroll track/thumb and click completion.
+- Connected native editor changes and keyboard capture: Tab completes, arrows
+  select, Escape dismisses; argument help is passive and Enter remains native.
+  IME and modified shortcuts fall through. Session cleanup removes listeners.
+- Live prefix /ec displayed /echo and its description, and Tab completed /echo
+  while leaving the editor open. No command/message was sent. Screenshots:
+  `/tmp/QoLAF-AutocompletePrefix.png`, `/tmp/QoLAF-AutocompleteTab.png`.
+- Live check caught pooled invisible rows inflating bounds and lifting a
+  one-row popup; now anchor to background height. Regression added. A second
+  check found native toggleChatMode adds tabs above the popup; now restore
+  source child order. Corrected anchor observed in
+  `/tmp/QoLAF-AutocompleteAnchor.png`. Final drawing-order check passed:
+  `/tmp/QoLAF-AutocompleteFinal.png` shows both command and description
+  immediately above the input after a clean reload.
+- TypeScript, formatting, and 173 tests pass. Full chat remains incomplete:
+  emoji/friend autocomplete, rich composer/views and source command inventory
+  still require implementation. Wheel/drag/click and resize need live checks.
