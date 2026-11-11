@@ -5,6 +5,7 @@ import { installInstantFrames } from './InstantFrames';
 import { installNetherBeamStyle } from './NetherBeamStyle';
 import { installNetherTentacleVisuals } from './NetherTentacleVisuals';
 import { TorpedoFrames } from './TorpedoFrames';
+import { installRibbonPool } from './RibbonPool';
 
 /** Source Projectile.draw: predict presentation between fixed 33 ms updates. */
 export function drawProjectileFrame(
@@ -44,6 +45,7 @@ export function installProjectileFrames(api: API): void {
   const projectile = api.cls('core.projectile.Projectile')?.prototype;
   const game = api.cls('core.scene.Game')?.prototype;
   if (!projectile || !game) return;
+  installRibbonPool(api);
   installNetherBeamStyle(api);
   installNetherTentacleVisuals(api);
   const drawInstant = installInstantFrames(api);

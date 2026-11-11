@@ -99,23 +99,42 @@ export function installNativeWeaponColors(
   }
   const projectiles = new Map<Raw, ProjectileState>();
   const meshes = new WeakMap<Raw, ProjectileState>();
+  const releaseRibbon = (state: ProjectileState) => {
+    const ribbon = state.ribbon;
+    if (!ribbon) return;
+    if (read(ribbon, 'color') === state.color.color) ribbon.set_color(state.ribbonColor);
+    if (state.ownedRibbonStyle && read(ribbon, 'style') === state.ownedRibbonStyle)
+      ribbon.setStyle(state.ribbonStyle, false);
+    meshes.delete(ribbon);
+    state.ribbon = null;
+  };
   const restore = (projectile: Raw) => {
     const state = projectiles.get(projectile);
     if (!state) return;
     if (read(state.clip, 'color') === state.color.color) state.clip.set_color(state.previousColor);
     if (state.ownedStyle && read(state.clip, 'style') === state.ownedStyle)
       state.clip.setStyle(state.previousStyle, false);
-    if (state.ribbon && read(state.ribbon, 'color') === state.color.color)
-      state.ribbon.set_color(state.ribbonColor);
-    if (state.ribbon) {
-      if (state.ownedRibbonStyle && read(state.ribbon, 'style') === state.ownedRibbonStyle)
-        state.ribbon.setStyle(state.ribbonStyle, false);
-      meshes.delete(state.ribbon);
-    }
+    releaseRibbon(state);
     emitters.release(projectile);
     meshes.delete(state.clip);
     projectiles.delete(projectile);
   };
+  const pool = game.ribbonTrailPool;
+  if (typeof pool?.removeRibbonTrail === 'function') {
+    api.before(pool, 'removeRibbonTrail', function (ribbon: Raw) {
+      if (!this.activeRibbonTrails.includes(ribbon)) return;
+      const state = meshes.get(ribbon);
+      if (state) releaseRibbon(state);
+    });
+  }
+  if (typeof pool?.reclaimOrphans === 'function') {
+    api.after(pool, 'reclaimOrphans', function () {
+      for (const ribbon of this.inactiveRibbonTrails) {
+        const state = meshes.get(ribbon);
+        if (state) releaseRibbon(state);
+      }
+    });
+  }
   const Factory = api.cls('core.projectile.ProjectileFactory');
   const Projectile = api.cls('core.projectile.Projectile')?.prototype;
   if (Factory && Projectile) {

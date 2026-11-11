@@ -160,6 +160,21 @@ test('native weapon rendering preserves simulation, isolates grayscale batches, 
   };
   manager.meshBatch.parent = parent;
   game.projectileManager = manager;
+  game.ribbonTrailPool = {
+    activeRibbonTrails: [projectile.ribbonTrail],
+    inactiveRibbonTrails: [] as Mesh[],
+    removeRibbonTrail(ribbon: Mesh) {
+      const index = this.activeRibbonTrails.indexOf(ribbon);
+      if (index < 0) return;
+      this.activeRibbonTrails.splice(index, 1);
+      this.inactiveRibbonTrails.push(ribbon);
+    },
+    reclaimOrphans() {
+      const count = this.activeRibbonTrails.length;
+      this.inactiveRibbonTrails.push(...this.activeRibbonTrails.splice(0));
+      return count;
+    },
+  };
   const classes: any = {
     'core.projectile.ProjectileFactory': Factory,
     'core.projectile.Projectile': Projectile,
@@ -168,6 +183,12 @@ test('native weapon rendering preserves simulation, isolates grayscale batches, 
     cls: (name: string) => classes[name],
     defer: (fn: Function) => cleanup.push(fn),
     around: hook,
+    after: (target: any, key: string, fn: Function) =>
+      hook(target, key, function (this: any, next: Function, ...args: any[]) {
+        const result = next(...args);
+        fn.call(this, result, ...args);
+        return result;
+      }),
     before: (target: any, key: string, fn: Function) =>
       hook(target, key, function (this: any, next: Function, ...args: any[]) {
         fn.apply(this, args);
@@ -183,6 +204,7 @@ test('native weapon rendering preserves simulation, isolates grayscale batches, 
     colors,
   );
   const originalStyle = projectile.movieClip.style;
+  const originalRibbonStyle = projectile.ribbonTrail.style;
   Factory.create({ key: 'a', unit: ship });
   assert.equal(projectile.movieClip.color, 0xff0088);
   assert.notEqual(projectile.movieClip.style, originalStyle);
@@ -191,14 +213,41 @@ test('native weapon rendering preserves simulation, isolates grayscale batches, 
   assert.equal(manager.meshBatch.records.length, 0);
   assert.equal(children.length, 1);
   assert.equal(children[0].records[0].color, 0xff0088);
+  game.ribbonTrailPool.removeRibbonTrail(projectile.ribbonTrail);
+  assert.equal(projectile.ribbonTrail.color, 0xffffff);
+  assert.equal(projectile.ribbonTrail.style, originalRibbonStyle);
+  assert.equal(
+    projectile.movieClip.color,
+    0xff0088,
+    'returning a trail leaves its live projectile alone',
+  );
+  const nextOwnerStyle = {};
+  projectile.ribbonTrail.setStyle(nextOwnerStyle);
+  projectile.ribbonTrail.set_color(0xff0088);
   projectile.reset();
   assert.equal(projectile.resets, 1);
   assert.equal(projectile.movieClip.color, 0xffffff);
   assert.equal(projectile.movieClip.style, originalStyle);
+  assert.equal(projectile.ribbonTrail.style, nextOwnerStyle);
+  assert.equal(
+    projectile.ribbonTrail.color,
+    0xff0088,
+    'old projectile cleanup cannot recolor a reused trail',
+  );
   Factory.create({ key: 'a', unit: {} });
   manager.update();
   assert.equal(manager.meshBatch.records.length, 1);
   assert.equal(children[0].records.length, 0);
+  game.ribbonTrailPool.inactiveRibbonTrails.length = 0;
+  game.ribbonTrailPool.activeRibbonTrails.push(projectile.ribbonTrail);
+  Factory.create({ key: 'a', unit: ship });
+  assert.notEqual(projectile.ribbonTrail.style, nextOwnerStyle);
+  assert.equal(game.ribbonTrailPool.reclaimOrphans(), 1);
+  assert.equal(
+    projectile.ribbonTrail.style,
+    nextOwnerStyle,
+    'orphan reclamation releases the owned grayscale style',
+  );
   for (const fn of cleanup.reverse()) fn();
 });
 

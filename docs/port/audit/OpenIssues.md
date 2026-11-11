@@ -2455,3 +2455,24 @@ reuse, read-only visual clock calls, and the actual aura shader upload path.
 All 541 tests, TypeScript and formatting pass. Desktop was on other applications;
 no game inputs or reloads were issued. Live encounter/visual comparison remains
 unverified, and this does not establish complete projectile or client parity.
+
+### Ribbon pool reset and visual ownership — 2026-11-10
+
+Compared extensions.RibbonTrail and core.pools.RibbonTrailPool against current
+upstream. Ported resetForPool defaults at checkout/return and after native orphan
+reclamation: detached follow line, playback/visibility, follow ratios, repeat,
+alpha, white color and zeroed segments. Native resetAllTo only changed segment
+history; it now also writes vertex positions/alpha immediately, as the original
+does, so the next batch cannot copy old geometry before a simulation tick.
+Native orphan detection and its return value remain intact.
+
+Custom weapon-color ownership now releases a ribbon's owned grayscale style and
+mesh association when it leaves the active pool. Cleanup of the former projectile
+cannot subsequently restore colors/styles onto that trail after reuse. The live
+projectile's own color remains in place when only its ribbon is returned.
+
+Tests cover checkout/return, repeated or unrelated removal, geometry before a
+tick, native orphan reclamation, full reset defaults, custom shader release and
+old-owner cleanup after reuse. All 543 tests, TypeScript, formatting and diff
+checks pass. Preview status currently reports the login/profile screen; no login,
+reload or gameplay input was issued. Live trail comparison remains unverified.
