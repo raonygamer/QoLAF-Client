@@ -71,3 +71,42 @@ test('a picker resolving after plugin disposal never opens its device', async ()
   await connect;
   assert.equal(result.opened, false);
 });
+
+test('remembers and restores only an already authorized HID device without a picker', async () => {
+  const { result } = device();
+  const saved = new Map<string, unknown>();
+  const storage = {
+    get<T>(key: string, fallback: T): T {
+      return (saved.get(key) as T) ?? fallback;
+    },
+    set(key: string, value: unknown) {
+      saved.set(key, value);
+    },
+  };
+  const first = new DualSenseHID((error) => {
+    throw error;
+  }, storage);
+  await first.connect({ requestDevice: async () => [result] });
+  await first.dispose();
+  const restored = new DualSenseHID((error) => {
+    throw error;
+  }, storage);
+  await restored.restore({
+    getDevices: async () => [result],
+    requestDevice: async () => {
+      throw Error('Must not open picker');
+    },
+  });
+  assert.equal(restored.connected, true);
+  await restored.dispose();
+  const revoked = new DualSenseHID((error) => {
+    throw error;
+  }, storage);
+  await revoked.restore({
+    getDevices: async () => [],
+    requestDevice: async () => {
+      throw Error('Must not open picker');
+    },
+  });
+  assert.equal(revoked.connected, false);
+});

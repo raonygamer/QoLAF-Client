@@ -1,6 +1,6 @@
 import { BitmapData, Image, Sprite, Text, Texture } from '../game/Bindings';
 import { controllerButtonName, type ControllerStyle } from './ControllerIdentity';
-import { genericIcon, xboxIcons } from './ControllerIcons';
+import { xboxIcons } from './ControllerIcons';
 
 /** All hint graphics are native Starling children, so scaling matches the game. */
 export function createControllerHints(): {
@@ -24,7 +24,11 @@ export function createControllerHints(): {
     let x = 0;
     for (const entry of currentEntries) {
       const asset =
-        currentStyle === 'xbox' ? (xboxIcons[entry.button] ?? genericIcon) : genericIcon;
+        currentStyle === 'xbox'
+          ? (xboxIcons[entry.button] ?? '')
+          : currentStyle === 'playstation' && entry.button < 4
+            ? `playstation:${entry.button}`
+            : '';
       if (asset.startsWith('playstation:') && !textures.has(asset)) {
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = 48;
@@ -63,7 +67,7 @@ export function createControllerHints(): {
         image.set_height(24);
         image.set_x(x);
         node.addChild(image);
-      } else if (!asset.startsWith('playstation:') && !loading.has(asset)) {
+      } else if (asset && !asset.startsWith('playstation:') && !loading.has(asset)) {
         loading.add(asset);
         const future = BitmapData.loadFromBase64(asset.slice(asset.indexOf(',') + 1), 'image/png');
         future.onComplete((bitmap) => {
@@ -82,12 +86,18 @@ export function createControllerHints(): {
           /* Text labels remain usable if an icon cannot be decoded. */
         });
       }
-      const label = new Text(x + 28, 5);
+      if (loaded && !entry.text) {
+        x += 28;
+        continue;
+      }
+      const label = new Text(x + (asset ? 28 : 0), 5);
       const name = controllerButtonName(entry.button, currentStyle);
       label.set_text(
         (currentStyle === 'xbox' || asset.startsWith('playstation:')) && loaded
           ? entry.text
-          : `${name}: ${entry.text}`,
+          : entry.text
+            ? `${name}: ${entry.text}`
+            : name,
       );
       node.addChild(label);
       x += Math.max(95, label.get_width() + 48);

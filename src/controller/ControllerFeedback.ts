@@ -13,15 +13,16 @@ export interface WeaponFeedback {
 export function weaponTrigger(weapon: WeaponFeedback | null, strength: number): TriggerEffect {
   if (!weapon || strength <= 0 || ['teleport', 'cloak', 'petSpawner'].includes(weapon.type))
     return { kind: 'off' };
-  if (weapon.charging || weapon.type === 'beam')
-    return { kind: 'resistance', start: 2, strength: strength * (weapon.firing ? 0.8 : 0.35) };
+  if (weapon.charging && !weapon.firing)
+    return { kind: 'resistance', start: 2, strength: strength * 0.35 };
   if (!weapon.firing) return { kind: 'weapon', start: 2, end: 6, strength: strength * 0.45 };
-  if (weapon.missile || weapon.interval >= 500)
+  if (weapon.type !== 'beam' && weapon.interval >= 250)
     return { kind: 'weapon', start: 2, end: 7, strength };
   return {
     kind: 'vibration',
     start: 2,
-    strength: strength * Math.max(0.35, Math.min(1, weapon.speed / 1000)),
+    strength:
+      strength * Math.max(0.35, Math.min(1, weapon.type === 'beam' ? 0.65 : weapon.speed / 1000)),
     frequency: Math.max(1, Math.min(60, Math.round(1000 / Math.max(17, weapon.interval)))),
   };
 }

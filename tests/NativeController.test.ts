@@ -175,6 +175,25 @@ test('controller hooks merge keyboard input, preserve boost edges, cycle weapons
   state.updateInput();
   state.updateInput();
   assert.equal(respawns, 1, 'respawn requires a fresh press and uses the native request');
+  // Lime's invisible IME helper must not steal controller input after a mouse/key event.
+  const helper = new HTMLElement();
+  Object.assign(helper, {
+    tagName: 'INPUT',
+    isContentEditable: false,
+    getBoundingClientRect: () => ({ width: 1, height: 1 }),
+  });
+  let style = { display: 'block', visibility: 'visible', opacity: '0', pointerEvents: 'none' };
+  Object.assign(window, { getComputedStyle: () => style });
+  Object.defineProperty(document, 'activeElement', { configurable: true, value: helper });
+  buttons[7].value = 1;
+  state.updateInput();
+  assert.equal(fire.at(-1), true, 'hidden Lime input does not suspend gamepad');
+  style = { display: 'block', visibility: 'visible', opacity: '1', pointerEvents: 'auto' };
+  Object.assign(helper, { getBoundingClientRect: () => ({ width: 200, height: 30 }) });
+  state.updateInput();
+  assert.equal(fire.at(-1), false, 'real text entry still suspends gamepad');
+  Object.defineProperty(document, 'activeElement', { configurable: true, value: null });
+  buttons[7].value = 0;
   focused = false;
   state.updateInput();
   assert.equal(fire.at(-1), false);

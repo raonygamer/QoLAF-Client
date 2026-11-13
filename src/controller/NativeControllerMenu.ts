@@ -1,3 +1,4 @@
+import { readControllers } from './ControllerDevices';
 import { createControllerHints } from './ControllerHints';
 import type { API } from '../api/Types';
 import type { Game } from '../game/Game';
@@ -62,6 +63,7 @@ export function installControllerMenu(
   };
   const keyboard = () => {
     controllerActive = false;
+    lastIntent = '';
     hide();
   };
   window.addEventListener('keydown', keyboard);
@@ -97,7 +99,7 @@ export function installControllerMenu(
       previousState = null;
       return;
     }
-    const pads = navigator.getGamepads?.() ?? [];
+    const pads = readControllers();
     const pad =
       settings.values.controllerIndex >= 0
         ? pads[settings.values.controllerIndex]
@@ -250,15 +252,20 @@ export function installControllerMenu(
       { button: 1, text: 'Back' },
       { button: 4, text: 'Previous page' },
       { button: 5, text: 'Next page' },
-      { button: 11, text: 'Move pointer' },
-      { button: 7, text: 'Hold to drag' },
     ]);
     hints.set_scaleX(1);
     hints.set_scaleY(1);
     const hintScale = Math.min(1, (stage.get_stageWidth() - 40) / Math.max(1, hints.get_width()));
     hints.set_scaleX(hintScale);
     hints.set_scaleY(hintScale);
-    hints.set_y(stage.get_stageHeight() - 28);
+    const panel = (state as { panel?: DisplayObjectContainer } | null)?.panel;
+    const bounds = panel?.getBounds(stage);
+    hints.set_x(bounds ? bounds.x + 190 : Math.max(12, rectangle.x));
+    hints.set_y(
+      bounds
+        ? bounds.y + bounds.height - 32
+        : Math.min(stage.get_stageHeight() - 28, rectangle.y + rectangle.height + 8),
+    );
     stage.addChild(hints);
   });
 }

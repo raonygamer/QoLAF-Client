@@ -36,10 +36,10 @@ export function createSettingsBindings(resolve: Resolve): any {
       this.g = param1;
       this.keybinds = SceneBase.settings.keybinds;
       this.scrollArea = new ScrollContainer();
-      this.scrollArea.y = 85;
+      this.scrollArea.y = 100;
       this.scrollArea.x = 8;
       this.scrollArea.width = 730;
-      this.scrollArea.height = 460;
+      this.scrollArea.height = 445;
       this.initComponents();
       this.addChild(this.scrollArea);
       const keyboard = new Button(() => {
@@ -48,7 +48,8 @@ export function createSettingsBindings(resolve: Resolve): any {
         this.scrollArea.visible = true;
       }, 'Keyboard / Mouse');
       keyboard.x = 28;
-      keyboard.y = 45;
+      keyboard.y = 52;
+      keyboard.autoEnableAfterClick = true;
       keyboard.width = 180;
       this.addChild(keyboard);
       const controller = new Button(() => {
@@ -58,7 +59,8 @@ export function createSettingsBindings(resolve: Resolve): any {
         this.addChild(this.controllerPage);
       }, 'Controller');
       controller.x = 220;
-      controller.y = 45;
+      controller.y = 52;
+      controller.autoEnableAfterClick = true;
       controller.width = 180;
       this.addChild(controller);
       param1.stage.addEventListener('updateButtons', this.updateButtons);

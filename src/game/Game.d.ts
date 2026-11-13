@@ -3145,7 +3145,7 @@ export declare namespace Game {
             cooldownOverlay: any;
             draw(): any;
             g: any;
-            hotkeySymbol: any;
+            hotkeySymbol: Game.core.hud.components.Text;
             iconTexture: any;
             inactiveIconTexture: any;
             initiateCooldown(): any;
@@ -3172,7 +3172,7 @@ export declare namespace Game {
             g: any;
             getHotkeys(): any;
             highlightWeapon(arg0?: any): any;
-            hotkeys: any;
+            hotkeys: Game.core.hud.components.hotkeys.WeaponHotkey[];
             load(): any;
             player: any;
             refresh(): any;

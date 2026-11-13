@@ -5,7 +5,8 @@ import {
   type RumbleActuator,
 } from './ControllerRumble';
 import type { API } from '../api/Types';
-import type { GameScene } from '../game/Bindings';
+import { ProjectileGun, type GameScene, type Weapon } from '../game/Bindings';
+import { WeaponCadence } from './WeaponCadence';
 import type { ControllerSettings } from './ControllerSettings';
 import type { DualSenseHID } from './DualSenseHID';
 import { feedbackOutput, type WeaponFeedback } from './ControllerFeedback';
@@ -16,6 +17,16 @@ export function installControllerFeedback(
   hid: DualSenseHID,
   currentPad: () => Gamepad | null,
 ): void {
+  const cadence = new WeakMap<Weapon, WeaponCadence>();
+  // This is the server-synchronized projectile path, after native heat/rate checks.
+  if (typeof ProjectileGun?.prototype?.shootSyncedProjectile === 'function') {
+    api.after(ProjectileGun.prototype, 'shootSyncedProjectile', function () {
+      if (this.unit !== this.g.get_me()?.ship) return;
+      let observed = cadence.get(this);
+      if (!observed) cadence.set(this, (observed = new WeaponCadence()));
+      observed.shot(this.g.time, this.reloadTime);
+    });
+  }
   let lastShip: object | null = null;
   let lastRoom: GameScene | null = null;
   let lastDamage = 0;
@@ -86,12 +97,16 @@ export function installControllerFeedback(
     lastHealth = health;
     lastDamage = marker;
     const weapon = ship.weapons[player.selectedWeaponIndex];
+    const observed = weapon ? cadence.get(weapon)?.sample(game.time, weapon.reloadTime) : null;
     const description: WeaponFeedback | null = weapon
       ? {
           type: typeof weapon.type === 'string' ? weapon.type : '',
-          interval: weapon.reloadTime,
+          interval: observed?.interval ?? weapon.reloadTime,
           speed: weapon.speed,
-          firing: weapon.get_fire() && ship.alive && !player.get_inSafeZone(),
+          firing:
+            ship.alive &&
+            !player.get_inSafeZone() &&
+            (weapon.type === 'beam' ? weapon.get_fire() : (observed?.firing ?? false)),
           charging: weapon.hasChargeUp === true,
           missile: weapon.isMissileWeapon === true,
         }

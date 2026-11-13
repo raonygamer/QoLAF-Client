@@ -18,9 +18,9 @@ const weapon: WeaponFeedback = {
 };
 
 test('trigger profiles distinguish sustained beams, missiles, charging and rapid projectiles', () => {
-  assert.equal(weaponTrigger({ ...weapon, type: 'beam' }, 0.5).kind, 'resistance');
-  assert.equal(weaponTrigger({ ...weapon, missile: true }, 0.5).kind, 'weapon');
-  assert.equal(weaponTrigger({ ...weapon, charging: true }, 0.5).kind, 'resistance');
+  assert.equal(weaponTrigger({ ...weapon, type: 'beam' }, 0.5).kind, 'vibration');
+  assert.equal(weaponTrigger({ ...weapon, missile: true }, 0.5).kind, 'vibration');
+  assert.equal(weaponTrigger({ ...weapon, charging: true, firing: false }, 0.5).kind, 'resistance');
   const rapid = weaponTrigger(weapon, 0.5);
   assert.equal(rapid.kind, 'vibration');
   if (rapid.kind === 'vibration') assert.equal(rapid.frequency, 10);

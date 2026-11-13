@@ -1,3 +1,4 @@
+import { readControllers, controllerStatus } from './ControllerDevices';
 import { controllerButtonName, controllerStyle } from './ControllerIdentity';
 import { ControllerCapture, setControllerCapture } from './ControllerCapture';
 import { PaintButton as Button, ScrollBox, Sprite, Text, SceneBase } from '../game/Bindings';
@@ -6,10 +7,12 @@ import type { ControllerPreferences } from './ControllerSettings';
 
 /** Native controls share the input page's viewport and lifetime. */
 export function createControllerPage(): Sprite {
+  let statusTimer: number | undefined;
   let stopCapture: (() => void) | null = null;
   class ControllerRoot extends Sprite {
     dispose(): void {
       stopCapture?.();
+      window.clearInterval(statusTimer);
       super.dispose();
     }
   }
@@ -19,9 +22,9 @@ export function createControllerPage(): Sprite {
   const values = settings.values;
   const scroll = new ScrollBox();
   scroll.set_x(8);
-  scroll.set_y(85);
+  scroll.set_y(100);
   scroll.set_width(730);
-  scroll.set_height(460);
+  scroll.set_height(445);
   root.addChild(scroll);
   let y = 0;
   const refreshBindings: (() => void)[] = [];
@@ -34,6 +37,7 @@ export function createControllerPage(): Sprite {
   }
   function button(text: string, x: number, callback: () => void): Button {
     const node = new Button(callback, text);
+    node.autoEnableAfterClick = true;
     node.set_x(x);
     node.set_y(y);
     node.set_width(125);
@@ -87,6 +91,16 @@ export function createControllerPage(): Sprite {
     y += 42;
   }
   toggle('enabled', 'Controller input');
+  const inputStatus = label('');
+  inputStatus.set_size(11);
+  const updateStatus = () =>
+    inputStatus.set_text(controllerStatus(values.enabled, values.controllerIndex).slice(0, 100));
+  updateStatus();
+  statusTimer = window.setInterval(() => {
+    updateStatus();
+    status.set_text(controllerHID()?.status ?? 'Not connected');
+  }, 1000);
+  y += 36;
   label('Button icon style');
   const styles = ['auto', 'xbox', 'playstation', 'generic'] as const;
   const style = button(values.iconStyle, 500, () => {
@@ -132,7 +146,7 @@ export function createControllerPage(): Sprite {
           : String(SceneBase.settings?.keybinds.getName(action) ?? `Action ${action}`),
     );
     const buttonName = (index: number) => {
-      const pads = navigator.getGamepads?.() ?? [];
+      const pads = readControllers();
       const pad =
         values.controllerIndex >= 0
           ? pads[values.controllerIndex]
@@ -155,7 +169,7 @@ export function createControllerPage(): Sprite {
       control.set_text('Press / move...');
       const deadline = performance.now() + 10000;
       const timer = window.setInterval(() => {
-        const pads = navigator.getGamepads?.() ?? [];
+        const pads = readControllers();
         const pad =
           values.controllerIndex < 0
             ? Array.from(pads).find((candidate) => candidate?.connected)

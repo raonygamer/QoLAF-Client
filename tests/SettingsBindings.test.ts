@@ -67,7 +67,7 @@ test('binding page preserves source row order and releases its stage update list
   const scroll = page.getChildAt(0) as Display;
   assert.deepEqual(
     [scroll.get_x(), scroll.get_y(), scroll.get_width(), scroll.get_height()],
-    [8, 85, 730, 460],
+    [8, 100, 730, 445],
   );
   assert.deepEqual(
     scroll.children

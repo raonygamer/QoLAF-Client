@@ -1,3 +1,4 @@
+import type { API } from '../api/Types';
 import { encodeDualSenseReport, type DualSenseOutput } from './DualSenseReport';
 
 interface HIDCollection {
@@ -19,6 +20,7 @@ export interface ControllerHIDDevice {
 }
 
 export interface ControllerHID {
+  getDevices?(): Promise<ControllerHIDDevice[]>;
   requestDevice(options: {
     filters: { vendorId: number; productId: number; usagePage: number; usage: number }[];
   }): Promise<ControllerHIDDevice[]>;
@@ -50,7 +52,32 @@ export class DualSenseHID {
   private failed = false;
   status = 'Not connected';
 
-  constructor(private readonly reportError: (error: unknown) => void) {}
+  constructor(
+    private readonly reportError: (error: unknown) => void,
+    private readonly storage?: API['storage'],
+  ) {}
+
+  async restore(hid: ControllerHID | undefined = browserHID()): Promise<void> {
+    const saved = this.storage?.get<{
+      vendorId: number;
+      productId: number;
+      productName: string;
+    } | null>('controller-hid', null);
+    if (!saved || !hid?.getDevices || this.connected || this.connecting || this.disposed) return;
+    try {
+      const devices = await hid.getDevices();
+      const device = devices.find(
+        (device) =>
+          device.vendorId === saved.vendorId &&
+          device.productId === saved.productId &&
+          device.productName === saved.productName,
+      );
+      if (device) await this.connect({ requestDevice: async () => [device] });
+    } catch (error) {
+      this.status = 'Saved controller unavailable';
+      this.reportError(error);
+    }
+  }
 
   get connected(): boolean {
     return !this.failed && (this.device?.opened ?? false);
@@ -90,6 +117,11 @@ export class DualSenseHID {
       this.failed = false;
       this.bluetooth = bluetooth;
       this.lastBytes = '';
+      this.storage?.set('controller-hid', {
+        vendorId: device.vendorId,
+        productId: device.productId,
+        productName: device.productName,
+      });
       this.status = `${device.productName} (${bluetooth ? 'Bluetooth' : 'USB'})`;
     } catch (error) {
       this.status = error instanceof Error ? error.message : String(error);

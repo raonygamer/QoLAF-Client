@@ -1,21 +1,36 @@
 import type { API } from '../api/Types';
+import type { Game } from '../game/Game';
 import { GameReflection } from '../api/GameReflection';
 import type { ControllerSettings } from './ControllerSettings';
 import { createControllerHints } from './ControllerHints';
 import { controllerHasIntent, controllerStyle } from './ControllerIdentity';
 
+type Hotkey = Game.core.hud.components.hotkeys.AbilityHotkey;
+
+/** Replace the existing hotkey legends, rather than floating a second HUD over gameplay. */
 export function installControllerHints(
   api: API,
   settings: ControllerSettings,
   currentPad: () => Gamepad | null,
 ): void {
-  const hints = createControllerHints();
   const reflection = new GameReflection(api);
+  const badges = new Map<
+    Hotkey,
+    { view: ReturnType<typeof createControllerHints>; visible: boolean }
+  >();
   let active = false;
   let lastIntent = '';
+  const clear = () => {
+    for (const [hotkey, badge] of badges) {
+      hotkey.hotkeySymbol?.set_visible(badge.visible);
+      badge.view.dispose();
+    }
+    badges.clear();
+  };
   const keyboard = () => {
     active = false;
-    hints.node.removeFromParent();
+    lastIntent = '';
+    clear();
   };
   window.addEventListener('keydown', keyboard);
   window.addEventListener('pointermove', keyboard);
@@ -24,21 +39,19 @@ export function installControllerHints(
     window.removeEventListener('keydown', keyboard);
     window.removeEventListener('pointermove', keyboard);
     window.removeEventListener('pointerdown', keyboard);
-    hints.dispose();
+    clear();
   });
   api.on('frame', ({ game }) => {
     const pad = currentPad();
-    const stage = game.get_stage();
     if (
       !pad ||
-      !stage ||
       !settings.values.enabled ||
       document.hidden ||
       !document.hasFocus() ||
       !reflection.is(game.gameStateMachine?.currentState, 'core.states.gameStates.RoamingState') ||
       game.chatInput?.isActive()
     ) {
-      hints.node.removeFromParent();
+      clear();
       return;
     }
     const intent = JSON.stringify([
@@ -52,28 +65,39 @@ export function installControllerHints(
       active = true;
     lastIntent = intent;
     if (!active) return;
-    const actions = [
-      [19, 'Fire'],
-      [15, game.get_me()?.ship?.alive === false ? 'Respawn' : 'Boost'],
-      [10, 'Land'],
-      [29, 'Previous weapon'],
-      [30, 'Next weapon'],
-    ] as const;
-    const entries: { button: number; text: string }[] = [];
-    for (const [action, text] of actions) {
-      const mapping = settings.values.mappings.find(
-        (mapping) => mapping.action === action && mapping.binding.kind === 'button',
-      );
-      if (mapping?.binding.kind === 'button') entries.push({ button: mapping.binding.index, text });
+    const wanted = new Set<Hotkey>();
+    const show = (hotkey: Hotkey, action: number) => {
+      const binding = settings.values.mappings.find(
+        (mapping) => mapping.action === action,
+      )?.binding;
+      if (binding?.kind !== 'button' || !hotkey.hotkeySymbol || !hotkey.get_visible()) return;
+      wanted.add(hotkey);
+      let badge = badges.get(hotkey);
+      if (!badge) {
+        badge = { view: createControllerHints(), visible: hotkey.hotkeySymbol.get_visible() };
+        badges.set(hotkey, badge);
+      }
+      badge.view.update(controllerStyle(pad.id, settings.values.iconStyle), [
+        { button: binding.index, text: '' },
+      ]);
+      badge.view.node.set_scaleX(0.75);
+      badge.view.node.set_scaleY(0.75);
+      badge.view.node.set_x(hotkey.hotkeySymbol.get_x() - 4);
+      badge.view.node.set_y(hotkey.hotkeySymbol.get_y());
+      hotkey.hotkeySymbol.set_visible(false);
+      hotkey.addChild(badge.view.node);
+    };
+    for (const key of game.hud?.weaponHotkeys?.hotkeys ?? []) show(key, 19 + key.key);
+    const actions: Record<string, number> = { Engine: 15, Shield: 16, Armor: 17, Power: 18 };
+    for (const key of game.hud?.abilities?.hotkeys ?? []) {
+      const action = actions[key.obj?.name ?? ''];
+      if (action !== undefined) show(key, action);
     }
-    hints.update(controllerStyle(pad.id, settings.values.iconStyle), entries);
-    hints.node.set_scaleX(1);
-    hints.node.set_scaleY(1);
-    const scale = Math.min(1, (stage.get_stageWidth() - 40) / Math.max(1, hints.node.get_width()));
-    hints.node.set_scaleX(scale);
-    hints.node.set_scaleY(scale);
-    hints.node.set_x(Math.max(20, (stage.get_stageWidth() - hints.node.get_width()) / 2));
-    hints.node.set_y(stage.get_stageHeight() - 30);
-    stage.addChild(hints.node);
+    for (const [key, badge] of badges)
+      if (!wanted.has(key)) {
+        key.hotkeySymbol?.set_visible(badge.visible);
+        badge.view.dispose();
+        badges.delete(key);
+      }
   });
 }

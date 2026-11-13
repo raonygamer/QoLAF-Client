@@ -1,3 +1,4 @@
+import { readControllers, controllerStatus } from './ControllerDevices';
 import { installControllerHints } from './NativeControllerHints';
 import { registerControllerContext } from './ControllerContext';
 import { installControllerMenu } from './NativeControllerMenu';
@@ -14,8 +15,14 @@ import { ControllerSettings, nextWeaponAction, previousWeaponAction } from './Co
 export function installNativeController(api: API): void {
   const settings = new ControllerSettings(api.storage);
   installControllerMenu(api, settings, isControllerCaptureActive);
-  const hid = new DualSenseHID((error) => api.log('Controller output:', error));
+  const hid = new DualSenseHID((error) => api.log('Controller output:', error), api.storage);
   api.defer(registerControllerContext(settings, hid));
+  const reconnectHID = () => {
+    void hid.restore();
+  };
+  reconnectHID();
+  window.addEventListener('gamepadconnected', reconnectHID);
+  api.defer(() => window.removeEventListener('gamepadconnected', reconnectHID));
   const input = new ControllerInput();
   let querying = false;
   let suspended = true;
@@ -23,7 +30,7 @@ export function installNativeController(api: API): void {
   let selectedIndex: number | null = null;
   let selectedID: string | null = null;
   const currentPad = () => {
-    const pads = navigator.getGamepads?.() ?? [];
+    const pads = readControllers();
     return selectedIndex === null ? null : (pads[selectedIndex] ?? null);
   };
   installControllerFeedback(api, settings, hid, currentPad);
@@ -50,7 +57,19 @@ export function installNativeController(api: API): void {
     settings.save();
   });
 
+  let inputBlock = 'Waiting for flight input';
+  let lastStatus = '';
+  let statusTime = -Infinity;
   api.on('frame', ({ game }) => {
+    const now = performance.now();
+    if (now - statusTime >= 1000) {
+      statusTime = now;
+      const status = `${controllerStatus(settings.values.enabled, settings.values.controllerIndex)}; ${inputBlock}`;
+      if (status !== lastStatus) {
+        lastStatus = status;
+        api.log('Controller input:', status);
+      }
+    }
     if (game.gameStateMachine?.currentState !== lastState) {
       input.clear();
       suspended = true;
@@ -69,29 +88,38 @@ export function installNativeController(api: API): void {
 
   api.around(RoamingState.prototype, 'updateInput', function (next) {
     const preferences = settings.values;
-    if (
-      !preferences.enabled ||
-      document.hidden ||
-      !document.hasFocus() ||
-      this.g.get_isLeaving() ||
-      this.g.chatInput?.isActive() ||
-      isKeyCaptureActive(this.g.get_stage()) ||
-      editingText()
-    ) {
+    inputBlock = !preferences.enabled
+      ? 'input off'
+      : document.hidden
+        ? 'document hidden'
+        : !document.hasFocus()
+          ? 'document unfocused'
+          : this.g.get_isLeaving()
+            ? 'leaving room'
+            : this.g.chatInput?.isActive()
+              ? 'chat active'
+              : isKeyCaptureActive(this.g.get_stage())
+                ? 'keyboard binding capture active'
+                : editingText()
+                  ? 'HTML text field active'
+                  : '';
+    if (inputBlock) {
       clear();
       return next();
     }
-    const pads = navigator.getGamepads?.() ?? [];
+    const pads = readControllers();
     const pad =
       preferences.controllerIndex >= 0
         ? pads[preferences.controllerIndex]
         : ((selectedIndex === null ? null : pads[selectedIndex]) ??
           Array.from(pads).find((candidate) => candidate?.connected));
     if (!pad?.connected) {
+      inputBlock = 'No exposed controller';
       clear();
       return next();
     }
     if (selectedIndex !== pad.index || selectedID !== pad.id) input.clear();
+    inputBlock = `Reading controller ${pad.index}`;
     selectedIndex = pad.index;
     selectedID = pad.id;
     input.update(pad, preferences.mappings, preferences);
@@ -128,8 +156,21 @@ export function installNativeController(api: API): void {
 
 function editingText(): boolean {
   const element = document.activeElement;
+  if (
+    !(element instanceof HTMLElement) ||
+    !(element.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(element.tagName))
+  )
+    return false;
+  // Lime focuses an invisible 1px IME input after keyboard/mouse activity.
+  // It is not an editable game field; chat and key capture have separate guards.
+  const style = window.getComputedStyle(element);
+  const bounds = element.getBoundingClientRect();
   return (
-    element instanceof HTMLElement &&
-    (element.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(element.tagName))
+    style.display !== 'none' &&
+    style.visibility !== 'hidden' &&
+    style.opacity !== '0' &&
+    style.pointerEvents !== 'none' &&
+    bounds.width > 1 &&
+    bounds.height > 1
   );
 }
