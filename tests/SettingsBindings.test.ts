@@ -36,7 +36,16 @@ test('binding page preserves source row order and releases its stage update list
     htmlText = '';
     size = 0;
   }
+  class Button extends Display {
+    constructor(
+      readonly callback: () => void,
+      readonly text: string,
+    ) {
+      super();
+    }
+  }
   const definitions: Record<string, unknown> = {
+    'core.hud.components.Button': Button,
     'core.hud.components.SettingsKeybind': Row,
     'core.hud.components.Text': Label,
     'core.scene.SceneBase': { settings: { keybinds } },
@@ -53,10 +62,12 @@ test('binding page preserves source row order and releases its stage update list
       4, 5, 8, 0,
     ],
   );
+  assert.equal((page.getChildAt(1) as Button).text, 'Keyboard / Mouse');
+  assert.equal((page.getChildAt(2) as Button).text, 'Controller');
   const scroll = page.getChildAt(0) as Display;
   assert.deepEqual(
     [scroll.get_x(), scroll.get_y(), scroll.get_width(), scroll.get_height()],
-    [8, 50, 730, 500],
+    [8, 85, 730, 460],
   );
   assert.deepEqual(
     scroll.children

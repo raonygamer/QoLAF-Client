@@ -1,8 +1,10 @@
+import { createControllerPage } from '../controller/ControllerPage';
 // Source port of core/states/gameStates/SettingsBindings.as.
 import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createSettingsBindings(resolve: Resolve): any {
   const SettingsKeybind: any = resolve('core.hud.components.SettingsKeybind');
   type SettingsKeybind = any;
+  const Button = resolve('core.hud.components.Button');
   const Text: any = resolve('core.hud.components.Text');
   type Text = any;
   const Game: any = resolve('core.scene.Game');
@@ -27,18 +29,38 @@ export function createSettingsBindings(resolve: Resolve): any {
     private currentWidth: number = 20;
     private scrollArea!: ScrollContainer;
     private keybindList: SettingsKeybind[] = [];
+    private controllerPage: ReturnType<typeof createControllerPage> | null = null;
 
     constructor(param1: Game) {
       super();
       this.g = param1;
       this.keybinds = SceneBase.settings.keybinds;
       this.scrollArea = new ScrollContainer();
-      this.scrollArea.y = 50;
+      this.scrollArea.y = 85;
       this.scrollArea.x = 8;
       this.scrollArea.width = 730;
-      this.scrollArea.height = 500;
+      this.scrollArea.height = 460;
       this.initComponents();
       this.addChild(this.scrollArea);
+      const keyboard = new Button(() => {
+        this.controllerPage?.removeFromParent(true);
+        this.controllerPage = null;
+        this.scrollArea.visible = true;
+      }, 'Keyboard / Mouse');
+      keyboard.x = 28;
+      keyboard.y = 45;
+      keyboard.width = 180;
+      this.addChild(keyboard);
+      const controller = new Button(() => {
+        if (this.controllerPage) return;
+        this.scrollArea.visible = false;
+        this.controllerPage = createControllerPage();
+        this.addChild(this.controllerPage);
+      }, 'Controller');
+      controller.x = 220;
+      controller.y = 45;
+      controller.width = 180;
+      this.addChild(controller);
       param1.stage.addEventListener('updateButtons', this.updateButtons);
     }
 

@@ -105,6 +105,7 @@ import { installCombatTextFrames } from './rendering/CombatTextFrames';
 import { installEmitterFrames } from './rendering/EmitterFrames';
 import { installLocalClientCommands } from './chat/LocalClientCommands';
 import { installNativeDeathMessages } from './chat/NativeDeathMessages';
+import { installNativeController } from './controller/NativeController';
 import { installWeaponInput } from './weapon/WeaponInput';
 import { installPaintShop } from './ship/PaintShop';
 import { installShipCreation } from './ship/ShipCreation';
@@ -268,6 +269,7 @@ export default {
       installLocalClientCommands(api);
       installNativeDeathMessages(api);
       installWeaponInput(api);
+      installNativeController(api);
       installPaintShop(api);
       installShipCreation(api);
       installRangeIndex(api);

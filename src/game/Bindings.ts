@@ -380,6 +380,12 @@ export let Converger: GameClasses['core.sync.Converger'];
 export type Clock = Game.clock.Clock;
 export let Clock: GameClasses['clock.Clock'];
 
+export type ScrollBox = Game.core.hud.components.ui.ScrollBox;
+export let ScrollBox: GameClasses['core.hud.components.ui.ScrollBox'];
+
+export type KeyBinds = Game.data.KeyBinds;
+export let KeyBinds: GameClasses['data.KeyBinds'];
+
 export type PlayState = Game.core.states.gameStates.PlayState;
 export let PlayState: GameClasses['core.states.gameStates.PlayState'];
 
@@ -639,6 +645,8 @@ export function bindGameClasses(api: API): void {
     WarpJumpState: reflection.require('core.states.gameStates.WarpJumpState'),
     KilledPlayerState: reflection.require('core.states.player.Killed'),
     RoamingState: reflection.require('core.states.gameStates.RoamingState'),
+    ScrollBox: reflection.require('core.hud.components.ui.ScrollBox'),
+    KeyBinds: reflection.require('data.KeyBinds'),
     PlayState: reflection.require('core.states.gameStates.PlayState'),
     LandedHangar: reflection.require('core.states.gameStates.LandedHangar'),
     LandedLore: reflection.require('core.states.gameStates.LandedLore'),
@@ -882,6 +890,8 @@ export function bindGameClasses(api: API): void {
     KilledPlayerState,
     RoamingState,
     PlayState,
+    KeyBinds,
+    ScrollBox,
     LandedHangar,
     LandedLore,
     LandedExplore,

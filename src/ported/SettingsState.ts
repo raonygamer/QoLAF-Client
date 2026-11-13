@@ -111,7 +111,7 @@ export function createSettingsState(resolve: Resolve): any {
       this.addCategory('hud', 'HUD');
       this.addCategory('combat', 'Combat');
       this.addCategory('chat', 'Chat');
-      this.addCategory('bindings', 'Key bindings');
+      this.addCategory('bindings', 'Input');
       this.addCategory('aim', 'Aim Assist');
       if (
         this.g.automationManager != null &&
