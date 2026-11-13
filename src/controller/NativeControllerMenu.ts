@@ -1,3 +1,4 @@
+import { hasControllerFocus } from './ControllerFocus';
 import { readControllers } from './ControllerDevices';
 import { createControllerHints } from './ControllerHints';
 import type { API } from '../api/Types';
@@ -88,7 +89,7 @@ export function installControllerMenu(
       !state ||
       !settings.values.enabled ||
       document.hidden ||
-      !document.hasFocus() ||
+      !hasControllerFocus() ||
       reflection.is(state, 'core.states.gameStates.RoamingState') ||
       game.chatInput?.isActive() ||
       isKeyCaptureActive(stage) ||

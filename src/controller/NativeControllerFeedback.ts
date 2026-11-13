@@ -1,3 +1,4 @@
+import { hasControllerFocus } from './ControllerFocus';
 import {
   getRumbleActuator,
   playRumble,
@@ -72,7 +73,7 @@ export function installControllerFeedback(
       !ship ||
       game.get_isLeaving() ||
       document.hidden ||
-      !document.hasFocus()
+      !hasControllerFocus()
     ) {
       reset();
       return;

@@ -1,3 +1,4 @@
+import { hasControllerFocus } from './ControllerFocus';
 import { readControllers, controllerStatus } from './ControllerDevices';
 import { installControllerHints } from './NativeControllerHints';
 import { registerControllerContext } from './ControllerContext';
@@ -58,13 +59,21 @@ export function installNativeController(api: API): void {
   });
 
   let inputBlock = 'Waiting for flight input';
+  let sample = '';
+  let lastPoll = -Infinity;
+  let nativeQueries = 0;
   let lastStatus = '';
   let statusTime = -Infinity;
   api.on('frame', ({ game }) => {
     const now = performance.now();
     if (now - statusTime >= 1000) {
       statusTime = now;
-      const status = `${controllerStatus(settings.values.enabled, settings.values.controllerIndex)}; ${inputBlock}`;
+      const route = !hasControllerFocus()
+        ? 'input suspended'
+        : now - lastPoll > 1500
+          ? 'flight input idle (menu or paused)'
+          : `${inputBlock}; ${sample}`;
+      const status = `${controllerStatus(settings.values.enabled, settings.values.controllerIndex)}; ${route}`;
       if (status !== lastStatus) {
         lastStatus = status;
         api.log('Controller input:', status);
@@ -77,22 +86,26 @@ export function installNativeController(api: API): void {
   });
 
   api.around(KeyBinds.prototype, 'isInputDown', function (next, action) {
+    if (querying) nativeQueries++;
     return (querying && input.isDown(action)) || next(action);
   });
   api.around(KeyBinds.prototype, 'isInputPressed', function (next, action) {
+    if (querying) nativeQueries++;
     return (querying && input.isPressed(action)) || next(action);
   });
   api.around(KeyBinds.prototype, 'isInputUp', function (next, action) {
+    if (querying) nativeQueries++;
     return !(querying && input.isDown(action)) && next(action);
   });
 
   api.around(RoamingState.prototype, 'updateInput', function (next) {
     const preferences = settings.values;
+    lastPoll = performance.now();
     inputBlock = !preferences.enabled
       ? 'input off'
       : document.hidden
         ? 'document hidden'
-        : !document.hasFocus()
+        : !hasControllerFocus()
           ? 'document unfocused'
           : this.g.get_isLeaving()
             ? 'leaving room'
@@ -127,6 +140,7 @@ export function installNativeController(api: API): void {
     suspended = false;
     lastState = this;
     querying = true;
+    nativeQueries = 0;
     try {
       const player = this.me;
       const ship = player?.ship;
@@ -148,6 +162,16 @@ export function installNativeController(api: API): void {
       }
       return next();
     } finally {
+      const buttons = pad.buttons.flatMap((button, index) =>
+        button.value > preferences.release ? [index] : [],
+      );
+      const axes = pad.axes.map((value) =>
+        Math.abs(value) < preferences.deadzone ? 0 : Math.round(value * 10) / 10,
+      );
+      const actions = preferences.mappings
+        .filter((mapping) => input.isDown(mapping.action))
+        .map((mapping) => mapping.action);
+      sample = `buttons [${buttons}], axes [${axes}], actions [${actions}], native queries ${nativeQueries > 0 ? 'yes' : 'NO'}`;
       querying = false;
       input.finishTick();
     }

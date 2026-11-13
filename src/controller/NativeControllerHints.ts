@@ -1,3 +1,4 @@
+import { hasControllerFocus } from './ControllerFocus';
 import type { API } from '../api/Types';
 import type { Game } from '../game/Game';
 import { GameReflection } from '../api/GameReflection';
@@ -47,7 +48,7 @@ export function installControllerHints(
       !pad ||
       !settings.values.enabled ||
       document.hidden ||
-      !document.hasFocus() ||
+      !hasControllerFocus() ||
       !reflection.is(game.gameStateMachine?.currentState, 'core.states.gameStates.RoamingState') ||
       game.chatInput?.isActive()
     ) {

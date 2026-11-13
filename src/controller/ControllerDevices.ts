@@ -1,3 +1,4 @@
+import { hasControllerFocus } from './ControllerFocus';
 interface PolicyDocument extends Document {
   permissionsPolicy?: { allowsFeature(feature: string): boolean };
   featurePolicy?: { allowsFeature(feature: string): boolean };
@@ -31,6 +32,6 @@ export function controllerStatus(enabled: boolean, index: number): string {
       ? `Controller index ${index} missing; choose Automatic`
       : 'No controller exposed - focus game and press a controller button';
   }
-  if (document.hidden || !document.hasFocus()) return `Controller ${pad.index}: game is unfocused`;
+  if (document.hidden || !hasControllerFocus()) return `Controller ${pad.index}: game is unfocused`;
   return `Controller ${pad.index}: ${pad.id} (${pad.mapping || 'unmapped'})`;
 }
