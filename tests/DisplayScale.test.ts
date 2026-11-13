@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installDisplayScale, scaledStageSize } from '../src/rendering/DisplayScale';
+import { bindGameClasses } from '../src/game/Bindings';
 import { DeviceSettings } from '../src/settings/DeviceSettings';
 
 test('DPI uses original even physical and logical sizes', () => {
@@ -33,7 +34,7 @@ test('DPI survives cached resize callbacks, updates layout and restores on unloa
   const native = { stageWidth: 1879, stageHeight: 965 };
   const stage = new Stage();
   const other = new Stage();
-  const starling = { stage, nativeStage: native };
+  const starling = { get_stage: () => stage, get_nativeStage: () => native };
   const cleanups: Function[] = [];
   const settings = new DeviceSettings({ get: (_key, fallback) => fallback, set() {} });
   const api: any = {
@@ -42,7 +43,7 @@ test('DPI survives cached resize callbacks, updates layout and restores on unloa
         ? Stage
         : name === 'starling.core.Starling'
           ? { get_current: () => starling }
-          : undefined,
+          : { prototype: {} },
     defer: (fn: Function) => cleanups.push(fn),
     around: (target: any, key: string, hook: Function) => {
       const original = target[key];
@@ -55,6 +56,7 @@ test('DPI survives cached resize callbacks, updates layout and restores on unloa
     },
     onGame() {},
   };
+  bindGameClasses(api);
   installDisplayScale(api, settings);
   settings.set('dpiScale', 1.25);
   assert.equal(stage.width, 1502);

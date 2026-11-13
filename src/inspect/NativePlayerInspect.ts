@@ -1,9 +1,8 @@
+import { writeClipboardText } from '../ui/Clipboard';
+import { GameReflection } from '../api/GameReflection';
 import { read, type API, type Raw } from '../api/Types';
 import { portedClasses } from '../ported/Registry';
 import { ChatArtifactToken } from '../chat/rich/ChatArtifactToken';
-import type { ChatArtifactLinkResolver } from '../chat/ChatArtifactLinkResolver';
-import { installNativeArtifactDraft } from '../chat/NativeArtifactDraft';
-import type { NativeBitmapInput } from '../chat/rich/NativeBitmapInput';
 import { installPopupKeyboard } from '../dialogs/NativePopupKeyboard';
 import { installNativeCargoQueue } from './CargoReadQueue';
 import { createInspectTabs } from './InspectTabs';
@@ -13,17 +12,12 @@ import { createPlayerInspectCard } from './PlayerInspectCard';
 import { createPlayerInspectPopup } from './PlayerInspectPopup';
 
 /** Session-owned read-only inspector, using the authenticated account's normal APIs. */
-export function installNativePlayerInspect(
-  api: API,
-  game: Raw,
-  editor: NativeBitmapInput | undefined,
-  artifacts: ChatArtifactLinkResolver,
-): void {
+export function installNativePlayerInspect(api: API, game: Raw): void {
   const chat = game.chatInput;
   if (!chat) return;
   const nativeResolve = portedClasses(api).resolve;
   const log = api.cls('core.hud.components.chat.MessageLog');
-  const queue = installNativeCargoQueue(api, game);
+  const queue = installNativeCargoQueue(api, new GameReflection(api).cast(game, 'core.scene.Game'));
   const cache: Record<string, any> = {
     'core.hud.components.chat.ChatArtifactToken': ChatArtifactToken,
     'core.hud.components.cargo.CargoReadQueue': {
@@ -47,9 +41,9 @@ export function installNativePlayerInspect(
     },
     'openfl.system.System': {
       setClipboard(value: string) {
-        void navigator.clipboard
-          .writeText(value)
-          .catch(() => log?.write('Unable to copy player ID.', 'error'));
+        void writeClipboardText(value).catch(() =>
+          log?.write('Unable to copy player ID.', 'error'),
+        );
       },
     },
   };
@@ -77,7 +71,6 @@ export function installNativePlayerInspect(
   };
   const previousOpen = Object.getOwnPropertyDescriptor(chat, 'openPlayerInspect');
   chat.openPlayerInspect = open;
-  installNativeArtifactDraft(api, game, editor, artifacts);
   api.around(chat, 'sendMessage', (next, ...args) => {
     const value = chat.input.get_text();
     const [command, argument = ''] = value.startsWith('/') ? chat.parseCommand(value) : [];

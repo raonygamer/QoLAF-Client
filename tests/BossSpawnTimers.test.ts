@@ -3,6 +3,8 @@ import { test } from 'node:test';
 import { BossSpawnTimerCatalog } from '../src/boss/BossSpawnTimerCatalog';
 import { BossSpawnTimers } from '../src/boss/BossSpawnTimers';
 import { installBossSpawnTimerHooks, bossSpawnTimers } from '../src/boss/NativeBossSpawnTimers';
+import { bindGameClasses, type GameScene } from '../src/game/Bindings';
+import type { EnemySpawnIdentity } from '../src/boss/BossSpawnTimers';
 import type { Raw } from '../src/api/Types';
 // @ts-expect-error actual host hooks
 import { Hooks } from './fixtures/HostCore.js';
@@ -27,8 +29,8 @@ function fixture() {
     isSystemTypeSurvival: () => false,
   };
   const model = new BossSpawnTimers(
-    game,
-    (enemy) => enemy.identity,
+    game as GameScene,
+    (enemy) => (enemy as typeof enemy & { identity?: EnemySpawnIdentity }).identity,
     () => local,
   );
   const at = (serverTime: number) => {
@@ -187,9 +189,11 @@ test('native hooks retain non-orbit spawner keys before pooling and leave handle
     'core.boss.BossManager': BossManager,
     'core.GameObject': ObjectBase,
   };
-  const hooks = new Hooks(),
+  const hooks = new Hooks((error: unknown) => {
+      throw error;
+    }),
     cleanups: (() => void)[] = [];
-  installBossSpawnTimerHooks({
+  const api = {
     cls: (key: string) => classes[key],
     before: (target: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'before', fn)),
@@ -198,15 +202,26 @@ test('native hooks retain non-orbit spawner keys before pooling and leave handle
     around: (target: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'around', fn)),
     onGame: (fn: Function) => fn(game, { defer: (fn: () => void) => cleanups.push(fn) }),
-  } as any);
+  } as any;
+  bindGameClasses({ ...api, cls: (key: string) => classes[key] ?? class {} });
+  installBossSpawnTimerHooks(api);
   const manager = new Manager();
   const cachedHandler = manager.killed.bind(manager);
   assert.equal(manager.spawnEnemy(), 123);
   assert.equal(cachedHandler({ getInt: () => 42 }, 0), 456);
   assert.equal(calls, 1);
-  assert.match(bossSpawnTimers(game).rows(true)[1].text, /2 mins, 0 seconds/);
+  assert.match(bossSpawnTimers(game as GameScene).rows(true)[1].text, /2 mins, 0 seconds/);
   assert.equal(enemy.alive, false);
-  cleanups.forEach((fn) => fn());
+  // Destroy/reset discarded the old definition identity. A stale kill must not
+  // restart this source's timer while the same object awaits a new factory call.
+  game.clock.getServerTime = () => 700001;
+  enemy.alive = true;
+  assert.equal(cachedHandler({ getInt: () => 42 }, 0), 456);
+  const rows = bossSpawnTimers(game as GameScene);
+  // Force a bounded scan through the independent clock (no game simulation tick).
+  rows.recordDeath('boss', 'boss', '', null);
+  assert.match(rows.rows(true)[1].text, /0 mins, 20 seconds/);
+  cleanups.reverse().forEach((fn) => fn());
 });
 
 test('ambiguous missing sources and unsynchronized deaths stay unknown; seasonal sources cannot win', () => {

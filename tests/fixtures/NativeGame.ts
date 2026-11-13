@@ -1,3 +1,4 @@
+import { overlayClasses } from './NativeOverlay';
 // Display-list test double. Event invocation is extracted from the real Haxe
 // runtime; this is NOT a browser/WebGL renderer or a visual parity test.
 // @ts-expect-error upstream JavaScript fixture
@@ -200,6 +201,9 @@ export class Stage extends Display {
   }
 }
 export class Format {
+  get_color(): number {
+    return this.color;
+  }
   [key: string]: any;
   constructor(
     font = 'DAIDRR',
@@ -349,6 +353,7 @@ export class NativeButton extends Display {
   set_text() {}
 }
 export class Unit {
+  damageFlash() {}
   alive = true;
   isHostile = true;
   level = 85;
@@ -389,6 +394,7 @@ export class ShipSync {
   playerUsedBoost(_message: any, _offset = 0) {}
 }
 export class Converger {
+  calculateOffset() {}
   run() {}
 }
 export class Heading {
@@ -403,6 +409,7 @@ export class GameStateMachine {
 }
 
 export class PlayerShip extends Ship {
+  runCommand(_type: number, _active: boolean) {}
   land() {}
   enterWarpJump() {}
   player: any;
@@ -411,6 +418,14 @@ export class PlayerShip extends Ship {
   }
 }
 export class EnemyShip extends Ship {
+  cloakStart() {}
+  cloakEnd(_heading: any) {}
+  set_alpha(value: number) {
+    return this.clip.set_alpha(value);
+  }
+  get_alpha() {
+    return this.clip.get_alpha();
+  }
   static RARE_TYPE_DEFENDER = 1;
   static RARE_TYPE_ATTACKER = 2;
   static RARE_TYPE_SPEEDER = 3;
@@ -536,6 +551,7 @@ export function registry() {
   }
   const texture = { width: 32, height: 32, get_root: () => ({}), dispose() {} };
   return {
+    ...overlayClasses(Display),
     'data.DataLocator': { getService: () => null },
     'sound.SoundLocator': { getService: () => null, register() {} },
     'sound.SoundManager': class {

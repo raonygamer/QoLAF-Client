@@ -1,5 +1,5 @@
 // Ported from core/hud/components/SettingsWindowChrome.as; retain original layout and behavior.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createSettingsWindowChrome(resolve: Resolve): any {
   const Quad: any = resolve('starling.display.Quad');
   type Quad = any;

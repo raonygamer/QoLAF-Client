@@ -35,6 +35,9 @@ export class AuraLightningFrames {
       });
   }
   begin(emitter: Raw): void {
+    if (emitter.qolafAuraLightningFrequency != null && !this.entries.has(emitter)) {
+      this.prepare(emitter, 4);
+    }
     const entry = this.entries.get(emitter);
     if (!entry) return;
     entry.mesh?.set_visible(false);
@@ -85,7 +88,7 @@ export class AuraLightningFrames {
       read(particle, 'color'),
       8,
       3,
-      entry.frequency,
+      emitter.qolafAuraLightningFrequency ?? entry.frequency,
     );
     this.align(mesh, particle, entry.alpha, clip, owner);
     if (this.OutlineMesh && this.contours) {
@@ -99,7 +102,7 @@ export class AuraLightningFrames {
         read(particle, 'color'),
         8,
         3,
-        entry.frequency / 16,
+        (emitter.qolafAuraLightningFrequency ?? entry.frequency) / 16,
       );
       this.align(outline, particle, entry.alpha, clip, owner);
     }
@@ -153,6 +156,7 @@ export function installAuraLightning(api: API): AuraLightningFrames | undefined 
     },
   );
   api.before(Emitter.prototype, 'dispose', function () {
+    delete this.qolafAuraLightningFrequency;
     frames.release(this);
   });
   api.defer(() => frames.dispose());

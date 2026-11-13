@@ -1,74 +1,58 @@
+import type { StyleProvider } from '../ui/StyleProvider';
+import type { createPodRewardPulseColor } from './PodRewardPulseColor';
+import type { createRoomInvitePulseColor } from './RoomInvitePulseColor';
+import type { createEchoPulseColor } from './EchoPulseColor';
+import type { createClientDeveloperTagColor } from './ClientDeveloperTagColor';
+import type { TextFormat } from '../game/Bindings';
+import type { Game } from '../game/Game';
+import { Image, MeshBatch, Event, type Texture, type DisplayObject } from '../game/Bindings';
+import type { createBitmapTextAdapter } from '../ui/BitmapTextAdapter';
+import { BitmapFontTextFormat } from '../ui/BitmapFontTextFormat';
+import { Point, StarlingTextField as TextField } from '../game/Bindings';
+import type {} from '../game/BitmapFont';
+import type { createJapaneseGlyphCache } from './JapaneseGlyphCache';
+import type { createChatRoleTags } from './ChatRoleTags';
+import { RussoBitmapFontRegistry } from '../ui/RussoBitmapFontRegistry';
+import type { BitmapChar, BitmapFont } from '../game/Bindings';
+import { JapaneseCachedGlyph } from './JapaneseCachedGlyph';
+import { RichBitmapLine } from './RichBitmapLine';
+import { RichBitmapGlyph } from './RichBitmapGlyph';
+import type { ArtifactLabelResolver } from '../chat/rich/ArtifactLabelResolver';
+import { RichBitmapEmojiResolver } from '../chat/rich/RichBitmapEmojiResolver';
+import { RichBitmapInlineAtom } from '../chat/rich/RichBitmapInlineAtom';
+import { RichBitmapMarkupParser } from '../chat/rich/RichBitmapMarkupParser';
+import { RichBitmapEmojiMatch } from '../chat/rich/RichBitmapEmojiMatch';
+import { RichBitmapMarkup } from '../chat/rich/RichBitmapMarkup';
 // Source port of core/hud/components/chat/rich/RichBitmapFontTextRenderer.as.
-import { bound, type Resolve } from '../runtime/As3';
-export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
-  const RichBitmapMarkup: any = resolve('core.hud.components.chat.rich.RichBitmapMarkup');
-  type RichBitmapMarkup = any;
-  const RichBitmapGlyph: any = resolve('core.hud.components.chat.rich.RichBitmapGlyph');
-  type RichBitmapGlyph = any;
-  const RichBitmapEmojiMatch: any = resolve('core.hud.components.chat.rich.RichBitmapEmojiMatch');
-  type RichBitmapEmojiMatch = any;
-  const JapaneseGlyphCache: any = resolve('core.hud.components.chat.rich.JapaneseGlyphCache');
-  type JapaneseGlyphCache = any;
-  const RichBitmapMarkupParser: any = resolve(
-    'core.hud.components.chat.rich.RichBitmapMarkupParser',
-  );
-  type RichBitmapMarkupParser = any;
-  const RichBitmapLine: any = resolve('core.hud.components.chat.rich.RichBitmapLine');
-  type RichBitmapLine = any;
-  const RichBitmapInlineAtom: any = resolve('core.hud.components.chat.rich.RichBitmapInlineAtom');
-  type RichBitmapInlineAtom = any;
-  const RichBitmapEmojiResolver: any = resolve(
-    'core.hud.components.chat.rich.RichBitmapEmojiResolver',
-  );
-  type RichBitmapEmojiResolver = any;
-  const JapaneseCachedGlyph: any = resolve('core.hud.components.chat.rich.JapaneseCachedGlyph');
-  type JapaneseCachedGlyph = any;
-  const ClientDeveloperTagColor: any = resolve('core.hud.components.ClientDeveloperTagColor');
-  type ClientDeveloperTagColor = any;
-  const EchoPulseColor: any = resolve('core.hud.components.EchoPulseColor');
-  type EchoPulseColor = any;
-  const RoomInvitePulseColor: any = resolve('core.hud.components.RoomInvitePulseColor');
-  type RoomInvitePulseColor = any;
-  const PodRewardPulseColor: any = resolve('core.hud.components.PodRewardPulseColor');
-  type PodRewardPulseColor = any;
-  const Style: any = resolve('core.hud.components.Style');
-  type Style = any;
-  const ChatRoleTags: any = resolve('core.hud.components.chat.ChatRoleTags');
-  type ChatRoleTags = any;
-  const RussoBitmapFontRegistry: any = resolve('core.text.RussoBitmapFontRegistry');
-  type RussoBitmapFontRegistry = any;
-  const BaseTextRenderer: any = resolve('feathers.controls.text.BaseTextRenderer');
-  type BaseTextRenderer = any;
-  type ITextRenderer = any;
-  type IStyleProvider = any;
-  const BitmapFontTextFormat: any = resolve('feathers.text.BitmapFontTextFormat');
-  type BitmapFontTextFormat = any;
-  const Point: any = resolve('openfl.geom.Point');
-  type Point = any;
-  const Rectangle: any = resolve('openfl.geom.Rectangle');
-  type Rectangle = any;
-  const DisplayObject: any = resolve('starling.display.DisplayObject');
-  type DisplayObject = any;
-  const Image: any = resolve('starling.display.Image');
-  type Image = any;
-  const MeshBatch: any = resolve('starling.display.MeshBatch');
-  type MeshBatch = any;
-  const Event: any = resolve('starling.events.Event');
-  type Event = any;
-  const BitmapChar: any = resolve('starling.text.BitmapChar');
-  type BitmapChar = any;
-  const BitmapFont: any = resolve('starling.text.BitmapFont');
-  type BitmapFont = any;
-  const TextFormat: any = resolve('starling.text.TextFormat');
-  type TextFormat = any;
-  const TextField: any = resolve('starling.text.TextField');
-  type TextField = any;
-  const TextOptions: any = resolve('starling.text.TextOptions');
-  type TextOptions = any;
-  const Texture: any = resolve('starling.textures.Texture');
-  type Texture = any;
-  const Align: any = resolve('starling.utils.Align');
-  type Align = any;
+import { bound, type Resolve } from '../runtime/HaxeInterop';
+export function createRichBitmapFontTextRenderer(resolve: Resolve) {
+  // Install the native property aliases used by source-ported font metrics.
+  resolve('starling.text.BitmapFont');
+  // Glyph metrics also use native property aliases. Binding its constructor
+  // alone does not install those getters on Haxe's BitmapChar prototype.
+  resolve('starling.text.BitmapChar');
+  const JapaneseGlyphCache = resolve(
+    'core.hud.components.chat.rich.JapaneseGlyphCache',
+  ) as ReturnType<typeof createJapaneseGlyphCache>;
+  const ClientDeveloperTagColor = resolve(
+    'core.hud.components.ClientDeveloperTagColor',
+  ) as ReturnType<typeof createClientDeveloperTagColor>;
+  const EchoPulseColor = resolve('core.hud.components.EchoPulseColor') as ReturnType<
+    typeof createEchoPulseColor
+  >;
+  const RoomInvitePulseColor = resolve('core.hud.components.RoomInvitePulseColor') as ReturnType<
+    typeof createRoomInvitePulseColor
+  >;
+  const PodRewardPulseColor = resolve('core.hud.components.PodRewardPulseColor') as ReturnType<
+    typeof createPodRewardPulseColor
+  >;
+  const Style = resolve('core.hud.components.Style') as { readonly COLOR_CLIENT_DEVELOPER: number };
+  const ChatRoleTags = resolve('core.hud.components.chat.ChatRoleTags') as ReturnType<
+    typeof createChatRoleTags
+  >;
+  const BaseTextRenderer = resolve('feathers.controls.text.BaseTextRenderer') as ReturnType<
+    typeof createBitmapTextAdapter
+  >;
 
   /**
    * Feathers text renderer for lightweight per-glyph bitmap-font HTML.
@@ -80,7 +64,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
 
   class RichBitmapFontTextRenderer extends BaseTextRenderer {
     static __interfaces__ = ['ITextRenderer'];
-    public static globalStyleProvider: IStyleProvider;
+    public static globalStyleProvider: StyleProvider<RichBitmapFontTextRenderer> | null = null;
 
     private static CLIENT_DEVELOPER_TAG: string = '[client_dev]';
     private static LEGACY_CLIENT_DEVELOPER_COLOR: number = 0xc2fc03;
@@ -88,10 +72,10 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       /(?:[^\r\n]{1,180} - )?QoLAF \(Server \d+ \/ v\d+\.\d+\.\d+(?: FINAL)? \((?:Public|Private)\)\)/g;
     private static LOGIN_SUFFIX_PATTERN: RegExp =
       /^(?:0|[1-9]\d{0,3})\.(?:0|[1-9]\d{0,3})\.(?:0|[1-9]\d{0,3}) \((?:Public|Private)\)$/;
-    private characterBatch: MeshBatch = null;
-    private japaneseBatches: MeshBatch[] = [];
-    private helperImage: Image = null;
-    private markup: RichBitmapMarkup = new RichBitmapMarkup();
+    private characterBatch: MeshBatch | null = null;
+    private japaneseBatches: (MeshBatch | null)[] = [];
+    private helperImage: Image | null = null;
+    private readonly markup: RichBitmapMarkup = new RichBitmapMarkup();
     private glyphPool: RichBitmapGlyph[] = [];
     private activeGlyphs: RichBitmapGlyph[] = [];
     private emojiMatch: RichBitmapEmojiMatch = new RichBitmapEmojiMatch();
@@ -116,11 +100,11 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
     private roomInviteLastColor: number = -1;
     private richDisposed: boolean = false;
 
-    private _textFormat: BitmapFontTextFormat = null;
-    private _resolvedTextFormat: BitmapFontTextFormat = null;
+    private _textFormat: BitmapFontTextFormat | null = null;
+    private _resolvedTextFormat: BitmapFontTextFormat | null = null;
     private _textureSmoothing: string = 'bilinear';
     private _emojiScale: number = 1;
-    private _artifactTokenLabelResolver: Function | null = null;
+    private _artifactTokenLabelResolver: ArtifactLabelResolver | null = null;
     private _collapseImageLinks: boolean = false;
     private _labelImageLinks: boolean = false;
     // Fractional placement lets the bilinear soft-mask atlas provide a
@@ -137,6 +121,12 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
     private measuredWidth: number = NaN;
     private measuredHeight: number = NaN;
     private _numLines: number = 0;
+    private readonly lineTops: number[] = [];
+
+    /** Copy scratch layout positions before another text field reuses this renderer. */
+    public copyLineTops(): number[] {
+      return this.lineTops.slice();
+    }
 
     constructor() {
       super();
@@ -151,7 +141,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       this.invalidate('data');
     }
 
-    /*override*/ protected get defaultStyleProvider(): IStyleProvider {
+    /*override*/ protected get defaultStyleProvider(): StyleProvider<RichBitmapFontTextRenderer> | null {
       return RichBitmapFontTextRenderer.globalStyleProvider;
     }
 
@@ -216,11 +206,11 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       this.refreshAnimatedColorListeners();
     }
 
-    public get textFormat(): BitmapFontTextFormat {
+    public get textFormat(): BitmapFontTextFormat | null {
       return this._textFormat;
     }
 
-    public set textFormat(value: BitmapFontTextFormat) {
+    public set textFormat(value: BitmapFontTextFormat | null) {
       if (this._textFormat === value) {
         return;
       }
@@ -231,17 +221,17 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       this.invalidate('styles');
     }
 
-    public get currentTextFormat(): BitmapFontTextFormat {
+    public get currentTextFormat(): BitmapFontTextFormat | null {
       this.resolveTextFormat();
       return this._resolvedTextFormat;
     }
 
     /** Null by default for renderers that do not project rich attachments. */
-    public get artifactTokenLabelResolver(): Function | null {
+    public get artifactTokenLabelResolver(): ArtifactLabelResolver | null {
       return this._artifactTokenLabelResolver;
     }
 
-    public set artifactTokenLabelResolver(value: Function | null) {
+    public set artifactTokenLabelResolver(value: ArtifactLabelResolver | null) {
       if (this._artifactTokenLabelResolver === value) {
         return;
       }
@@ -381,11 +371,14 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
         this._resolvedTextFormat.font,
         this._resolvedTextFormat.size,
       );
-      return (this._resolvedTextFormat.font.baseline * size) / this._resolvedTextFormat.font.size;
+      return (
+        (this._resolvedTextFormat.font.get_baseline() * size) /
+        this._resolvedTextFormat.font.get_size()
+      );
     }
 
     @bound
-    public measureText(result: Point = null): Point {
+    public measureText(result: Point | null = null): Point {
       if (result == null) {
         result = new Point();
       }
@@ -412,9 +405,9 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
 
     @bound
     protected setTextScrollOffset(value: number): void {
-      if (this.characterBatch != null) this.characterBatch.x = value;
+      if (this.characterBatch != null) this.characterBatch.set_x(value);
       for (const batch of this.japaneseBatches) {
-        if (batch != null) batch.x = value;
+        if (batch != null) batch.set_x(value);
       }
     }
 
@@ -443,7 +436,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
 
     /** Looks up marked roles in parsed text, independent of animated vertex RGB. */
     @bound
-    public roleTagAtPoint(localX: number, localY: number): string {
+    public roleTagAtPoint(localX: number, localY: number): string | null {
       let index: number = this.visibleTextIndexAtPoint(localX, localY);
       return ChatRoleTags.atVisibleIndex(this.markup, index);
     }
@@ -467,7 +460,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       if (this.characterBatch == null) this.initializeNow();
       this.refreshLayoutState();
       let visibleIndex: number = this.markup.visibleIndexAtSource(sourceIndex, false);
-      let previous: RichBitmapGlyph;
+      let previous: RichBitmapGlyph | null = null;
       for (const glyph of this.activeGlyphs) {
         if (glyph.textBegin >= visibleIndex) return glyph.hitX;
         if (glyph.textEnd <= visibleIndex) previous = glyph;
@@ -481,7 +474,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       if (this.characterBatch == null) this.initializeNow();
       this.refreshLayoutState();
       let visibleIndex: number = this.markup.visibleIndexAtSource(sourceIndex, false);
-      let previous: RichBitmapGlyph;
+      let previous: RichBitmapGlyph | null = null;
       for (const glyph of this.activeGlyphs) {
         if (glyph.textBegin >= visibleIndex) return glyph.hitY;
         if (glyph.textEnd <= visibleIndex) previous = glyph;
@@ -504,7 +497,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       value: string,
       font: BitmapFont,
       format: TextFormat,
-      options: TextOptions,
+      options: Game.starling.text.TextOptions | null,
     ): void {
       if (target == null || font == null || value == null || value.length == 0) {
         return;
@@ -515,19 +508,19 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       let previousJapaneseFallback: boolean = this.japaneseFallbackEnabled;
       this.japaneseFallbackEnabled = false;
 
-      let size: number = format.size;
+      let size: number = format.get_size();
       if (size < 0) {
-        size *= -font.size;
+        size *= -font.get_size();
       }
       size = RichBitmapFontTextRenderer.normalizedSize(font, size);
       let bitmapFormat: BitmapFontTextFormat = new BitmapFontTextFormat(
         font,
         size,
-        format.color,
-        format.horizontalAlign,
-        format.leading,
+        format.get_color(),
+        format.get_horizontalAlign(),
+        format.get_leading(),
       );
-      bitmapFormat.isKerningEnabled = format.kerning;
+      bitmapFormat.isKerningEnabled = format.get_kerning();
 
       // Haxe TextField keeps its previous hit-area width for HTML even when
       // horizontal autosizing is enabled. An empty/short previous value can
@@ -535,7 +528,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       // native plain-text compositor's unconstrained measurement width.
       if (
         options != null &&
-        (options.autoSize === 'horizontal' || options.autoSize === 'bothDirections')
+        (options.get_autoSize() === 'horizontal' || options.get_autoSize() === 'bothDirections')
       ) {
         width = 100000;
       }
@@ -543,10 +536,10 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       this._textFormat = bitmapFormat;
       this._resolvedTextFormat = bitmapFormat;
       this._text = value;
-      this._wordWrap = options != null && options.wordWrap;
+      this._wordWrap = options != null && options.get_wordWrap();
       this._explicitWidth = Math.max(0, width);
       this._explicitHeight = NaN;
-      this._textureSmoothing = font.smoothing;
+      this._textureSmoothing = font.get_smoothing();
       this.markupInvalid = true;
       this.layoutInvalid = true;
       this.lastLayoutConstraint = NaN;
@@ -555,7 +548,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       // Match BitmapFont's autoscale behavior closely for fixed-size fields.
       // HTML sizes are reparsed on each pass so relative default-size text
       // shrinks without allocating any textures.
-      if (options != null && options.autoScale) {
+      if (options != null && options.get_autoScale()) {
         while (
           bitmapFormat.size > 3 &&
           (this.measuredHeight > height || (!this._wordWrap && this.measuredWidth > width))
@@ -568,15 +561,17 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       }
 
       let offsetY: number = 0;
-      if (format.verticalAlign == Align.BOTTOM) {
+      if (format.get_verticalAlign() == 'bottom') {
         offsetY = height - this.measuredHeight;
-      } else if (format.verticalAlign == Align.CENTER) {
+      } else if (format.get_verticalAlign() == 'center') {
         offsetY = (height - this.measuredHeight) / 2;
       }
-      this.characterBatch.x = 0;
-      this.characterBatch.y = Math.max(0, offsetY);
-      target.addMesh(this.characterBatch);
-      this.characterBatch.x = this.characterBatch.y = 0;
+      const batch = this.requireCharacterBatch();
+      batch.set_x(0);
+      batch.set_y(Math.max(0, offsetY));
+      target.addMesh(batch);
+      batch.set_x(0);
+      batch.set_y(0);
       this.japaneseFallbackEnabled = previousJapaneseFallback;
     }
 
@@ -585,7 +580,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
     protected initialize(): void {
       if (this.characterBatch == null) {
         this.characterBatch = new MeshBatch();
-        this.characterBatch.touchable = false;
+        this.characterBatch.set_touchable(false);
         this.addChild(this.characterBatch);
       }
     }
@@ -624,13 +619,13 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       this.resolveTextFormat();
 
       if (this.characterBatch != null) {
-        this.characterBatch.pixelSnapping = this._pixelSnapping;
-        this.characterBatch.batchable = !this._useSeparateBatch;
+        this.characterBatch.set_pixelSnapping(this._pixelSnapping);
+        this.characterBatch.set_batchable(!this._useSeparateBatch);
       }
       for (const japaneseBatch of this.japaneseBatches) {
         if (japaneseBatch == null) continue;
-        japaneseBatch.pixelSnapping = this._pixelSnapping;
-        japaneseBatch.batchable = !this._useSeparateBatch;
+        japaneseBatch.set_pixelSnapping(this._pixelSnapping);
+        japaneseBatch.set_batchable(!this._useSeparateBatch);
       }
 
       let constraint: number = this.getLayoutConstraint();
@@ -695,13 +690,14 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       this.measuredWidth = 0;
       this.measuredHeight = 0;
       this._numLines = 0;
+      this.lineTops.length = 0;
       this.clearAnimatedVertices();
       this.findClientDeveloperTags();
       this.findEchoLabels();
       this.findRoomInvites();
       this.findPodRewards();
       this.recycleActiveGlyphs();
-      this.characterBatch.clear();
+      this.requireCharacterBatch().clear();
       for (const japaneseBatch of this.japaneseBatches) {
         if (japaneseBatch != null) japaneseBatch.clear();
       }
@@ -722,13 +718,14 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
         font,
         this._resolvedTextFormat.size,
       );
-      let defaultLineHeight: number = (font.lineHeight * defaultSize) / font.size;
+      let defaultLineHeight: number = (font.get_lineHeight() * defaultSize) / font.get_size();
       let line: RichBitmapLine = new RichBitmapLine();
       let top: number = 0;
       let length: number = this.markup.text.length;
       let endsWithLineBreak: boolean = false;
       let atomIndex: number = 0;
-      let atom: RichBitmapInlineAtom = this.markup.atoms.length == 0 ? null : this.markup.atoms[0];
+      let atom: RichBitmapInlineAtom | null =
+        this.markup.atoms.length == 0 ? null : this.markup.atoms[0];
 
       for (let i: number = 0; i < length; i++) {
         let charID: number = this.markup.text.charCodeAt(i);
@@ -807,7 +804,8 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
               line.glyphs.length - breakIndex - 1,
             );
             while (line.glyphs.length > 0 && line.glyphs[line.glyphs.length - 1].isWhitespace) {
-              this.recycleGlyph(line.glyphs.pop());
+              const whitespace = line.glyphs.pop();
+              if (whitespace) this.recycleGlyph(whitespace);
             }
             this.recomputeLine(line);
             top = this.finishLine(line, top, defaultLineHeight, constraint);
@@ -855,8 +853,8 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       textBegin: number,
       textEnd: number,
     ): void {
-      let character: BitmapChar = font.getChar(charID);
-      let japaneseGlyph: JapaneseCachedGlyph;
+      let character: BitmapChar | null = font.getChar(charID);
+      let japaneseGlyph: JapaneseCachedGlyph | null = null;
       if (character == null && this.japaneseFallbackEnabled && !isEmoji) {
         japaneseGlyph = JapaneseGlyphCache.acquire(sourceCodePoint);
         if (japaneseGlyph != null) {
@@ -885,7 +883,8 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       // change from silently resizing its color glyphs.
       let resolvedSize: number = RichBitmapFontTextRenderer.normalizedSize(font, size);
       if (japaneseGlyph != null) resolvedSize = Math.max(20, resolvedSize);
-      glyph.scale = resolvedSize / (glyph.isEmoji ? RichBitmapGlyph.EMOJI_NATIVE_SIZE : font.size);
+      glyph.scale =
+        resolvedSize / (glyph.isEmoji ? RichBitmapGlyph.EMOJI_NATIVE_SIZE : font.get_size());
       if (glyph.isEmoji) {
         glyph.scale *= this._emojiScale;
       }
@@ -895,7 +894,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       glyph.isClientDeveloperTag =
         !glyph.isEmoji && this.isClientDeveloperGlyph(textBegin, textEnd, glyph.color);
       glyph.isEchoLabel = !glyph.isEmoji && this.isEchoGlyph(textBegin, textEnd, glyph.color);
-      glyph.advance = character == null ? 0 : character.xAdvance * glyph.scale;
+      glyph.advance = character == null ? 0 : character.get_xAdvance() * glyph.scale;
       if (sourceCodePoint == 9) {
         glyph.advance *= 4;
       }
@@ -903,9 +902,11 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
 
     @bound
     private appendGlyph(line: RichBitmapLine, glyph: RichBitmapGlyph): void {
+      const format = this._resolvedTextFormat;
+      if (!format) throw Error('Resolve a text format before laying out glyphs');
       let kerning: number = 0;
       if (
-        this._resolvedTextFormat.isKerningEnabled &&
+        format.isKerningEnabled &&
         line.previousCharID >= 0 &&
         glyph.character != null &&
         !line.previousWasEmoji &&
@@ -917,17 +918,12 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       glyph.x = line.cursor;
       glyph.visualRight = glyph.x;
       if (glyph.character != null) {
-        glyph.visualRight += (glyph.character.xOffset + glyph.character.width) * glyph.scale;
-        line.lineHeight = Math.max(
-          line.lineHeight,
-          this._resolvedTextFormat.font.lineHeight * glyph.scale,
-        );
-        line.baseline = Math.max(
-          line.baseline,
-          this._resolvedTextFormat.font.baseline * glyph.scale,
-        );
+        glyph.visualRight +=
+          (glyph.character.get_xOffset() + glyph.character.get_width()) * glyph.scale;
+        line.lineHeight = Math.max(line.lineHeight, format.font.get_lineHeight() * glyph.scale);
+        line.baseline = Math.max(line.baseline, format.font.get_baseline() * glyph.scale);
       }
-      line.cursor += glyph.advance + this._resolvedTextFormat.letterSpacing;
+      line.cursor += glyph.advance + format.letterSpacing;
       line.width = Math.max(line.width, line.cursor, glyph.visualRight);
       line.previousCharID = glyph.charID;
       line.previousWasEmoji = glyph.isEmoji;
@@ -961,7 +957,9 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       defaultLineHeight: number,
       constraint: number,
     ): number {
-      let font: BitmapFont = this._resolvedTextFormat.font;
+      const format = this._resolvedTextFormat;
+      if (!format) throw Error('Resolve a text format before laying out glyphs');
+      let font: BitmapFont = format.font;
       let lineHeight: number = line.lineHeight > 0 ? line.lineHeight : defaultLineHeight;
 
       // Only an oversized whitespace glyph is an attachment spacer. Keep
@@ -972,13 +970,13 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       let maxWhitespaceLineHeight: number = 0;
       for (const baselineGlyph of line.glyphs) {
         if (baselineGlyph.character == null) continue;
-        let glyphLineHeight: number = font.lineHeight * baselineGlyph.scale;
+        let glyphLineHeight: number = font.get_lineHeight() * baselineGlyph.scale;
         if (baselineGlyph.isWhitespace) {
           maxWhitespaceLineHeight = Math.max(maxWhitespaceLineHeight, glyphLineHeight);
           continue;
         }
         maxVisibleLineHeight = Math.max(maxVisibleLineHeight, glyphLineHeight);
-        let descent: number = (font.lineHeight - font.baseline) * baselineGlyph.scale;
+        let descent: number = (font.get_lineHeight() - font.get_baseline()) * baselineGlyph.scale;
         maxVisibleDescent = Math.max(maxVisibleDescent, descent);
       }
       let hasAttachmentSpacer: boolean =
@@ -989,34 +987,35 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
           ? line.baseline
           : this.baseline;
       if (this._numLines > 0) {
-        top += this._resolvedTextFormat.leading;
+        top += format.leading;
       }
+      this.lineTops.push(top);
       let alignmentWidth: number = constraint;
       if (alignmentWidth == Infinity && this._explicitWidth === this._explicitWidth) {
         alignmentWidth = this._explicitWidth;
       }
       let offsetX: number = 0;
       if (alignmentWidth != Infinity && alignmentWidth === alignmentWidth) {
-        if (this._resolvedTextFormat.align == 'center') {
+        if (format.align == 'center') {
           offsetX = Math.round((alignmentWidth - line.width) / 2);
-        } else if (this._resolvedTextFormat.align == 'right') {
+        } else if (format.align == 'right') {
           offsetX = alignmentWidth - line.width;
         }
       }
 
       for (const glyph of line.glyphs) {
-        glyph.hitX = offsetX + glyph.x + font.offsetX * glyph.scale;
+        glyph.hitX = offsetX + glyph.x + font.get_offsetX() * glyph.scale;
         glyph.hitY = top;
         glyph.hitWidth = Math.max(
           1,
-          glyph.advance + this._resolvedTextFormat.letterSpacing,
+          glyph.advance + format.letterSpacing,
           glyph.visualRight - glyph.x,
         );
         glyph.hitHeight = lineHeight;
         this.addGlyphToBatch(
           glyph,
-          offsetX + glyph.x + font.offsetX * glyph.scale,
-          top + lineBaseline - font.baseline * glyph.scale + font.offsetY * glyph.scale,
+          offsetX + glyph.x + font.get_offsetX() * glyph.scale,
+          top + lineBaseline - font.get_baseline() * glyph.scale + font.get_offsetY() * glyph.scale,
         );
       }
 
@@ -1029,33 +1028,34 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
 
     @bound
     private addGlyphToBatch(glyph: RichBitmapGlyph, x: number, y: number): void {
-      let character: BitmapChar = glyph.character;
+      let character: BitmapChar | null = glyph.character;
       if (character == null) {
         return;
       }
-      let texture: Texture = character.texture;
-      let frame: Rectangle = texture.frame;
+      let texture: Texture = character.get_texture();
+      const frame = texture.get_frame();
       if (
         (frame != null && (frame.width == 0 || frame.height == 0)) ||
-        (frame == null && (texture.width == 0 || texture.height == 0))
+        (frame == null && (texture.get_width() == 0 || texture.get_height() == 0))
       ) {
         return;
       }
       if (this.helperImage == null) {
         this.helperImage = new Image(texture);
       } else {
-        this.helperImage.texture = texture;
+        this.helperImage.set_texture(texture);
         this.helperImage.readjustSize();
       }
-      this.helperImage.x = x + character.xOffset * glyph.scale;
-      this.helperImage.y = y + character.yOffset * glyph.scale;
-      this.helperImage.scaleX = this.helperImage.scaleY = glyph.scale;
-      this.helperImage.color = glyph.color;
-      this.helperImage.alpha = 1;
-      this.helperImage.textureSmoothing = this._textureSmoothing;
-      this.helperImage.pixelSnapping = this._pixelSnapping;
+      this.helperImage.set_x(x + character.get_xOffset() * glyph.scale);
+      this.helperImage.set_y(y + character.get_yOffset() * glyph.scale);
+      this.helperImage.set_scaleX(glyph.scale);
+      this.helperImage.set_scaleY(glyph.scale);
+      this.helperImage.set_color(glyph.color);
+      this.helperImage.set_alpha(1);
+      this.helperImage.set_textureSmoothing(this._textureSmoothing);
+      this.helperImage.set_pixelSnapping(this._pixelSnapping);
       let targetBatch: MeshBatch = this.batchForGroup(glyph.batchGroup);
-      let firstVertex: number = targetBatch.numVertices;
+      let firstVertex: number = targetBatch.get_numVertices();
       targetBatch.addMesh(this.helperImage);
       let animatedVertices: number[] | null =
         targetBatch !== this.characterBatch
@@ -1074,25 +1074,30 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
                     : this.podRewardVertices
                   : null;
       if (animatedVertices != null) {
-        for (let vertex: number = firstVertex; vertex < targetBatch.numVertices; vertex++) {
+        for (let vertex: number = firstVertex; vertex < targetBatch.get_numVertices(); vertex++) {
           animatedVertices.push(vertex);
         }
       }
     }
 
+    private requireCharacterBatch(): MeshBatch {
+      if (!this.characterBatch) throw Error('Initialize the renderer before composing glyphs');
+      return this.characterBatch;
+    }
+
     @bound
     private batchForGroup(group: number): MeshBatch {
-      if (group <= 0) return this.characterBatch;
+      if (group <= 0) return this.requireCharacterBatch();
       let index: number = group - 1;
       while (this.japaneseBatches.length <= index) {
         this.japaneseBatches.push(null);
       }
-      let batch: MeshBatch = this.japaneseBatches[index];
+      let batch = this.japaneseBatches[index];
       if (batch == null) {
         batch = new MeshBatch();
-        batch.touchable = false;
-        batch.pixelSnapping = this._pixelSnapping;
-        batch.batchable = !this._useSeparateBatch;
+        batch.set_touchable(false);
+        batch.set_pixelSnapping(this._pixelSnapping);
+        batch.set_batchable(!this._useSeparateBatch);
         this.japaneseBatches[index] = batch;
         this.addChild(batch);
       }
@@ -1152,7 +1157,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       // Match the visible label and its existing gold marker, not arbitrary
       // gold text/artifacts. Wire messages and stored HTML stay unchanged.
       RichBitmapFontTextRenderer.ECHO_LABEL_PATTERN.lastIndex = 0;
-      let match: any;
+      let match: RegExpExecArray | null;
       while (
         (match = RichBitmapFontTextRenderer.ECHO_LABEL_PATTERN.exec(this.markup.text)) != null
       ) {
@@ -1344,7 +1349,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
     @bound
     private syncAnimatedColorFrame(): void {
       let needed: boolean =
-        this.stage != null &&
+        this.get_stage() != null &&
         ((this._animateClientDeveloperTags && this.clientDeveloperVertices.length > 0) ||
           (this._animateEchoLabels && this.echoVertices.length > 0) ||
           (this._animateRoomInvites && this.roomInviteVertices.length > 0) ||
@@ -1379,7 +1384,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
     private updateAnimatedColors(): void {
       if (
         this.characterBatch == null ||
-        this.stage == null ||
+        this.get_stage() == null ||
         (this.clientDeveloperVertices.length == 0 &&
           this.echoVertices.length == 0 &&
           this.roomInviteVertices.length == 0 &&
@@ -1387,10 +1392,10 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
           this.lowRelicVertices.length == 0)
       )
         return;
-      let current: DisplayObject = this;
+      let current: DisplayObject | null = this;
       while (current != null) {
-        if (!current.visible || current.alpha <= 0) return;
-        current = current.parent;
+        if (!current.get_visible() || current.get_alpha() <= 0) return;
+        current = current.get_parent();
       }
       let changed: boolean = false;
       let color: number;
@@ -1451,8 +1456,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
 
     @bound
     private acquireGlyph(): RichBitmapGlyph {
-      let glyph: RichBitmapGlyph =
-        this.glyphPool.length > 0 ? this.glyphPool.pop() : new RichBitmapGlyph();
+      let glyph: RichBitmapGlyph = this.glyphPool.pop() ?? new RichBitmapGlyph();
       this.activeGlyphs.push(glyph);
       return glyph;
     }
@@ -1471,7 +1475,8 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
     @bound
     private recycleActiveGlyphs(): void {
       while (this.activeGlyphs.length > 0) {
-        let glyph: RichBitmapGlyph = this.activeGlyphs.pop();
+        const glyph = this.activeGlyphs.pop();
+        if (!glyph) break;
         JapaneseGlyphCache.release(glyph.japaneseGlyph);
         glyph.clear();
         this.glyphPool.push(glyph);
@@ -1480,7 +1485,7 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
 
     @bound
     private static normalizedSize(font: BitmapFont, value: number): number {
-      return value === value && isFinite(value) && value > 0 ? value : font.size;
+      return value === value && isFinite(value) && value > 0 ? value : font.get_size();
     }
 
     /**
@@ -1502,41 +1507,43 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
         return;
       }
 
-      let inherited: TextFormat = this._fontStyles.getTextFormatForTarget(this);
+      let inherited: TextFormat | null = this._fontStyles.getTextFormatForTarget(this);
       if (inherited == null) {
         return;
       }
-      let inheritedFontName: string = inherited.font;
+      let inheritedFontName: string = inherited.get_font();
       if (
         inheritedFontName == null ||
         inheritedFontName.toLowerCase() == RussoBitmapFontRegistry.DEVICE_FONT_ALIAS ||
         inheritedFontName == RussoBitmapFontRegistry.PRIMARY_FONT_NAME
       ) {
-        inheritedFontName = RussoBitmapFontRegistry.fontNameForSize(inherited.size);
+        inheritedFontName = RussoBitmapFontRegistry.fontNameForSize(inherited.get_size());
       }
-      let font: BitmapFont = TextField.getBitmapFont(inheritedFontName);
+      let font: BitmapFont | null = TextField.getBitmapFont(inheritedFontName);
       if (font == null) {
         // The Aeon base theme uses the device-font name "_sans". Falling
         // back to Russo keeps custom FontStylesSet values useful even when
         // a caller supplies another unavailable device-font name.
-        font = TextField.getBitmapFont(RussoBitmapFontRegistry.fontNameForSize(inherited.size));
+        font = TextField.getBitmapFont(
+          RussoBitmapFontRegistry.fontNameForSize(inherited.get_size()),
+        );
       }
       if (font == null) {
         return;
       }
 
-      let size: number = inherited.size;
+      let size: number = inherited.get_size();
       if (size < 0) {
-        size *= -font.size;
+        size *= -font.get_size();
       }
       let bitmapFormat: BitmapFontTextFormat = new BitmapFontTextFormat(
         font,
         RichBitmapFontTextRenderer.normalizedSize(font, size),
-        inherited.color,
-        inherited.horizontalAlign,
-        inherited.leading,
+        inherited.get_color(),
+        inherited.get_horizontalAlign(),
+        inherited.get_leading(),
       );
-      bitmapFormat.isKerningEnabled = inherited.kerning;
+      bitmapFormat.isKerningEnabled = inherited.get_kerning();
       this._resolvedTextFormat = bitmapFormat;
     }
 
@@ -1567,7 +1574,6 @@ export function createRichBitmapFontTextRenderer(resolve: Resolve): any {
       this.glyphPool = [];
       this.activeGlyphs = [];
       this.markup.clear();
-      this.markup = null;
       if (this.helperImage != null) {
         this.helperImage.dispose();
         this.helperImage = null;

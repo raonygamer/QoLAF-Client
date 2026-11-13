@@ -1,3 +1,5 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
@@ -77,12 +79,28 @@ test('native Text retains identity, renders HTML colors, and restores its upstre
   }
   const oldSetter = NativeText.prototype.set_text;
   const instance = new NativeText();
-  bridgeNativeBitmapText(
-    { cls: () => NativeText, defer: (fn: () => void) => cleanups.push(fn) } as any,
-    fixture.Text,
-  );
+  const api = {
+    cls: (name: string) => {
+      if (name === 'core.hud.components.Text') return NativeText;
+      try {
+        return fixture.resolve(name);
+      } catch {
+        return {};
+      }
+    },
+    defer: (fn: () => void) => cleanups.push(fn),
+  } as unknown as API;
+  bindGameClasses(api);
+  bridgeNativeBitmapText(api, fixture.Text);
   assert.equal(instance.get_text(), 'AB');
   assert.ok(instance instanceof NativeText);
+  // The native PvP leaderboard passes numeric ranks through the Haxe setter.
+  Reflect.apply(instance.set_text, instance, [42]);
+  assert.equal(instance.get_text(), '42');
+  Reflect.apply(instance.set_htmlText, instance, [0]);
+  assert.equal(instance.get_text(), '0');
+  Reflect.apply(instance.set_text, instance, [null]);
+  assert.equal(instance.get_text(), '');
   instance.set_htmlText('<font color="#00ff00">A</font>B');
   assert.deepEqual(
     instance.finalLayer.characterBatch.meshes.map((m: any) => m.color),

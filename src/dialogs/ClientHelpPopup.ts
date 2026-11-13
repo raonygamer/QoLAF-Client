@@ -1,5 +1,5 @@
 import { read } from '../api/Types';
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 import { ClientChangelogTextChunks } from './ClientChangelogTextChunks';
 import type { ClientHelpPage } from './ClientHelpContent';
 

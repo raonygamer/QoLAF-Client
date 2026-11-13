@@ -1,13 +1,13 @@
-import { read, type Raw } from '../api/Types';
+import type { Player } from '../game/Bindings';
 
-/** Haxe Group exposes get_id(); do not equate two absent JS properties. */
+/** Haxe Group exposes get_id(); absent groups never establish membership. */
 export function samePlayerGroup(
-  first: Raw | null | undefined,
-  second: Raw | null | undefined,
+  first: Pick<Player, 'get_group'> | null | undefined,
+  second: Pick<Player, 'get_group'> | null | undefined,
 ): boolean {
-  const mine = read(first, 'group');
-  const theirs = read(second, 'group');
+  const mine = first?.get_group();
+  const theirs = second?.get_group();
   if (!mine || !theirs) return false;
-  const id = read(mine, 'id');
-  return id != null && id === read(theirs, 'id');
+  const id = mine.get_id();
+  return id != null && id === theirs.get_id();
 }

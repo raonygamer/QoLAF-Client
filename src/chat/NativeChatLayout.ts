@@ -1,14 +1,20 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import { Quad, type DisplayObject, type GameScene } from '../game/Bindings';
 import type { DeviceSettings } from '../settings/DeviceSettings';
 import { ChatLayout } from './ChatLayout';
 
 /** Fit the native projections to the original panel and composer geometry. */
-export function installNativeChatLayout(api: API, game: Raw, preferences?: DeviceSettings): void {
+export function installNativeChatLayout(
+  api: API,
+  game: GameScene,
+  preferences?: DeviceSettings,
+): void {
   const log = game.messageLog;
   const chat = game.chatInput;
-  const stage = read(game, 'stage');
-  const Quad = api.cls('starling.display.Quad') as any;
-  if (!log?.simple?.tf || !log.advanced?.scroll || !chat?.input || !stage || !Quad) return;
+  const stage = game.get_stage();
+  const reflection = new GameReflection(api);
+  if (!log?.simple?.tf || !log.advanced?.scroll || !chat?.input || !stage) return;
   const simple = log.simple,
     advanced = log.advanced;
   const input = chat.input,
@@ -16,15 +22,19 @@ export function installNativeChatLayout(api: API, game: Raw, preferences?: Devic
     scroll = advanced.scroll;
   const background = advanced.scrollView.getChildAt(0);
   const saved: (() => void)[] = [];
-  const remember = (node: Raw, keys: string[]) => {
+  const remember = (node: DisplayObject, keys: readonly ('x' | 'y' | 'width' | 'height')[]) => {
     for (const key of keys) {
-      const value = read(node, key);
+      const value = node[`get_${key}`]();
       saved.push(() => node[`set_${key}`](value));
     }
   };
   remember(log, ['x', 'y']);
-  remember(simple, ['x', 'y', 'mask']);
-  remember(simple.tf, ['width', 'y', 'maxWidth']);
+  remember(simple, ['x', 'y']);
+  const originalMask = simple.get_mask();
+  saved.push(() => simple.set_mask(originalMask));
+  remember(simple.tf, ['width', 'y']);
+  const originalMaxWidth = simple.tf.maxWidth;
+  saved.push(() => simple.tf.set_maxWidth(originalMaxWidth));
   remember(advanced, ['y']);
   remember(background, ['width', 'height']);
   remember(scroll, ['x', 'y', 'width', 'height']);
@@ -42,19 +52,19 @@ export function installNativeChatLayout(api: API, game: Raw, preferences?: Devic
   let openedAdvanced = false;
   let disposed = false;
   const integrated = () => preferences?.get('enableNewChatIntegrationSystem') ?? true;
-  const positionSimple = () => simple.tf.set_y(Math.min(0, viewHeight - read(simple.tf, 'height')));
+  const positionSimple = () => simple.tf.set_y(Math.min(0, viewHeight - simple.tf.get_height()));
   const fitRows = () => {
-    for (let i = 0; i < read(scroll, 'numChildren'); i++) {
+    for (let i = 0; i < scroll.get_numChildren(); i++) {
       const row = scroll.getChildAt(i);
       if (row === advanced.playerChatOptions) continue;
-      row.set_width(Math.max(1, read(scroll, 'width') - 10));
+      row.set_width(Math.max(1, scroll.get_width() - 10));
     }
     scroll.arrange();
   };
   const layout = () => {
     if (disposed) return;
-    const width = read(stage, 'stageWidth'),
-      height = read(stage, 'stageHeight');
+    const width = stage.get_stageWidth(),
+      height = stage.get_stageHeight();
     const view = ChatLayout.fit(width, height);
     viewHeight = view.height;
     log.set_x(view.x);
@@ -68,8 +78,8 @@ export function installNativeChatLayout(api: API, game: Raw, preferences?: Devic
     mask.set_width(contentWidth);
     mask.set_height(view.height);
     positionSimple();
-    const previousScroll = read(scroll, 'verticalScrollPosition');
-    const followBottom = previousScroll >= read(scroll, 'maxVerticalScrollPosition') - 2;
+    const previousScroll = scroll.get_verticalScrollPosition();
+    const followBottom = previousScroll >= scroll.get_maxVerticalScrollPosition() - 2;
     background.set_width(view.width);
     background.set_height(view.height);
     scroll.set_x(Math.min(10, Math.max(0, view.width - 1)));
@@ -79,7 +89,7 @@ export function installNativeChatLayout(api: API, game: Raw, preferences?: Devic
     fitRows();
     scroll.scrollToPosition(
       0,
-      followBottom ? read(scroll, 'maxVerticalScrollPosition') : previousScroll,
+      followBottom ? scroll.get_maxVerticalScrollPosition() : previousScroll,
     );
     const enabled = integrated();
     composer.set_visible(enabled);
@@ -101,7 +111,7 @@ export function installNativeChatLayout(api: API, game: Raw, preferences?: Devic
     if (openedAdvanced && log.contains(advanced)) log.toggleView('advanced');
     openedAdvanced = false;
   };
-  api.around(chat, 'toggleChatMode', function (next, ...args) {
+  reflection.around(chat, 'toggleChatMode', function (next, ...args) {
     const wasActive = chat.isActive();
     if (!wasActive && integrated()) {
       openedAdvanced = !log.contains(advanced);
@@ -112,17 +122,35 @@ export function installNativeChatLayout(api: API, game: Raw, preferences?: Devic
     layout();
     return result;
   });
-  api.after(chat, 'closeChat', restoreSimple);
-  api.after(simple.tf, 'set_text', positionSimple);
-  api.after(log, 'toggleView', layout);
-  api.after(tabs, 'layoutTabs', () => {
+  reflection.after(chat, 'closeChat', restoreSimple);
+  reflection.after(simple.tf, 'set_text', positionSimple);
+  let changingView = false;
+  reflection.around(log, 'toggleView', function (next, view) {
+    if (changingView) return next(view);
+    changingView = true;
+    try {
+      if (view === 'advanced' && log.contains(advanced) && chat.isActive()) {
+        chat.closeChat();
+        // closeChat may already restore Simple through restoreSimple. Do not
+        // toggle Advanced back on after that nested restoration.
+        if (!log.contains(advanced)) return;
+      }
+      next(view);
+    } finally {
+      changingView = false;
+      const active = log.contains(advanced) ? advanced : simple;
+      if (log.contains(active)) log.setChildIndex(active, 0);
+      layout();
+    }
+  });
+  reflection.after(tabs, 'layoutTabs', () => {
     if (!integrated()) return;
     const buttons = tabs.tabs ?? [];
     let x = 0;
     for (const button of buttons) {
       const width = tabs.equalTabs
-        ? Math.max(1, (read(tabs, 'width') - Math.max(0, buttons.length - 1) * 3) / buttons.length)
-        : read(button, 'width');
+        ? Math.max(1, (tabs.get_width() - Math.max(0, buttons.length - 1) * 3) / buttons.length)
+        : button.get_width();
       button.set_x(x);
       button.set_width(width);
       x += width + 3;

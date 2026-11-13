@@ -1,17 +1,13 @@
-import { read, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
-import { ChatGifDecoder } from './ChatGifDecoder';
-import type { ChatImagePlatform } from './ChatRemoteImageLoader';
+import { BitmapData, Texture, Starling } from '../game/Bindings';
+import { ChatGIFDecoder } from './ChatGIFDecoder';
+import type { ChatImagePlatform, ChatImageBitmap } from './ChatRemoteImageLoader';
 
 /** Browser decoding feeds the game's actual OpenFL bitmap and Starling texture types. */
-export function createBrowserImagePlatform(resolve: Resolve): ChatImagePlatform {
-  const BitmapData = resolve('openfl.display.BitmapData');
-  const Texture = resolve('starling.textures.Texture');
-  const Starling = resolve('starling.core.Starling');
-  const decoder = new ChatGifDecoder(resolve);
+export function createBrowserImagePlatform(): ChatImagePlatform {
+  const decoder = new ChatGIFDecoder();
   return {
     fetch: (url, options) => fetch(url, options),
-    async decodeStatic(bytes): Promise<Raw> {
+    async decodeStatic(bytes): Promise<ChatImageBitmap> {
       const image = await createImageBitmap(new Blob([new Uint8Array(bytes)]));
       try {
         if (image.width > 4096 || image.height > 4096 || image.width * image.height > 8_000_000)
@@ -38,10 +34,10 @@ export function createBrowserImagePlatform(resolve: Resolve): ChatImagePlatform 
         image.close();
       }
     },
-    beginGif: (bytes) => decoder.begin(bytes),
+    beginGIF: (bytes) => decoder.begin(bytes),
     nextFrame(signal) {
       return new Promise<void>((resolveFrame, reject) => {
-        const stage = read(read(Starling, 'current'), 'stage');
+        const stage = Starling.get_current()?.get_stage();
         if (!stage) {
           reject(new Error('Image frame scheduler is unavailable.'));
           return;
@@ -63,6 +59,10 @@ export function createBrowserImagePlatform(resolve: Resolve): ChatImagePlatform 
         if (signal.aborted) aborted();
       });
     },
-    upload: (bitmap) => Texture.fromBitmapData(bitmap, false, false, 1),
+    upload(bitmap) {
+      if (!(bitmap instanceof BitmapData))
+        throw new TypeError('Chat texture upload requires native OpenFL bitmap data.');
+      return Texture.fromBitmapData(bitmap, false, false, 1);
+    },
   };
 }

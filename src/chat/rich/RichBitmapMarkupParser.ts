@@ -1,5 +1,6 @@
+import type { ArtifactLabelResolver, ArtifactLabelPresentation } from './ArtifactLabelResolver';
 // Source port of core/hud/components/chat/rich/RichBitmapMarkupParser.as.
-import { bound } from '../../runtime/As3';
+import { bound } from '../../runtime/HaxeInterop';
 import { RichBitmapMarkup } from './RichBitmapMarkup';
 import { RichBitmapInlineAtom } from './RichBitmapInlineAtom';
 
@@ -22,7 +23,7 @@ export class RichBitmapMarkupParser {
     defaultSize: number,
     defaultColor: number,
     result: RichBitmapMarkup | null = null,
-    artifactTokenLabelResolver: Function | null = null,
+    artifactTokenLabelResolver: ArtifactLabelResolver | null = null,
     collapseImageLinks: boolean = false,
     labelImageLinks: boolean = false,
   ): RichBitmapMarkup {
@@ -35,7 +36,7 @@ export class RichBitmapMarkupParser {
       return result;
     }
 
-    let output: any[] = [];
+    let output: string[] = [];
     let colors: number[] = result.colors;
     let sizes: number[] = result.sizes;
     let sourceStarts: number[] = result.sourceStarts;
@@ -52,10 +53,11 @@ export class RichBitmapMarkupParser {
       if (character == '$' && artifactTokenLabelResolver != null) {
         let artifactToken: ChatArtifactToken | null = ChatArtifactToken.parseAt(source, i);
         if (artifactToken != null) {
-          let artifactPresentation: any = RichBitmapMarkupParser.resolveArtifactPresentation(
-            artifactTokenLabelResolver,
-            artifactToken,
-          );
+          let artifactPresentation: ArtifactLabelPresentation =
+            RichBitmapMarkupParser.resolveArtifactPresentation(
+              artifactTokenLabelResolver,
+              artifactToken,
+            );
           let visibleBegin: number = sizes.length;
           RichBitmapMarkupParser.appendText(
             String(artifactPresentation.label),
@@ -113,7 +115,7 @@ export class RichBitmapMarkupParser {
               sizes.length,
               imageLink.sourceBegin,
               imageLink.sourceEnd,
-              imageLink.rawUrl,
+              imageLink.rawURL,
               ChatDiscordImageLink.LINK_COLOR,
             ),
           );
@@ -279,18 +281,23 @@ export class RichBitmapMarkupParser {
 
   @bound
   private static resolveArtifactPresentation(
-    resolver: Function | null,
+    resolver: ArtifactLabelResolver | null,
     token: ChatArtifactToken,
-  ): any {
+  ): ArtifactLabelPresentation {
     let label: string | null = null;
     let color: number = RichBitmapMarkupParser.ARTIFACT_LINK_COLOR;
     try {
-      let resolved: any = resolver?.(token.playerId, token.artifactId, token.rawToken);
+      const resolved: unknown = resolver?.(token.playerId, token.artifactId, token.rawToken);
       if (resolved != null) {
-        if (!(typeof resolved === 'string') && resolved.hasOwnProperty('label')) {
-          label = String(resolved.label);
-          if (resolved.hasOwnProperty('color')) {
-            let numericColor: number = Number(resolved.color);
+        if (
+          (typeof resolved === 'object' || typeof resolved === 'function') &&
+          Object.prototype.hasOwnProperty.call(resolved, 'label')
+        ) {
+          const resolvedLabel: unknown = Reflect.get(resolved, 'label');
+          label = String(resolvedLabel);
+          if (Object.prototype.hasOwnProperty.call(resolved, 'color')) {
+            const resolvedColor: unknown = Reflect.get(resolved, 'color');
+            const numericColor = Number(resolvedColor);
             if (
               !isNaN(numericColor) &&
               isFinite(numericColor) &&
@@ -304,7 +311,7 @@ export class RichBitmapMarkupParser {
           label = String(resolved);
         }
       }
-    } catch (error: any) {
+    } catch {
       label = null;
     }
     if (label == null) {
@@ -324,7 +331,7 @@ export class RichBitmapMarkupParser {
   @bound
   private static appendText(
     value: string,
-    output: any[],
+    output: string[],
     sizes: number[],
     colors: number[],
     size: number,

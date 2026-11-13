@@ -1,4 +1,4 @@
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 
 /** Feathers was replaced upstream. Keep the source pages' property contract,
  * using Haxe's actual controls for pointer handling, scrolling and focus. */
@@ -135,22 +135,13 @@ export function settingsControls(resolve: Resolve) {
     }
     setThumbState(state: string) {
       if (this.enabled === false) state = 'disabled';
-      if (this.thumb && state === this.thumbState) return;
       this.thumbState = state;
-      this.thumb?.removeFromParent(true);
-      this.thumb = new Frame(
-        10,
-        14,
-        state === 'disabled'
-          ? 0x080808
-          : state === 'down'
-            ? 0x282828
-            : state === 'hover'
-              ? 0x181818
-              : 0x505050,
-        state === 'disabled' ? 0x282828 : 0x707070,
-      );
-      this.addChild(this.thumb);
+      // AstroTheme.settingsSliderThumb supplies only defaultSkin. Feathers
+      // reuses it for hover/down/disabled; preserve that appearance and node.
+      if (!this.thumb) {
+        this.thumb = new Frame(10, 14, 0x505050, 0x707070);
+        this.addChild(this.thumb);
+      }
       this.layout();
     }
     layout() {

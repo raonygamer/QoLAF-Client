@@ -39,7 +39,7 @@ export class ChatImageCache {
       onFailed?.('Image cache is disposed.');
       return;
     }
-    if (!link?.rawUrl) {
+    if (!link?.rawURL) {
       onFailed?.('Invalid image URL.');
       return;
     }
@@ -63,7 +63,7 @@ export class ChatImageCache {
     const entry: Entry = { asset: null, loader, waiters: [waiter] };
     this.entries.set(key, entry);
     loader.loadCandidates(
-      link.candidateUrls(2048, 2048),
+      link.candidateURLs(2048, 2048),
       (asset) => {
         if (this.entries.get(key) !== entry) {
           asset.dispose();
@@ -91,7 +91,7 @@ export class ChatImageCache {
   }
 
   cachedSize(link: ChatDiscordImageLink | null): { width: number; height: number } | null {
-    if (!link?.rawUrl) return null;
+    if (!link?.rawURL) return null;
     const asset = this.entries.get(this.keyFor(link))?.asset;
     return asset ? { width: asset.width, height: asset.height } : null;
   }
@@ -126,7 +126,7 @@ export class ChatImageCache {
   }
 
   private keyFor(link: ChatDiscordImageLink): string {
-    return link.candidateUrls(2048, 2048)[0] ?? link.rawUrl;
+    return link.candidateURLs(2048, 2048)[0] ?? link.rawURL;
   }
 
   private deliver<T>(callback: (value: T) => void, value: T): void {

@@ -1,3 +1,4 @@
+import type { Artifact } from '../game/Bindings';
 import { read, type Raw } from '../api/Types';
 import { ChatArtifactLinkData } from './ChatArtifactLinkData';
 import { ChatArtifactToken } from './rich/ChatArtifactToken';
@@ -30,7 +31,7 @@ export class ChatArtifactLinkResolver {
 
   constructor(
     private game: Raw,
-    private createArtifact: (record: Raw) => Raw,
+    private createArtifact: (record: Raw) => Artifact,
     private localize: (text: string) => string = (text) => text,
     private now: () => number = () => performance.now(),
     registry?: ChatArtifactTokenRegistry,
@@ -71,7 +72,7 @@ export class ChatArtifactLinkResolver {
     return this.cache.artifacts.get(this.key(playerId, artifactId)) ?? null;
   }
 
-  registerLocal(playerId: string, artifact: Raw): Result {
+  registerLocal(playerId: string, artifact: Artifact): Result {
     const me = read(this.game, 'me');
     if (
       !this.current() ||
@@ -168,7 +169,7 @@ export class ChatArtifactLinkResolver {
             this.finish(key, null);
             return;
           }
-          let artifact: Raw;
+          let artifact: Artifact;
           try {
             artifact = this.createArtifact(record);
           } catch {

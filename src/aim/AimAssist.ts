@@ -89,6 +89,23 @@ export class AimAssist {
     this.mouseMoving = this.movingToward = false;
   }
 
+  /** Source updateAimAngle advances time even when automation/overlay guards return. */
+  suspend(now: number, reason: string): void {
+    this.lastUpdate = now;
+    this.resetDiagnostics();
+    this.release(reason);
+  }
+
+  automate(now: number, angle: number): void {
+    this.suspend(
+      now,
+      Number.isNaN(angle)
+        ? 'automation owns aim control; waiting for angle'
+        : 'automation owns aim control',
+    );
+    this.aimAngle = angle;
+  }
+
   update(input: AimAssistInput): void {
     this.resetDiagnostics();
     const elapsed =

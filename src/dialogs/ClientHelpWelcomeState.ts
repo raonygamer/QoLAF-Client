@@ -1,14 +1,18 @@
-import { read, type Raw } from '../api/Types';
+export interface ClientWelcomeStorage {
+  data?: Record<string, unknown>;
+  get_data?(): Record<string, unknown>;
+  flush(): unknown;
+}
 
 /** One invitation per local profile, retained across room changes if storage fails. */
 export class ClientHelpWelcomeState {
   private state: 'pending' | 'dismissed' | undefined;
   private static readonly storageKey = 'qolafClientHelpWelcomeState';
 
-  initialize(storage: Raw | undefined): void {
+  initialize(storage: ClientWelcomeStorage | undefined): void {
     if (this.state) return;
     try {
-      const data = read(storage, 'data');
+      const data = storage?.get_data ? storage.get_data() : storage?.data;
       const saved = data?.[ClientHelpWelcomeState.storageKey];
       if (saved === 'pending' || saved === 'dismissed') {
         this.state = saved;
@@ -26,15 +30,17 @@ export class ClientHelpWelcomeState {
     return this.state === 'pending';
   }
 
-  dismiss(storage: Raw | undefined): void {
+  dismiss(storage: ClientWelcomeStorage | undefined): void {
     this.state = 'dismissed';
     this.save(storage);
   }
 
-  private save(storage: Raw | undefined): void {
+  private save(storage: ClientWelcomeStorage | undefined): void {
     try {
       if (!storage) return;
-      read(storage, 'data')[ClientHelpWelcomeState.storageKey] = this.state;
+      const data = storage.get_data ? storage.get_data() : storage.data;
+      if (!data) return;
+      data[ClientHelpWelcomeState.storageKey] = this.state;
       storage.flush();
     } catch {
       // The in-memory state still survives sector transitions.

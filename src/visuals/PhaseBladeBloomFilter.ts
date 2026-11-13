@@ -1,4 +1,4 @@
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 
 export function createPhaseBladeBloomFilter(resolve: Resolve) {
   const Filter = resolve('starling.filters.FragmentFilter');

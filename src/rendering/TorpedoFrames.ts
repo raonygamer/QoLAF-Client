@@ -1,4 +1,4 @@
-import type { Raw } from '../api/Types';
+import type { Projectile, GameScene } from '../game/Bindings';
 import { networkTime } from './NetworkTime';
 import { xhersixTorpedoWeaponKey } from '../projectile/XhersixTorpedoCue';
 
@@ -18,37 +18,49 @@ export function projectileOffsetSeconds(target: number, course: number, limit: n
   return Math.abs(offset) <= limit ? offset * 0.001 : NaN;
 }
 
-/** Presentation only: the current game's course, collision and TTL stay native. */
-export class TorpedoFrames {
-  private enabled = new WeakSet<Raw>();
-  private frameTime = new WeakMap<Raw, number>();
+const frameTimes = new WeakMap<GameScene, number>();
 
-  capture(projectile: Raw, enabled: boolean): void {
+export function projectileRenderTime(game: GameScene): number {
+  return frameTimes.get(game) ?? networkTime(game);
+}
+
+/** One render timestamp and one shared per-life eligibility decision. */
+export class TorpedoFrames {
+  private enabled = new WeakSet<Projectile>();
+
+  capture(projectile: Projectile, enabled: boolean): void {
     this.reset(projectile);
     if (enabled) this.enabled.add(projectile);
   }
 
-  reset(projectile: Raw): void {
+  reset(projectile: Projectile): void {
     this.enabled.delete(projectile);
   }
 
-  beginFrame(game: Raw): void {
+  beginFrame(game: GameScene): void {
     // SceneBase.getServerTime writes g.time. The source observer reads the
     // clock directly so rendering cannot change the simulation's tick time.
-    this.frameTime.set(game, networkTime(game));
+    frameTimes.set(game, networkTime(game));
   }
 
-  seconds(projectile: Raw, fallback: number): number {
-    if (
-      !this.enabled.has(projectile) ||
-      !projectile.isEnemy ||
-      projectile.ai !== 'bullet' ||
-      projectile.wave ||
-      projectile.weapon?.key !== xhersixTorpedoWeaponKey
-    )
-      return fallback;
+  capturedSetting(projectile: Projectile): boolean {
+    return this.enabled.has(projectile);
+  }
+
+  usesServerCourse(projectile: Projectile): boolean {
+    return (
+      this.enabled.has(projectile) &&
+      projectile.isEnemy &&
+      projectile.ai === 'bullet' &&
+      !projectile.wave &&
+      projectile.weapon?.key === xhersixTorpedoWeaponKey
+    );
+  }
+
+  seconds(projectile: Projectile, fallback: number): number {
+    if (!this.usesServerCourse(projectile)) return fallback;
     const offset = projectileOffsetSeconds(
-      this.frameTime.get(projectile.g) ?? networkTime(projectile.g),
+      projectileRenderTime(projectile.g),
       projectile.course.time,
       250,
     );

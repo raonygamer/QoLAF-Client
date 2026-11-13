@@ -1,8 +1,11 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 // @ts-expect-error actual host hooks
 import { Hooks } from './fixtures/HostCore.js';
+import { installNativeThrottle } from '../src/movement/NativeThrottle';
 import { installAutomationControls } from '../src/automation/AutomationControls';
+import { installNativeControlTiming } from '../src/movement/NativeControlTiming';
 
 test('automation ownership gates physical input and routes source steering through native commands', () => {
   const calls: any[] = [];
@@ -40,6 +43,10 @@ test('automation ownership gates physical input and routes source steering throu
     checkAccelerate(suppressed: boolean) {
       calls.push(['native acceleration', suppressed]);
     }
+    handleTurn() {
+      calls.push(['player turn']);
+    }
+    checkBoost() {}
     sendCommand(id: number, enabled: boolean) {
       calls.push([id, enabled]);
     }
@@ -71,14 +78,15 @@ test('automation ownership gates physical input and routes source steering throu
         })(),
     },
   };
-  installAutomationControls({
+  const api = {
     cls: (name: string) => classes[name],
     defer: (fn: Function) => cleanup.push(fn),
     around: (object: any, name: string, fn: Function) =>
       cleanup.push(hooks.add(object, name, 'around', fn)),
     before: (object: any, name: string, fn: Function) =>
       cleanup.push(hooks.add(object, name, 'before', fn)),
-  } as any);
+  } as any;
+  installAutomationControls(api);
   const play: any = new Roaming();
   assert.equal(play.updateCommands(), 'native-result');
   play.checkAccelerate(true);
@@ -87,6 +95,11 @@ test('automation ownership gates physical input and routes source steering throu
   assert.equal(play.currentAimAngle, Math.PI / 2);
   assert.equal(play.setAutomationAimAngle('one', 1), false);
   owner = 'one';
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? class {} });
+  installNativeThrottle(api, play.g, () => {
+    throw new Error('Physical throttle command sent while automation owns controls');
+  });
+  installNativeControlTiming(api, play.g);
   assert.equal(play.setAutomationAimAngle('other', 1), false);
   assert.equal(play.setAutomationAimAngle('one', Infinity), false);
   assert.equal(play.setAutomationAimAngle('one', NaN), false);
@@ -147,6 +160,30 @@ test('automation ownership gates physical input and routes source steering throu
   play.setAutomationAimAngle('two', 2);
   play.exit();
   assert.ok(Number.isNaN(play.currentAimAngle));
+  owner = '';
+  course.time = 43;
+  play.handleTurn();
+  assert.deepEqual(calls.splice(0), [['player turn']]);
+  owner = 'two';
+  play.setAutomationAimAngle('two', 1);
+  play.updateCommands();
+  assert.deepEqual(calls, [], 'claiming controls preserves the player turn clock');
+  course.time = 76;
+  play.updateCommands();
+  assert.deepEqual(calls.splice(0), [[2, true]]);
+  play.clearAutomationAimAngle('two');
+  play.setAutomationAimAngle('two', -1);
+  play.updateCommands();
+  assert.deepEqual(calls, [], 'clearing and setting a target cannot restart the turn clock');
+  owner = '';
+  play.handleTurn();
+  assert.deepEqual(calls, [], 'releasing controls preserves the automation turn clock');
+  course.time = 108;
+  play.handleTurn();
+  assert.deepEqual(calls, [], '32ms is still inside the source throttle interval');
+  course.time = 109;
+  play.handleTurn();
+  assert.deepEqual(calls.splice(0), [['player turn']]);
   cleanup.reverse().forEach((fn) => fn());
   assert.equal('setAutomationAimAngle' in play, false);
   assert.equal('currentAimAngle' in play, false);

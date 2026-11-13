@@ -13,17 +13,23 @@ export class RichBitmapInputBinding {
     private readonly element: HTMLInputElement,
     private readonly changed: () => void,
     private readonly selectionChanged: () => void = () => {},
+    activity: () => void = () => {},
   ) {
     this.composition = new RichBitmapComposition(model);
     this.listen(element, 'beforeinput', (event) => this.beforeInput(event as InputEvent));
     this.listen(element, 'input', (event) => this.input(event as InputEvent));
     this.listen(element, 'keydown', (event) => {
+      activity();
       // Let the IME handle candidate navigation/confirmation without submitting
       // chat or activating game shortcuts through TextEntry's native listener.
       if (this.composition.isActive || (event as KeyboardEvent).isComposing)
         event.stopImmediatePropagation();
       else this.navigate(event as KeyboardEvent);
     });
+    // Preserve TextEntry's own Enter listener and browser editing defaults, but
+    // do not let typing reach Lime's window-level gameplay keydown listener.
+    // Keyup still bubbles to release keys held before the composer gained focus.
+    this.listen(element, 'keydown', (event) => event.stopPropagation(), false);
     this.listen(element, 'compositionstart', () => {
       this.readSelection();
       this.session = this.composition.start();
@@ -76,8 +82,8 @@ export class RichBitmapInputBinding {
     for (const cleanup of this.cleanups.splice(0)) cleanup();
   }
 
-  private listen(target: EventTarget, name: string, listener: EventListener): void {
-    const options = { capture: true };
+  private listen(target: EventTarget, name: string, listener: EventListener, capture = true): void {
+    const options = { capture };
     target.addEventListener(name, listener, options);
     this.cleanups.push(() => target.removeEventListener(name, listener, options));
   }
@@ -107,14 +113,18 @@ export class RichBitmapInputBinding {
       );
       return;
     }
-    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key))
+      return;
     this.readSelection();
     event.preventDefault();
     event.stopImmediatePropagation();
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
       this.model.moveHorizontal(event.key === 'ArrowLeft' ? -1 : 1, event.shiftKey, byWord);
     else {
-      const target = event.key === 'Home' ? 0 : this.model.visibleText.length;
+      // Source single-line editor treats Up/Down like Home/End. Chat history
+      // and autocomplete consume their keys earlier, at window capture.
+      const target =
+        event.key === 'Home' || event.key === 'ArrowUp' ? 0 : this.model.visibleText.length;
       this.model.select(event.shiftKey ? this.model.selectionAnchor : target, target);
     }
     this.project();

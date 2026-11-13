@@ -1,6 +1,6 @@
 // Source port of af/PlayerInspectProjection.as.
 import { read } from '../api/Types';
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createPlayerInspectProjection(resolve: Resolve): any {
   const PlayerInspectViewModel: any = resolve('af.PlayerInspectViewModel');
   type PlayerInspectViewModel = any;
@@ -104,7 +104,7 @@ export function createPlayerInspectProjection(resolve: Resolve): any {
             );
             if (weapon.dmg != null)
               PlayerInspectProjection.row(weapons, description + ': damage ' + weapon.dmg.dmg());
-            var dps: any = PlayerInspectViewModel.weaponDps(weapon);
+            var dps: any = PlayerInspectViewModel.weaponDPS(weapon);
             PlayerInspectProjection.row(
               weapons,
               description +

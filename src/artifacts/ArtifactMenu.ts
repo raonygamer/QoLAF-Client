@@ -1,32 +1,54 @@
-import { read, type API, type Raw } from '../api/Types';
+import { cancelNativePlayerCommands } from '../movement/NativeCommandCancellation';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import {
+  ArtifactState2,
+  DisplayState,
+  ArtifactOverview,
+  MenuHud,
+  Point,
+  Quad,
+  Starling,
+  RymdenRunt,
+  SceneBase,
+  ToolTip,
+  type StarlingStage,
+} from '../game/Bindings';
 import { configureArtifactLayout } from './ArtifactLayout';
 
+const expandedGames = new WeakSet<object>();
+export function expandedArtifactsOpen(game: object): boolean {
+  return expandedGames.has(game);
+}
+
+interface MenuOverview extends ArtifactOverview {
+  expandedView?: boolean;
+  landedClassicView?: boolean;
+  artifactMenu?: MenuHud;
+}
+
 interface MenuSession {
-  overview: Raw | null;
-  menu: Raw;
-  stage: Raw;
-  stats: Raw | null;
+  overview: MenuOverview | null;
+  menu: MenuHud;
+  stage: StarlingStage;
+  stats: Starling | null;
   statsVisible: boolean;
   backgroundVisible: boolean;
   closeVisible: boolean;
-  dim: Raw | null;
+  dim: Quad | null;
   dimAlpha: number;
   position: () => void;
   rebuild: () => void;
   close: () => void;
+  release: () => void;
 }
 
 /** Original ArtifactState2 lifecycle adapted to the native Haxe DisplayState container. */
 export function installArtifactMenu(api: API): void {
-  const State = api.cls('core.states.menuStates.ArtifactState2');
-  const Base = api.cls('core.states.DisplayState');
-  const Overview = api.cls('core.artifact.ArtifactOverview');
-  const Point = api.cls('openfl.geom.Point') as any;
-  if (!State || !Base || !Overview) throw Error('Artifact menu runtime dependencies are missing');
-  const sessions = new Map<Raw, MenuSession>();
-  const setStats = (stats: Raw | null, visible: boolean) => {
-    if (stats?.set_showStats) stats.set_showStats(visible);
-    else if (stats) stats.showStats = visible;
+  const reflection = new GameReflection(api);
+  const sessions = new Map<ArtifactState2, MenuSession>();
+  const setStats = (stats: Starling | null, visible: boolean) => {
+    stats?.set_showStats(visible);
   };
   const reset = (session: MenuSession) => {
     const { menu } = session;
@@ -38,7 +60,7 @@ export function installArtifactMenu(api: API): void {
     session.dim = null;
     setStats(session.stats, session.statsVisible);
   };
-  const destroyOverview = (state: Raw, session: MenuSession) => {
+  const destroyOverview = (state: ArtifactState2, session: MenuSession) => {
     const view = session.overview;
     session.overview = null;
     if (!view) return;
@@ -46,80 +68,77 @@ export function installArtifactMenu(api: API): void {
     view.removeEventListener('artifactOverviewCloseRequested', session.close);
     state.removeChild(view, true);
   };
-  api.around(State.prototype, 'enter', function () {
+  const release = (state: ArtifactState2) => {
+    const session = sessions.get(state);
+    if (!session) return;
+    sessions.delete(state);
+    expandedGames.delete(state.g);
+    ToolTip.disposeType('artifactBox');
+    session.menu.removeEventListener('addedToStage', session.position);
+    session.menu.removeEventListener('removedFromStage', session.release);
+    session.stage.removeEventListener('resize', session.position);
+    destroyOverview(state, session);
+    reset(session);
+    state.g.messageLog?.set_visible(true);
+  };
+  reflection.around(ArtifactState2.prototype, 'enter', function () {
     const state = this;
-    Base.prototype.enter.call(state);
+    DisplayState.prototype.enter.call(state);
     const game = state.g;
-    if (game.chatInput?.isActive()) game.chatInput.closeChat();
-    game.messageLog.set_visible(false);
-    const play = read(game.gameStateMachine, 'activeState');
-    const ship = read(game, 'me')?.ship;
-    if (play?.sendCommand && ship) {
-      play.autoCruise = false;
-      play.fireWithHotkeys = false;
-      play.releaseAimAssist?.();
-      const course = read(ship, 'course');
-      for (const [field, command] of [
-        ['accelerate', 0],
-        ['deaccelerate', 8],
-        ['rotateLeft', 1],
-        ['rotateRight', 2],
-      ] as const)
-        if (course?.[field]) play.sendCommand(command, false);
-      if (read(ship, 'isShooting')) {
-        for (const weapon of ship.weapons) weapon.set_fire(false);
-        play.sendCommand(3, false);
-      }
-      game.camera.zoomFocus(read(game, 'me').zoom, 100);
-    }
-    const menu = state.sm.parent;
-    const stage = api.cls('starling.core.Starling')!.get_current().get_stage();
-    const stats = api.cls('RymdenRunt')?.s ?? null;
+    cancelNativePlayerCommands(game);
+    const menu = reflection.cast(state.sm.parent, 'core.hud.MenuHud');
+    const stage = Starling.get_current()?.get_stage();
+    if (!stage) throw new Error('Artifact menu requires an active Starling stage');
+    const stats = RymdenRunt.s ?? null;
     const session: MenuSession = {
       overview: null,
       menu,
       stage,
       stats,
-      statsVisible: read(stats, 'showStats', false),
-      backgroundVisible: read(menu.bgr, 'visible', true),
-      closeVisible: read(menu.continueGameButton, 'visible', true),
+      statsVisible: stats?.get_showStats() ?? false,
+      backgroundVisible: menu.bgr?.get_visible() ?? true,
+      closeVisible: menu.continueGameButton?.get_visible() ?? true,
       dim: null,
       dimAlpha: 0,
       position: () => {},
       rebuild: () => {},
       close: () => menu.close(),
+      release: () => release(state),
     };
     session.position = () => {
       const expanded = !!session.overview?.expandedView;
       menu.set_x(0);
       menu.set_y(0);
       if (!expanded) return;
-      const parent = read(menu, 'parent');
-      if (!parent || !read(menu, 'stage')) return;
+      const parent = menu.get_parent();
+      if (!parent || !menu.get_stage()) return;
       const origin = parent.localToGlobal(new Point(0, 0));
       menu.set_x(-origin.x);
       menu.set_y(-origin.y);
       if (!session.dim) {
         const index = parent.getChildIndex(menu);
         const candidate = index > 0 ? parent.getChildAt(index - 1) : null;
-        const Quad = api.cls('starling.display.Quad') as any;
         if (candidate && candidate instanceof Quad) {
           session.dim = candidate;
-          session.dimAlpha = read(candidate, 'alpha');
+          session.dimAlpha = candidate.get_alpha();
         }
       }
       session.dim?.set_alpha(Math.min(session.dimAlpha, 0.35));
     };
     session.rebuild = () => {
-      api.cls('core.hud.components.ToolTip')?.disposeType('artifactBox');
+      ToolTip.disposeType('artifactBox');
       destroyOverview(state, session);
       reset(session);
-      const view = new (Overview as any)(game);
+      const view: MenuOverview = new ArtifactOverview(game);
       view.landedClassicView = !!view.p.isLanded;
       view.expandedView =
-        !view.landedClassicView &&
-        (api.cls('core.scene.SceneBase')?.clientSettings?.expandedArtifactOverview ?? true);
-      configureArtifactLayout(view, read(stage, 'stageWidth'), read(stage, 'stageHeight'));
+        !view.landedClassicView && (SceneBase.clientSettings?.expandedArtifactOverview ?? true);
+      if (view.expandedView) {
+        expandedGames.add(game);
+        if (game.chatInput?.isActive()) game.chatInput.closeChat();
+      } else expandedGames.delete(game);
+      game.messageLog?.set_visible(!view.expandedView);
+      configureArtifactLayout(view, stage.get_stageWidth(), stage.get_stageHeight());
       view.artifactMenu = menu;
       view.addEventListener('artifactOverviewLayoutChanged', session.rebuild);
       view.addEventListener('artifactOverviewCloseRequested', session.close);
@@ -135,21 +154,16 @@ export function installArtifactMenu(api: API): void {
     };
     sessions.set(state, session);
     menu.addEventListener('addedToStage', session.position);
+    menu.addEventListener('removedFromStage', session.release);
     stage.addEventListener('resize', session.position);
     session.rebuild();
   });
-  api.before(State.prototype, 'exit', function () {
-    const session = sessions.get(this);
-    if (!session) return;
-    session.menu.removeEventListener('addedToStage', session.position);
-    session.stage.removeEventListener('resize', session.position);
-    destroyOverview(this, session);
-    reset(session);
-    this.g.messageLog.set_visible(true);
-    sessions.delete(this);
+  reflection.before(ArtifactState2.prototype, 'exit', function () {
+    release(this);
   });
   api.defer(() => {
     for (const session of [...sessions.values()]) session.close();
+    for (const state of sessions.keys()) expandedGames.delete(state.g);
     sessions.clear();
   });
 }

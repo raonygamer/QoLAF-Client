@@ -1,10 +1,13 @@
+import { chargingWeapon } from '../weapon/WeaponChargeOwnership';
+import type { PlayerShip } from '../game/Bindings';
 import { read, type API, type Raw } from '../api/Types';
-import { type Resolve } from '../runtime/As3';
+import { type Resolve } from '../runtime/HaxeInterop';
 import { installBeamEmitterTint } from './BeamEmitterTint';
 import { createGrayscaleTintStyle } from './GrayscaleTintStyle';
 import { WeaponColors, type WeaponColor } from './WeaponColors';
 import { ClientDevVisual } from './ClientDevVisual';
 import { installInstantWeaponColors } from './InstantWeaponColors';
+import { ShipVisualStateStore } from './ShipVisualStateStore';
 
 /** Presentation only: the native factory, simulation, collision and damage still run. */
 export function installNativeWeaponColors(
@@ -21,6 +24,7 @@ export function installNativeWeaponColors(
     const style = new Style();
     style.set_texture(read(mesh, 'texture'));
     style.set_textureSmoothing(read(mesh, 'textureSmoothing'));
+    style.set_textureRepeat(read(mesh, 'textureRepeat', false));
     return style;
   };
   const hue = (color: number) => {
@@ -28,8 +32,14 @@ export function installNativeWeaponColors(
     const hsv = Color.RGBtoHSV(...rgb);
     return (((hsv[0] - 120 + 360) % 360) * Math.PI) / 360;
   };
-  const selected = (weapon: Raw | null): WeaponColor | null =>
-    weapon && weapon.unit === game.me?.ship ? colors.get(weapon.key) : null;
+  const visualState = ShipVisualStateStore.forGame(game);
+  const selected = (weapon: Raw | null): WeaponColor | null => {
+    if (!weapon || weapon.g !== game) return null;
+    if (weapon.unit === game.me?.ship) return colors.get(weapon.key);
+    const player = weapon.unit?.player;
+    if (!player || player.ship !== weapon.unit) return null;
+    return visualState.remote(player.id)?.weaponStyles?.[weapon.key] ?? null;
+  };
   const ownsHullPalette = (weapon: Raw) =>
     weapon.key === ClientDevVisual.PHASE_BLADE &&
     read(read(weapon.unit, 'movieClip'), 'style')?.__class__?.__name__ ===
@@ -72,6 +82,7 @@ export function installNativeWeaponColors(
       }
       style!.set_texture(read(segment, 'texture'));
       style!.set_textureSmoothing(read(segment, 'textureSmoothing'));
+      style!.set_textureRepeat(read(segment, 'textureRepeat', false));
       const previous = read(segment, 'style');
       segment.setStyle(style, false);
       try {
@@ -229,9 +240,9 @@ export function installNativeWeaponColors(
   }
   const Ship = api.cls('core.ship.PlayerShip')?.prototype;
   if (Ship)
-    api.after(Ship, 'startChargeUpEffect', function () {
-      if (this !== game.me?.ship) return;
-      const style = selected(read(this, 'weapon'));
+    api.after(Ship, 'startChargeUpEffect', function (this: PlayerShip) {
+      if (this.g !== game) return;
+      const style = selected(chargingWeapon(this));
       if (style)
         emitters.updateFixed(
           this,

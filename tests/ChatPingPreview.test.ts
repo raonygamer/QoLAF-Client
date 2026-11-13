@@ -1,3 +1,6 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { Texture, GameScene } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
@@ -19,6 +22,9 @@ function fixture() {
     constructor(public texture: any) {
       super();
       this.readjustSize();
+    }
+    set_texture(texture: unknown) {
+      this.texture = texture;
     }
     readjustSize() {
       this.set_width(this.texture.width);
@@ -44,6 +50,15 @@ function fixture() {
       };
     return bitmap.resolve(name);
   };
+  bindGameClasses({
+    cls: (name: string) => {
+      try {
+        return resolve(name);
+      } catch {
+        return {};
+      }
+    },
+  } as unknown as API);
   return { ...bitmap, resolve, filters };
 }
 const ping = (room = 'room') =>
@@ -56,6 +71,11 @@ const ping = (room = 'room') =>
     solarSystemKey: 'fulzar',
     room,
   });
+
+function fieldText(value: unknown): string {
+  assert.ok(value instanceof Text);
+  return value.get_text();
+}
 
 test('ping popup preserves source fields, pointer placement, ship paint ownership and lazy labels', (t) => {
   const f = fixture();
@@ -72,7 +92,7 @@ test('ping popup preserves source fields, pointer placement, ship paint ownershi
       textureDisposed = true;
     },
   };
-  popup.showFor(data, texture, 675, 495, 680, 500);
+  popup.showFor(data, texture as unknown as Texture, 675, 495, 680, 500);
   assert.equal(popup.get_width(), 276);
   assert.equal(popup.get_height(), 82);
   assert.equal(popup.get_x(), 387);
@@ -83,14 +103,14 @@ test('ping popup preserves source fields, pointer placement, ship paint ownershi
   assert.equal(image.get_height(), 28);
   assert.equal(image.get_x(), 8);
   assert.equal(image.get_y(), 27);
-  assert.equal(popup.getChildAt(6).text, 'Pilot');
+  assert.equal(fieldText(popup.getChildAt(6)), 'Pilot');
   assert.equal(popup.getChildAt(6).get_height(), 22);
-  assert.equal(popup.getChildAt(7).text, 'ID: pilot');
-  assert.equal(popup.getChildAt(8).text, 'Level 90  •  Clan');
-  assert.equal(popup.getChildAt(9).text, 'In Fulzar');
+  assert.equal(fieldText(popup.getChildAt(7)), 'ID: pilot');
+  assert.equal(fieldText(popup.getChildAt(8)), 'Level 90  •  Clan');
+  assert.equal(fieldText(popup.getChildAt(9)), 'In Fulzar');
   data.systemType = 'clan';
   popup.refreshData(data);
-  assert.equal(popup.getChildAt(9).text, 'In Fulzar  •  Clan Instance');
+  assert.equal(fieldText(popup.getChildAt(9)), 'In Fulzar  •  Clan Instance');
   assert.equal(f.filters.length, 1, 'room lookup must not rebuild the ship filter');
   popup.showFor(data, null, 10, 10, 100, 30);
   assert.equal(popup.get_x(), 0);
@@ -98,11 +118,11 @@ test('ping popup preserves source fields, pointer placement, ship paint ownershi
   assert.equal(image.get_visible(), false);
   assert.equal(f.filters[0].disposed, true);
   popup.showFor(new ChatFriendPingData(), null, 0, 0, 680, 500);
-  assert.equal(popup.getChildAt(6).text, 'Unknown player');
-  assert.equal(popup.getChildAt(7).text, 'Player ID unavailable');
-  assert.equal(popup.getChildAt(8).text, 'Player');
-  assert.equal(popup.getChildAt(9).text, '');
-  popup.showFor(data, texture, 0, 0, 680, 500);
+  assert.equal(fieldText(popup.getChildAt(6)), 'Unknown player');
+  assert.equal(fieldText(popup.getChildAt(7)), 'Player ID unavailable');
+  assert.equal(fieldText(popup.getChildAt(8)), 'Player');
+  assert.equal(fieldText(popup.getChildAt(9)), '');
+  popup.showFor(data, texture as unknown as Texture, 0, 0, 680, 500);
   popup.dispose();
   assert.equal(f.filters.at(-1).disposed, true);
   assert.equal(textureDisposed, false);
@@ -180,11 +200,17 @@ test('ping hover closes without mouse motion and late room replies never reopen 
   view.scroll = scroll;
   log.advanced = view;
   log.updateTexts = () => {};
+  log.getQueue = () => [];
+  log.advanced.addText = () => {};
   let hit: any = scroll;
   stage.hitTest = () => hit;
   const callbacks: any[] = [];
+  const gameClass = {};
   const game = {
+    __class__: gameClass,
     stage,
+    get_stage: () => stage,
+    get_isLeaving: () => false,
     messageLog: log,
     client: { multiplayer: { listRooms: (...args: any[]) => callbacks.push(args[4]) } },
   };
@@ -192,8 +218,10 @@ test('ping hover closes without mouse motion and late room replies never reopen 
     hooks = new Hooks();
   let frame: any;
   const api: any = {
-    cls: () => undefined,
+    cls: (name: string) => (name === 'core.scene.Game' ? gameClass : undefined),
     defer: (fn: Function) => cleanup.push(fn),
+    around: (object: any, key: string, fn: Function) =>
+      cleanup.push(hooks.add(object, key, 'around', fn)),
     after: (object: any, key: string, fn: Function) =>
       cleanup.push(hooks.add(object, key, 'after', fn)),
     on: (_event: string, fn: Function) => {
@@ -201,7 +229,9 @@ test('ping hover closes without mouse motion and late room replies never reopen 
     },
   };
   let current: any = { row: node(), ping: ping() };
-  installNativeChatPingPreview(api, game, f.resolve, { pingAtStagePoint: () => current });
+  installNativeChatPingPreview(api, game as unknown as GameScene, f.resolve, {
+    pingAtStagePoint: () => current,
+  });
   const popup: any = view.getChildAt(view.get_numChildren() - 1);
   const touch = (phase = 'hover') => {
     for (const listener of stage.listeners('touch'))
@@ -217,18 +247,18 @@ test('ping hover closes without mouse motion and late room replies never reopen 
   callbacks[0]([{ id: 'room', data: { systemType: 'friendly' } }]);
   assert.equal(popup.get_visible(), false);
   touch();
-  assert.equal(popup.getChildAt(8).text, 'In Fulzar  •  Friendly');
+  assert.equal(fieldText(popup.getChildAt(8)), 'In Fulzar  •  Friendly');
   hit = stage;
-  frame({ game });
+  view.dispatchEventWith('enterFrame');
   assert.equal(popup.get_visible(), false);
   hit = scroll;
   touch();
   position++;
-  frame({ game });
+  view.dispatchEventWith('enterFrame');
   assert.equal(popup.get_visible(), false);
   touch();
   current = null;
-  frame({ game });
+  view.dispatchEventWith('enterFrame');
   assert.equal(popup.get_visible(), false);
   current = { row: node(), ping: ping('later') };
   touch();

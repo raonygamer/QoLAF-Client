@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { createSettingsAutomations } from '../src/ported/SettingsAutomations';
 import { AutomationManager } from '../src/automation/AutomationManager';
 import { Display } from './fixtures/NativeGame';
-import { aliasProperties } from '../src/runtime/As3';
+import { aliasProperties } from '../src/runtime/HaxeInterop';
 
 test('source automation page selects, starts, stops, confirms removal and detaches asynchronous UI', async (t) => {
   const cleanups: Function[] = [];
@@ -125,6 +125,12 @@ test('source automation page selects, starts, stops, confirms removal and detach
   const page = new Page(game);
   assert.equal(page.moduleList.get_width(), 398);
   assert.equal(page.moduleList.get_selectedItem(), first);
+  assert.ok(
+    page.details.children.some((child: Label) =>
+      String(Reflect.get(child, 'htmlText')).includes('&lt;safe&gt;'),
+    ),
+    'module descriptions remain literal text rather than injected markup',
+  );
   page.moduleList.set_selectedItem(second);
   page.startButton.click();
   assert.equal(page.selectedModule, second);
@@ -137,6 +143,18 @@ test('source automation page selects, starts, stops, confirms removal and detach
   assert.equal(manager.modules.length, 1);
   assert.equal(page.selectedModule, first);
   assert.deepEqual(calls, ['start:two', 'stop:two', 'remove:two']);
+  const originalImport = manager.importURL;
+  manager.importURL = async () => {
+    throw new Error(AutomationManager.MODULE_ALREADY_IMPORTED);
+  };
+  await page.importURL();
+  assert.deepEqual(messages.splice(0), ['Module already imported.']);
+  manager.importURL = async () => {
+    throw new Error('<bad>&module');
+  };
+  await page.importURL();
+  assert.deepEqual(messages.splice(0), ['Automation import failed: &lt;bad&gt;&amp;module']);
+  manager.importURL = originalImport;
   const pending = page.importURL();
   page.removeButton.click();
   page.dispose();

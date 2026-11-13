@@ -1,3 +1,7 @@
+import type { Artifact, Player, GameScene } from '../src/game/Bindings';
+import { bindGameClasses } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
+import { Display } from './fixtures/NativeGame';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installArtifactUI } from '../src/artifacts/NativeArtifacts';
@@ -29,6 +33,8 @@ test('fitness sorting preserves source reveal ordering and resets the rebuilt in
       scrollToPosition: (...args: unknown[]) => calls.push(args),
     };
     chooseSorting() {}
+    reloadStats() {}
+    dispose() {}
     drawArtifactsInCargo() {
       calls.push('draw');
     }
@@ -41,11 +47,14 @@ test('fitness sorting preserves source reveal ordering and resets the rebuilt in
     'core.artifact.ArtifactBox': Box,
     'core.artifact.ArtifactOverview': Overview,
   };
+  bindGameClasses({ cls: (name: string) => classes[name] ?? {} } as API);
   installArtifactUI(
     {
       cls: (name: string) => classes[name],
       after: (target: any, name: string, callback: Function) =>
         hooks.add(target, name, 'after', callback),
+      before: (target: any, name: string, callback: Function) =>
+        hooks.add(target, name, 'before', callback),
       defer() {},
       around: (target: any, name: string, callback: Function) =>
         hooks.add(target, name, 'around', callback),
@@ -91,7 +100,7 @@ test('source potential, modifier, name and adequacy orders retain reveal groupin
       { type: 'healthAdd2', value: 1 },
       { type: 'healthAdd3', value: 2 },
     ],
-  };
+  } as unknown as Artifact;
   const b = {
     id: 'b',
     name: 'Beta',
@@ -101,20 +110,31 @@ test('source potential, modifier, name and adequacy orders retain reveal groupin
       { type: 'healthAdd', value: 3 },
       { type: 'shieldAdd', value: 1 },
     ],
-  };
+  } as unknown as Artifact;
   const c = {
     id: 'c',
     name: 'Gamma',
     level: 20,
     revealed: true,
     stats: [{ type: 'shieldAdd2', value: 1 }],
-  };
-  const hidden = { id: 'd', name: 'Hidden', level: 100, revealed: false, stats: [] };
+  } as unknown as Artifact;
+  const hidden = {
+    id: 'd',
+    name: 'Hidden',
+    level: 100,
+    revealed: false,
+    stats: [],
+  } as unknown as Artifact;
   const player = {
     artifacts: [hidden, c, b, a],
-    activeArtifacts: ['a', 'c', 'd'],
+    get_activeArtifacts: () => ['a', 'c', 'd'],
     getArtifactById: (id: string) => [a, b, c, hidden].find((art) => art.id === id),
-  };
+  } as unknown as Player;
+  assert.equal(
+    'activeArtifacts' in player,
+    false,
+    'native player exposes a getter, not an AS3 field',
+  );
   const adequacy = artifactAdequacy(player);
   assert.equal(adequacy.get(a), 100);
   assert.equal(adequacy.get(b), 75);
@@ -140,21 +160,11 @@ test('source potential, modifier, name and adequacy orders retain reveal groupin
 
 test('source sorting screen routes every action and closes once without sorting on Close', async () => {
   const { createArtifactSorting } = await import('../src/artifacts/ArtifactSorting');
-  class Node {
-    children: any[] = [];
-    width = 80;
-    height = 30;
-    x = 0;
-    y = 0;
-    parent: any = null;
-    listeners = new Map<string, Function>();
-    addChild(node: any) {
-      this.children.push(node);
-      node.parent = this;
-      return node;
-    }
-    addEventListener(name: string, fn: Function) {
-      this.listeners.set(name, fn);
+  class Node extends Display {
+    constructor() {
+      super();
+      this.set_width(80);
+      this.set_height(30);
     }
   }
   class Quad extends Node {
@@ -164,8 +174,8 @@ test('source sorting screen routes every action and closes once without sorting 
       public color: number,
     ) {
       super();
-      this.width = w;
-      this.height = h;
+      this.set_width(w);
+      this.set_height(h);
     }
   }
   class Button extends Node {
@@ -196,31 +206,66 @@ test('source sorting screen routes every action and closes once without sorting 
     'generics.ObjUtils': { ToVector: (table: unknown) => table },
     'core.artifact.Artifact': { TYPE_INCREASE_RECYCLE_RATE: 'increaseRecyleRate' },
   };
+  bindGameClasses({ cls: (name: string) => classes[name] ?? {} } as API);
   const Popup = createArtifactSorting((name) => classes[name]);
-  const game = { dataManager: { loadTable: () => types } };
+  const game = { dataManager: { loadTable: () => types } } as unknown as GameScene;
   const actions: string[] = [];
   const popup = new Popup(
     game,
     (order: string) => actions.push(order),
     () => actions.push('close'),
   );
-  const buttons = popup.children.filter((node: any) => node instanceof Button);
+  const buttons = (popup as unknown as Node).children.filter(
+    (node): node is Button => node instanceof Button,
+  );
   assert.equal(buttons.length, 11);
-  buttons.find((button: any) => button.label === 'Adequacy high').callback();
+  const adequacy = buttons.find((button) => button.label === 'Adequacy high');
+  assert.ok(adequacy);
+  adequacy.callback();
   popup.close();
   assert.deepEqual(actions, ['adequacyhigh', 'close']);
+  for (const [label, order] of [
+    ['Strength high', 'levelhigh'],
+    ['Strength low', 'levellow'],
+    ['Fitness high', 'fitnesshigh'],
+    ['Fitness low', 'fitnesslow'],
+    ['Potential high', 'potentialhigh'],
+    ['Potential low', 'potentiallow'],
+    ['Adequacy high', 'adequacyhigh'],
+    ['Adequacy low', 'adequacylow'],
+    ['Modifiers high', 'modifiershigh'],
+    ['Modifiers low', 'modifierslow'],
+  ]) {
+    const routed: string[] = [];
+    const view = new Popup(
+      game,
+      (value) => routed.push(value),
+      () => routed.push('close'),
+    );
+    const button = (view as unknown as Node).children.find(
+      (node) => node instanceof Button && node.label === label,
+    );
+    assert.ok(button instanceof Button, label);
+    button.callback();
+    button.callback();
+    assert.deepEqual(routed, [order, 'close'], label);
+  }
   const closeOnly = new Popup(
     game,
     () => assert.fail('Close must not sort'),
     () => actions.push('cancel'),
   );
-  closeOnly.children
-    .find((node: any) => node instanceof Button && node.label === 'Close')
-    .callback();
+  const close = (closeOnly as unknown as Node).children.find(
+    (node) => node instanceof Button && node.label === 'Close',
+  );
+  assert.ok(close instanceof Button);
+  close.callback();
   assert.equal(actions.at(-1), 'cancel');
-  const body = popup.children.find((node: any) => node.children.length)?.children[0];
+  const body = (popup as unknown as Node).children.find((node: any) => node.children.length)
+    ?.children[0];
+  assert.ok(body);
   assert.deepEqual(
-    body.children.map((node: any) => node.name),
+    body.children.map((node) => node.get_name()),
     ['healthAdd', 'increaseRecyleRate'],
   );
 });
@@ -234,6 +279,9 @@ test('sorting popup toggles, centers in expanded view, preserves controls and di
     parent: Node | null = null;
     children: Node[] = [];
     removed = false;
+    get_parent() {
+      return this.parent;
+    }
     addChild(node: Node) {
       node.parent = this;
       this.children.push(node);
@@ -270,6 +318,7 @@ test('sorting popup toggles, centers in expanded view, preserves controls and di
       assert.fail('old sorting screen should not open');
     }
     onSort(_order: string) {}
+    reloadStats() {}
     dispose() {
       actions.push('dispose');
     }
@@ -277,6 +326,12 @@ test('sorting popup toggles, centers in expanded view, preserves controls and di
   class Popup extends Node {
     x = 0;
     y = 0;
+    set_x(value: number) {
+      this.x = value;
+    }
+    set_y(value: number) {
+      this.y = value;
+    }
     constructor(
       public g: unknown,
       public sort: Function,
@@ -302,7 +357,11 @@ test('sorting popup toggles, centers in expanded view, preserves controls and di
   for (const kind of ['before', 'after', 'around'])
     api[kind] = (target: any, key: string, fn: Function) =>
       cleanup.push(hooks.add(target, key, kind, fn));
-  installArtifactUI(api, () => Popup);
+  bindGameClasses({ cls: (name: string) => classes[name] ?? {} } as API);
+  installArtifactUI(
+    api,
+    () => Popup as unknown as ReturnType<Parameters<typeof installArtifactUI>[1]>,
+  );
   const view = new Overview();
   view.chooseSorting();
   const popup = view.children[0] as Popup;

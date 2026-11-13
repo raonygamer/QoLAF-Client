@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { bindGameClasses, type GameScene } from '../src/game/Bindings';
+import { installNativeControlTiming } from '../src/movement/NativeControlTiming';
 import { MapNavigation } from '../src/map/MapNavigation';
 import {
   installMapNavigation,
@@ -119,7 +121,8 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
       this.set_width(60);
     }
   }
-  const game: any = {};
+  let leaving = false;
+  const game = { get_isLeaving: () => leaving };
   const joins: unknown[][] = [];
   let nativeUpdates = 0,
     clicks = 0,
@@ -176,8 +179,27 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
       return 55;
     }
   }
+  const turns: Array<[number, boolean]> = [];
+  const held = new Set<number>();
+  const course = { time: 100, rotateLeft: true, rotateRight: true };
+  let nativeTurns = 0;
   class Play {
+    static mouseBlocked = false;
+    static mouseIntegrator = 12;
     g = game;
+    me = { ship: { get_course: () => course } };
+    keybinds = {
+      isInputDown: (key: number) => held.has(key),
+      isInputUp: (key: number) => !held.has(key),
+    };
+    sendCommand(command: number, active: boolean) {
+      turns.push([command, active]);
+    }
+    handleTurn() {
+      nativeTurns++;
+    }
+    checkBoost() {}
+    updateCommands() {}
     updateAimAngle() {
       aims++;
       return 77;
@@ -202,7 +224,9 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
     on: (n: string, f: Function) => events.set(n, f),
     defer: (f: Function) => cleanups.push(f),
   };
-  installMapNavigation(api, game);
+  installMapNavigation(api, game as unknown as GameScene);
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? class {} });
+  installNativeControlTiming(api, game as unknown as GameScene);
   const map = new MapView();
   const joining = { id: 'joining-player' };
   assert.equal(map.playerJoined(joining), undefined);
@@ -228,7 +252,7 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
   assert.equal(nativeUpdates, 0);
   assert.equal(bodyUpdates, 1);
   const other = new MapView();
-  other.g = {};
+  other.g = { get_isLeaving: () => false };
   assert.equal(other.update(), 456);
   const body = new Body();
   map.mapContainer.addChild(body.layer);
@@ -255,6 +279,18 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
   const play = new Play();
   play.updateAimAngle();
   assert.equal(aims, 0, 'map drag owns mouse aim');
+  play.handleTurn();
+  assert.deepEqual(turns.splice(0), [[1, false], [2, false]], 'drag releases both held axes');
+  assert.equal(nativeTurns, 0);
+  course.rotateLeft = course.rotateRight = false;
+  held.add(13);
+  play.handleTurn();
+  assert.deepEqual(turns, [], 'map keyboard path shares the simulation turn throttle');
+  course.time += 33;
+  play.handleTurn();
+  assert.deepEqual(turns.splice(0), [[1, true]]);
+  assert.equal(Play.mouseBlocked, true);
+  assert.equal(Play.mouseIntegrator, 0);
   touch.phase = 'ended';
   touch.x = 150;
   assert.equal(
@@ -265,6 +301,11 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
   assert.equal(clicks, 0);
   onTouch(event);
   assert.equal(isMapNavigating(game), false);
+  play.handleTurn();
+  assert.equal(nativeTurns, 0, 'ending the drag cannot send another turn in the same tick');
+  course.time += 33;
+  play.handleTurn();
+  assert.equal(nativeTurns, 1, 'normal steering resumes after releasing the map');
   assert.equal(map.mapContainer.get_x(), 299);
   assert.equal(body.click(event), undefined, 'cancelled touch-end stays suppressed');
   play.updateAimAngle();
@@ -295,6 +336,11 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
   wheel(wheelEvent);
   assert.equal(prevented, 0, 'outside hits fall through');
   hit = background;
+  leaving = true;
+  wheel(wheelEvent);
+  assert.equal(prevented, 0, 'leaving game must not consume wheel events');
+  assert.equal(map.mapContainer.get_scaleX(), 1);
+  leaving = false;
   const anchor = (200 - map.mapContainer.get_x()) / map.mapContainer.get_scaleX();
   wheel(wheelEvent);
   assert.equal(prevented, 1);

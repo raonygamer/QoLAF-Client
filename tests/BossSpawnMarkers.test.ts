@@ -322,7 +322,7 @@ test('dashed source rings cache geometry and markers hide only for their own act
   marker.update(1, 2);
   assert.equal(marker.node.get_visible(), true);
   assert.equal(marker.node.get_x(), 10);
-  assert.equal(marker.node.children.at(-1).get_scaleX(), 2);
+  assert.equal(marker.node.getChildAt(marker.node.get_numChildren() - 1).get_scaleX(), 2);
   game.bossManager.bosses.push({ alive: true, parentBody: anchor });
   marker.update(1);
   assert.equal(marker.node.get_visible(), false);
@@ -330,7 +330,7 @@ test('dashed source rings cache geometry and markers hide only for their own act
   marker.update(1);
   assert.equal(marker.node.get_visible(), true);
   marker.dispose();
-  assert.equal(marker.node.disposed, true);
+  assert.equal((marker.node as unknown as Display).disposed, true);
 });
 
 test('world and map hooks share configured locations but own and dispose separate displays', () => {

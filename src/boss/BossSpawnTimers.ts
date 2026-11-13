@@ -1,4 +1,4 @@
-import { read, type Raw } from '../api/Types';
+import type { GameScene, EnemyShip } from '../game/Bindings';
 import { BossSpawnTimerCatalog, type BossTimerEntry } from './BossSpawnTimerCatalog';
 
 export interface BossTimerRow {
@@ -23,8 +23,8 @@ export class BossSpawnTimers {
   private lastSecondary = false;
 
   constructor(
-    private game: Raw | null,
-    private identityOf: (enemy: Raw) => EnemySpawnIdentity | undefined,
+    private game: GameScene | null,
+    private identityOf: (enemy: EnemyShip) => EnemySpawnIdentity | undefined,
     private localTime = () => performance.now(),
   ) {}
 
@@ -46,14 +46,13 @@ export class BossSpawnTimers {
 
   rows(showSecondary: boolean): BossTimerRow[] {
     const game = this.game;
-    if (!game || read(game, 'isLeaving') || !read(game, 'connected') || !this.initialize())
-      return [];
+    if (!game || game.get_isLeaving() || !game.get_connected() || !this.initialize()) return [];
     const now = this.localTime();
     const scan =
       !Number.isFinite(this.lastScanAt) || now < this.lastScanAt || now - this.lastScanAt >= 250;
     if (scan) {
       this.lastScanAt = now;
-      this.sampledServerTime = game.clock?.getServerTime();
+      this.sampledServerTime = game.clock?.getServerTime() ?? NaN;
       this.refreshAlive();
     }
     if (scan || showSecondary !== this.lastSecondary) {
@@ -70,7 +69,7 @@ export class BossSpawnTimers {
     identity: unknown,
   ): void {
     const game = this.game;
-    if (!game || read(game, 'isLeaving') || !read(game, 'connected') || !this.initialize()) return;
+    if (!game || game.get_isLeaving() || !game.get_connected() || !this.initialize()) return;
     const id = `${kind}:${key}`,
       entry = this.byId.get(id);
     if (!entry) return;
@@ -89,7 +88,7 @@ export class BossSpawnTimers {
     if (!records) this.deaths.set(id, (records = new Map()));
     const previous = records.get(matchedSource);
     if (identity != null && previous?.identity === identity) return;
-    const at = game.clock?.getServerTime();
+    const at = game.clock?.getServerTime() ?? NaN;
     records.set(matchedSource, { at: Number.isFinite(at) && at > 0 ? at : NaN, identity });
     entry.seenAlive = true;
     this.lastScanAt = NaN;
@@ -107,7 +106,7 @@ export class BossSpawnTimers {
           id,
           key,
           kind: 'boss',
-          name: read(boss, 'name'),
+          name: boss.get_name(),
           primary: true,
           conditional: false,
           sources: [],

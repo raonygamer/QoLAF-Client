@@ -1,3 +1,5 @@
+import { bindGameClasses, type GameScene } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatLayout } from '../src/chat/ChatLayout';
@@ -110,6 +112,10 @@ test('integrated composer follows the log, reflows rows, restores view ownership
   chat.addChild(input);
   chat.addChild(tabs);
   const stage = Object.assign(new Display(), { stageWidth: 1920, stageHeight: 1022 });
+  Object.assign(stage, {
+    get_stageWidth: () => stage.stageWidth,
+    get_stageHeight: () => stage.stageHeight,
+  });
   const preferences = new DeviceSettings({ get: (_key, fallback) => fallback, set() {} });
   const api: any = {
     cls: (name: string) => (name === 'openfl.text.TextFormat' ? class {} : Quad),
@@ -119,9 +125,10 @@ test('integrated composer follows the log, reflows rows, restores view ownership
       cleanups.push(hooks.add(object, key, 'after', fn)),
     defer: (fn: () => void) => cleanups.push(fn),
   };
-  const game = { messageLog: log, chatInput: chat, stage };
-  installNativeChatPreferences(api, game, preferences);
-  installNativeChatLayout(api, game, preferences);
+  const game = { messageLog: log, chatInput: chat, stage, get_stage: () => stage };
+  bindGameClasses({ cls: (name: string) => api.cls(name) ?? {} } as unknown as API);
+  installNativeChatPreferences(api, game as unknown as GameScene, preferences);
+  installNativeChatLayout(api, game as unknown as GameScene, preferences);
   assert.equal(chat.get_x(), 20);
   assert.equal(chat.get_y(), 590);
   assert.equal(input.get_y(), 32);

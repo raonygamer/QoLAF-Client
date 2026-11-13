@@ -1,25 +1,21 @@
+import { BitmapChar, Rectangle, Texture, StarlingTextField as TextField } from '../game/Bindings';
+import type { BitmapFont } from '../game/Bindings';
+import { JapaneseGlyphPage } from './JapaneseGlyphPage';
+import { JapaneseCachedGlyph } from './JapaneseCachedGlyph';
+import type { JapaneseRuntimeFontLoader as FontLoader } from '../chat/rich/JapaneseRuntimeFontLoader';
+type GlyphEntries = Partial<Record<string, JapaneseCachedGlyph>>;
+type ProtectedKeys = Readonly<Record<string, boolean>> | null;
+interface GlyphSlot {
+  page: JapaneseGlyphPage;
+  slot: number;
+}
 // Source port of core/hud/components/chat/rich/JapaneseGlyphCache.as.
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { createJapaneseRasterizer } from '../ui/JapaneseRasterizer';
-export function createJapaneseGlyphCache(resolve: Resolve): any {
-  const JapaneseGlyphPage: any = resolve('core.hud.components.chat.rich.JapaneseGlyphPage');
-  type JapaneseGlyphPage = any;
-  const JapaneseRuntimeFontLoader: any = resolve(
+export function createJapaneseGlyphCache(resolve: Resolve) {
+  const JapaneseRuntimeFontLoader = resolve(
     'core.hud.components.chat.rich.JapaneseRuntimeFontLoader',
-  );
-  type JapaneseRuntimeFontLoader = any;
-  const JapaneseCachedGlyph: any = resolve('core.hud.components.chat.rich.JapaneseCachedGlyph');
-  type JapaneseCachedGlyph = any;
-  const Rectangle: any = resolve('openfl.geom.Rectangle');
-  type Rectangle = any;
-  const BitmapChar: any = resolve('starling.text.BitmapChar');
-  type BitmapChar = any;
-  const BitmapFont: any = resolve('starling.text.BitmapFont');
-  type BitmapFont = any;
-  const Texture: any = resolve('starling.textures.Texture');
-  type Texture = any;
-  const TextField: any = resolve('starling.text.TextField');
-  type TextField = any;
+  ) as typeof FontLoader;
   const rasterizer = createJapaneseRasterizer(resolve);
 
   /** Shared static-kana and bounded-page runtime-kanji cache. */
@@ -30,9 +26,9 @@ export function createJapaneseGlyphCache(resolve: Resolve): any {
     private static CELL_PADDING: number = 3;
     private static BASE_PAGE_COUNT: number = 3;
 
-    private static kanaFont: BitmapFont = null;
-    private static kanaEntries: any = {};
-    private static kanjiEntries: any = {};
+    private static kanaFont: BitmapFont | null = null;
+    private static kanaEntries: GlyphEntries = {};
+    private static kanjiEntries: GlyphEntries = {};
     private static pages: JapaneseGlyphPage[] = [];
     private static useCounter: number = 0;
 
@@ -41,7 +37,7 @@ export function createJapaneseGlyphCache(resolve: Resolve): any {
     public static prepare(value: string): void {
       JapaneseRuntimeFontLoader.initialize();
       if (value == null || value.length == 0) return;
-      let required: any = {};
+      const required: Record<string, boolean> = {};
       let i: number;
       let codePoint: number;
       for (i = 0; i < value.length; i++) {
@@ -51,9 +47,7 @@ export function createJapaneseGlyphCache(resolve: Resolve): any {
       let key: string;
       for (key in required) {
         codePoint = Number(key);
-        let existing: JapaneseCachedGlyph = <JapaneseCachedGlyph>(
-          JapaneseGlyphCache.kanjiEntries[key]
-        );
+        const existing = JapaneseGlyphCache.kanjiEntries[key];
         if (existing != null) {
           existing.lastUsed = ++JapaneseGlyphCache.useCounter;
         } else {
@@ -65,13 +59,13 @@ export function createJapaneseGlyphCache(resolve: Resolve): any {
       }
     }
 
-    public static acquire(codePoint: number): JapaneseCachedGlyph {
+    public static acquire(codePoint: number): JapaneseCachedGlyph | null {
       if (JapaneseGlyphCache.isStaticJapanese(codePoint)) {
         return JapaneseGlyphCache.acquireKana(codePoint);
       }
       if (!JapaneseGlyphCache.isRuntimeKanji(codePoint)) return null;
       let key: string = String(codePoint);
-      let entry: JapaneseCachedGlyph = <JapaneseCachedGlyph>JapaneseGlyphCache.kanjiEntries[key];
+      let entry: JapaneseCachedGlyph | null | undefined = JapaneseGlyphCache.kanjiEntries[key];
       if (entry == null) {
         entry = JapaneseGlyphCache.rasterize(codePoint, null, true);
       }
@@ -79,10 +73,10 @@ export function createJapaneseGlyphCache(resolve: Resolve): any {
         entry.references++;
         entry.lastUsed = ++JapaneseGlyphCache.useCounter;
       }
-      return entry;
+      return entry ?? null;
     }
 
-    public static release(entry: JapaneseCachedGlyph): void {
+    public static release(entry: JapaneseCachedGlyph | null): void {
       if (entry != null && entry.page != null && entry.references > 0) {
         entry.references--;
       }
@@ -96,20 +90,20 @@ export function createJapaneseGlyphCache(resolve: Resolve): any {
       JapaneseRuntimeFontLoader.initialize();
     }
 
-    public static whenReady(callback: Function): void {
+    public static whenReady(callback: () => void): void {
       JapaneseRuntimeFontLoader.whenReady(callback);
     }
 
-    public static removeReadyCallback(callback: Function): void {
+    public static removeReadyCallback(callback: () => void): void {
       JapaneseRuntimeFontLoader.removeReadyCallback(callback);
     }
 
-    private static acquireKana(codePoint: number): JapaneseCachedGlyph {
+    private static acquireKana(codePoint: number): JapaneseCachedGlyph | null {
       JapaneseGlyphCache.initializeKana();
       let key: string = String(codePoint);
-      let entry: JapaneseCachedGlyph = <JapaneseCachedGlyph>JapaneseGlyphCache.kanaEntries[key];
+      let entry = JapaneseGlyphCache.kanaEntries[key];
       if (entry != null) return entry;
-      let character: BitmapChar = JapaneseGlyphCache.kanaFont.getChar(Number(codePoint));
+      let character: BitmapChar | null = JapaneseGlyphCache.kanaFont?.getChar(codePoint) ?? null;
       if (character == null) return null;
       entry = new JapaneseCachedGlyph();
       entry.codePoint = codePoint;
@@ -126,9 +120,9 @@ export function createJapaneseGlyphCache(resolve: Resolve): any {
 
     private static rasterize(
       codePoint: number,
-      protectedKeys: any,
+      protectedKeys: ProtectedKeys,
       uploadNow: boolean,
-    ): JapaneseCachedGlyph {
+    ): JapaneseCachedGlyph | null {
       if (!JapaneseRuntimeFontLoader.isReady) return null;
       const family = JapaneseGlyphCache.runtimeFontName(codePoint);
       if (!family || !JapaneseRuntimeFontLoader.hasFamily(family)) return null;
@@ -176,7 +170,7 @@ export function createJapaneseGlyphCache(resolve: Resolve): any {
       return entry;
     }
 
-    private static allocateSlot(protectedKeys: any): any {
+    private static allocateSlot(protectedKeys: ProtectedKeys): GlyphSlot {
       for (const available of JapaneseGlyphCache.pages) {
         if (available.hasUnusedSlot) {
           return { page: available, slot: available.takeUnusedSlot() };
@@ -188,15 +182,15 @@ export function createJapaneseGlyphCache(resolve: Resolve): any {
         return { page: created, slot: created.takeUnusedSlot() };
       }
 
-      let oldest: JapaneseCachedGlyph = null;
+      let oldest: JapaneseCachedGlyph | null = null;
       let key: string;
       for (key in JapaneseGlyphCache.kanjiEntries) {
-        let candidate: JapaneseCachedGlyph = <JapaneseCachedGlyph>(
-          JapaneseGlyphCache.kanjiEntries[key]
-        );
+        const candidate = JapaneseGlyphCache.kanjiEntries[key];
         if (
           candidate == null ||
           candidate.references != 0 ||
+          candidate.page == null ||
+          candidate.character == null ||
           (protectedKeys != null && protectedKeys[key])
         )
           continue;
@@ -204,7 +198,7 @@ export function createJapaneseGlyphCache(resolve: Resolve): any {
           oldest = candidate;
         }
       }
-      if (oldest != null) {
+      if (oldest?.page != null && oldest.character != null) {
         delete JapaneseGlyphCache.kanjiEntries[String(oldest.codePoint)];
         oldest.character.texture.dispose();
         oldest.page.clearSlot(oldest.slot);

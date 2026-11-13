@@ -1,4 +1,5 @@
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
+import { read } from '../api/Types';
 import { settingsControls } from '../settings/NativeControls';
 
 /** Radio's 38px Feathers rows on the native scrolling/hit-testing implementation. */
@@ -97,13 +98,14 @@ export function createRadioList(resolve: Resolve, Marquee: any) {
 
     @bound
     private onRowTouch(event: any): void {
-      const row = event.currentTarget;
+      const row = read(event, 'currentTarget');
+      if (!row) return;
       const began = event.getTouch(row, 'began');
       if (began)
         this.press = {
           row,
-          x: began.globalX,
-          y: began.globalY,
+          x: read(began, 'globalX'),
+          y: read(began, 'globalY'),
           scroll: this.verticalScrollPosition,
         };
       const ended = event.getTouch(row, 'ended');
@@ -111,9 +113,9 @@ export function createRadioList(resolve: Resolve, Marquee: any) {
       const press = this.press;
       this.press = null;
       if (
-        !ended.cancelled &&
-        Math.abs(ended.globalX - press.x) < 8 &&
-        Math.abs(ended.globalY - press.y) < 8 &&
+        !read(ended, 'cancelled', false) &&
+        Math.abs(read(ended, 'globalX') - press.x) < 8 &&
+        Math.abs(read(ended, 'globalY') - press.y) < 8 &&
         Math.abs(this.verticalScrollPosition - press.scroll) < 8
       ) {
         this.selectedIndex = Number(row.name);

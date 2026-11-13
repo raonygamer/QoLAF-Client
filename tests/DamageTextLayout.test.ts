@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installDamageText } from '../src/hud/DamageText';
+import { bindGameClasses } from '../src/game/Bindings';
 import { installCombatTextLayout } from '../src/rendering/CombatTextLayout';
 import { Display, Text } from './fixtures/NativeGame';
 import type { Raw } from '../src/api/Types';
@@ -70,12 +71,14 @@ test('combined layout and native damage hooks format before measurement while re
   const hooks = new Hooks(),
     cleanups: Array<() => void> = [];
   const api: any = {
-    cls: (name: string) => classes[name],
+    defer: (cleanup: () => void) => cleanups.push(cleanup),
+    cls: (name: string) => classes[name] ?? { prototype: {} },
     around: (object: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(object, key, 'around', fn)),
     after: (object: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(object, key, 'after', fn)),
   };
+  bindGameClasses(api);
   installCombatTextLayout(api);
   installDamageText(api, game);
   try {

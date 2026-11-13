@@ -1,3 +1,5 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { ArtifactTooltipContext } from '../src/artifacts/ArtifactTooltip';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { artifactTooltip } from '../src/artifacts/ArtifactTooltip';
@@ -34,9 +36,13 @@ function fixture() {
   };
   const player = {
     activeArtifacts: ['equipped'],
+    get_activeArtifacts() {
+      return this.activeArtifacts;
+    },
     crewMembers: [{ artifact: 'a', artifactEnd: 500 }],
     getArtifactById: () => ({ revealed: true, stats: [{ type: 'healthAdd', value: 1 }] }),
   };
+  bindGameClasses({ cls: (name: string) => classes[name] ?? class {} } as any);
   return {
     api: { cls: (name: string) => classes[name] } as any,
     box: { a: artifact, p: player, g: { time: 100 } },
@@ -46,7 +52,7 @@ function fixture() {
 test('cargo tooltip follows source localized order, integer fitness, adequacy and native stat HTML', () => {
   const { api, box } = fixture();
   assert.equal(
-    artifactTooltip(api, box, true),
+    artifactTooltip(box as unknown as ArtifactTooltipContext, true),
     "Localized artifact<br><font color='#ff0000'>Requires level 50</font><br>" +
       'Level 60, strength 20<br>Fitness localized: 5<br>Adequacy localized: 50%<br>' +
       'Max Upgraded<br>Upgrading: 400ms<br>healthAdd2:1000:false<br>armorAdd:20:true<br>',
@@ -56,9 +62,12 @@ test('cargo tooltip follows source localized order, integer fitness, adequacy an
 
 test('active tooltip omits cargo-only fitness/restriction and recomputes adequacy after setup changes', () => {
   const { api, box } = fixture();
-  const first = artifactTooltip(api, box, false);
+  const first = artifactTooltip(box as unknown as ArtifactTooltipContext, false);
   assert.doesNotMatch(first, /Fitness|Requires|Max Upgraded/);
   assert.match(first, /strength 20<br>Adequacy localized: 50%<br>10 upgrades/);
   box.p.activeArtifacts = [];
-  assert.match(artifactTooltip(api, box, false), /Adequacy localized: 0%/);
+  assert.match(
+    artifactTooltip(box as unknown as ArtifactTooltipContext, false),
+    /Adequacy localized: 0%/,
+  );
 });

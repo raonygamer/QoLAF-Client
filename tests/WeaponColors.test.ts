@@ -97,6 +97,7 @@ test('native weapon rendering preserves simulation, isolates grayscale batches, 
   };
   class Mesh {
     texture = { id: 'native-texture' };
+    textureRepeat = true;
     color = 0xffffff;
     style: any = {};
     parent: any = null;
@@ -123,6 +124,10 @@ test('native weapon rendering preserves simulation, isolates grayscale batches, 
       this.texture = texture;
     }
     set_textureSmoothing() {}
+    textureRepeat = false;
+    set_textureRepeat(value: boolean) {
+      this.textureRepeat = value;
+    }
   }
   const children: Mesh[] = [];
   const parent = {
@@ -205,10 +210,12 @@ test('native weapon rendering preserves simulation, isolates grayscale batches, 
   );
   const originalStyle = projectile.movieClip.style;
   const originalRibbonStyle = projectile.ribbonTrail.style;
-  Factory.create({ key: 'a', unit: ship });
+  Factory.create({ g: game, key: 'a', unit: ship });
   assert.equal(projectile.movieClip.color, 0xff0088);
   assert.notEqual(projectile.movieClip.style, originalStyle);
   assert.equal(projectile.movieClip.style.texture, projectile.movieClip.texture);
+  assert.equal(projectile.movieClip.style.textureRepeat, true);
+  assert.equal(projectile.ribbonTrail.style.textureRepeat, true);
   manager.update();
   assert.equal(manager.meshBatch.records.length, 0);
   assert.equal(children.length, 1);
@@ -234,13 +241,13 @@ test('native weapon rendering preserves simulation, isolates grayscale batches, 
     0xff0088,
     'old projectile cleanup cannot recolor a reused trail',
   );
-  Factory.create({ key: 'a', unit: {} });
+  Factory.create({ g: game, key: 'a', unit: {} });
   manager.update();
   assert.equal(manager.meshBatch.records.length, 1);
   assert.equal(children[0].records.length, 0);
   game.ribbonTrailPool.inactiveRibbonTrails.length = 0;
   game.ribbonTrailPool.activeRibbonTrails.push(projectile.ribbonTrail);
-  Factory.create({ key: 'a', unit: ship });
+  Factory.create({ g: game, key: 'a', unit: ship });
   assert.notEqual(projectile.ribbonTrail.style, nextOwnerStyle);
   assert.equal(game.ribbonTrailPool.reclaimOrphans(), 1);
   assert.equal(

@@ -1,4 +1,4 @@
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 export function createMusicTrackCatalog(resolve: Resolve) {
   const DataLocator = resolve('data.DataLocator');
   /** Detached display metadata from the already-loaded DB cache; never loads audio. */

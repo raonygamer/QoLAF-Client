@@ -1,7 +1,9 @@
+import { bindGameClasses, type GameScene } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 // @ts-expect-error actual host hooks
 import { Hooks } from './fixtures/HostCore.js';
+import { installNativeControlTiming } from '../src/movement/NativeControlTiming';
 import { installNativeAimAssist } from '../src/aim/NativeAimAssist';
 import { installAutomationControls } from '../src/automation/AutomationControls';
 import { createClientSettings } from '../src/ported/ClientSettings';
@@ -84,6 +86,7 @@ test('native assist integrates settings and confirmed targets while preserving t
     enter() {}
     exit() {}
     checkAccelerate() {}
+    checkBoost() {}
   }
   const classes: any = {
     'core.states.gameStates.PlayState': Play,
@@ -115,28 +118,34 @@ test('native assist integrates settings and confirmed targets while preserving t
     now: () => now,
     lastContact: () => (contactTarget ? { unit: target, time: now } : undefined),
   });
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? class {} });
+  installNativeControlTiming(api, game as unknown as GameScene);
   const state = new Play();
   const frame = (delta = 66) => {
     now += delta;
     game.time += delta;
+    course.time += delta;
     return state.updateCommands();
   };
   try {
     assert.equal(frame(), 'native commands');
-    assert.equal(state.nativeAim, 1, 'disabled settings preserve upstream steering');
-    assert.equal(commands.length, 0);
+    assert.equal(state.nativeAim, 0, 'disabled assist retains source manual steering');
+    assert.deepEqual(commands, [[2, true]]);
+    commands.length = 0;
     enabled = true;
     pointerAngle = 0.11;
     frame();
     assert.deepEqual(commands, [[2, true]]);
-    assert.equal(state.nativeAim, 1);
+    assert.equal(state.nativeAim, 0);
     assert.ok(
       (state as any).currentAimAngle > pointerAngle,
       'property and Haxe getter both expose correction',
     );
     assert.equal((state as any).currentAimAngle, (state as any).get_currentAimAngle());
-    frame(65);
-    assert.equal(commands.length, 1, 'native send interval remains enforced');
+    (state as any).releaseAimAssist();
+    assert.ok(Math.abs((state as any).currentAimAngle - pointerAngle) < 1e-12);
+    frame(32);
+    assert.equal(commands.length, 1, 'source 33ms course interval remains enforced');
     frame(1);
     assert.equal(commands.length, 2);
     commands.length = 0;
@@ -153,7 +162,16 @@ test('native assist integrates settings and confirmed targets while preserving t
     frame();
     assert.equal(commands.length, 0, 'automation without a supplied angle owns the controls');
     assert.ok(Number.isNaN((state as any).currentAimAngle));
+    frame(10000);
     automated = false;
+    pointerRadius = 100;
+    pointerAngle = 0.19;
+    contactTarget = true;
+    frame(16);
+    assert.ok(
+      Math.abs((state as any).currentAimAngle - pointerAngle) < 1e-12,
+      'returning from automation measures fast pointer movement against the latest frame',
+    );
     state.exit();
     usingMouse = false;
     direction = 1;
@@ -176,4 +194,5 @@ test('native assist integrates settings and confirmed targets while preserving t
   state.updateMouseAim();
   assert.equal(state.nativeAim, before + 1, 'session disposal restores native steering');
   assert.equal(Object.hasOwn(Play.prototype, 'currentAimAngle'), false);
+  assert.equal(Object.hasOwn(Play.prototype, 'releaseAimAssist'), false);
 });

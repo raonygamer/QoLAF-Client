@@ -8,17 +8,17 @@ test('image links retain source offsets and signed URLs while excluding markup a
   const url = 'https://cdn.discordapp.com/attachments/a/cat%20face.PNG?ex=123&amp;hm=abc';
   const text = `<font color='https://hidden.invalid/x.png'>See (${url}).</font>`;
   const link = Link.firstIn(text)!;
-  assert.equal(link.rawUrl, url);
+  assert.equal(link.rawURL, url);
   assert.equal(text.substring(link.sourceBegin, link.sourceEnd), url);
   assert.equal(link.fileName, 'cat face.PNG');
   assert.equal(Link.firstIn('<a href="https://hidden.invalid/x.png">nothing</a>'), null);
   assert.equal(Link.firstIn('<broken https://hidden.invalid/x.png'), null);
   assert.equal(
-    Link.firstIn('https://a.test/page then http://b.test/yes.gif')?.rawUrl,
+    Link.firstIn('https://a.test/page then http://b.test/yes.gif')?.rawURL,
     'http://b.test/yes.gif',
   );
   assert.equal(Link.parseAt('https://a.test/a(1).webp)', 0), null);
-  assert.equal(Link.parseAt('(https://a.test/a.webp)', 1)?.rawUrl, 'https://a.test/a.webp');
+  assert.equal(Link.parseAt('(https://a.test/a.webp)', 1)?.rawURL, 'https://a.test/a.webp');
   for (const value of [
     'ftp://a.test/a.png',
     'https://a.test/page',
@@ -32,19 +32,19 @@ test('image links retain source offsets and signed URLs while excluding markup a
 test('source image fallbacks preserve authentication and original-first order', () => {
   const original =
     'https://cdn.discordapp.com/attachments/a/b.gif?ex=123&amp;hm=abc&width=10&height=20&format=webp&animated=true&quality=lossless';
-  assert.deepEqual(Link.parseAt(original, 0)!.candidateUrls(5000, 1), [
+  assert.deepEqual(Link.parseAt(original, 0)!.candidateURLs(5000, 1), [
     original.replace('&amp;', '&'),
     'https://media.discordapp.net/attachments/a/b.gif?ex=123&hm=abc&width=4096&height=16&format=png',
   ]);
-  assert.deepEqual(Link.parseAt('https://i.imgur.com/a.webp?x=y', 0)!.candidateUrls(100, 100), [
+  assert.deepEqual(Link.parseAt('https://i.imgur.com/a.webp?x=y', 0)!.candidateURLs(100, 100), [
     'https://i.imgur.com/a.webp?x=y',
     'https://i.imgur.com/a.png?x=y',
   ]);
-  assert.deepEqual(Link.parseAt('https://media2.tenor.com/a.webp', 0)!.candidateUrls(100, 100), [
+  assert.deepEqual(Link.parseAt('https://media2.tenor.com/a.webp', 0)!.candidateURLs(100, 100), [
     'https://media2.tenor.com/a.webp',
     'https://media2.tenor.com/a.gif',
   ]);
-  assert.deepEqual(Link.parseAt('https://example.test/a.webp', 0)!.candidateUrls(100, 100), [
+  assert.deepEqual(Link.parseAt('https://example.test/a.webp', 0)!.candidateURLs(100, 100), [
     'https://example.test/a.webp',
   ]);
   assert.equal(Link.isEmbedChannel('CLAN'), true);
@@ -72,7 +72,7 @@ function memory(initial: unknown = []) {
 test('shortcuts normalize, sort, persist, reload and reject partial image URLs', () => {
   const storage = memory();
   const warmed: string[] = [];
-  const store = new Store(storage, (link) => warmed.push(link.rawUrl));
+  const store = new Store(storage, (link) => warmed.push(link.rawURL));
   assert.equal(store.save(' Zed ', ' https://x.test/z.gif '), null);
   assert.equal(store.save('a_+-', 'https://x.test/a.png?token=signed'), null);
   assert.deepEqual(

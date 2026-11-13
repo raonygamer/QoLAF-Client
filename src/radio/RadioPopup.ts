@@ -1,10 +1,18 @@
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
+import { read } from '../api/Types';
 import type { RadioViewService } from './RadioViewService';
 import { createRadioMarqueeTextRenderer } from './RadioMarqueeTextRenderer';
 import { createRadioList } from './RadioList';
 import { createRadioSlider } from './RadioSlider';
+import type { RadioChatBridge } from './RadioChatBridge';
 /** Source: core/hud/components/dialogs/RadioPopup.as; native Starling controls. */
-export function createRadioPopup(resolve: Resolve, InputText: any, service: RadioViewService) {
+export function createRadioPopup(
+  resolve: Resolve,
+  InputText: any,
+  service: RadioViewService,
+  chatBridge?: RadioChatBridge,
+  QueryInput: any = InputText,
+) {
   const PopupMessage = resolve('core.hud.components.dialogs.PopupMessage');
   const Button = resolve('core.hud.components.Button');
   const Text = resolve('core.hud.components.Text');
@@ -18,7 +26,7 @@ export function createRadioPopup(resolve: Resolve, InputText: any, service: Radi
   const ListCollection = class {
     constructor(public data: any[]) {}
   };
-  const RadioQueryInput = InputText;
+  const RadioQueryInput = QueryInput;
   const Slider = createRadioSlider(resolve);
   const Event = { CHANGE: 'change' };
   const FeathersEventType = {
@@ -91,6 +99,7 @@ export function createRadioPopup(resolve: Resolve, InputText: any, service: Radi
       RadioPopup.active = new RadioPopup(g);
       RadioPopup.active.addEventListener('close', RadioPopup.active.onClose);
       g.addChildToOverlay(RadioPopup.active, true);
+      chatBridge?.attach(g, RadioPopup.active);
     }
     constructor(g: any) {
       super('Close');
@@ -605,8 +614,11 @@ export function createRadioPopup(resolve: Resolve, InputText: any, service: Radi
     }
     @bound
     private changeVolume(event: any): void {
-      if (!this.disposed && !this.syncing && SceneBase.settings != null)
-        SceneBase.settings.musicVolume = this.volume.value;
+      const settings = read(SceneBase, 'settings');
+      if (this.disposed || this.syncing || !settings) return;
+      if (typeof settings.set_musicVolume === 'function')
+        settings.set_musicVolume(this.volume.value);
+      else settings.musicVolume = this.volume.value;
     }
     @bound
     private promoteLeader(event: any): void {
@@ -835,29 +847,28 @@ export function createRadioPopup(resolve: Resolve, InputText: any, service: Radi
     @bound
     protected redraw(event: any = null): void {
       if (this.stage == null || this.disposed) return;
+      const stageWidth = read(this.stage, 'stageWidth');
+      const stageHeight = read(this.stage, 'stageHeight');
       this.box.scaleX = this.box.scaleY = 1;
       this.box.width = RadioPopup.PANEL_WIDTH;
       this.box.height = RadioPopup.PANEL_HEIGHT;
       let scale: number = Math.min(
         1,
-        (this.stage.stageWidth - 24) / RadioPopup.PANEL_WIDTH,
-        (this.stage.stageHeight - 24) / RadioPopup.PANEL_HEIGHT,
+        (stageWidth - 24) / RadioPopup.PANEL_WIDTH,
+        (stageHeight - 24) / RadioPopup.PANEL_HEIGHT,
       );
       this.box.scaleX = this.box.scaleY = Math.max(0.01, scale);
-      this.box.x = Math.round(
-        (this.stage.stageWidth - RadioPopup.PANEL_WIDTH * this.box.scaleX) / 2,
-      );
-      this.box.y = Math.round(
-        (this.stage.stageHeight - RadioPopup.PANEL_HEIGHT * this.box.scaleY) / 2,
-      );
+      this.box.x = Math.round((stageWidth - RadioPopup.PANEL_WIDTH * this.box.scaleX) / 2);
+      this.box.y = Math.round((stageHeight - RadioPopup.PANEL_HEIGHT * this.box.scaleY) / 2);
       this.closeButton.x = RadioPopup.PANEL_WIDTH - this.closeButton.width - 18;
       this.closeButton.y = 740;
-      this.bgr.width = this.stage.stageWidth;
-      this.bgr.height = this.stage.stageHeight;
+      this.bgr.width = stageWidth;
+      this.bgr.height = stageHeight;
     }
     @bound
     protected keyDown(event: any): void {
-      if (event.keyCode == 27) {
+      if (read(event, 'keyCode') == 27) {
+        if (chatBridge?.handleEscape(this.game, this)) return;
         event.stopImmediatePropagation();
         this.close();
       }
@@ -890,6 +901,7 @@ export function createRadioPopup(resolve: Resolve, InputText: any, service: Radi
     public dispose(): void {
       if (this.disposed) return;
       this.disposed = true;
+      chatBridge?.detach(this);
 
       clearInterval(this.poll);
       this.clean();

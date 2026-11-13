@@ -29,7 +29,7 @@ function fixture() {
   definitions['core.hud.components.chat.ChatComposerFormatButton'] =
     createChatComposerFormatButton(resolve);
   const warmed: string[] = [];
-  const prefetch = (link: { rawUrl: string }) => warmed.push(link.rawUrl);
+  const prefetch = (link: { rawURL: string }) => warmed.push(link.rawURL);
   const store = new ChatImageShortcutStore(
     { get: (_key, fallback) => fallback, set() {} },
     prefetch,

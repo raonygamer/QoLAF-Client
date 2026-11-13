@@ -1,5 +1,5 @@
 import { createRichBitmapFontCompositor } from '../ported/RichBitmapFontCompositor';
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { createBitmapTextAdapter, createBitmapFontTextFormat } from './BitmapTextAdapter';
 import { RichBitmapMarkup } from '../chat/rich/RichBitmapMarkup';
 import { RichBitmapMarkupParser } from '../chat/rich/RichBitmapMarkupParser';

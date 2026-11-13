@@ -1,18 +1,41 @@
-import type { Resolve } from '../runtime/As3';
+import { invalidateChatView } from './ChatViewInvalidation';
+import { ChatPerformanceProfiler as Profiler } from './ChatPerformanceProfiler';
+import type { Resolve } from '../runtime/HaxeInterop';
 import type { ChatImageCache } from './ChatImageCache';
-import { SimpleChatImages } from './SimpleChatImages';
-import { read, type API, type Raw } from '../api/Types';
+import { SimpleChatImages, type SimpleChatRenderer } from './SimpleChatImages';
+import type { API } from '../api/Types';
+import type {} from '../game/ChatView';
+import type { ChatMessage } from '../game/ChatMessage';
+import { MessageLog, WrapText, type GameScene } from '../game/Bindings';
+import { GameReflection } from '../api/GameReflection';
 
 /** Source ChatSimple's ten-row projection and 100ms receive batching. */
 export function installNativeSimpleChat(
   api: API,
-  game: Raw,
-  imageOptions?: { resolve: Resolve; cache: ChatImageCache; renderer: Raw },
+  game: GameScene,
+  imageOptions?: { resolve: Resolve; cache: ChatImageCache; renderer: SimpleChatRenderer },
 ): void {
   const log = game.messageLog;
-  const simple = log?.simple;
-  const messages = api.cls('core.hud.components.chat.MessageLog');
+  if (!log) return;
+  const simple = log.simple;
+  const messages = MessageLog;
+  const reflection = new GameReflection(api);
   if (!simple?.tf || !messages || typeof simple.update !== 'function') return;
+  if (typeof simple.tf.layoutText === 'function') {
+    reflection.around(simple.tf, 'layoutText', function (next, ...args) {
+      if (!Profiler.active) return next(...args);
+      const started = Profiler.now();
+      const result = next(...args);
+      Profiler.record(
+        'simple.label',
+        'layout',
+        Profiler.now() - started,
+        simple.tf.get_text().length,
+        simple.tf.get_width() * simple.tf.get_height(),
+      );
+      return result;
+    });
+  }
   let refreshPending = false;
   let nextRefreshAt = 0;
   const images = imageOptions
@@ -29,14 +52,15 @@ export function installNativeSimpleChat(
     : undefined;
   if (images) {
     api.defer(() => images.dispose());
-    const WrapText = api.cls('core.hud.components.ui.WrapText');
     if (WrapText)
-      api.after(WrapText.prototype, 'layoutText', function () {
+      reflection.after(WrapText.prototype, 'layoutText', function () {
         if (this === simple.tf) images.position();
       });
   }
   const refresh = () => {
-    const rows: Raw[] = [];
+    invalidateChatView(simple);
+    const started = Profiler.active ? Profiler.now() : 0;
+    const rows: ChatMessage[] = [];
     const queue = messages.textQueue ?? [];
     refreshPending = false;
     nextRefreshAt = game.time + 100;
@@ -45,7 +69,7 @@ export function installNativeSimpleChat(
       const message = queue[index];
       const timeout = Number(message.timeout);
       if (timeout <= game.time) break;
-      if (log.isMuted(message.type)) continue;
+      if (log.isMuted(message.type ?? '')) continue;
       rows.push(message);
       if (simple.nextTimeout === 0 || timeout < simple.nextTimeout) simple.nextTimeout = timeout;
     }
@@ -55,27 +79,45 @@ export function installNativeSimpleChat(
       : rows.length
         ? `${rows.map((row) => String(row.text)).join('\n')}\n`
         : '';
-    if (read(simple.tf, 'text') !== text) simple.tf.set_text(text);
+    if (simple.tf.get_text() !== text) simple.tf.set_text(text);
     images?.position();
+    if (Profiler.active)
+      Profiler.record('simple', 'rebuild', Profiler.now() - started, queue.length, text.length);
   };
-  api.around(simple, 'updateTexts', refresh);
-  api.around(simple, 'update', () => {
+  reflection.around(simple, 'updateTexts', refresh);
+  const previousClear = Object.getOwnPropertyDescriptor(simple, 'clearMessages');
+  simple.clearMessages = () => {
+    invalidateChatView(simple);
+    refreshPending = false;
+    nextRefreshAt = 0;
+    simple.nextTimeout = 0;
+    images?.clear();
+    simple.tf.set_text('');
+    simple.tf.set_y(0);
+  };
+  api.defer(() => {
+    if (previousClear) Object.defineProperty(simple, 'clearMessages', previousClear);
+    else delete simple.clearMessages;
+  });
+  reflection.around(simple, 'update', () => {
+    Profiler.frame('simple');
     if (
       (refreshPending && game.time >= nextRefreshAt) ||
       (simple.nextTimeout !== 0 && simple.nextTimeout <= game.time)
     )
       refresh();
   });
-  api.around(log, 'updateTexts', function (next, ...args) {
+  reflection.around(log, 'updateTexts', function (next, ...args) {
     if (log.contains(simple)) {
       refreshPending = true;
       images?.prefetch(messages.textQueue?.at(-1));
+      if (Profiler.active) Profiler.record('simple', 'enqueue', 0, messages.textQueue.length, 0);
     } else return next(...args);
   });
   // The native addedToStage listener was bound before these instance hooks.
   // Reproject after switching views so that cached listener cannot retain its
   // eleven-row output or its nonexistent message.nextTimeout field.
-  api.after(log, 'toggleView', () => {
+  reflection.after(log, 'toggleView', () => {
     if (log.contains(simple)) refresh();
   });
   refresh();

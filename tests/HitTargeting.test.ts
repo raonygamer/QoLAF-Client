@@ -1,3 +1,5 @@
+import { bindGameClasses, type GameScene, type Unit } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { DamageObserver } from '../src/telemetry/DamageObserver';
@@ -5,24 +7,42 @@ import { TargetSystem } from '../src/target/TargetSystem';
 import { defaults } from '../src/settings/Settings';
 
 function setup() {
-  const ship = { alive: true, pos: { x: 0, y: 0 } };
+  bindGameClasses({ cls: () => class {} } as unknown as API);
+  const ship = {
+    alive: true,
+    pos: { x: 0, y: 0 },
+    get_pos() {
+      return this.pos;
+    },
+  };
   const enemy = {
+    get_pos() {
+      return this.pos;
+    },
+    hasFaction: () => false,
     alive: true,
     isHostile: true,
     pos: { x: 50, y: 0 },
     collisionRadius: 5,
     canBeDamage: () => true,
   };
-  const game = { me: { ship }, unitManager: { units: [enemy] } };
+  const game = {
+    hud: {} as object | null,
+    me: { ship },
+    get_me() {
+      return this.me;
+    },
+    unitManager: { units: [enemy] },
+  };
   const config = { ...defaults, show_radar_dps: false };
-  const targets = new TargetSystem(game, config);
+  const targets = new TargetSystem(game as unknown as Pick<GameScene, 'get_me'>, config);
   const weapon = { unit: ship, dmg: { type: 0, dmg: () => 500 } };
   const observer = new DamageObserver(
     game,
     config,
     6,
     () => 1000,
-    (target) => targets.auto(target),
+    (target) => targets.auto(target as Unit),
   );
   return { ship, enemy, game, config, targets, weapon, observer };
 }
@@ -129,4 +149,16 @@ test('weapon reuse clears contact history without erasing other weapons or targe
   assert.equal(f.observer.lastContact(f.weapon), undefined);
   assert.equal(f.observer.lastContact(secondWeapon)?.unit, f.enemy);
   assert.equal(f.targets.current, f.enemy);
+});
+
+test('HUD absence suppresses estimates but preserves actual hit targeting and history', () => {
+  const f = setup();
+  f.game.hud = null;
+  f.config.show_radar_dps = true;
+  f.observer.contact(f.weapon, f.enemy);
+  assert.equal(f.targets.current, f.enemy);
+  assert.equal(f.observer.lastContact(f.weapon)?.unit, f.enemy);
+  assert.equal(f.observer.estimate.perSecond(1000), 0);
+  f.observer.partial(f.weapon);
+  assert.equal(f.observer.estimate.isPartial(1000), false);
 });

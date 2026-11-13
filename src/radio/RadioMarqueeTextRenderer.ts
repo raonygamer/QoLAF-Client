@@ -1,4 +1,4 @@
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 /** Source: core/hud/components/dialogs/RadioMarqueeTextRenderer.as. */
 export function createRadioMarqueeTextRenderer(resolve: Resolve) {
   const RichBitmapFontTextRenderer = resolve(

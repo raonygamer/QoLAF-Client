@@ -3,11 +3,12 @@ import { read, type API, type Raw } from '../api/Types';
 import { portedClasses } from '../ported/Registry';
 import { createBitmapClasses } from '../ui/BitmapClasses';
 import { createBitmapInputAdapter } from '../ui/BitmapInputAdapter';
-import { bridgeNativeProperties } from '../runtime/As3';
+import { bridgeNativeProperties } from '../runtime/HaxeInterop';
 import { installPopupKeyboard } from '../dialogs/NativePopupKeyboard';
 import { createWeaponColorPopup } from './WeaponColorPopup';
 import { WeaponColors } from './WeaponColors';
 import { installNativeWeaponColors } from './NativeWeaponColors';
+import { ShipVisualStateStore } from './ShipVisualStateStore';
 
 export function installNativeWeaponColorPopup(api: API, game: Raw): void {
   const chat = game.chatInput;
@@ -15,6 +16,9 @@ export function installNativeWeaponColorPopup(api: API, game: Raw): void {
   api.cls('af.ChatCommandRegistry')?.reserveBuiltInCommands(['sv', 'ship', 'shipvisual']);
   const resolve = portedClasses(api).resolve;
   const colors = new WeaponColors();
+  api.defer(
+    ShipVisualStateStore.forGame(game).bind('weapons', () => ({ weaponStyles: colors.snapshot() })),
+  );
   const storageKey = 'weapon-colors:' + game.me.id;
   try {
     colors.restore(api.storage.get(storageKey, {}));
@@ -30,6 +34,7 @@ export function installNativeWeaponColorPopup(api: API, game: Raw): void {
   const available = () =>
     api.game === game && !game.isLeaving && !game.isRecoveringGameConnection && game.me?.ship;
   const save = () => {
+    ShipVisualStateStore.forGame(game).changed();
     try {
       api.storage.set(storageKey, colors.snapshot());
     } catch {
@@ -109,6 +114,11 @@ export function installNativeWeaponColorPopup(api: API, game: Raw): void {
     game.addChildToOverlay(popup, true);
   };
   const previousOpen = Object.getOwnPropertyDescriptor(chat, 'openWeaponColorPopup');
+  const previousReset = Object.getOwnPropertyDescriptor(chat, 'resetAllExperimentalWeaponColors');
+  chat.resetAllExperimentalWeaponColors = () => {
+    colors.reset();
+    save();
+  };
   chat.openWeaponColorPopup = open;
   api.around(chat, 'sendMessage', (next, ...args) => {
     const text = read(chat.input, 'text', '').trim();
@@ -147,5 +157,8 @@ export function installNativeWeaponColorPopup(api: API, game: Raw): void {
     close();
     if (previousOpen) Object.defineProperty(chat, 'openWeaponColorPopup', previousOpen);
     else delete chat.openWeaponColorPopup;
+    if (previousReset)
+      Object.defineProperty(chat, 'resetAllExperimentalWeaponColors', previousReset);
+    else delete chat.resetAllExperimentalWeaponColors;
   });
 }

@@ -65,9 +65,9 @@ test('artifact colors keep AS3 uint conversion and image links retain original s
   const source = 'Look https://example.org/image.png?x=1&amp;y=2.';
   const link = ChatDiscordImageLink.firstIn(source)!;
   assert.ok(link);
-  assert.equal(link.rawUrl, 'https://example.org/image.png?x=1&amp;y=2');
-  assert.equal(source.slice(link.sourceBegin, link.sourceEnd), link.rawUrl);
+  assert.equal(link.rawURL, 'https://example.org/image.png?x=1&amp;y=2');
+  assert.equal(source.slice(link.sourceBegin, link.sourceEnd), link.rawURL);
   const projected = Parser.parse(source, 13, 0xffffff, null, null, false, true);
   assert.equal(projected.text, 'Look [Image].');
-  assert.equal(projected.copyTextForVisibleRange(5, 12), link.rawUrl);
+  assert.equal(projected.copyTextForVisibleRange(5, 12), link.rawURL);
 });

@@ -1,3 +1,4 @@
+import type { Texture } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createChatImageThumbnail } from '../src/ported/ChatImageThumbnail';
@@ -5,7 +6,9 @@ import { ChatImageCache } from '../src/chat/ChatImageCache';
 import { ChatImageAsset } from '../src/chat/ChatImageAsset';
 import { ChatDiscordImageLink } from '../src/chat/ChatDiscordImageLink';
 import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
-import { Text } from './fixtures/NativeGame';
+import { bindGameClasses } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
+import { Text, Display } from './fixtures/NativeGame';
 
 function fixture() {
   const bitmap = bitmapRendererFixture('verdana48_bitmap');
@@ -24,6 +27,9 @@ function fixture() {
       super();
     }
     readjustSize() {}
+    set_texture(texture: unknown) {
+      this.texture = texture;
+    }
   }
   const resolve = (name: string): any =>
     name === 'starling.display.Image'
@@ -31,10 +37,21 @@ function fixture() {
       : name === 'starling.text.TextField'
         ? Text
         : bitmap.resolve(name);
-  const Thumbnail = createChatImageThumbnail(resolve, cache, () => time);
+  bindGameClasses({
+    cls: (name: string) => {
+      try {
+        return resolve(name);
+      } catch {
+        return {};
+      }
+    },
+  } as unknown as API);
+  const Thumbnail = createChatImageThumbnail(cache, () => time);
   const thumbnail = new Thumbnail();
+  const display = thumbnail as unknown as Display;
   return {
     thumbnail,
+    display,
     Thumbnail,
     cache,
     pending,
@@ -52,7 +69,7 @@ function fixture() {
 const link = (name: string) => ChatDiscordImageLink.parseAt(`https://example.test/${name}.gif`, 0)!;
 function asset(width: number, height: number, delays = [100]) {
   return new ChatImageAsset(
-    delays.map((_, index) => ({ index, dispose() {} })),
+    delays.map((_, index) => ({ index, dispose() {} })) as unknown as Texture[],
     delays,
     width,
     height,
@@ -68,13 +85,13 @@ test('thumbnail uses source placeholder, aspect ratio limits and synchronous cac
   view.link = link('wide');
   assert.equal(view.previewWidth, 92);
   assert.equal(view.previewHeight, 16);
-  assert.equal(view.children[0].text, '[Image loading]');
+  assert.equal(f.display.children[0].text, '[Image loading]');
   const image = asset(1000, 400);
   f.pending[0].ok(image);
   assert.equal(view.previewWidth, 220);
   assert.equal(view.previewHeight, 88);
-  assert.equal(view.children[1].scaleX, 0.22);
-  assert.equal(view.children[0].visible, false);
+  assert.equal(f.display.children[1].scaleX, 0.22);
+  assert.equal(f.display.children[0].visible, false);
   assert.equal(changes, 1);
   view.link = null;
   assert.equal(image.refCount, 0);
@@ -96,9 +113,9 @@ test('thumbnail releases stale results and ignores failures for recycled links',
   const old = asset(20, 20);
   f.pending[0].ok(old);
   assert.equal(old.refCount, 0);
-  assert.equal(f.thumbnail.children.length, 1);
+  assert.equal(f.display.children.length, 1);
   f.pending[1].fail('network');
-  assert.equal(f.thumbnail.children[0].text, '[Image unavailable]');
+  assert.equal(f.display.children[0].text, '[Image unavailable]');
   assert.equal(f.thumbnail.previewWidth, 110);
   assert.equal(f.thumbnail.previewHeight, 16);
   f.thumbnail.link = link('late');
@@ -114,7 +131,7 @@ test('GIF playback follows source frame delays, bounded catch-up and stop lifecy
   f.thumbnail.link = link('animated');
   const image = asset(8, 8, [100, 20, 70, 100]);
   f.pending[0].ok(image);
-  const node = f.thumbnail.children[1];
+  const node = f.display.children[1];
   assert.equal(f.thumbnail.previewWidth, 8); // Never upscale a small image.
   f.tick(99);
   assert.equal(node.texture.index, 0);
@@ -129,7 +146,7 @@ test('GIF playback follows source frame delays, bounded catch-up and stop lifecy
   f.tick(10_000);
   assert.equal(node.texture.index, 1); // Source guard: at most N+1 transitions.
   f.thumbnail.link = null;
-  assert.equal(f.thumbnail.listeners('enterFrame').length, 0);
+  assert.equal(f.display.listeners('enterFrame').length, 0);
   assert.equal(image.refCount, 0);
   assert.equal(node.visible, false);
 });
@@ -142,6 +159,6 @@ test('size callbacks may dispose the thumbnail during cache delivery', (t) => {
   const image = asset(20, 20, [30, 30]);
   f.pending[0].ok(image);
   assert.equal(image.refCount, 0);
-  assert.equal(f.thumbnail.listeners('enterFrame').length, 0);
+  assert.equal(f.display.listeners('enterFrame').length, 0);
   assert.equal(f.thumbnail.onPreviewSizeChanged, null);
 });

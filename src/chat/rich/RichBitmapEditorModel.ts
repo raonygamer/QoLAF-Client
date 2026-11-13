@@ -1,3 +1,4 @@
+import type { ArtifactLabelResolver } from './ArtifactLabelResolver';
 import { RichBitmapMarkup } from './RichBitmapMarkup';
 import { RichBitmapMarkupParser } from './RichBitmapMarkupParser';
 import { RichBitmapMarkupSerializer } from './RichBitmapMarkupSerializer';
@@ -22,7 +23,7 @@ export class RichBitmapEditorModel {
   constructor(
     public defaultSize = 13,
     public defaultColor = 0xffffff,
-    private artifactResolver: Function | null = null,
+    private artifactResolver: ArtifactLabelResolver | null = null,
   ) {}
 
   get text(): string {

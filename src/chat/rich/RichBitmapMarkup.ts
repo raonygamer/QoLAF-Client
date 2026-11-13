@@ -1,6 +1,6 @@
 // Source port of core/hud/components/chat/rich/RichBitmapMarkup.as.
 import { RichBitmapInlineAtom } from './RichBitmapInlineAtom';
-import { bound } from '../../runtime/As3';
+import { bound } from '../../runtime/HaxeInterop';
 
 /**
  * Parsed rich text with one style and source span per UTF-16 code unit.

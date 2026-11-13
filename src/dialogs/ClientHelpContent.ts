@@ -1,4 +1,4 @@
-import { CLIENT_VERSION, SOURCE_VERSION } from '../login/LoginIdentity';
+import { CLIENT_BUILD, CLIENT_VERSION_LABEL, SOURCE_VERSION } from '../login/LoginIdentity';
 import type { CommandHelpEntry, CommandField } from '../chat/ChatCommandRegistry';
 export interface ClientHelpPage {
   label: string;
@@ -10,7 +10,7 @@ export class ClientHelpContent {
     private readonly serverVersion: string,
     private readonly automationsSupported: boolean,
     private readonly commandEntries: CommandHelpEntry[] = [],
-    private readonly clientVersion = `${CLIENT_VERSION} (Public)`,
+    private readonly clientVersion = `${CLIENT_VERSION_LABEL} (${CLIENT_BUILD})`,
   ) {}
   createPages(): ClientHelpPage[] {
     const pages = [
@@ -34,7 +34,7 @@ export class ClientHelpContent {
       this.serverVersion +
       '.<br><br>' +
       "<font color='#ffcc00'>Port in development.</font> This guide describes the original client. " +
-      'Some features are still being ported; automation code examples below use the original AS3 API.<br><br>' +
+      'Some features are still being ported; automation examples use the browser module API.<br><br>' +
       this.heading('Where to find things') +
       'Settings open in a centered, artifact-style dark window with gray borders and matching controls. ' +
       'The window stays bounded and scales down to fit smaller displays. ' +
@@ -69,7 +69,7 @@ export class ClientHelpContent {
         "Outside Global, complete valid HTML fragments convert as you type or paste. For example, &lt;font color='#ffcc44'&gt;gold text&lt;/font&gt;. Incomplete or unsupported tags stay literal; the existing renderer supports font color, size and line breaks.",
       ) +
       (this.automationsSupported
-        ? this.item('Settings &gt; Automations', 'Import and control optional automation SWFs.')
+        ? this.item('Settings &gt; Automations', 'Import and control optional automation modules.')
         : '') +
       this.item(
         'Login profiles',
@@ -103,7 +103,7 @@ export class ClientHelpContent {
       ) +
       this.item(
         '/floatingchat &lt;int&gt;',
-        "Join an existing Service room in Advanced chat by index, for example /floatingchat 0 joins Service-1409_0. Accepts indices 0-2147483647, not full room IDs. Never creates rooms or falls back to another room. If joining fails, the window shows the error. Drag its title to move it and its bottom-right corner to resize. Local is temporarily enabled through that Service connection. Closing releases its connection; other users of that connection keep it open. Repeating the command brings that Service's window forward.",
+        `Join an existing Service room in Advanced chat by index, for example /floatingchat 0 joins Service-${this.serverVersion}_0. Accepts indices 0-2147483647, not full room IDs. Never creates rooms or falls back to another room. If joining fails, the window shows the error. Drag its title to move it and its bottom-right corner to resize. Local is temporarily enabled through that Service connection. Closing releases its connection; other users of that connection keep it open. Repeating the command brings that Service's window forward.`,
       ) +
       this.item(
         '/rec',
@@ -120,8 +120,8 @@ export class ClientHelpContent {
         "Open the local music player: 14 tracks from cached metadata, with readable titles and known system associations. Uncheck the default-on 'Let the game drive the songs' checkbox to enable manual play, pause/resume, stop and loop controls; checking it again returns to automatic music. Mode, selected track, loop and playing/paused/stopped state are saved locally per account across restarts. Restored playback starts from the beginning; paused/stopped music stays silent. Manual loops survive room changes, and closing the window does not stop music. The existing music-volume setting still applies.",
       ) +
       this.item(
-        '/ref, /refresh',
-        'Refresh the current Game room through the existing authenticated Service connection, rebuilding the system state without restarting QoLAF.',
+        '/ref, /refresh, /upstream',
+        'Refresh the current Game room through the existing authenticated Service connection, rebuilding the system state while keeping QoLAF and its plugins loaded.',
       ) +
       this.item(
         '/resync [1-10]',
@@ -168,7 +168,11 @@ export class ClientHelpContent {
       ) +
       this.item(
         '/testchatspeed',
-        'Locally write 300 progressively wider debug messages over five seconds to benchmark the active chat view without sending network chat. Timings are saved separately to Documents/Astroflux-chat-profile-simple.csv or Astroflux-chat-profile-advanced.csv.',
+        'Locally write 300 progressively wider debug messages over five seconds to benchmark the active chat view without sending network chat. Downloads a CSV profile with separate timings for each active chat view.',
+      ) +
+      this.item(
+        '/discordpresence [on|off|status|app &lt;application ID&gt;]',
+        'Control Discord Rich Presence in the patched Steam or itch launcher. Shares your current location, player name and level, or nearby boss status. Changed activity updates every five seconds. The General settings toggle saves your preference; ordinary browsers report that the native host is unavailable.',
       ) +
       this.item(
         '/aimdebug, /aimassistdebug',
@@ -185,8 +189,8 @@ export class ClientHelpContent {
         'Toggle persistent protection from the inactivity disconnect. The same setting is available in Settings &gt; General.',
       ) +
       this.item(
-        '/upstream, /restart',
-        'Ask the QoLAF Thin Wrapper to reload the client; requires the wrapper.',
+        '/restart',
+        'Reload QoLAF and its plugins through the launcher.',
       ) +
       this.item(
         '/tptodeath',
@@ -207,7 +211,7 @@ export class ClientHelpContent {
       ) +
       this.item(
         '/joinservice &lt;int&gt;',
-        'Private build only: join the existing Service-1409_&lt;int&gt; using a decimal index from 0 to 2147483647, with no optional flags. Hidden rooms can be joined by index. Always reconnect to a Game in that Service for the same solar system, preserving PvE, PvP or your own clan-instance mode; leave queued matches first. Never create the target Service, including retries or later automatic recovery. A failed transition before Game teardown restores the previous Service using its previous creation policy. Joining the current Service also enables join-only recovery. Use /switchservice to explicitly allow Service creation again.',
+        `Private build only: join the existing Service-${this.serverVersion}_&lt;int&gt; using a decimal index from 0 to 2147483647, with no optional flags. Hidden rooms can be joined by index. Always reconnect to a Game in that Service for the same solar system, preserving PvE, PvP or your own clan-instance mode; leave queued matches first. Never create the target Service, including retries or later automatic recovery. A failed transition before Game teardown restores the previous Service using its previous creation policy. Joining the current Service also enables join-only recovery. Use /switchservice to explicitly allow Service creation again.`,
       ) +
       this.item(
         '/warptofriend @friend [pve|pvp|ci]',
@@ -453,12 +457,12 @@ export class ClientHelpContent {
   }
   private automationsContent(): string {
     return (
-      this.title('Importable automation SWFs') +
-      'Automations are private-build-only optional SWF modules that subscribe to client lifecycle events. Open ' +
+      this.title('Importable automation modules') +
+      'Automations are optional JavaScript modules that subscribe to client lifecycle events. Open ' +
       "<font color='#ffff88'>Settings &gt; Automations</font> to manage them.<br><br>" +
       this.heading('Installing and operating') +
-      this.item('Add URL', 'Download and install an automation SWF from a direct URL.') +
-      this.item('Add File', 'Import an automation SWF already stored on your device.') +
+      this.item('Add URL', 'Download and install an automation module from a direct URL.') +
+      this.item('Add File', 'Import an automation module already stored on your device.') +
       this.item(
         'Metadata',
         'The details panel shows the script ID, version, authors, minimum client version, website, status, file, and description.',
@@ -475,42 +479,34 @@ export class ClientHelpContent {
         '/script',
         'Show active automations. The /script &lt;id&gt; &lt;command&gt; form remains available for legacy modules; structured commands use /namespace:command.',
       ) +
-      "<br><font color='#ff5555'>Security warning:</font> automation SWFs run as trusted client code. " +
+      "<br><font color='#ff5555'>Security warning:</font> automation modules run as trusted client code. " +
       'They can do anything the client can do. Install modules only from authors and URLs you trust.<br><br>' +
-      this.heading('Authoring: SWF entry point') +
-      "Build against the matching <font color='#ffff88'>AstrofluxClient-private.swc</font> " +
-      'as an external library. The SWF document class must inherit Sprite and expose its script class:<br>' +
+      this.heading('Authoring: module and lifecycle') +
+      'Export the script class as the default export of a single .js or .mjs module. ' +
+      'Bundle dependencies into that file; imported files are loaded from a temporary blob URL. ' +
+      'Use a stable, unique SCRIPT_ID and accept the script-scoped EventBus in the constructor.<br>' +
       this.codeBlock(
-        'public class AutomationRoot extends Sprite {\n' +
-          '    public static const SCRIPT_CLASS:Class = AutomationScript;\n' +
-          '}',
-      ) +
-      this.heading('Authoring: script and lifecycle') +
-      'The script has a stable, unique SCRIPT_ID, implements IAutomationScript, and accepts only its ' +
-      'script-scoped EventBus in the constructor. Imports are omitted here for readability.<br>' +
-      this.codeBlock(
-        'public class AutomationScript implements IAutomationScript {\n' +
-          '    public static const SCRIPT_ID:String = "example";\n' +
-          '    private var bus:EventBus;\n\n' +
-          '    public function AutomationScript(bus:EventBus) {\n' +
+        'export default class AutomationScript {\n' +
+          '    static SCRIPT_ID = "example";\n\n' +
+          '    constructor(bus) {\n' +
           '        this.bus = bus;\n' +
-          '        bus.subscribe(AutomationEvent.INITIALIZE, onInitialize);\n' +
-          '        bus.subscribe(AutomationEvent.START, onStart);\n' +
-          '        bus.subscribe(AutomationEvent.UPDATE, onUpdate);\n' +
-          '        bus.subscribe(AutomationEvent.RENDER, onRender);\n' +
-          '        bus.subscribe(AutomationEvent.STOP, onStop);\n' +
-          '        bus.subscribe(AutomationEvent.DISPOSE, onDispose);\n' +
+          '        bus.subscribe("initialize", event => this.onInitialize(event));\n' +
+          '        bus.subscribe("start", () => this.onStart());\n' +
+          '        bus.subscribe("update", event => this.onUpdate(event));\n' +
+          '        bus.subscribe("render", event => this.onRender(event));\n' +
+          '        bus.subscribe("stop", () => this.onStop());\n' +
+          '        bus.subscribe("dispose", event => this.onDispose(event));\n' +
           '    }\n\n' +
-          '    public function getInfo():AutomationInfo {\n' +
-          '        return new AutomationInfo("Name", "Description",\n' +
-          '                "1.0.0", new <String>["Author"], 76);\n' +
+          '    getInfo() {\n' +
+          '        return { name: "Example", description: "Lifecycle example",\n' +
+          '            version: "1.0.0", authors: ["Author"], minClientVersion: 76 };\n' +
           '    }\n\n' +
-          '    private function onInitialize(e:AutomationEvent):void {}\n' +
-          '    private function onStart():void {}\n' +
-          '    private function onUpdate(e:AutomationEvent):void {}\n' +
-          '    private function onRender(e:AutomationEvent):void {}\n' +
-          '    private function onStop():void {}\n' +
-          '    private function onDispose(e:AutomationEvent):void {}\n' +
+          '    onInitialize(event) { this.game = event.game; }\n' +
+          '    onStart() {}\n' +
+          '    onUpdate(event) {}\n' +
+          '    onRender(event) {}\n' +
+          '    onStop() {}\n' +
+          '    onDispose(event) { this.game = null; }\n' +
           '}',
       ) +
       this.item('initialize', 'Runs once when the game is ready. Cache event.game here.') +
@@ -541,10 +537,10 @@ export class ClientHelpContent {
           '    optional: [{name: "level", defaultValue: "brief"}],\n' +
           '    allowExtraArguments: false\n' +
           '}, onDebug);\n\n' +
-          'private function onDebug(command:ChatCommandInvocation):void {\n' +
-          '    var enabled:String = command.getArgument("enabled");\n' +
-          '    var level:String = command.getArgument("level");\n' +
-          '    var game:Game = command.game;\n' +
+          'function onDebug(command) {\n' +
+          '    const enabled = command.getArgument("enabled");\n' +
+          '    const level = command.getArgument("level");\n' +
+          '    const game = command.game;\n' +
           '    // Apply the validated command here.\n' +
           '}',
       ) +
@@ -561,18 +557,19 @@ export class ClientHelpContent {
       'Only one running module may own gameplay controls. Claim before issuing commands, verify ownership ' +
       'when needed, then clear automation aim before releasing ownership:<br>' +
       this.codeBlock(
-        'var manager:AutomationManager = game.automationManager;\n' +
-          'var play:PlayState = game.gameStateMachine.activeState as PlayState;\n\n' +
-          'if (manager.claimControls(SCRIPT_ID) && play != null) {\n' +
-          '    play.setAutomationAimAngle(SCRIPT_ID, angleRadians);\n' +
+        'const scriptId = AutomationScript.SCRIPT_ID;\n' +
+          'const manager = game.automationManager;\n' +
+          'const play = game.gameStateMachine.currentState;\n\n' +
+          'if (manager.claimControls(scriptId) && play != null) {\n' +
+          '    play.setAutomationAimAngle(scriptId, angleRadians);\n' +
           '}\n\n' +
-          'if (play != null && manager.ownsControls(SCRIPT_ID)) {\n' +
-          '    play.clearAutomationAimAngle(SCRIPT_ID);\n' +
+          'if (play != null && manager.ownsControls(scriptId)) {\n' +
+          '    play.clearAutomationAimAngle(scriptId);\n' +
           '}\n' +
-          'manager.releaseControls(SCRIPT_ID);\n\n' +
+          'manager.releaseControls(scriptId);\n\n' +
           '// Temporary and automatically cleared when the module stops.\n' +
-          'manager.setTransientDontKick(SCRIPT_ID, true);\n' +
-          'manager.setTransientDontKick(SCRIPT_ID, false);',
+          'manager.setTransientDontKick(scriptId, true);\n' +
+          'manager.setTransientDontKick(scriptId, false);',
       ) +
       "The aim setter accepts radians and uses PlayState's normal turn-command throttling. It rejects " +
       'invalid angles and any script ID that does not own controls. Forward, backward, firing, and abilities ' +

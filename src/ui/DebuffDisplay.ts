@@ -1,9 +1,13 @@
-import { type Raw } from '../api/Types';
+import type { Sprite, Image } from '../game/Bindings';
+import type { Texture } from '../game/Bindings';
+import type { GameScene } from '../game/Bindings';
 import { DebuffEffect, type DebuffTracker } from '../debuff/DebuffTracker';
 import { debuffInfo } from '../debuff/DebuffInfo';
 import { NativeUI } from './NativeUI';
+import { ToolTip } from '../game/Bindings';
+import { styleClientTooltip } from './NativeTooltip';
 
-type Entry = { image: Raw; tooltip: Raw; text: string };
+type Entry = { image: Image; tooltip: ToolTip; text: string };
 let nextTooltipId = 0;
 
 export function debuffTooltip(effect: DebuffEffect, now: number, name: string): string {
@@ -24,21 +28,21 @@ export function debuffTooltip(effect: DebuffEffect, now: number, name: string): 
 
 /** Original 21px debuff icon grid, sharing the game's native ToolTip system. */
 export class DebuffDisplay {
-  readonly node: Raw;
+  readonly node: Sprite;
   height = 0;
-  private readonly fallback: Raw;
+  private readonly fallback: Texture;
   private readonly tooltipType = `qolafTargetDebuff${++nextTooltipId}`;
   private readonly entries = new Map<DebuffEffect, Entry>();
   private readonly pool: Entry[] = [];
   constructor(
     private readonly ui: NativeUI,
-    private readonly game: Raw,
+    private readonly game: GameScene,
     private readonly tracker: DebuffTracker,
   ) {
     this.node = ui.sprite();
     this.fallback = ui.texture('ti_astro_lance_levels', 'texture_gui1_test.png');
   }
-  update(unit: Raw | null, hidden: boolean, name: string): void {
+  update(unit: object | null, hidden: boolean, name: string): void {
     const effects =
       unit && !hidden
         ? this.tracker
@@ -62,7 +66,7 @@ export class DebuffDisplay {
         entry = this.pool.pop() ?? this.create();
         const info = debuffInfo.find((info) => info.id === effect.debuff)!;
         entry.image.set_texture(
-          this.ui.texture(info.icon, 'texture_gui1_test.png') ?? this.fallback,
+          this.ui.findTexture(info.icon, 'texture_gui1_test.png') ?? this.fallback,
         );
         entry.image.set_color(0xffffff);
         entry.image.set_width(21);
@@ -84,13 +88,13 @@ export class DebuffDisplay {
   private create(): Entry {
     const image = this.ui.image(this.fallback);
     image.set_touchable(true);
-    const Tooltip = this.ui.cls('core.hud.components.ToolTip');
-    const tooltip = new Tooltip(this.game, image, '', null, this.tooltipType, 260);
+    const tooltip = new ToolTip(this.game, image, '', null, this.tooltipType, 260);
+    styleClientTooltip(tooltip);
     tooltip.set_color(0xffffff);
     return { image, tooltip, text: '' };
   }
   dispose(): void {
-    this.ui.cls('core.hud.components.ToolTip').disposeType(this.tooltipType);
+    ToolTip.disposeType(this.tooltipType);
     for (const entry of this.pool) entry.image.dispose();
     this.pool.length = 0;
     this.entries.clear();

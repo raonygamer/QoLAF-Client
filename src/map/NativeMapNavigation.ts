@@ -1,6 +1,8 @@
 import { read, type API, type Raw } from '../api/Types';
+import type { GameScene } from '../game/Bindings';
 import { NativeUI } from '../ui/NativeUI';
 import { MapNavigation } from './MapNavigation';
+import { takeSteeringTurn } from '../movement/SteeringClock';
 
 interface MapView {
   map: Raw;
@@ -43,7 +45,7 @@ export function mapHeatViewport(map: Raw, width: number, height: number) {
 }
 
 /** Native Starling viewport and input adapter for the original source navigation. */
-export function installMapNavigation(api: API, game: Raw): void {
+export function installMapNavigation(api: API, game: GameScene): void {
   const MapClass = api.cls('core.hud.components.map.Map'),
     prototype = MapClass?.prototype;
   if (!prototype?.load || !prototype?.update) return;
@@ -194,7 +196,7 @@ export function installMapNavigation(api: API, game: Raw): void {
           !read(map, 'visible') ||
           !stage ||
           !delta ||
-          game.isLeaving ||
+          game.get_isLeaving() ||
           api.cls('RymdenRunt')?.isInFocus === false ||
           read(event, 'target') !== view.wheelStage
         )
@@ -294,7 +296,28 @@ export function installMapNavigation(api: API, game: Raw): void {
       return next(event);
     });
   // Do not steer the ship with the pointer while it belongs to a map gesture.
-  const play = api.cls('core.states.gameStates.PlayState')?.prototype;
+  const Play = api.cls('core.states.gameStates.PlayState');
+  const play = Play?.prototype;
+  if (typeof play?.handleTurn === 'function')
+    api.around(play, 'handleTurn', function (next, ...args) {
+      if (this.g !== game || !isMapNavigating(game)) return next(...args);
+      const course = this.me?.ship?.get_course();
+      if (!course || !takeSteeringTurn(this, course.time)) return;
+      const keys = this.keybinds;
+      if (keys.isInputDown(13) || keys.isInputDown(14)) {
+        Play!.mouseBlocked = true;
+        Play!.mouseIntegrator = 0;
+      }
+      // Source handleTurn keeps keyboard transitions while the map owns the
+      // pointer, including releases when mouse steering is otherwise active.
+      for (const [field, key, command] of [
+        ['rotateLeft', 13, 1],
+        ['rotateRight', 14, 2],
+      ] as const) {
+        if (!course[field] && keys.isInputDown(key)) this.sendCommand(command, true);
+        else if (course[field] && keys.isInputUp(key)) this.sendCommand(command, false);
+      }
+    });
   for (const method of ['updateAimAngle', 'updateMouseAim', 'updateMouseIntegrator'])
     if (typeof play?.[method] === 'function')
       api.around(play, method, function (next, ...args) {

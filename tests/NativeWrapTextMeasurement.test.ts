@@ -1,3 +1,6 @@
+import { bitmapLineTops } from '../src/ported/RichBitmapFontCompositor';
+import type { MeshBatch } from '../src/game/Bindings';
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installWrapTextMeasurement } from '../src/ui/NativeWrapTextMeasurement';
@@ -23,6 +26,7 @@ test('tooltip layout uses rendered bitmap metrics and retains native extraction,
     static getBitmapFont(name: string) {
       return name === 'bitmap' ? {} : null;
     }
+    _meshBatch = {} as MeshBatch;
     disposed = false;
     wraps = false;
     constructor(
@@ -50,6 +54,11 @@ test('tooltip layout uses rendered bitmap metrics and retains native extraction,
     }
     get_textBounds() {
       const advance = this.text.length * this.format.size;
+      const lines = this.wraps ? Math.ceil(advance / this.width) : 1;
+      bitmapLineTops.set(
+        this._meshBatch,
+        Array.from({ length: lines }, (_, index) => index * 16),
+      );
       return {
         width: this.wraps ? Math.min(this.width, advance) : advance,
         height: (this.wraps ? Math.ceil(advance / this.width) : 1) * 16,
@@ -61,6 +70,10 @@ test('tooltip layout uses rendered bitmap metrics and retains native extraction,
   }
   class Wrap {
     extractionCalls = 0;
+    lastWrapWidth = 55;
+    lineTop(line: number) {
+      return line * 19;
+    }
     field = { get_format: () => this.format, get_text: () => this.text };
     text = 'Players present';
     format = new Format();
@@ -72,24 +85,29 @@ test('tooltip layout uses rendered bitmap metrics and retains native extraction,
   }
   const hooks = new Hooks(),
     cleanups: (() => void)[] = [];
-  installWrapTextMeasurement({
+  const api = {
     cls: (name: string) => (name.endsWith('WrapText') ? Wrap : Field),
     around: (target: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'around', fn)),
     before: (target: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'before', fn)),
     defer: (fn: () => void) => cleanups.push(fn),
-  } as any);
+  } as any;
+  bindGameClasses(api);
+  installWrapTextMeasurement(api);
   const tooltip = new Wrap();
   assert.deepEqual(tooltip.measure(0), { width: 165, height: 16 });
   assert.deepEqual(tooltip.measure(55), { width: 55, height: 48 });
   assert.equal(tooltip.extractionCalls, 2);
   assert.equal(fields.length, 1, 'reuse a private measuring field');
+  assert.equal(tooltip.lineTop(2), 32, 'icons follow bitmap line spacing');
+  assert.equal(tooltip.lineTop(9), 171, 'unavailable lines retain native fallback');
   tooltip.format.size = 20;
   assert.equal(tooltip.measure(0).width, 300);
   assert.notEqual(fields[0].format, tooltip.format, 'measurement must not mutate visible format');
   tooltip.format.font = 'native-outline-font';
   assert.deepEqual(tooltip.measure(0), { width: 7, height: 8 });
+  assert.equal(tooltip.lineTop(2), 38, 'outline fonts retain native line positions');
   const second = new Wrap();
   second.measure(0);
   tooltip.dispose();

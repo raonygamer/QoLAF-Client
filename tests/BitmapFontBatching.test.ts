@@ -1,3 +1,5 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 // @ts-expect-error actual host hook implementation
@@ -15,11 +17,13 @@ test('native bitmap font batching reaches upstream instances, preserves layout a
     }
   }
   const upstream = new Font();
-  installBitmapFontBatching({
+  const api = {
     cls: () => Font,
     before: (target: any, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'before', fn)),
-  } as any);
+  } as unknown as API;
+  bindGameClasses(api);
+  installBitmapFontBatching(api);
   const batch = {
     batchable: false,
     set_batchable(value: boolean) {

@@ -1,5 +1,5 @@
 import type { API } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { createBitmapInputAdapter } from '../ui/BitmapInputAdapter';
 import { createChatComposerFormatButton } from '../ported/ChatComposerFormatButton';
 import { createChatSelectionValueSlider } from '../ported/ChatSelectionValueSlider';

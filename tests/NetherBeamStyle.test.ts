@@ -1,5 +1,14 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import type { API } from '../src/api/Types';
+import type { ProjectileAISettings } from '../src/game/ProjectileAISettings';
+import { bindGameClasses } from '../src/game/Bindings';
+type Settings = ProjectileAISettings & { range?: number; ttl?: number };
+interface ProjectileFixture {
+  unit: object;
+  weapon: { key: string };
+  ai?: string;
+}
 import { installNetherBeamStyle } from '../src/rendering/NetherBeamStyle';
 // @ts-expect-error production hook dispatcher
 import { Hooks } from './fixtures/HostCore.js';
@@ -11,7 +20,7 @@ test('Nether beam uses Chrono appearance without substituting AI, range, TTL or 
       return this.nether && name === 'Nether';
     }
   }
-  let style: any = {
+  let style: Settings | null = {
     ai: 'bullet',
     color: 1,
     glowColor: 2,
@@ -32,12 +41,12 @@ test('Nether beam uses Chrono appearance without substituting AI, range, TTL or 
     ttl: 33,
   });
   const factory = {
-    createProjectileAI(input: any, _game: any, p: any) {
+    createProjectileAI(input: Settings, _game: object, p: ProjectileFixture) {
       p.ai = input.ai;
       return input;
     },
   };
-  const classes: any = {
+  const classes: Record<string, unknown> = {
     'core.states.aistates.AIStateFactory': factory,
     'core.ship.EnemyShip': Enemy,
     'data.DataLocator': {
@@ -51,13 +60,21 @@ test('Nether beam uses Chrono appearance without substituting AI, range, TTL or 
     },
   };
   const hooks = new Hooks();
-  const remove: Function[] = [];
-  installNetherBeamStyle({
+  const remove: Array<() => void> = [];
+  const api = {
     cls: (name: string) => classes[name],
-    around: (target: any, method: string, fn: Function) =>
-      remove.push(hooks.add(target, method, 'around', fn)),
-  } as any);
-  const projectile: any = { unit: new Enemy(), weapon: { key: '222ekuHQxE6j9IOXMVXs6g' } };
+    around: (target: object, method: string, fn: unknown) => {
+      const off = hooks.add(target, method, 'around', fn);
+      remove.push(off);
+      return off;
+    },
+  } as unknown as API;
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? {} } as API);
+  installNetherBeamStyle(api);
+  const projectile: ProjectileFixture = {
+    unit: new Enemy(),
+    weapon: { key: '222ekuHQxE6j9IOXMVXs6g' },
+  };
   const result = factory.createProjectileAI(original, {}, projectile);
   assert.equal(result.color, 1);
   assert.equal(result.glowColor, 2);

@@ -1,11 +1,14 @@
+import assert from 'node:assert/strict';
+import { bindGameClasses } from '../../src/game/Bindings';
+import type { API } from '../../src/api/Types';
 import { createPodRewardPulseColor } from '../../src/ported/PodRewardPulseColor';
 import { createRoomInvitePulseColor } from '../../src/ported/RoomInvitePulseColor';
 import { createEchoPulseColor } from '../../src/ported/EchoPulseColor';
 import { createClientDeveloperTagColor } from '../../src/ported/ClientDeveloperTagColor';
 import { readFileSync } from 'node:fs';
 import { DOMParser } from 'linkedom';
-import { Display, Format } from './NativeGame';
-import { aliasProperties } from '../../src/runtime/As3';
+import { Display, Format, Text as NativeText } from './NativeGame';
+import { aliasProperties } from '../../src/runtime/HaxeInterop';
 import {
   createBitmapTextAdapter,
   createBitmapFontTextFormat,
@@ -42,16 +45,37 @@ export function bitmapRendererFixture(
         for (const listener of [...this.listeners(type)]) this.removeEventListener(type, listener);
     }
     setRequiresRedraw() {}
+    hitTestMask() {
+      return true;
+    }
+    hitTest() {
+      return null;
+    }
   }
   class Image extends Sprite {
     constructor(public texture: any) {
       super();
     }
     readjustSize() {}
+    set_texture(texture: typeof this.texture) {
+      this.texture = texture;
+      return texture;
+    }
+    set_color(color: number) {
+      this.color = color;
+      return color;
+    }
+    set_textureSmoothing(smoothing: string) {
+      this.textureSmoothing = smoothing;
+      return smoothing;
+    }
   }
   class Batch extends Sprite {
     meshes: any[] = [];
     get numVertices() {
+      return this.get_numVertices();
+    }
+    get_numVertices() {
       return this.meshes.length * 4;
     }
     clear() {
@@ -90,11 +114,19 @@ export function bitmapRendererFixture(
       xAdvance: numeric('xadvance'),
       width: numeric('width'),
       height: numeric('height'),
-      texture: { width: numeric('width'), height: numeric('height'), frame: null },
+      texture: {
+        width: numeric('width'),
+        height: numeric('height'),
+        frame: null,
+        get_frame: () => null,
+        get_width: () => numeric('width'),
+        get_height: () => numeric('height'),
+      },
       getKerning: (_previous: number) => 0,
     });
   }
   const font = {
+    get_name: () => 'DAIDRR',
     size: Number(xml.querySelector('info')!.getAttribute('size')),
     lineHeight: Number(xml.querySelector('common')!.getAttribute('lineHeight')),
     baseline: Number(xml.querySelector('common')!.getAttribute('base')),
@@ -102,6 +134,18 @@ export function bitmapRendererFixture(
     offsetY: 0,
     getChar: (id: number) => glyphs.get(id) ?? null,
   };
+  // Native Haxe accessors remain after a plugin removes its temporary aliases.
+  for (const glyph of glyphs.values()) {
+    for (const key of ['texture', 'xOffset', 'yOffset', 'xAdvance', 'width']) {
+      const value = glyph[key];
+      Object.defineProperty(glyph, 'get_' + key, { value: () => value });
+    }
+  }
+  for (const key of ['size', 'lineHeight', 'baseline', 'offsetX', 'offsetY'] as const) {
+    const value = font[key];
+    Object.defineProperty(font, 'get_' + key, { value: () => value });
+  }
+  Object.defineProperty(font, 'get_smoothing', { value: () => 'bilinear' });
   const richPrefix = 'core.hud.components.chat.rich.';
   const definitions: Record<string, any> = {
     [richPrefix + 'RichBitmapMarkup']: RichBitmapMarkup,
@@ -120,6 +164,14 @@ export function bitmapRendererFixture(
     },
     'starling.display.Sprite': Sprite,
     'starling.display.Quad': class extends Sprite {
+      color = 0;
+      set_color(color: number) {
+        this.color = color;
+        return color;
+      }
+      get_color() {
+        return this.color;
+      }
       constructor(width: number, height: number, color: number) {
         super();
         this.set_width(width);
@@ -135,7 +187,11 @@ export function bitmapRendererFixture(
     'starling.text.BitmapFont': class {},
     'starling.text.TextFormat': Format,
     'starling.text.TextOptions': class {},
-    'starling.text.TextField': { getBitmapFont: () => font },
+    'starling.text.TextField': class extends NativeText {
+      static getBitmapFont() {
+        return font;
+      }
+    },
     'starling.textures.Texture': class {},
     'starling.textures.TextureSmoothing': { BILINEAR: 'bilinear' },
     'starling.filters.GlowFilter': class {
@@ -177,6 +233,7 @@ export function bitmapRendererFixture(
       fontNameForSize: () => 'verdana16_bitmap',
     },
   };
+  definitions['generics.Localize'] = { t: (text: string) => text };
   definitions['core.scene.Game'] = { instance: null };
   const resolve = (name: string) => {
     if (!(name in definitions)) throw Error('Missing test dependency ' + name);
@@ -188,6 +245,7 @@ export function bitmapRendererFixture(
   definitions['core.hud.components.EchoPulseColor'] = createEchoPulseColor(resolve);
   definitions['core.hud.components.RoomInvitePulseColor'] = createRoomInvitePulseColor(resolve);
   definitions['core.hud.components.PodRewardPulseColor'] = createPodRewardPulseColor(resolve);
+  bindGameClasses({ cls: (name: string) => definitions[name] ?? {} } as unknown as API);
   definitions['feathers.controls.text.BaseTextRenderer'] = createBitmapTextAdapter(resolve);
   definitions['feathers.text.BitmapFontTextFormat'] = createBitmapFontTextFormat(resolve);
   definitions[richPrefix + 'RichBitmapGlyph'] = createRichBitmapGlyph(resolve);
@@ -199,6 +257,20 @@ export function bitmapRendererFixture(
   return {
     resolve,
     Renderer,
+    displayNode(node: object) {
+      assert.ok(node instanceof Sprite);
+      return node;
+    },
+    labelRenderer(text: InstanceType<typeof Text>) {
+      const renderer = text.getChildAt(0);
+      assert.ok(renderer instanceof Renderer);
+      return renderer;
+    },
+    paintedGlyphs(renderer: InstanceType<typeof Renderer>) {
+      const batch = renderer.getChildAt(0);
+      assert.ok(batch instanceof Batch);
+      return batch.meshes;
+    },
     Sprite,
     Text,
     font,

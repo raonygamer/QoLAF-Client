@@ -1,9 +1,8 @@
 // Source port of core/hud/components/ClientDeveloperTagColor.as.
-import type { Resolve } from '../runtime/As3';
-import { read } from '../api/Types';
-export function createClientDeveloperTagColor(resolve: Resolve): any {
-  const Game: any = resolve('core.scene.Game');
-  type Game = any;
+import type { Resolve } from '../runtime/HaxeInterop';
+import type { GameScene } from '../game/Bindings';
+export function createClientDeveloperTagColor(resolve: Resolve) {
+  const Game: typeof GameScene = resolve('core.scene.Game');
 
   /** Shared server-clock hue for Client Dev labels; never changes simulation time. */
 
@@ -16,13 +15,8 @@ export function createClientDeveloperTagColor(resolve: Resolve): any {
       // The reference is local to this call: never retain a departing Game.
       // time becomes positive after join/clock sync, but its fixed-step value
       // is not the animation clock. Read the continuously advancing observer.
-      let game: Game = Game.instance;
-      if (
-        game == null ||
-        read(game, 'isLeaving', false) ||
-        !isFinite(game.time) ||
-        game.time <= 0
-      ) {
+      const game = Game.instance;
+      if (game == null || game.get_isLeaving() || !isFinite(game.time) || game.time <= 0) {
         return 0xff6666;
       }
       let now: number = game.clock == null ? NaN : game.clock.getServerTime();

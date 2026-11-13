@@ -1,3 +1,5 @@
+import { bindGameClasses, type GameScene } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createClientSettings } from '../src/ported/ClientSettings';
@@ -64,7 +66,9 @@ test('runtime settings migrate the old subset once and share live values with so
           : undefined,
     defer: (fn: Function) => cleanup.push(fn),
   };
-  const first = sessionSettings(api, { me: { id: 'p1' } });
+  bindGameClasses({ cls: (name: string) => api.cls(name) ?? {} } as unknown as API);
+  const game = (id: string) => ({ get_me: () => ({ id }) }) as unknown as GameScene;
+  const first = sessionSettings(api, game('p1'));
   assert.equal(first.config.auto_target, false);
   assert.equal(first.config.target_info_x, 0.3);
   assert.equal(first.config.target_search_distance, 5000);
@@ -77,12 +81,14 @@ test('runtime settings migrate the old subset once and share live values with so
   first.config.nearby_enemy_radar_lines = 999;
   assert.equal(first.client.nearbyEnemyRadarLines, 10);
   first.client.showRadarDPS = false;
+  first.client.dontKick = true;
   cleanup
     .splice(0)
     .reverse()
     .forEach((fn) => fn());
   assert.equal(scene.clientSettings, prior);
-  const restored = sessionSettings(api, { me: { id: 'p1' } });
+  const restored = sessionSettings(api, game('p1'));
+  assert.equal(restored.client.dontKick, true, 'inactivity preference survives room recreation');
   assert.equal(
     restored.config.auto_target,
     true,
@@ -97,12 +103,51 @@ test('runtime settings migrate the old subset once and share live values with so
     .splice(0)
     .reverse()
     .forEach((fn) => fn());
-  const other = sessionSettings(api, { me: { id: 'p2' } });
+  const other = sessionSettings(api, game('p2'));
   assert.equal(other.config.auto_target, true);
   assert.equal(other.client.showRadarDPS, true);
+  assert.equal(other.client.dontKick, false, 'inactivity preference belongs to the account');
   cleanup
     .splice(0)
     .reverse()
     .forEach((fn) => fn());
   assert.equal(scene.clientSettings, prior);
+});
+
+test('settings reject malformed account records and tolerate own-property names in saved data', () => {
+  const saved: { data: { settings: unknown }; flush(): void } = {
+    data: { settings: null },
+    flush() {},
+  };
+  const definitions: Record<string, unknown> = {
+    'core.scene.Game': { instance: { me: { id: 'p1' } } },
+    'openfl.geom.Point': class {
+      constructor(
+        public x = 0,
+        public y = 0,
+      ) {}
+    },
+    'openfl.net.SharedObject': { getLocal: () => saved },
+  };
+  const Settings = createClientSettings((name) => definitions[name]);
+  for (const invalid of [null, 12, 'invalid', []]) {
+    saved.data.settings = { p1: invalid, p2: { auto_target: false } };
+    const settings = new Settings();
+    assert.equal(settings.autoTarget, true);
+    settings.autoTarget = false;
+    const persisted = saved.data.settings as Record<string, unknown>;
+    assert.deepEqual(persisted.p2, { auto_target: false });
+    assert.equal(new Settings().autoTarget, false);
+  }
+  saved.data.settings = {
+    hasOwnProperty: false,
+    p1: {
+      hasOwnProperty: false,
+      auto_target: false,
+      advanced_chat_tab: { mode: 'privateSaved', privateTarget: 42 },
+    },
+  };
+  const settings = new Settings();
+  assert.equal(settings.autoTarget, false);
+  assert.deepEqual(settings.advancedChatTab, { mode: 'local', privateTarget: '' });
 });

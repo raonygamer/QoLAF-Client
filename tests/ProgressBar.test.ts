@@ -1,3 +1,5 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ProgressBar, MULTIBAR_COLORS } from '../src/ui/ProgressBar';
@@ -25,32 +27,43 @@ function fixture() {
   }
   const labels: Node[] = [];
   const settings = { formatTargetBarValues: false };
-  const ui: any = {
-    api: { cls: () => ({ settings }) },
-    sprite: () => new Node(),
-    quad: () => new Node(),
-    image: () => new Node(),
-    place() {},
-    cls: (name: string) =>
-      name === 'openfl.display.BitmapData'
-        ? class {
-            setPixel32() {}
-            dispose() {}
-          }
-        : { fromBitmapData: () => ({ dispose() {} }) },
-    text: () => {
-      const label = new Node();
-      labels.push(label);
-      return label;
+  const classes: Record<string, unknown> = {
+    'core.scene.SceneBase': { settings },
+    'starling.display.Sprite': Node,
+    'starling.display.Quad': Node,
+    'starling.display.Image': Node,
+    'starling.text.TextFormat': class {},
+    'starling.text.TextField': class extends Node {
+      constructor(width: number, height: number, text: string) {
+        super();
+        this.set_width(width);
+        this.set_height(height);
+        this.text = text;
+        labels.push(this);
+      }
     },
+    'openfl.display.BitmapData': class {
+      draw() {}
+      dispose() {}
+    },
+    'openfl.display.Shape': class {
+      get_graphics() {
+        return { beginGradientFill() {}, drawRect() {}, endFill() {} };
+      }
+    },
+    'openfl.geom.Matrix': class {
+      createGradientBox() {}
+    },
+    'starling.textures.Texture': { fromBitmapData: () => ({ dispose() {} }) },
   };
-  const bar = new ProgressBar(ui, 300, 14, 0xff0022);
+  bindGameClasses({ cls: (name: string) => classes[name] ?? {} } as unknown as API);
+  const bar = new ProgressBar(300, 14, 0xff0022);
   return {
     bar,
     labels,
     settings,
-    trail: bar.node.children[1] as Node,
-    overlay: bar.node.children[2] as Node,
+    trail: (bar.node as unknown as Display).children[1] as Node,
+    overlay: (bar.node as unknown as Display).children[2] as Node,
   };
 }
 
@@ -122,4 +135,55 @@ test('multibar dividend follows the source finite fallback and minimum', () => {
   bar.update(0);
   assert.equal(overlay.get_width(), 300);
   assert.equal(labels[1].text, '2x');
+});
+
+test('damage trail advances on each render frame, healing catches up immediately and lower maxima clamp it', () => {
+  for (const fps of [30, 60, 120, 180]) {
+    const { bar, trail, overlay } = fixture();
+    bar.multibar = false;
+    bar.set(100, 100);
+    bar.update(0);
+    bar.set(100, 40);
+    let expected = 100;
+    for (let frame = 0; frame < fps; frame++) {
+      expected += (40 - expected) * Math.min(1, 8 / fps);
+      bar.update(1 / fps);
+      assert.ok(Math.abs(trail.get_width() - 3 * expected) < 1e-9);
+      assert.equal(overlay.get_width(), 120);
+    }
+    bar.set(100, 90);
+    bar.update(0);
+    assert.equal(trail.get_width(), 270, 'healing does not lag behind the value');
+    bar.set(50, 40);
+    bar.update(0);
+    assert.equal(trail.get_width(), 300, 'a lower maximum clamps the trail');
+    assert.equal(overlay.get_width(), 240);
+    bar.dispose();
+  }
+});
+
+test('partial top multibar layers and exact boundaries retain original capacity math', () => {
+  const { bar, overlay, labels } = fixture();
+  for (const [value, width, multiplier] of [
+    [25000, 300, '3x'],
+    [22500, 150, '3x'],
+    [20000, 300, '2x'],
+    [15000, 150, '2x'],
+    [10000, 300, '1x'],
+    [5000, 150, '1x'],
+    [0, 0.01, '0x'],
+  ] as const) {
+    bar.set(25000, value);
+    bar.update(0);
+    assert.equal(overlay.get_width(), width);
+    assert.equal(labels[1].text, multiplier);
+  }
+});
+
+test('ordinary target bars preserve fractional maxima', () => {
+  const { bar, overlay } = fixture();
+  bar.multibar = false;
+  bar.set(0.5, 0.25);
+  bar.update(0);
+  assert.equal(overlay.get_width(), 150);
 });

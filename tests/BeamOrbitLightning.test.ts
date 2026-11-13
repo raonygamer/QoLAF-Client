@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createBeamOrbitLightning, supportsBeamOrbit } from '../src/rendering/BeamOrbitLightning';
@@ -12,7 +13,8 @@ test('beam orbit eligibility uses the source weapon keys, never display names', 
     '222ekuHQxE6j9IOXMVXs6g',
   ])
     assert.equal(supportsBeamOrbit({ weapon: { key } }), true);
-  assert.equal(supportsBeamOrbit({ weapon: { name: 'Chrono Beam', key: 'other' } }), false);
+  const namedWeapon = { name: 'Chrono Beam', key: 'other' };
+  assert.equal(supportsBeamOrbit({ weapon: namedWeapon }), false);
   assert.equal(supportsBeamOrbit({}), false);
 });
 
@@ -22,7 +24,8 @@ test('orbit mesh rejects invalid rays, collapses unused geometry and stops after
     'starling.rendering.VertexData': Vertices,
     'starling.rendering.IndexData': Indices,
   };
-  const Orbit = createBeamOrbitLightning({ cls: (name: string) => classes[name] } as any);
+  bindGameClasses({ cls: (name: string) => classes[name] ?? class {} } as any);
+  const Orbit = createBeamOrbitLightning();
   const mesh = new Orbit();
   mesh.drawBetween(10, 20, 10, 620, 50, 0xff8800, 200, 2);
   assert.equal(mesh.get_visible(), true);
@@ -51,5 +54,6 @@ test('orbit mesh rejects invalid rays, collapses unused geometry and stops after
   mesh.dispose();
   mesh.drawBetween(0, 0, 100, 0, 4, 0, 0, 1);
   assert.equal(mesh.get_visible(), false);
+  assert.ok(mesh instanceof Mesh);
   assert.equal(mesh.disposed, true);
 });

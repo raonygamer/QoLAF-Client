@@ -43,6 +43,10 @@ class Style {
     this.texture = value;
   }
   set_textureSmoothing() {}
+  textureRepeat = false;
+  set_textureRepeat(value: boolean) {
+    this.textureRepeat = value;
+  }
 }
 class Filter {
   disposed = false;

@@ -9,9 +9,10 @@ export class ChatCommandAutocompleteModel {
   argumentMode = false;
   constructor(
     private builtIns: readonly ChatCommandSuggestion[],
-    private maxResults = 128,
+    private maxResults = 8,
     private customProvider: () => readonly ChatCommandSuggestion[] = () => [],
   ) {
+    this.builtIns = [...builtIns];
     this.maxResults = Math.max(1, maxResults);
   }
 

@@ -1,5 +1,5 @@
 // Source port of core/states/gameStates/SettingsState.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createSettingsState(resolve: Resolve): any {
   const PlayState: any = resolve('core.states.gameStates.PlayState');
   type PlayState = any;
@@ -43,6 +43,7 @@ export function createSettingsState(resolve: Resolve): any {
     private settings!: Settings;
     private panel!: Sprite;
     private categories: any[] = [];
+    private externalPages = new Map<string, () => Sprite>();
     private selectedMarker!: Quad;
     private pageTitle!: Text;
     private activeCategory!: string | null;
@@ -56,7 +57,9 @@ export function createSettingsState(resolve: Resolve): any {
     }
 
     static initializeNative(state: any): void {
+      state.activePage?.removeFromParent(true);
       state.categories = [];
+      state.externalPages = new Map<string, () => Sprite>();
       state.panel = null;
       state.activePage = null;
       state.activeCategory = null;
@@ -72,7 +75,7 @@ export function createSettingsState(resolve: Resolve): any {
         'closeButton',
         'exitButton',
       ]) {
-        state[key]?.dispose();
+        state[key]?.removeFromParent(true);
         state[key] = null;
       }
     }
@@ -156,6 +159,12 @@ export function createSettingsState(resolve: Resolve): any {
     }
 
     @bound
+    public addExternalCategory(id: string, label: string, createPage: () => Sprite): void {
+      this.externalPages.set(id, createPage);
+      if (!this.categories.some((category) => category.id === id)) this.addCategory(id, label);
+    }
+
+    @bound
     /*override*/
     public enter(): void {
       this.closing = false;
@@ -225,23 +234,26 @@ export function createSettingsState(resolve: Resolve): any {
       if (selected == null) selected = this.categories[0];
       if (this.activePage != null && this.activeCategory == selected.id) return;
       this.disposeActivePage();
-      switch (selected.id) {
-        case 'chat':
-          this.activePage = new SettingsChat(this.g);
-          break;
-        case 'bindings':
-          this.activePage = new SettingsBindings(this.g);
-          break;
-        case 'aim':
-          this.activePage = new SettingsQoLAF(this.g, 'aim');
-          break;
-        case 'automations':
-          this.activePage = new (resolve('core.states.gameStates.SettingsAutomations'))(this.g);
-          break;
-        default:
-          this.activePage = new SettingsGeneral(this.g, selected.id);
-          break;
-      }
+      const external = this.externalPages.get(selected.id);
+      if (external) this.activePage = external();
+      else
+        switch (selected.id) {
+          case 'chat':
+            this.activePage = new SettingsChat(this.g);
+            break;
+          case 'bindings':
+            this.activePage = new SettingsBindings(this.g);
+            break;
+          case 'aim':
+            this.activePage = new SettingsQoLAF(this.g, 'aim');
+            break;
+          case 'automations':
+            this.activePage = new (resolve('core.states.gameStates.SettingsAutomations'))(this.g);
+            break;
+          default:
+            this.activePage = new SettingsGeneral(this.g, selected.id);
+            break;
+        }
       this.activeCategory = selected.id;
       this.activePage.x = SettingsState.SIDEBAR_WIDTH;
       this.activePage.y = 8;
@@ -288,6 +300,7 @@ export function createSettingsState(resolve: Resolve): any {
         this.panel = null;
       }
       this.categories = [];
+      this.externalPages.clear();
       this.selectedMarker = null;
       this.pageTitle = null;
       super.exit(param1);

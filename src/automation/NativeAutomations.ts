@@ -18,15 +18,13 @@ export const AUTOMATION_API_VERSION = 1;
 // Fallback for a sendMessage method already wrapped by another plugin. Prefer
 // the actual current native cases so upstream additions remain authoritative.
 const nativeCommands =
-  'ban c clan command commands eventimage eventurl g getId global go group grp help i ignore inv invite kick l leave list local lowerfps m modchat msgstats mute myid next onlinestats private privateSaved profile r reply report setquality showbanhistory showbans showquality sil silall silence silenceall stats t tell unban unignore unmute w warpToId whisper y yes'.split(
-    ' ',
-  );
+  'ban c clan command commands eventimage eventurl g getId global go group grp help i ignore inv invite kick l leave list local lowerfps m modchat msgstats mute myid next onlinestats private privateSaved profile r reply report setquality showbanhistory showbans showquality sil silall silence silenceall stats t tell unban unignore unmute w warpToId whisper y yes';
 
 export function reserveNativeCommands(registry: ChatCommandRegistry, sendMessage: Function): void {
   const names = [...sendMessage.toString().matchAll(/case\s*["']([^"']+)["']\s*:/g)].map(
     (match) => match[1],
   );
-  registry.reserveBuiltInCommands([...nativeCommands, ...names]);
+  registry.reserveBuiltInCommands([...nativeCommands.split(' '), ...names]);
 }
 
 /** One manager across rooms; each native session owns its hooks and game binding. */
@@ -130,9 +128,9 @@ export function installNativeAutomations(
     manager.attachGame(game);
     session.defer(() => {
       manager.suspendForRoomTransition(game);
-      if (game.automationManager !== manager) return;
+      if (Object.getOwnPropertyDescriptor(game, 'automationManager')?.value !== manager) return;
       if (previous) Object.defineProperty(game, 'automationManager', previous);
-      else delete game.automationManager;
+      else Reflect.deleteProperty(game, 'automationManager');
     });
     // Keep import/reload reads out of login and wait until the native game session exists.
     restore ??= manager.restore().catch((error) => api.log('Automation restore failed', error));
@@ -142,7 +140,7 @@ export function installNativeAutomations(
         if (this === game) manager.update(api.cls('core.scene.Game')?.TICK_LENGTH ?? 33);
       });
     session.on('frame', ({ game: current, event }) => {
-      if (current === game) manager.render(read(event, 'passedTime', 0) * 1000);
+      if (current === game) manager.render(event.get_passedTime() * 1000);
     });
     if (typeof native?.disconnectIfInactive === 'function')
       session.before(native, 'disconnectIfInactive', function () {

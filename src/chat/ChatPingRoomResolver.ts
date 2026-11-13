@@ -1,4 +1,8 @@
-import type { Raw } from '../api/Types';
+import type { Game } from '../game/Game';
+
+interface PingRoomGame {
+  readonly client?: { readonly multiplayer: Pick<Game.playerio.Multiplayer, 'listRooms'> } | null;
+}
 import type { ChatFriendPingData } from './ChatFriendPingData';
 import { displayPingSystemType } from '../ported/ChatFriendPingPreviewPopup';
 
@@ -10,7 +14,7 @@ export class ChatPingRoomResolver {
   private disposed = false;
 
   constructor(
-    private game: Raw,
+    private readonly game: PingRoomGame,
     private onResolved: (ping: ChatFriendPingData) => void,
     private now = () => performance.now(),
   ) {}
@@ -54,7 +58,7 @@ export class ChatPingRoomResolver {
         { solarSystemKey: ping.solarSystemKey },
         100,
         0,
-        (rooms: Raw[] | null) => {
+        (rooms) => {
           const room = rooms?.find((room) => room && String(room.id) === expectedRoom);
           const type = String(room?.data?.systemType ?? '')
             .trim()

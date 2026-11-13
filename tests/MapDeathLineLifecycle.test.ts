@@ -3,6 +3,8 @@ import { test } from 'node:test';
 // @ts-expect-error actual host hook implementation
 import { Hooks } from './fixtures/HostCore.js';
 import { installMapDeathLineLifecycle } from '../src/map/MapDeathLineLifecycle';
+import type { API } from '../src/api/Types';
+import { bindGameClasses } from '../src/game/Bindings';
 import { Display } from './fixtures/NativeGame';
 
 test('map death-line disposal detaches before pool return, including teardown without a pool', () => {
@@ -12,7 +14,7 @@ test('map death-line disposal detaches before pool return, including teardown wi
   let returned = 0;
   class DeathLine {
     line = new Display();
-    g: any = {
+    g: { linePool: { removeLine(line: Display): void } | null } = {
       linePool: {
         removeLine: (line: Display) => {
           assert.equal(line.parent, null, 'pool may immediately reuse the line');
@@ -26,11 +28,16 @@ test('map death-line disposal detaches before pool return, including teardown wi
       return 42;
     }
   }
-  installMapDeathLineLifecycle({
+  const api = {
     cls: () => DeathLine,
-    before: (target: any, key: string, fn: Function) =>
-      cleanups.push(hooks.add(target, key, 'before', fn)),
-  } as any);
+    before: (target: object, key: string, fn: (...args: never[]) => unknown) => {
+      const off = hooks.add(target, key, 'before', fn);
+      cleanups.push(off);
+      return off;
+    },
+  } as unknown as API;
+  bindGameClasses(api);
+  installMapDeathLineLifecycle(api);
   try {
     const map = new Display();
     const marker = new DeathLine();

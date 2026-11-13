@@ -1,4 +1,4 @@
-import type { Raw } from '../api/Types';
+import type { AutomationGame } from '../game/AutomationGame';
 
 export class ChatCommandInvocation {
   private readonly supplied: string[];
@@ -11,7 +11,7 @@ export class ChatCommandInvocation {
     args: readonly string[],
     extra: readonly string[],
     named: Record<string, string>,
-    readonly game: Raw | null,
+    readonly game: AutomationGame | null,
   ) {
     this.supplied = [...args];
     this.extra = [...extra];
@@ -26,7 +26,7 @@ export class ChatCommandInvocation {
   get namedArguments(): Record<string, string> {
     return { ...this.named };
   }
-  get context(): Raw | null {
+  get context(): AutomationGame | null {
     return this.game;
   }
   hasArgument(name: string): boolean {
@@ -36,3 +36,5 @@ export class ChatCommandInvocation {
     return this.hasArgument(name) ? this.named[name.toLowerCase()] : fallback;
   }
 }
+
+export type ChatCommandCallback = (invocation: ChatCommandInvocation) => unknown;

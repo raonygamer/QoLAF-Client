@@ -48,7 +48,13 @@ test('remote ship playback respects cinematic ownership, native engine getters a
   let now = 0;
   const remote = new RemoteShips(() => now);
   const ship = {
-    player: { isMe: false, isLanded: false },
+    player: {
+      isMe: false,
+      isLanded: false,
+      get_isWarpJumping() {
+        return false;
+      },
+    },
     alive: true,
     engine: { get_rotationSpeed: () => 2 },
     stateMachine: { inState: (state: string) => state === 'Roaming' },

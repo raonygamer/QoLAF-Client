@@ -1,20 +1,28 @@
+import type { API } from '../src/api/Types';
+import type { AutocompleteFriend } from '../src/chat/ChatFriendAutocompleteModel';
+import { bindGameClasses, type GameScene } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatFriendRoster } from '../src/chat/ChatFriendRoster';
 
 test('friend roster uses persistent IDs, unique live names and cached skin textures', () => {
-  const online: any = { id: 'account', name: 'Pilot' };
-  const offline: any = { name: 'Earlier' };
-  const ambiguous: any = { name: 'Duplicate' };
+  const online: AutocompleteFriend = { id: 'account', name: 'Pilot' };
+  const offline: AutocompleteFriend = { name: 'Earlier' };
+  const ambiguous: AutocompleteFriend = { name: 'Duplicate' };
   const player = {
     id: 'account',
     get_name: () => 'Pilot',
-    get_activeSkin: () => 'painted',
-    getActiveFleetObj: () => ({ shipHue: 0.4, shipBrightness: 0.1 }),
+    activeSkin: 'painted',
+    getActiveFleetObj: () => ({
+      shipHue: 0.4,
+      shipBrightness: 0.1,
+      shipSaturation: 0,
+      shipContrast: 0,
+    }),
   };
   const texture = {};
   let loads = 0;
-  const classes: any = {
+  const classes: Record<string, unknown> = {
     'core.player.Player': { onlineFriends: [online], friends: [offline, ambiguous] },
     'core.hud.components.chat.MessageLog': {
       textQueue: [
@@ -24,12 +32,14 @@ test('friend roster uses persistent IDs, unique live names and cached skin textu
     },
     'textures.TextureLocator': { getService: () => ({ getTexturesMainByKey: () => [texture] }) },
   };
-  const roster = new ChatFriendRoster({ cls: (name: string) => classes[name] } as any, {
+  bindGameClasses({ cls: (name: string) => classes[name] ?? {} } as unknown as API);
+  const roster = new ChatFriendRoster({
     playerManager: {
+      get_playersById: () => ({ h: { account: player } }),
       get_players: () => [
         player,
-        { id: 'one', name: 'Duplicate' },
-        { id: 'two', name: 'Duplicate' },
+        { id: 'one', get_name: () => 'Duplicate' },
+        { id: 'two', get_name: () => 'Duplicate' },
       ],
     },
     dataManager: {
@@ -39,7 +49,7 @@ test('friend roster uses persistent IDs, unique live names and cached skin textu
         return table === 'Skins' ? { ship: 'ship' } : { bitmap: 'atlas' };
       },
     },
-  });
+  } as unknown as GameScene);
   assert.equal(roster.records()[0], online);
   assert.equal(online.playerId, 'account');
   assert.equal(online.skin, 'painted');
@@ -47,6 +57,7 @@ test('friend roster uses persistent IDs, unique live names and cached skin textu
   assert.equal(online.previewShipContrast, 0);
   assert.equal(offline.playerId, 'persistent-earlier');
   assert.equal(ambiguous.playerId, '');
+  assert.equal(roster.texture(''), null);
   assert.equal(roster.texture('painted'), texture);
   assert.equal(roster.texture('painted'), texture);
   assert.equal(loads, 2);
@@ -61,7 +72,6 @@ test('friend refresh is lazy, throttles synchronous callbacks and ignores dispos
     ready = 0;
   let pending = () => {};
   const roster = new ChatFriendRoster(
-    {} as any,
     {
       friendManager: {
         updateOnlineFriends(callback: () => void) {
@@ -70,7 +80,7 @@ test('friend refresh is lazy, throttles synchronous callbacks and ignores dispos
           callback();
         },
       },
-    },
+    } as unknown as GameScene,
     () => now,
   );
   const refresh = () =>

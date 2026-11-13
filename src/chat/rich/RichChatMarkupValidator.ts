@@ -1,5 +1,5 @@
 // Source port of core/hud/components/chat/rich/RichChatMarkupValidator.as.
-import { bound } from '../../runtime/As3';
+import { bound } from '../../runtime/HaxeInterop';
 
 /**
  * Strict validation for the rich-markup subset emitted by the chat composer.

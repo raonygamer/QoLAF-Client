@@ -1,8 +1,10 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installProjectileContacts } from '../src/telemetry/ProjectileContacts';
 import { DamageObserver } from '../src/telemetry/DamageObserver';
 import { defaults } from '../src/settings/Settings';
+import { selectAimAssistTarget } from '../src/aim/AimAssistTarget';
 import {
   createProjectileBulletExecute,
   createBouncingExecute,
@@ -29,7 +31,7 @@ function setup(family = 'bullet', hits = 1, bomb = false, positions = [5]) {
   const ship = new Unit({ x: 0, y: 0 });
   ship.isHostile = false;
   const targets = positions.map((value) => new Unit({ x: value, y: value }));
-  const game: any = { time: 1000, me: { ship }, unitManager: { units: targets } };
+  const game: any = { time: 1000, hud: {}, me: { ship }, unitManager: { units: targets } };
   const weapon: any = { unit: ship, dmg: { type: 0, dmg: () => 500 }, weaponDebuffs: [] };
   class Projectile {
     g = game;
@@ -161,7 +163,10 @@ function setup(family = 'bullet', hits = 1, bomb = false, positions = [5]) {
     targets,
     observer,
     snapshot,
-    install: () => installProjectileContacts(api, game, observer),
+    install: () => {
+      bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? {} });
+      installProjectileContacts(api, game, observer);
+    },
     cleanup: () => cleanups.reverse().forEach((fn) => fn()),
   };
 }
@@ -224,6 +229,29 @@ test('native bouncing eligibility behavior remains unchanged, with no invented h
   observed.cleanup();
 });
 
+test('native bouncing self-target contacts are observed without inventing self damage', () => {
+  const baseline = setup('bouncing');
+  const observed = setup('bouncing');
+  for (const sample of [baseline, observed]) {
+    const shooter = sample.projectile.unit;
+    shooter.pos.x = shooter.pos.y = 5;
+    sample.targets.splice(0, sample.targets.length, shooter);
+    sample.projectile.aiTargetSelf = true;
+  }
+  baseline.state.execute();
+  assert.equal(baseline.projectile.removals, 1, 'the fixture must reach a real native collision');
+  observed.install();
+  try {
+    observed.state.execute();
+    assert.deepEqual(observed.snapshot(), baseline.snapshot());
+    assert.equal(observed.contacts.length, 1);
+    assert.equal(observed.contacts[0], observed.projectile.unit);
+    assert.equal(observed.observer.estimate.perSecond(1000), 0, 'self damage is not DPS');
+  } finally {
+    observed.cleanup();
+  }
+});
+
 test('throwing native collision scans release their candidate and preserve the original exception', () => {
   const observed = setup();
   const error = new Error('native position lookup failed');
@@ -261,4 +289,70 @@ test('native bullet hits offer auto-targets with the DPS display disabled', () =
   });
   assert.equal(observed.observer.estimate.perSecond(1000), 0);
   observed.cleanup();
+});
+
+test('native contact during room departure preserves history but adds no DPS estimate', () => {
+  const baseline = setup();
+  baseline.projectile.g.get_isLeaving = () => true;
+  baseline.state.execute();
+  const observed = setup();
+  observed.projectile.g.get_isLeaving = () => true;
+  observed.install();
+  try {
+    observed.state.execute();
+    assert.deepEqual(observed.snapshot(), baseline.snapshot());
+    assert.deepEqual(observed.contacts, [observed.targets[0]]);
+    assert.equal(
+      observed.observer.lastContact(observed.projectile.weapon)?.unit,
+      observed.targets[0],
+    );
+    assert.equal(observed.observer.estimate.perSecond(1000), 0);
+  } finally {
+    observed.cleanup();
+  }
+});
+
+test('native collision history feeds aim eligibility and weapon reset invalidates it', () => {
+  const observed = setup();
+  const weapon = observed.projectile.weapon;
+  Object.assign(weapon, { fire: true, projectileFunction: 'bullet', range: 10, reloadTime: 400 });
+  const numbers: Record<string, number> = {
+    aim_assist_min_distance: 0,
+    aim_assist_min_range_ratio: 0,
+    aim_assist_min_hit_window: 650,
+    aim_assist_max_hit_window: 1200,
+  };
+  const select = (now: number) =>
+    selectAimAssistTarget(
+      observed.projectile.unit,
+      weapon,
+      now,
+      {
+        getAimAssistBoolean: () => false,
+        getAimAssistNumber: (key) => numbers[key],
+      },
+      {
+        current: null,
+        locked: false,
+        lastContact: (value) => observed.observer.lastContact(value),
+        isPlayer: () => false,
+        isTeleport: () => false,
+        isBeam: () => false,
+        isEnemyShip: () => false,
+      },
+    );
+  observed.config.show_radar_dps = false;
+  observed.install();
+  try {
+    assert.equal(select(1000).target, null, 'eligibility needs an actual contact');
+    observed.state.execute();
+    assert.equal(select(1000).target, observed.targets[0]);
+    assert.equal(select(1800).target, observed.targets[0], 'inclusive source hit window');
+    assert.equal(select(1801).target, null);
+    observed.observer.resetWeapon(weapon);
+    assert.equal(select(1000).target, null, 'pooled weapon reset clears contact history');
+    assert.equal(observed.observer.estimate.perSecond(1000), 0);
+  } finally {
+    observed.cleanup();
+  }
 });

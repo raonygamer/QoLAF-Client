@@ -1,3 +1,4 @@
+import { GameReflection } from '../api/GameReflection';
 import { read, type API, type Raw } from '../api/Types';
 import { portedClasses } from '../ported/Registry';
 import { createClientChangelogPopup } from './ClientChangelogPopup';
@@ -8,6 +9,7 @@ import { CLIENT_VERSION } from '../login/LoginIdentity';
 const releases = new ClientReleaseSequence();
 
 export function installNativeClientChangelog(api: API, game: Raw): () => boolean {
+  const nativeGame = new GameReflection(api).cast(game, 'core.scene.Game');
   const chat = game.chatInput;
   if (!chat) return () => false;
   const Popup = createClientChangelogPopup(portedClasses(api).resolve);
@@ -18,13 +20,18 @@ export function installNativeClientChangelog(api: API, game: Raw): () => boolean
     if (!previous) return;
     previous.removeEventListener('close', close);
     if (read(previous, 'parent')) {
-      const recovering = game.isRecoveringGameConnection;
+      const recovering = nativeGame.get_isRecoveringGameConnection?.();
       game.removeChildFromOverlay(previous, true);
       if (recovering) game.blockHotkeys = true;
     } else previous.dispose();
   };
-  const open = releases.install(api, game, CLIENT_VERSION, () => {
-    if (api.game !== game || game.isLeaving || game.isRecoveringGameConnection) return false;
+  const open = releases.install(api, nativeGame, CLIENT_VERSION, () => {
+    if (
+      api.game !== game ||
+      nativeGame.get_isLeaving() ||
+      nativeGame.get_isRecoveringGameConnection?.()
+    )
+      return false;
     if (popup) return true;
     popup = new Popup();
     popup!.addEventListener('close', close);

@@ -1,5 +1,12 @@
-import type { Raw } from '../api/Types';
 import { RichBitmapMarkupParser } from './rich/RichBitmapMarkupParser';
+import type { ChatSenderSnapshot } from './ChatSenderSnapshot';
+
+export interface ChatContextMessage extends ChatSenderSnapshot {
+  text?: string;
+  playerKey?: string | null;
+  playerName?: string | null;
+  clanKey?: string;
+}
 
 /** Source ChatMessageContextData: transport keys and persistent IDs stay distinct. */
 export class ChatMessageContextData {
@@ -12,9 +19,10 @@ export class ChatMessageContextData {
   readonly canBlock: boolean;
 
   constructor(
-    readonly message: Raw,
+    readonly message: ChatContextMessage,
     currentPlayerId = '',
-    livePlayer: Raw | null = null,
+    livePlayer: object | null = null,
+    allowBlock = true,
   ) {
     const property = ChatMessageContextData.propertyText;
     this.messageText = ChatMessageContextData.plainText(property(message, 'text'));
@@ -38,6 +46,7 @@ export class ChatMessageContextData {
       ? property(message, 'clanName') || property(livePlayer, 'clanName')
       : '';
     this.canBlock =
+      allowBlock &&
       !!this.playerKey &&
       !!this.playerName &&
       this.playerKey !== (currentPlayerId ?? '') &&
@@ -58,11 +67,19 @@ export class ChatMessageContextData {
     return RichBitmapMarkupParser.parse(markup ?? '', 14, 0xffffff).text;
   }
 
-  static propertyText(source: Raw | null, property: string): string {
+  static propertyText(source: object | null | undefined, property: string): string {
     if (!source || !property) return '';
     try {
-      const value = source[property];
-      return typeof value === 'string' ? value : '';
+      const value: unknown = Reflect.get(source, property);
+      if (typeof value === 'string') return value;
+      // AS3 properties may be explicit accessors on Haxe instances. BigDB
+      // records and history snapshots retain their ordinary string fields.
+      const getter: unknown = Reflect.get(source, `get_${property}`);
+      if (typeof getter === 'function') {
+        const result: unknown = Reflect.apply(getter, source, []);
+        return typeof result === 'string' ? result : '';
+      }
+      return '';
     } catch {
       return '';
     }

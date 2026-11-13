@@ -1,5 +1,5 @@
 // Source port of core/hud/components/chat/ChatRolePreviewPopup.as.
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 
 export function createChatRolePreviewPopup(resolve: Resolve): any {
   const Sprite = resolve('starling.display.Sprite');

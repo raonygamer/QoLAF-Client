@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { bindGameClasses } from '../src/game/Bindings';
 import { installCombatTextLayout } from '../src/rendering/CombatTextLayout';
 import { Display, Text } from './fixtures/NativeGame';
 import type { Raw } from '../src/api/Types';
@@ -49,11 +50,14 @@ test('combat layout uses the source atlas before measuring and disposes the comp
   };
   const hooks = new Hooks(),
     cleanups: Array<() => void> = [];
-  installCombatTextLayout({
-    cls: (name: string) => classes[name],
+  const api = {
+    defer: (cleanup: () => void) => cleanups.push(cleanup),
+    cls: (name: string) => classes[name] ?? { prototype: {} },
     around: (target: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'around', fn)),
-  } as any);
+  } as any;
+  bindGameClasses(api);
+  installCombatTextLayout(api);
   const add = (alignment: string, fixed = false) =>
     handler.add(
       '12345',
@@ -104,6 +108,7 @@ test('combat layout uses the source atlas before measuring and disposes the comp
 test('handler initialization extends the native pool to the original 80 particles only once', () => {
   class Particle {
     static created = 0;
+    static disposed = 0;
     constructor(
       public id: number,
       public g: Raw,
@@ -112,6 +117,10 @@ test('handler initialization extends the native pool to the original 80 particle
     }
     set_text() {}
     reset() {}
+    removeFromParent() {}
+    dispose() {
+      Particle.disposed++;
+    }
   }
   const Handler = makeTextHandler();
   class Manager {
@@ -124,6 +133,9 @@ test('handler initialization extends the native pool to the original 80 particle
     loadHandlers() {
       this.textHandler = new Handler(this.g);
     }
+    dispose() {
+      this.textHandler!.dispose();
+    }
   }
   const classes: Raw = {
     'core.text.TextHandler': Handler,
@@ -133,13 +145,16 @@ test('handler initialization extends the native pool to the original 80 particle
   };
   const hooks = new Hooks(),
     cleanups: Array<() => void> = [];
-  installCombatTextLayout({
-    cls: (name: string) => classes[name],
+  const api = {
+    defer: (cleanup: () => void) => cleanups.push(cleanup),
+    cls: (name: string) => classes[name] ?? { prototype: {} },
     around: (object: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(object, key, 'around', fn)),
     before: (object: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(object, key, 'before', fn)),
-  } as any);
+  } as any;
+  bindGameClasses(api);
+  installCombatTextLayout(api);
   try {
     const manager = new Manager({});
     manager.loadHandlers();
@@ -152,6 +167,12 @@ test('handler initialization extends the native pool to the original 80 particle
     );
     manager.loadHandlers();
     assert.equal(Particle.created, 80);
+    manager.dispose();
+    assert.equal(Particle.disposed, 80);
+    assert.equal(manager.textHandler, null);
+    assert.equal(manager.inactiveTexts, null);
+    manager.dispose();
+    assert.equal(Particle.disposed, 80, 'repeated teardown must not dispose particles twice');
   } finally {
     cleanups.reverse().forEach((cleanup) => cleanup());
   }

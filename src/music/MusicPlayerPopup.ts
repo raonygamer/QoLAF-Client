@@ -1,4 +1,4 @@
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 import { createMusicTrackCatalog } from './MusicTrackCatalog';
 import type { MusicPlayerService } from './MusicPlayer';
 export function createMusicPlayerPopup(resolve: Resolve, MusicPlayer: MusicPlayerService) {

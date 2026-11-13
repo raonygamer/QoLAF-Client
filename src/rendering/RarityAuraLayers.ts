@@ -77,6 +77,11 @@ export function installRarityAuraLayers(api: API): ((emitter: Raw) => void) | un
   });
   return (emitter: Raw) => {
     const entry = entries.get(emitter);
-    if (entry) sync(entry);
+    if (!entry) return;
+    // These dedicated batches are not in native CollectiveMeshBatch.meshBatches.
+    // Match the source beginUpdate even when update exits before drawing (for
+    // example after culling or when a retained emitter has stopped emitting).
+    entry.batch.clear();
+    sync(entry);
   };
 }

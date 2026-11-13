@@ -1,69 +1,90 @@
-import type { API, Raw } from '../api/Types';
-import { read } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import {
+  Artifact,
+  ArtifactBox,
+  ArtifactCargoBox,
+  ArtifactOverview,
+  type GameScene,
+  type Sprite,
+  type DisplayObject,
+} from '../game/Bindings';
 import { artifactOrder } from './ArtifactOrder';
 import { artifactTooltip } from './ArtifactTooltip';
-export function installArtifactUI(api: API, createSorting: () => any) {
-  let Sorting: any;
-  const popups = new Map<Raw, Raw>();
-  for (const [name, method] of [
-    ['core.artifact.ArtifactCargoBox', 'addToolTip'],
-    ['core.artifact.ArtifactBox', 'setArtifact'],
-  ]) {
-    const prototype = api.cls(name)?.prototype;
-    if (typeof prototype?.[method] !== 'function') throw Error(`Missing ${name}.${method}`);
-    api.after(prototype, method, function () {
-      if (this.a?.revealed && this.toolTip)
-        this.toolTip.set_text(artifactTooltip(api, this, name.endsWith('.ArtifactCargoBox')));
-    });
-  }
-  const overview = api.cls('core.artifact.ArtifactOverview')!.prototype;
-  if (typeof overview.reloadStats === 'function')
-    api.before(overview, 'reloadStats', function () {
-      for (const box of this.activeSlots ?? [])
-        if (box.a?.revealed && box.toolTip) box.toolTip.set_text(artifactTooltip(api, box, false));
-    });
-  const dismiss = (view: Raw) => {
+
+interface ArtifactView extends ArtifactOverview {
+  expandedView?: boolean;
+  viewWidth?: number;
+  viewHeight?: number;
+  sortingBar?: DisplayObject;
+  layoutToggleButton?: DisplayObject;
+  closeViewButton?: DisplayObject;
+}
+
+type SortingDialog = new (
+  game: GameScene,
+  sort: (order: string) => void,
+  close: () => void,
+  expanded: boolean,
+) => Sprite;
+
+export function installArtifactUI(api: API, createSorting: () => SortingDialog): void {
+  const reflection = new GameReflection(api);
+  let Sorting: SortingDialog | undefined;
+  const popups = new Map<ArtifactView, Sprite>();
+  const refreshTooltip = (box: ArtifactBox | ArtifactCargoBox, cargo: boolean) => {
+    if (box.a?.revealed && box.toolTip)
+      box.toolTip.set_text(artifactTooltip({ a: box.a, p: box.p, g: box.g }, cargo));
+  };
+  reflection.after(ArtifactCargoBox.prototype, 'addToolTip', function () {
+    refreshTooltip(this, true);
+  });
+  reflection.after(ArtifactBox.prototype, 'setArtifact', function () {
+    refreshTooltip(this, false);
+  });
+  const overview = ArtifactOverview.prototype;
+  reflection.before(overview, 'reloadStats', function () {
+    for (const box of this.activeSlots ?? []) refreshTooltip(box, false);
+  });
+  const dismiss = (view: ArtifactView) => {
     const popup = popups.get(view);
     popups.delete(view);
-    if (popup) popup.removeFromParent(true);
+    popup?.removeFromParent(true);
     view.chooseSortingButton?.set_enabled(true);
   };
-  api.around(overview, 'chooseSorting', function () {
+  reflection.around(overview, 'chooseSorting', function () {
     if (popups.has(this)) {
       dismiss(this);
       return;
     }
     Sorting ??= createSorting();
-    const view = this;
+    const view: ArtifactView = this;
     const popup = new Sorting(
-      this.g,
-      (order: string) => view.onSort(order),
+      view.g,
+      (order) => view.onSort(order),
       () => dismiss(view),
-      !!this.expandedView,
+      !!view.expandedView,
     );
-    popup.x = this.expandedView ? Math.round((this.viewWidth - 665) / 2) : 0;
-    popup.y = this.expandedView ? Math.round((this.viewHeight - 520) / 2) : 0;
-    popups.set(this, popup);
-    this.addChild(popup);
-    for (const node of [this.sortingBar, this.layoutToggleButton, this.closeViewButton]) {
-      if (node && read(node, 'parent') === this)
-        this.setChildIndex(node, read(this, 'numChildren') - 1);
+    popup.set_x(view.expandedView ? Math.round(((view.viewWidth ?? 665) - 665) / 2) : 0);
+    popup.set_y(view.expandedView ? Math.round(((view.viewHeight ?? 520) - 520) / 2) : 0);
+    popups.set(view, popup);
+    view.addChild(popup);
+    for (const node of [view.sortingBar, view.layoutToggleButton, view.closeViewButton]) {
+      if (node?.get_parent() === view) view.setChildIndex(node, view.get_numChildren() - 1);
     }
   });
-  if (typeof overview.dispose === 'function')
-    api.before(overview, 'dispose', function () {
-      dismiss(this);
-    });
+  reflection.before(overview, 'dispose', function () {
+    dismiss(this);
+  });
   api.defer(() => {
     for (const view of popups.keys()) dismiss(view);
   });
-  api.around(overview, 'onSort', function (_next, order: string) {
+  reflection.around(overview, 'onSort', function (_next, order) {
     dismiss(this);
     let compare = artifactOrder(this.p, order);
     if (!compare) {
-      const Artifact = api.cls('core.artifact.Artifact');
-      if (Artifact) Artifact.currentTypeOrder = order;
-      compare = (a: Raw, b: Raw) => {
+      Artifact.currentTypeOrder = order;
+      compare = (a, b) => {
         if (a.revealed !== b.revealed) return a.revealed ? -1 : 1;
         const left = a.getStat(order),
           right = b.getStat(order);

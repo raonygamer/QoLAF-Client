@@ -1,5 +1,6 @@
+import { beginKeyCapture, endKeyCapture } from '../settings/KeyCapture';
 // Source port of core/hud/components/SettingsKeybind.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createSettingsKeybind(resolve: Resolve): any {
   const Box: any = resolve('core.hud.components.Box');
   type Box = any;
@@ -92,6 +93,7 @@ export function createSettingsKeybind(resolve: Resolve): any {
         this.currentButton.text = Localize.t('Push a Button');
         this.stopListening();
         this.listeningStage = this.stage;
+        beginKeyCapture(this.listeningStage, this);
         this.listeningStage.addEventListener('keyDown', this.onClickButton);
         this.listeningStage.addEventListener('touch', this.onMouseTouch);
         this.listeningStage.addEventListener('rightClick', this.rightClick);
@@ -153,6 +155,7 @@ export function createSettingsKeybind(resolve: Resolve): any {
       // removeFromParent(true) disconnects this row before dispose(): stage
       // is already null then, but its capture listeners still need removal.
       if (this.listeningStage != null) {
+        endKeyCapture(this.listeningStage, this);
         this.listeningStage.removeEventListener('keyDown', this.onClickButton);
         this.listeningStage.removeEventListener('touch', this.onMouseTouch);
         this.listeningStage.removeEventListener('rightClick', this.rightClick);

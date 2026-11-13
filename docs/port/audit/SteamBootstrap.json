@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-12",
+  "executable": "/home/raony/.local/share/Steam/steamapps/common/Astroflux/Astroflux.exe",
+  "sha256": "9d8a66f6c5c30b9a7f7974de5514756adb88427dcdf26d87fa3bbcb46d737538",
+  "fuseVersion": 1,
+  "fuses": {
+    "RunAsNode": "1",
+    "EnableCookieEncryption": "0",
+    "EnableNodeOptionsEnvironmentVariable": "1",
+    "EnableNodeCliInspectArguments": "1",
+    "EnableEmbeddedAsarIntegrityValidation": "0",
+    "OnlyLoadAppFromAsar": "0",
+    "LoadBrowserProcessSpecificV8Snapshot": "0",
+    "GrantFileProtocolExtraPrivileges": "1",
+    "WasmTrapHandlers": "1"
+  },
+  "installedArchivePresent": false,
+  "extractedAppPresent": true,
+  "requirements": [
+    "One-time setup; no manual repatching after Steam updates",
+    "Keep Steam authentication and existing private-client support",
+    "Users must keep normal Steam Play; no separate launcher or manually configured environment variables",
+    "Current external-launcher proposal rejected by user"
+  ],
+  "verifiedFindings": [
+    "Modern Electron checks app.asar before app, so restoring the archive bypasses extracted app patches.",
+    "Node CLI inspection and RunAsNode fuses are enabled in this installed executable.",
+    "NODE_OPTIONS fuse being enabled does not permit --require in packaged applications; Electron restricts packaged NODE_OPTIONS."
+  ],
+  "candidatesNotYetVerified": [
+    "A stock-executable automatic extra-file loading mechanism, if one exists"
+  ],
+  "notProven": [
+    "End-to-end startup injection in the actual Windows Steam shell",
+    "Steam overlay/authentication through an external launcher",
+    "Behavior after a real Steam update",
+    "Windows launch-option packaging/distribution"
+  ],
+  "sources": [
+    "https://github.com/electron/electron/blob/v39.0.0/shell/common/node_bindings.cc#L670",
+    "https://github.com/electron/fuses/blob/main/src/config.ts",
+    "https://www.electronjs.org/docs/latest/api/environment-variables#node_options"
+  ],
+  "changesToInstalledGame": false,
+  "probe": {
+    "runtime": "Linux Electron 43.8.7",
+    "packaged": true,
+    "method": "--inspect-brk=127.0.0.1:0; Debugger.evaluateOnCallFrame before entrypoint; Debugger.resume; detach",
+    "result": {
+      "electronAPI": "object",
+      "injectedMarkerObservedByMain": "before-main",
+      "exitCode": 0
+    },
+    "directory": "/tmp/qolaf-startup-probe",
+    "limitations": [
+      "This is a minimal packaged probe, not the Windows/Proton Steam application.",
+      "Stock default_app is ESM: initial test showed lexical require is unavailable there; packaged CommonJS main provides it.",
+      "Steam login, native bridge, overlay and real update still unverified."
+    ],
+    "installedGameModified": false
+  }
+}

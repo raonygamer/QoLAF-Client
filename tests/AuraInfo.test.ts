@@ -1,8 +1,10 @@
+import type { API } from '../src/api/Types';
+import { bindGameClasses, type GameScene, type Unit } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { AuraInfo, auraTooltip } from '../src/ui/AuraInfo';
 import { NativeUI } from '../src/ui/NativeUI';
-import { registry, EnemyShip, ToolTip } from './fixtures/NativeGame';
+import { registry, EnemyShip, ToolTip, Display } from './fixtures/NativeGame';
 
 test('aura information matches original descriptions using native rare-type constants', () => {
   const native = {
@@ -44,30 +46,32 @@ test('aura information matches original descriptions using native rare-type cons
 
 test('aura button follows target identity, disposes stale tooltips, and leaves enemies unchanged', () => {
   const classes = registry();
-  const ui = new NativeUI({ cls: (name: string) => classes[name] } as any);
-  const info = new AuraInfo(ui, {});
+  const api = { cls: (name: string) => classes[name] ?? {} } as unknown as API;
+  bindGameClasses(api);
+  const ui = new NativeUI(api);
+  const info = new AuraInfo(ui, {} as GameScene);
   const first = Object.assign(new EnemyShip(), { rareType: EnemyShip.RARE_TYPE_DEFENDER });
   const snapshot = { ...first };
-  assert.equal(info.update(first, 0x00bff5), true);
+  assert.equal(info.update(first as unknown as Unit, 0x00bff5), true);
   const tooltip = ToolTip.instances.at(-1)!;
   assert.equal(tooltip.target, info.node);
   assert.equal(tooltip.width, 260);
   assert.equal(tooltip.color, 0xffffff);
-  assert.equal(info.node.children[0].get_width(), 20);
+  assert.equal(info.node.getChildAt(0).get_width(), 20);
   assert.deepEqual({ ...first }, snapshot);
-  info.update(first, 0x00bff5);
+  info.update(first as unknown as Unit, 0x00bff5);
   assert.equal(ToolTip.instances.at(-1), tooltip);
   const second = Object.assign(new EnemyShip(), { rareType: first.rareType });
-  info.update(second, 0x00bff5);
+  info.update(second as unknown as Unit, 0x00bff5);
   assert.equal(tooltip.disposed, true);
   const replacement = ToolTip.instances.at(-1)!;
   assert.notEqual(replacement, tooltip);
-  info.update(second, 0);
+  info.update(second as unknown as Unit, 0);
   assert.equal(replacement.disposed, true);
   assert.equal(info.node.get_visible(), false);
-  info.update(first, 0x00bff5);
+  info.update(first as unknown as Unit, 0x00bff5);
   const last = ToolTip.instances.at(-1)!;
   info.dispose();
   assert.equal(last.disposed, true);
-  assert.equal(info.node.disposed, true);
+  assert.equal((info.node as unknown as Display).disposed, true);
 });

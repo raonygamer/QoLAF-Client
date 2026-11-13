@@ -1,27 +1,32 @@
-import type { Raw } from '../api/Types';
+import type { Texture } from '../game/Bindings';
+export interface ChatImageBitmap {
+  readonly width: number;
+  readonly height: number;
+  dispose(): void;
+}
 import type { ChatImageLoader } from './ChatImageCache';
 import { ChatImageAsset } from './ChatImageAsset';
 
-interface GifTask {
+interface GIFTask {
   readonly width: number;
   readonly height: number;
   readonly complete: boolean;
-  nextFrame(): { bitmap: Raw; delay: number } | null;
+  nextFrame(): { bitmap: ChatImageBitmap; delay: number } | null;
   dispose(): void;
 }
 export interface ChatImagePlatform {
   fetch(url: string, options: RequestInit): Promise<Response>;
-  decodeStatic(bytes: Uint8Array): Promise<Raw>;
-  beginGif(bytes: Uint8Array): GifTask;
+  decodeStatic(bytes: Uint8Array): Promise<ChatImageBitmap>;
+  beginGIF(bytes: Uint8Array): GIFTask;
   nextFrame(signal: AbortSignal): Promise<void>;
-  upload(bitmap: Raw): Raw;
+  upload(bitmap: ChatImageBitmap): Texture;
 }
 
 /** Source remote loader policy adapted to cancellable browser I/O and game-frame uploads. */
 export class ChatRemoteImageLoader implements ChatImageLoader {
   private static readonly maxEncodedBytes = 20 * 1024 * 1024;
   private static readonly candidateTimeoutMs = 20_000;
-  private static readonly maxAnimatedGifPixels = 60_000;
+  private static readonly maxAnimatedGIFPixels = 60_000;
   private generation = 0;
   private controller: AbortController | null = null;
 
@@ -148,8 +153,8 @@ export class ChatRemoteImageLoader implements ChatImageLoader {
       const width = bytes[6] | (bytes[7] << 8);
       const height = bytes[8] | (bytes[9] << 8);
       this.checkDimensions(width, height);
-      if (width * height <= ChatRemoteImageLoader.maxAnimatedGifPixels)
-        return this.decodeGif(bytes, signal);
+      if (width * height <= ChatRemoteImageLoader.maxAnimatedGIFPixels)
+        return this.decodeGIF(bytes, signal);
     }
     const bitmap = await this.abortable(this.platform.decodeStatic(bytes), signal, (late) =>
       late.dispose(),
@@ -165,10 +170,10 @@ export class ChatRemoteImageLoader implements ChatImageLoader {
     }
   }
 
-  private async decodeGif(bytes: Uint8Array, signal: AbortSignal): Promise<ChatImageAsset> {
-    const task = this.platform.beginGif(bytes);
-    const textures: Raw[] = [],
-      bitmaps: Raw[] = [],
+  private async decodeGIF(bytes: Uint8Array, signal: AbortSignal): Promise<ChatImageAsset> {
+    const task = this.platform.beginGIF(bytes);
+    const textures: Texture[] = [],
+      bitmaps: ChatImageBitmap[] = [],
       delays: number[] = [];
     try {
       while (!task.complete) {

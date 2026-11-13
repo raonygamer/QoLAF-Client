@@ -203,7 +203,7 @@ test('early packet hooks survive cached handlers and observe before native facto
   classes['core.projectile.ProjectileManager'] = Manager;
   classes['core.projectile.ProjectileFactory'] = factory;
   classes['core.scene.SceneBase'] = { clientSettings: { showXhersixTorpedoRhythm: true } };
-  const makeApi = (cleanups: Function[]) => ({
+  const makeAPI = (cleanups: Function[]) => ({
     ...api,
     before: (target: any, name: string, fn: Function) =>
       cleanups.push(hooks.add(target, name, 'before', fn)),
@@ -214,10 +214,10 @@ test('early packet hooks survive cached handlers and observe before native facto
     defer: (fn: Function) => cleanups.push(fn),
     on() {},
   });
-  installTorpedoCueHooks(makeApi(rootCleanup));
+  installTorpedoCueHooks(makeAPI(rootCleanup));
   game.projectileManager = new Manager(game);
   const cachedHandler = game.projectileManager.addEnemyProjectile.bind(game.projectileManager);
-  const cue = installTorpedoCue(makeApi(sessionCleanup), game);
+  const cue = installTorpedoCue(makeAPI(sessionCleanup), game);
   const observations: any[] = [];
   cue.observe = (...args: any[]) => {
     observations.push(args);

@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installEmitterDelays } from '../src/rendering/EmitterDelays';
@@ -12,6 +13,10 @@ function fixture() {
   const targets = new EmitterTargets();
   const pending: Raw[] = [];
   const tween = {
+    killTweensOf(callback: Function) {
+      for (let i = pending.length - 1; i >= 0; i--)
+        if (pending[i].callback === callback) pending.splice(i, 1);
+    },
     delayedCall(delay: number, callback: Function, params?: any[], useFrames?: boolean) {
       const handle = { delay, callback, params, useFrames };
       pending.push(handle);
@@ -19,23 +24,48 @@ function fixture() {
     },
   };
   let loads = 0;
-  const data = {
-    getService: () => ({
-      loadKey() {
-        loads++;
-        return { multiple: true, multipleDelay: 250, multipleRadius: 20, emitters: [] };
-      },
-    }),
-  };
+  class DataManager {
+    loadKey() {
+      loads++;
+      return { multiple: true, multipleDelay: 250, multipleRadius: 20, emitters: [] };
+    }
+  }
+  const service = new DataManager();
+  const data = { getService: () => service };
   const factory = makeFactory(data, tween);
+  factory.resolveTexture = () => null;
+  const calls: unknown[][] = [];
+  const nativeCreate = factory.create;
+  factory.create = (...args: unknown[]) => {
+    calls.push(args);
+    return nativeCreate(...args);
+  };
   const hooks = new Hooks();
   const cleanups: Array<() => void> = [];
-  const classes: Raw = { 'core.particle.EmitterFactory': factory, 'com.greensock.TweenMax': tween };
+  const classes: Raw = {
+    'core.particle.EmitterFactory': factory,
+    'com.greensock.TweenMax': tween,
+    'data.DataLocator': data,
+    'data.DataManager': DataManager,
+  };
   const api = {
     cls: (name: string) => classes[name],
+    defer: (cleanup: () => void) => cleanups.push(cleanup),
+    log() {},
+    before: (target: Raw, key: string, fn: Function) =>
+      cleanups.push(hooks.add(target, key, 'before', fn)),
+    after: (target: Raw, key: string, fn: Function) =>
+      cleanups.push(hooks.add(target, key, 'after', fn)),
     around: (target: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'around', fn)),
   } as any;
+  class BindingFixture {
+    play() {}
+    getEmitter() {
+      return null;
+    }
+  }
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? BindingFixture });
   installEmitterDelays(api, targets);
   const game: Raw = {
     leaving: false,
@@ -45,6 +75,7 @@ function fixture() {
   };
   return {
     targets,
+    calls,
     pending,
     tween,
     factory,
@@ -98,57 +129,35 @@ test('targetless effects and unrelated timers preserve native callbacks and leav
   }
 });
 
-test('nested factories and exceptions restore timer scope and preserve invocation arguments', () => {
-  const targets = new EmitterTargets();
-  const hooks = new Hooks();
-  const cleanups: Array<() => void> = [];
-  const timers: Raw[] = [];
-  const callback = function (this: Raw, value: number) {
-    return this.base + value;
-  };
-  const tween = {
-    delayedCall(delay: number, callback: Function, params?: number[]) {
-      const handle = { delay, callback, params };
-      timers.push(handle);
-      return handle;
-    },
-  };
-  const child = {};
-  const parent = {};
-  const game = { isLeaving: false };
-  const factory = {
-    create(key: string, g: Raw, x: number, y: number, target: Raw): Raw {
-      if (key === 'fail') throw Error('factory failure');
-      if (key === 'parent') factory.create('child', g, x, y, child);
-      return tween.delayedCall(1, callback, [4]);
-    },
-  };
-  const originalCreate = factory.create;
-  const originalDelay = tween.delayedCall;
-  installEmitterDelays(
-    {
-      cls: (name: string) => (name === 'core.particle.EmitterFactory' ? factory : tween),
-      around: (target: Raw, key: string, fn: Function) =>
-        cleanups.push(hooks.add(target, key, 'around', fn)),
-    } as any,
-    targets,
-  );
+test('delayed effects preserve fractional positions and the destination canvas', () => {
+  const f = fixture();
+  const random = Math.random;
+  Math.random = () => 0.25;
   try {
-    const result = factory.create('parent', game, 0, 0, parent);
-    assert.equal(result, timers[1]);
-    targets.resetTarget(child);
-    assert.equal(timers[0].callback.call({ base: 10 }, ...timers[0].params), undefined);
-    assert.equal(timers[1].callback.call({ base: 10 }, ...timers[1].params), 14);
-    assert.throws(() => factory.create('fail', game, 0, 0, parent), /factory failure/);
-    const external = tween.delayedCall(2, callback, [8]);
-    assert.equal(
-      external.callback,
-      callback,
-      'throwing factory must not leak its target into other timers',
-    );
+    const canvas = {};
+    f.factory.create('effect', f.game, 10.5, 20.25, null, true, true, true, canvas);
+    f.pending.shift()!.callback();
+    assert.equal(f.calls.length, 2);
+    assert.equal(f.calls[1][2], 20.5);
+    assert.equal(f.calls[1][3], 30.25);
+    assert.equal(f.calls[1][8], canvas);
+    assert.equal(f.calls[1][7], false);
   } finally {
-    cleanups.reverse().forEach((fn) => fn());
+    Math.random = random;
+    f.cleanup();
   }
-  assert.equal(factory.create, originalCreate);
-  assert.equal(tween.delayedCall, originalDelay);
+});
+
+test('omitted positions use rendered coordinates and unloaded timers cannot create effects', () => {
+  const f = fixture();
+  const target = { get_renderX: () => 42.5, get_renderY: () => -12.25 };
+  f.factory.create('effect', f.game, undefined, undefined, target);
+  assert.equal(f.calls[0][2], 42.5);
+  assert.equal(f.calls[0][3], -12.25);
+  const callback = f.pending[0].callback;
+  const loads = f.loads();
+  f.cleanup();
+  assert.equal(f.pending.length, 0);
+  callback();
+  assert.equal(f.loads(), loads);
 });

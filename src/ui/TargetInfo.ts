@@ -1,5 +1,7 @@
+import type { Sprite, Image, StarlingTextField } from '../game/Bindings';
+import type { Texture, GameScene } from '../game/Bindings';
 import { createTargetBossIcon } from './TargetBossIcon';
-import { read, type Raw } from '../api/Types';
+import type {} from '../game/GameRecovery';
 import type { DebuffTracker } from '../debuff/DebuffTracker';
 import { DebuffDisplay } from './DebuffDisplay';
 import { NativeUI } from './NativeUI';
@@ -13,16 +15,16 @@ import { NearbyTargets } from '../target/NearbyTargets';
 import type { Settings } from '../settings/Settings';
 // TargetInfoElement.as: native display-list port; no HTML counterpart.
 export class TargetInfo {
-  readonly node: Raw;
-  private lock: Raw;
-  private unlockTexture: Raw;
-  private lockTexture: Raw;
-  private boss: Raw;
-  private level: Raw;
+  readonly node: Sprite;
+  private lock: Image;
+  private unlockTexture: Texture;
+  private lockTexture: Texture;
+  private boss: Image;
+  private level: StarlingTextField;
   private name: AuraText;
   private auraInfo: AuraInfo;
-  private collapse: Raw;
-  private collapseText: Raw;
+  private collapse: Sprite;
+  private collapseText: StarlingTextField;
   private shield: ProgressBar;
   private health: ProgressBar;
   private rows: NearbyTargetBar[] = [];
@@ -32,14 +34,14 @@ export class TargetInfo {
   private debuffs?: DebuffDisplay;
   constructor(
     private ui: NativeUI,
-    private game: Raw,
+    private game: GameScene,
     private target: TargetSystem,
     private config: Settings,
     private save: () => void,
     debuffs?: DebuffTracker,
   ) {
     this.node = ui.sprite();
-    this.info = new TargetPresentation(ui, game);
+    this.info = new TargetPresentation(game);
     this.nearby = new NearbyTargets(target, this.info, config);
     if (debuffs) {
       this.debuffs = new DebuffDisplay(ui, game, debuffs);
@@ -54,12 +56,12 @@ export class TargetInfo {
     ui.touch(this.lock, () => {
       if (target.current && target.valid(target.current)) target.locked = !target.locked;
     });
-    this.boss = createTargetBossIcon(ui, 18);
+    this.boss = createTargetBossIcon(18);
     this.node.addChild(this.boss);
     this.level = ui.text(55, 20, '', 14);
     this.level.set_autoSize('horizontal');
     this.node.addChild(this.level);
-    this.name = new AuraText(ui, 188, 20, 14);
+    this.name = new AuraText(188, 20, 14);
     this.node.addChild(this.name.node);
     this.auraInfo = new AuraInfo(ui, game);
     this.node.addChild(this.auraInfo.node);
@@ -72,24 +74,29 @@ export class TargetInfo {
       config.target_list_expanded = !config.target_list_expanded;
       save();
     });
-    this.shield = new ProgressBar(ui, 300, 14, 0x3377ff);
-    this.health = new ProgressBar(ui, 300, 14, 0xff0022);
+    this.shield = new ProgressBar(300, 14, 0x3377ff);
+    this.health = new ProgressBar(300, 14, 0xff0022);
     this.node.addChild(this.shield.node);
     this.node.addChild(this.health.node);
   }
   update(dt: number) {
-    const stage = read(this.game, 'stage');
-    if (!stage) return;
-    this.node.set_x(Math.round((read(stage, 'stageWidth') - 300) * this.config.target_info_x));
-    this.node.set_y(Math.round((read(stage, 'stageHeight') - 53) * this.config.target_info_y));
-    while (this.rows.length < this.config.nearby_enemy_radar_lines) {
-      const row = new NearbyTargetBar(this.ui, this.info, (u) => {
+    const stage = this.game.get_stage();
+    if (!stage || this.game.get_isLeaving() || this.game.get_isRecoveringGameConnection?.()) return;
+    this.node.set_x(Math.round((stage.get_stageWidth() - 300) * this.config.target_info_x));
+    this.node.set_y(Math.round((stage.get_stageHeight() - 53) * this.config.target_info_y));
+    const rowCount = Math.max(0, Math.min(10, Math.trunc(this.config.nearby_enemy_radar_lines)));
+    const resized = this.rows.length !== rowCount;
+    while (this.rows.length < rowCount) {
+      const row = new NearbyTargetBar(this.info, (u) => {
         this.nearby.select(u);
       });
       this.rows.push(row);
       this.node.addChild(row.node);
     }
-    while (this.rows.length > this.config.nearby_enemy_radar_lines) this.rows.pop()!.dispose();
+    while (this.rows.length > rowCount) this.rows.pop()!.dispose();
+    // Original syncNearbyTargetBars invalidates its snapshot without resetting
+    // the scan budget, so settings changes cannot trigger repeated world scans.
+    if (resized) this.nearby.clear();
     const unit = this.target.current,
       hidden = !!unit && this.info.hideStats(unit);
     let y = 25;
@@ -98,7 +105,7 @@ export class TargetInfo {
     this.boss.set_visible(!!unit && this.info.bossIcon(unit));
     this.level.set_text(unit ? 'Lv. ' + this.info.level(unit) : '--');
     this.level.get_format().set_color(unit ? levelColor(this.info.level(unit)) : 0x777777);
-    this.name.text(unit ? this.info.name(unit) : 'No active target');
+    this.name.text(unit ? this.info.activeName(unit) : 'No active target');
     const auraColor = unit ? this.info.aura(unit) : 0;
     this.name.auraColor(auraColor);
     const hasAura = this.auraInfo.update(unit, auraColor);
@@ -147,7 +154,7 @@ export class TargetInfo {
       }
     }
     this.refresh = Math.max(0, this.refresh - Math.max(0, dt));
-    if (this.config.target_list_expanded && this.refresh <= 0) {
+    if (this.config.target_list_expanded && this.rows.length > 0 && this.refresh <= 0) {
       this.nearby.refresh(this.game.unitManager.units, this.rows.length);
       this.refresh = 0.25;
     }
@@ -159,10 +166,11 @@ export class TargetInfo {
     y += 2;
     for (let i = 0; i < this.rows.length; i++) {
       const row = this.rows[i];
+      row.node.set_visible(this.config.target_list_expanded);
+      if (!this.config.target_list_expanded) continue;
       const u = this.nearby.at(i);
       row.node.set_y(y + i * 30);
       row.show(u, u ? this.target.distance(u) : 0, dt);
-      row.node.set_visible(this.config.target_list_expanded);
     }
   }
   dispose() {

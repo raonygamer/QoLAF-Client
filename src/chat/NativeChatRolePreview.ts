@@ -1,5 +1,7 @@
+import { onChatViewInvalidation } from './ChatViewInvalidation';
+import { ChatRows } from './ChatRows';
 import { read, type API, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { createChatRolePreviewPopup } from '../ported/ChatRolePreviewPopup';
 
 interface RoleMessages {
@@ -37,7 +39,7 @@ export function installNativeChatRolePreview(
     hoverRole = null;
   };
   const visible = (view: Raw): boolean => {
-    if (game.isLeaving || !log.contains(view)) return false;
+    if (read(game, 'isLeaving', false) || !log.contains(view)) return false;
     for (let node: Raw | null = view; node; node = read(node, 'parent')) {
       if (!read(node, 'visible') || read(node, 'alpha') <= 0) return false;
     }
@@ -80,11 +82,12 @@ export function installNativeChatRolePreview(
     hoverRole = role;
     scrollPosition = read(scroll, 'verticalScrollPosition');
   };
+  for (const { view } of cards) api.defer(onChatViewInvalidation(view, close));
   stage.addEventListener('touch', hover);
   for (const { view } of cards) view.addEventListener('removedFromStage', close);
   api.after(log, 'updateTexts', close);
-  api.on('frame', ({ game: currentGame }) => {
-    if (currentGame !== game || !shown) return;
+  const checkHover = () => {
+    if (!shown) return;
     const isSimple = shown.view === simple;
     if (
       !visible(shown.view) ||
@@ -102,11 +105,18 @@ export function installNativeChatRolePreview(
       while (hit && hit !== scroll) hit = read(hit, 'parent');
       if (!hit) close();
     }
-  });
+  };
+  for (const { view } of cards) view.addEventListener('enterFrame', checkHover);
+  api.defer(
+    ChatRows.install(api, advanced, () => log.getQueue()).onRelease(() => {
+      if (shown?.view === advanced) close();
+    }),
+  );
   api.defer(() => {
     stage.removeEventListener('touch', hover);
     for (const { view, popup } of cards) {
       view.removeEventListener('removedFromStage', close);
+      view.removeEventListener('enterFrame', checkHover);
       popup.removeFromParent(true);
     }
     shown = undefined;

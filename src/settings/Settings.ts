@@ -17,26 +17,35 @@ export const defaults = {
   disable_native_boss_bar: true,
 };
 export type Settings = typeof defaults;
+type BooleanSetting = {
+  [Key in keyof Settings]: Settings[Key] extends boolean ? Key : never;
+}[keyof Settings];
+function isBooleanSetting(key: keyof Settings): key is BooleanSetting {
+  return typeof defaults[key] === 'boolean';
+}
+
 export function settings(value: unknown): Settings {
   const result = { ...defaults };
   if (!value || typeof value !== 'object') return result;
+  const v = value as Record<string, unknown>;
   for (const key of Object.keys(defaults) as (keyof Settings)[]) {
-    const v = (value as Record<string, unknown>)[key];
-    if (typeof defaults[key] === 'boolean' && typeof v === 'boolean') (result as any)[key] = v;
+    const entry = v[key];
+    if (isBooleanSetting(key) && typeof entry === 'boolean') result[key] = entry;
   }
-  const v = value as Partial<Settings>;
-  if (Number.isFinite(v.target_search_distance))
-    result.target_search_distance = Math.max(100, Math.min(5000, v.target_search_distance!));
-  if (Number.isFinite(v.nearby_enemy_radar_lines))
+  if (typeof v.target_search_distance === 'number' && Number.isFinite(v.target_search_distance))
+    result.target_search_distance = Math.max(100, Math.min(5000, v.target_search_distance));
+  if (typeof v.nearby_enemy_radar_lines === 'number' && Number.isFinite(v.nearby_enemy_radar_lines))
     result.nearby_enemy_radar_lines = Math.round(
-      Math.max(0, Math.min(10, v.nearby_enemy_radar_lines!)),
+      Math.max(0, Math.min(10, v.nearby_enemy_radar_lines)),
     );
   for (const [key, min, max] of [
     ['multibar_dividend', 1000, 100000],
     ['target_info_x', 0, 1],
     ['target_info_y', 0, 1],
   ] as const) {
-    if (Number.isFinite(v[key])) result[key] = Math.max(min, Math.min(max, v[key]!));
+    const entry = v[key];
+    if (typeof entry === 'number' && Number.isFinite(entry))
+      result[key] = Math.max(min, Math.min(max, entry));
   }
   return result;
 }

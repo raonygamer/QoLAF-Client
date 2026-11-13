@@ -1,3 +1,5 @@
+import { clientEchoText } from '../src/chat/ClientEcho';
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatProfanityFilter } from '../src/chat/ChatProfanityFilter';
@@ -56,11 +58,19 @@ function fixture(t: { after(fn: () => void): void }) {
   const hooks = new Hooks();
   const cleanups: Function[] = [];
   const rows: any[] = [];
+  const sent: { type: string; values: unknown[] }[] = [];
   let pings = 0;
-  const me = { id: 'self', get_name: () => 'Pilot', get_team: () => 1 };
+  const me = {
+    id: 'self',
+    get_name: () => 'Pilot',
+    get_team: () => 1,
+    get_level: () => 1,
+    getActiveFleetObj: () => null,
+  };
   const players: Record<string, any> = {};
   const errors: any[] = [];
   const game: any = {
+    sendToServiceRoom: (type: string, values: unknown[]) => sent.push({ type, values }),
     get_me: () => me,
     client: {
       connectUserId: 'self',
@@ -68,7 +78,10 @@ function fixture(t: { after(fn: () => void): void }) {
     },
     solarSystem: { type: 'normal' },
     time: 100,
-    playerManager: { get_playersById: () => ({ h: players }) },
+    playerManager: {
+      get_playersById: () => ({ h: players }),
+      get_players: () => Object.values(players),
+    },
     messageLog: { updateTexts: (row: any) => rows.push(row) },
   };
   const dictionary = { bad: true, 'a+b': true };
@@ -93,14 +106,18 @@ function fixture(t: { after(fn: () => void): void }) {
     }
   }
   log.writeChatMsg = nativeChatWriter(log, Regex);
+  class Game {}
+  Object.setPrototypeOf(game, Game.prototype);
   const api: any = {
-    cls: (name: string) => (name.endsWith('.MessageLog') ? log : {}),
+    cls: (name: string) =>
+      name === 'core.scene.Game' ? Game : name.endsWith('.MessageLog') ? log : {},
     around: (target: any, key: string, hook: Function) =>
       cleanups.push(hooks.add(target, key, 'around', hook)),
   };
+  bindGameClasses(api);
   installNativeChatPresentation(api, game, () => pings++);
   t.after(() => cleanups.reverse().forEach((fn) => fn()));
-  return { log, rows, game, dictionary, players, errors, pings: () => pings };
+  return { log, rows, sent, game, dictionary, players, errors, pings: () => pings };
 }
 
 test('native writer retains checks and metadata while source relay expansion may exceed the wire limit', (t) => {
@@ -124,7 +141,7 @@ test('native writer retains checks and metadata while source relay expansion may
   assert.equal(f.errors.length, 1);
   assert.equal(f.log.profanities, f.dictionary);
   f.game.solarSystem.type = 'pvp dom';
-  f.players[Relay.playerId] = { get_team: () => 2 };
+  f.players[Relay.playerId] = { get_team: () => 2, get_name: () => 'Bot' };
   f.log.writeChatMsg('local', 'A: @Pilot', Relay.playerId, 'Bot');
   assert.equal(f.rows.length, 3);
   assert.equal(f.pings(), 2);
@@ -142,7 +159,7 @@ test('native badges derive from IDs, retain staff rights, and cannot be granted 
   f.log.writeChatMsg('local', 'hello', 'simple1744094288719', 'Peer', '', true);
   assert.match(
     f.rows[3].text,
-    /\[grinder\]<\/FONT> <font color='#ffff66'>&#9733;<\/font>Peer: hello/,
+    /\[grinder\]<\/FONT> <font color='#ffff66'>&#11088;<\/font> Peer: hello/,
   );
   f.log.writeChatMsg('global', 'D(Name): hello', 'other', 'Bot');
   assert.equal(f.rows[4].text, '[global] Bot: D(Name): hello');
@@ -172,4 +189,44 @@ test('native filter bypass and receive context restore across nested delivery an
   assert.equal(f.log.profanities, f.dictionary);
   assert.equal(f.log.colorRights('', 'ordinary'), 'ordinary');
   assert.equal(f.log.colorCoding('[global]'), '[global]');
+});
+
+test('exact echo requests retain source channel routing and precede team filtering', (t) => {
+  const f = fixture(t);
+  for (const channel of ['global', 'private']) {
+    f.log.writeChatMsg(channel, 'echo.', 'other', 'Other');
+    assert.deepEqual(f.sent.at(-1), {
+      type: 'chatMsg',
+      values: ['private', 'Other', clientEchoText()],
+    });
+  }
+  for (const channel of ['local', 'team', 'group']) {
+    f.log.writeChatMsg(channel, 'echo.', 'other', 'Other');
+    assert.deepEqual(f.sent.at(-1), { type: 'chatMsg', values: ['local', clientEchoText()] });
+  }
+  const count = f.sent.length;
+  f.log.writeChatMsg('global', 'echo.', 'self', 'Pilot');
+  for (const text of ['Echo.', 'echo', ' echo.', 'echo. ', 'echo.' + 'x'.repeat(251)])
+    f.log.writeChatMsg('global', text, 'other', 'Other');
+  assert.equal(f.sent.length, count);
+  f.game.solarSystem.type = 'pvp dom';
+  f.players.enemy = { get_team: () => 2, get_name: () => 'Enemy' };
+  const rows = f.rows.length;
+  f.log.writeChatMsg('local', 'echo.', 'enemy', 'Enemy');
+  assert.equal(f.sent.length, count + 1);
+  assert.equal(f.rows.length, rows, 'native opposing-team message remains filtered');
+});
+
+test('native death and system rows may omit sender fields without producing player replies', (t) => {
+  const f = fixture(t);
+  f.log.writeChatMsg('death', "<FONT COLOR='#ff4444'>Pilot has died.</FONT>");
+  assert.equal(f.rows.length, 1);
+  assert.match(f.rows[0].text, /Pilot has died/);
+  assert.doesNotMatch(f.rows[0].text, /undefined|null/);
+  f.log.writeChatMsg('global', 'echo.');
+  f.log.writeChatMsg('private', 'echo.', null, null);
+  assert.deepEqual(f.sent, []);
+  assert.deepEqual(f.errors, []);
+  assert.equal(f.pings(), 0);
+  assert.equal(f.log.profanities, f.dictionary);
 });

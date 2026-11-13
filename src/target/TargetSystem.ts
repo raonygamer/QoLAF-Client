@@ -1,10 +1,18 @@
+import type { RenderedGameObject } from '../game/RenderedGameObject';
+import {
+  NativeEventDispatcher,
+  PlayerShip,
+  type GameScene,
+  type NativeEvent,
+  type Unit,
+} from '../game/Bindings';
+import { createTargetUpdatedEvent } from './TargetUpdatedEvent';
 import { samePlayerGroup } from './PlayerGroup';
-import { read, type Raw } from '../api/Types';
 import type { Settings } from '../settings/Settings';
 export class TargetSystem {
-  private lifecycles = new WeakMap<Raw, number>();
-  current: Raw | null = null;
-  previous: Raw | null = null;
+  private lifecycles = new WeakMap<Unit, { native: number | undefined; revision: number }>();
+  current: Unit | null = null;
+  previous: Unit | null = null;
   private lockedTarget = false;
   get locked(): boolean {
     return this.lockedTarget;
@@ -13,56 +21,125 @@ export class TargetSystem {
     this.lockedTarget = value && this.valid(this.current);
   }
   private timeout = 0;
-  /** Haxe units are pooled but do not expose the source client's lifecycleId. */
-  lifecycle(unit: Raw): number {
-    return this.lifecycles.get(unit) ?? 0;
+  private events: NativeEventDispatcher | null = null;
+
+  get unit(): Unit | null {
+    return this.current;
   }
-  remove(unit: Raw): void {
-    this.lifecycles.set(unit, this.lifecycle(unit) + 1);
+  set unit(value: Unit | null) {
+    this.select(value);
+  }
+  get oldUnit(): Unit | null {
+    return this.previous;
+  }
+
+  /** Original target_updated_event surface, backed by the game's event dispatcher. */
+  initializeEvents(): void {
+    this.events = new NativeEventDispatcher(this);
+  }
+
+  addEventListener<E extends NativeEvent>(
+    type: string,
+    listener: (event: E) => void,
+    capture = false,
+    priority = 0,
+    weak = false,
+  ): void {
+    this.events?.addEventListener(type, listener, capture, priority, weak);
+  }
+
+  removeEventListener<E extends NativeEvent>(
+    type: string,
+    listener: (event: E) => void,
+    capture = false,
+  ): void {
+    this.events?.removeEventListener(type, listener, capture);
+  }
+
+  hasEventListener(type: string): boolean {
+    return this.events?.hasEventListener(type) ?? false;
+  }
+
+  willTrigger(type: string): boolean {
+    return this.events?.willTrigger(type) ?? false;
+  }
+
+  dispatchEvent(event: NativeEvent): boolean {
+    return this.events?.dispatchEvent(event) ?? true;
+  }
+
+  private notifyChanged(): void {
+    if (!this.events) return;
+    this.events.dispatchEvent(createTargetUpdatedEvent(this));
+  }
+
+  disposeEvents(): void {
+    // Release the dispatcher and its listener graph with the game session.
+    this.events = null;
+  }
+  /** Invalidate snapshots on both native pool resets and manager removal. */
+  lifecycle(unit: Unit & RenderedGameObject): number {
+    const native = unit.get_lifecycleId?.();
+    let state = this.lifecycles.get(unit);
+    if (!state) {
+      state = { native, revision: 0 };
+      this.lifecycles.set(unit, state);
+    } else if (state.native !== native) {
+      state.native = native;
+      state.revision++;
+    }
+    return state.revision;
+  }
+  remove(unit: Unit): void {
+    // Removal invalidates immediately, even when native reset happens later.
+    this.lifecycle(unit);
+    this.lifecycles.get(unit)!.revision++;
     if (this.current === unit) this.clear(true);
   }
   constructor(
-    private game: Raw,
+    private game: Pick<GameScene, 'get_me'>,
     private config: Settings,
-    private PlayerShip?: any,
   ) {}
   private me() {
-    return read(this.game, 'me');
+    return this.game.get_me();
   }
-  private player(unit: Raw) {
-    return this.PlayerShip ? unit instanceof this.PlayerShip : !!unit.player;
+  private player(unit: Unit): unit is PlayerShip {
+    return unit instanceof PlayerShip;
   }
-  valid(unit: Raw | null): unit is Raw {
+  valid(unit: Unit | null): unit is Unit {
     const ship = this.me()?.ship;
     return !!(
       ship &&
       unit?.alive &&
       unit !== ship &&
-      (!this.player(unit) || (unit.player && !unit.player.isMe && !read(unit, 'landed')))
+      (!this.player(unit) || (unit.player && !unit.player.isMe && !unit.get_landed()))
     );
   }
-  distance(unit: Raw) {
-    const a = read(this.me()?.ship, 'pos'),
-      b = read(unit, 'pos');
+  distance(unit: Unit) {
+    const a = this.me()?.ship?.get_pos(),
+      b = unit.get_pos();
     return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : Infinity;
   }
-  excluded(unit: Raw) {
-    return (
-      !this.player(unit) && this.config.exclude_af_faction_from_radar && unit.hasFaction?.('AF')
-    );
+  excluded(unit: Unit) {
+    return !this.player(unit) && this.config.exclude_af_faction_from_radar && unit.hasFaction('AF');
   }
-  private priority(unit: Raw | null) {
+  private priority(unit: Unit | null) {
     if (!unit || !this.player(unit)) return 0;
     return samePlayerGroup(this.me(), unit.player) ? -1 : 1;
   }
   clear(force = false) {
     if (this.locked && !force) return;
+    if (!this.current && !this.previous) {
+      this.locked = false;
+      return;
+    }
     this.previous = this.current;
     this.current = null;
     this.locked = false;
     this.timeout = 0;
+    this.notifyChanged();
   }
-  select(unit: Raw | null, force = false): boolean {
+  select(unit: Unit | null, force = false): boolean {
     if (!unit) {
       this.clear(force);
       return true;
@@ -75,6 +152,7 @@ export class TargetSystem {
     this.current = unit;
     this.locked = false;
     this.timeout = 0.5;
+    this.notifyChanged();
     return true;
   }
   update(dt: number) {
@@ -86,8 +164,9 @@ export class TargetSystem {
     )
       this.clear(true);
   }
-  auto(unit: Raw) {
+  auto(unit: Unit | null) {
     if (
+      !unit ||
       !this.config.auto_target ||
       this.locked ||
       unit === this.current ||

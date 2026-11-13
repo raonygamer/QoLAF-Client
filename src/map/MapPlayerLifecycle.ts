@@ -1,23 +1,25 @@
-import { read, type API } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import { MapPlayer, TweenMax } from '../game/Bindings';
 
 /** Source MapPlayer visibility and tween cleanup around the native marker drawing. */
 export function installMapPlayerLifecycle(api: API): void {
-  const prototype = api.cls('core.hud.components.map.MapPlayer')?.prototype;
-  if (!prototype?.update) return;
-  api.around(prototype, 'update', function (next, ...args) {
+  const reflection = new GameReflection(api);
+  const prototype = MapPlayer.prototype;
+  reflection.around(prototype, 'update', function (next) {
     const ship = this.player?.ship;
-    if (!ship || !ship.alive || read(ship, 'landed') || ship.hp <= 0) {
+    if (!ship || !ship.alive || ship.get_landed() || ship.hp <= 0) {
       this.layer.set_visible(false);
       this.text.set_visible(false);
       this.supporterImage?.set_visible(false);
       return;
     }
-    const reappearing = !read(this.layer, 'visible');
-    const result = next(...args);
+    const reappearing = !this.layer.get_visible();
+    const result = next();
     if (reappearing) this.supporterImage?.set_visible(true);
     return result;
   });
-  api.before(prototype, 'dispose', function () {
-    if (this.layer) api.cls('com.greensock.TweenMax')?.killTweensOf(this.layer);
+  reflection.before(prototype, 'dispose', function () {
+    if (this.layer) TweenMax.killTweensOf(this.layer);
   });
 }

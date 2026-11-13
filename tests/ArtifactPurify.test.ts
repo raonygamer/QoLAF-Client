@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ArtifactFavorites } from '../src/artifacts/ArtifactFavorites';
@@ -11,6 +12,7 @@ function fixture() {
     level: 80,
     revealed: false,
     stats: [],
+    get_isUnique: () => false,
     ...extra,
   });
   const artifacts = [
@@ -33,7 +35,13 @@ function fixture() {
   let hideLimit = 0;
   const game = {
     artifactRecyclePending: false,
-    myCargo: { isFull: false, addItem: (...args: any[]) => items.push(args) },
+    myCargo: {
+      isFull: false,
+      get_isFull() {
+        return this.isFull;
+      },
+      addItem: (...args: any[]) => items.push(args),
+    },
     hud: { hideArtifactLimitText: () => hideLimit++ },
     showErrorDialog: (message: string) => errors.push(message),
     createMessage: (type: string) => ({
@@ -83,7 +91,7 @@ const response = (values: any[]) => ({
   getBoolean: (i: number) => values[i],
   getString: (i: number) => values[i],
   getInt: (i: number) => values[i],
-  get_length: () => values.length,
+  length: values.length,
 });
 
 test('purify keeps cargo order, caps at 40, and excludes revealed, unique, favorites and generator', () => {
@@ -185,6 +193,12 @@ test('native Purify controls match source positions, use saved filters and persi
     set_text(v: string) {
       this.text = v;
     }
+    get_width() {
+      return this.width;
+    }
+    get_height() {
+      return this.height;
+    }
     get_text() {
       return this.text;
     }
@@ -254,6 +268,7 @@ test('native Purify controls match source positions, use saved filters and persi
     after: (target: any, key: string, fn: Function) => hooks.add(target, key, 'after', fn),
     before: (target: any, key: string, fn: Function) => hooks.add(target, key, 'before', fn),
   };
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? {} });
   installArtifactPurify(api, f.favorites);
   const view = new Overview();
   view.drawComponents();

@@ -1,3 +1,7 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
+import { RussoBitmapFontRegistry } from '../src/ui/RussoBitmapFontRegistry';
+import { VerdanaBitmapFontRegistry } from '../src/ui/VerdanaBitmapFontRegistry';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { layoutArtifactRecycle } from '../src/artifacts/ArtifactRecycleLayout';
@@ -34,6 +38,15 @@ class Label {
   }
   set_text(value: string) {
     this.text = value;
+  }
+  get_x() {
+    return this.x;
+  }
+  get_y() {
+    return this.y;
+  }
+  get_width() {
+    return this.width;
   }
   get_height() {
     // Measure text after format, width and wrapping have been applied, as the
@@ -83,10 +96,11 @@ for (const supporter of [false, true]) {
         'A long localized description of the automatic artifact recycling threshold.'.repeat(3);
       view.autoRecycleButton.width = 81;
       view.buySupporter.height = 24;
-      layoutArtifactRecycle(view, (name: string) => classes[name]);
+      bindGameClasses({ cls: (name: string) => classes[name] ?? {} } as unknown as API);
+      layoutArtifactRecycle(view);
       assert.equal(view.recycleTextInfo.width, expanded ? 590 : 200);
-      assert.equal(view.recycleTextInfo.format.font, 'Verdana13');
-      assert.equal(view.recycleText.format.font, 'Russo13');
+      assert.equal(view.recycleTextInfo.format.font, VerdanaBitmapFontRegistry.fontNameForSize(13));
+      assert.equal(view.recycleText.format.font, RussoBitmapFontRegistry.fontNameForSize(13));
       assert.equal(view.recycleTextInfo.format.color, 0xffffff);
       assert.equal(view.recycleTextInfo.wrap, true);
       assert.match(

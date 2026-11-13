@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { circleInCameraView, updateCameraView } from '../src/rendering/CameraView';
@@ -88,6 +89,9 @@ test('body culling includes sprite and zone extent without altering course', () 
     g: { camera, get_me: () => ({ ship: {} }) },
     type: 'sun',
     pos: { x: 3500, y: 400 },
+    get_pos() {
+      return this.pos;
+    },
     _mc: { get_width: () => 1600, get_height: () => 1600 },
     safeZoneRadius: 0,
     hostileZoneRadius: 0,
@@ -108,6 +112,16 @@ test('body culling includes sprite and zone extent without altering course', () 
   body.safeZoneRadius = 1000;
   updateBodyVisibility(body);
   assert.equal(body.isAddedToCanvas, true, 'safe-zone rings count toward visual extent');
+  body.type = 'planet';
+  body.pos.x = 400;
+  for (const missing of [undefined, NaN]) {
+    body.safeZoneRadius = missing;
+    body.hostileZoneRadius = missing;
+    body.isAddedToCanvas = false;
+    updateBodyVisibility(body);
+    assert.equal(body.isAddedToCanvas, true, 'absent optional radii must not hide nearby planets');
+    assert.equal(Number.isFinite(body.nextDistanceCalculation), true);
+  }
   body.type = 'hidden';
   body.pos.x = 1e8;
   updateBodyVisibility(body);
@@ -120,12 +134,16 @@ test('body ticks invalidate distance cache after zoom or resize even after inter
   class Body {
     g = { camera, get_me: () => ({ ship: {} }) };
     pos = { x: 10000, y: 10000 };
+    get_pos() {
+      return this.pos;
+    }
     type = 'planet';
     safeZoneRadius = 0;
     hostileZoneRadius = 0;
     nextDistanceCalculation = 9999;
     lastViewSizeRevision = 1;
     updateIsNear() {}
+    removeFromCanvas() {}
     updateBody() {
       if (this.nextDistanceCalculation <= 0) this.updateIsNear();
       else this.nextDistanceCalculation -= 33;
@@ -133,6 +151,7 @@ test('body ticks invalidate distance cache after zoom or resize even after inter
   }
   const hooks = new Hooks();
   const cleanup: Function[] = [];
+  bindGameClasses({ cls: () => Body } as any);
   installBodyVisibility({
     cls: () => Body,
     around: (object: any, key: string, fn: Function) =>

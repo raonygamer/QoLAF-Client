@@ -1,3 +1,4 @@
+import type { Message } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createPlayerInspectViewModel } from '../src/inspect/PlayerInspectViewModel';
@@ -96,17 +97,17 @@ test('remote empty defaults do not erase saved equipment or artifact slots', () 
 test('inspect nominal DPS validates snapshot stats and preserves the source burst formula', () => {
   const { View } = models();
   const weapon = { dmg: { dmg: () => 100 }, reloadTime: 500, burst: 3, multiNrOfP: 2 };
-  assert.equal(View.weaponDps(weapon), 600000 / 566);
-  assert.equal(View.weaponDps({ ...weapon, burst: 1.5 }), null);
-  assert.equal(View.weaponDps({ ...weapon, reloadTime: 0 }), null);
-  assert.equal(View.weaponDps({ ...weapon, dmg: null }), null);
+  assert.equal(View.weaponDPS(weapon), 600000 / 566);
+  assert.equal(View.weaponDPS({ ...weapon, burst: 1.5 }), null);
+  assert.equal(View.weaponDPS({ ...weapon, reloadTime: 0 }), null);
+  assert.equal(View.weaponDPS({ ...weapon, dmg: null }), null);
   const record = saved();
   record.fleet.skin.weaponsHotkeys = [1.5];
   assert.equal(View.weapons(record)[0].hotkey, null);
 });
 
 const message = (amount: number) => ({
-  get_length: () => 4,
+  length: 4,
   getString: () => '',
   getInt: () => amount,
 });
@@ -208,7 +209,8 @@ test('room fleet snapshots tolerate empty slots and resolve live weapon DPS', ()
 
 test('native cargo RPC preserves the Haxe argument array and serializes native and inspector reads', () => {
   const sent: any[][] = [];
-  const game: any = { rpc: (...args: any[]) => sent.push(args) };
+  let leaving = false;
+  const game: any = { get_isLeaving: () => leaving, rpc: (...args: any[]) => sent.push(args) };
   const cleanup: Function[] = [];
   const api: any = {
     game,
@@ -224,11 +226,51 @@ test('native cargo RPC preserves the Haxe argument array and serializes native a
   queue.enqueue(['inspected-player', 'Commodities'], () => received.push('inspector'));
   assert.equal(sent.length, 1);
   assert.deepEqual(sent[0][2], ['native-player', 'Commodities']);
-  sent[0][1]({ get_length: () => 0 });
+  sent[0][1]({ length: 0 });
   assert.deepEqual(sent[1][2], ['inspected-player', 'Commodities']);
-  sent[1][1]({ get_length: () => 0 });
+  sent[1][1]({ length: 0 });
   assert.deepEqual(received, ['native', 'inspector']);
   game.rpc('unrelated', () => {}, ['unchanged']);
   assert.deepEqual(sent[2].slice(2), [['unchanged']]);
+  queue.enqueue(['late-player'], () => received.push('stale'));
+  leaving = true;
+  sent[3][1]({ length: 0 });
+  assert.deepEqual(
+    received,
+    ['native', 'inspector'],
+    'native leaving getter rejects late responses',
+  );
   cleanup.forEach((fn) => fn());
+});
+
+test('cargo consumer can dispose during a reply without sending queued work or retaining room closures', () => {
+  let receive: ((value: Message) => void) | null = null;
+  let sends = 0;
+  const sender = (callback: (value: Message) => void) => {
+    receive = callback;
+    sends++;
+  };
+  const current = () => true;
+  const queue = new CargoReadQueue(sender, current);
+  queue.enqueue(['first'], () => queue.dispose());
+  queue.enqueue(['second'], () => {
+    throw Error('Disposed consumer ran');
+  });
+  assert.ok(receive);
+  (receive as (value: Message) => void)(message(1) as unknown as Message);
+  assert.equal(sends, 1);
+  assert.equal(Object.values(queue).includes(sender), false);
+  assert.equal(Object.values(queue).includes(current), false);
+  (receive as (value: Message) => void)(message(2) as unknown as Message);
+  queue.dispose();
+  let rejected = false;
+  queue.enqueue(
+    ['third'],
+    () => {},
+    () => {
+      rejected = true;
+    },
+  );
+  assert.equal(rejected, true);
+  assert.equal(sends, 1);
 });

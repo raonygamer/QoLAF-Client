@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installNativeRewardNotices } from '../src/chat/NativeRewardNotices';
@@ -104,15 +105,30 @@ function fixture(t: { after(fn: () => void): void }) {
     'core.hud.components.credits.CreditPackageItem': Package,
     'core.player.Player': Player,
     'core.artifact.ArtifactFactory': Factory,
+    'core.hud.components.credits.BuyFlux': class {
+      onBuyPaypal() {}
+      onBuySteam() {}
+    },
+    'core.hud.components.dialogs.PopupMessage': class {
+      close() {}
+      dispose() {}
+    },
+    'playerio.PayVault': class {
+      getBuyCoinsInfo() {}
+      usePaymentInfo() {}
+    },
   };
   const api: any = {
     game,
     cls: (name: string) => classes[name],
     defer: (fn: Function) => cleanups.push(fn),
+    before: (target: any, key: string, fn: Function) =>
+      cleanups.push(hooks.add(target, key, 'before', fn)),
     around: (target: any, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'around', fn)),
   };
-  installNativeRewardNotices(api, (owner) => (owner === game ? feed : null));
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? class {} });
+  installNativeRewardNotices(api, (owner) => (Object.is(owner, game) ? feed : null));
   const cleanup = () => {
     for (const fn of cleanups.splice(0).reverse()) fn();
   };

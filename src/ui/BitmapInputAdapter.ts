@@ -1,20 +1,37 @@
-import type { API, Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import { TextEntry, Sprite, Quad, NativeTextFormat } from '../game/Bindings';
+import type { BitmapFontTextFormat } from './BitmapFontTextFormat';
+import type { API } from '../api/Types';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { bindNativeBitmapInput, type NativeBitmapInput } from '../chat/rich/NativeBitmapInput';
 
+interface EditorProperties {
+  textFormat?: Pick<BitmapFontTextFormat, 'size' | 'color'>;
+}
+
+export interface NativeFocusBridge {
+  addEventListener(
+    name: 'keyDown',
+    listener: (event: KeyboardEvent) => void,
+    capture?: boolean,
+    priority?: number,
+    weak?: boolean,
+  ): void;
+  removeEventListener(name: 'keyDown', listener: (event: KeyboardEvent) => void): void;
+}
+
 /** Feathers chat-input contract, backed by the game's native input and bitmap editor. */
-export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
-  const Sprite = resolve('starling.display.Sprite');
-  const TextEntry = resolve('core.hud.components.ui.TextEntry');
-  const TextFormat = resolve('openfl.text.TextFormat');
-  const Quad = resolve('starling.display.Quad');
+export function createBitmapInputAdapter(api: API, resolve: Resolve) {
+  resolve('starling.display.Sprite');
+  resolve('core.hud.components.ui.TextEntry');
+  resolve('openfl.text.TextFormat');
+  resolve('starling.display.Quad');
   return class BitmapInputAdapter extends Sprite {
-    private readonly entry: Raw;
+    private readonly entry: TextEntry;
     private readonly editor: NativeBitmapInput;
-    private readonly background: Raw;
+    private readonly background: Quad;
     private removed = false;
-    readonly textEditorProperties: Raw;
-    readonly richEditor: Raw;
+    readonly textEditorProperties: EditorProperties;
+    readonly richEditor: { readonly nativeFocus: NativeFocusBridge };
     styleName = '';
     private idleColor = 0x191919;
     private focusColor = 0x292929;
@@ -24,7 +41,7 @@ export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
       super();
       this.entry = new TextEntry('plain');
       this.entry.set_maxChars(150);
-      this.entry.set_textFormat(new TextFormat('Verdana', 14, 0xffffff));
+      this.entry.set_textFormat(new NativeTextFormat('Verdana', 14, 0xffffff));
       this.entry.paddingLeft = this.entry.paddingRight = 8;
       this.entry.paddingTop = this.entry.paddingBottom = 3;
       this.entry.applyPadding();
@@ -35,18 +52,18 @@ export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
       this.editor = bindNativeBitmapInput(api, this.entry, resolve);
       this.textEditorProperties = {};
       Object.defineProperty(this.textEditorProperties, 'textFormat', {
-        set: (format: Raw) =>
-          this.entry.set_textFormat(new TextFormat('Verdana', format.size, format.color)),
+        set: (format: NonNullable<EditorProperties['textFormat']>) =>
+          this.entry.set_textFormat(new NativeTextFormat('Verdana', format.size, format.color)),
       });
-      const element: HTMLInputElement = this.entry.element;
-      // The popup uses Flash's native focus dispatcher solely for keyboard events.
-      const keyName = (name: string) => (name === 'keyDown' ? 'keydown' : name);
+      const element = this.entry.element;
+      if (!element) throw new Error('TextEntry did not initialize its browser input');
+      // Preserve the source popup's event name while delivering browser keyboard events.
       this.richEditor = {
         nativeFocus: {
-          addEventListener: (name: string, fn: EventListener) =>
-            element.addEventListener(keyName(name), fn, true),
-          removeEventListener: (name: string, fn: EventListener) =>
-            element.removeEventListener(keyName(name), fn, true),
+          addEventListener: (_name: 'keyDown', fn: (event: KeyboardEvent) => void) =>
+            element.addEventListener('keydown', fn, true),
+          removeEventListener: (_name: 'keyDown', fn: (event: KeyboardEvent) => void) =>
+            element.removeEventListener('keydown', fn, true),
         },
       };
       this.entry.addEventListener('change', this.onChange);
@@ -76,7 +93,7 @@ export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
     }
     set isEnabled(value: boolean) {
       this.entry.set_isEnabled(value);
-      this.touchable = value;
+      this.set_touchable(value);
       if (!value) this.clearFocus();
     }
 
@@ -106,7 +123,7 @@ export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
       this.entry.set_restrict(value);
     }
     get hasFocus(): boolean {
-      return this.entry.element.ownerDocument.activeElement === this.entry.element;
+      return this.entry.element?.ownerDocument.activeElement === this.entry.element;
     }
     get_width(): number {
       return this.entry.get_width();
@@ -136,7 +153,10 @@ export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
     set paddingBottom(value: number) {
       this.setPadding('paddingBottom', value);
     }
-    private setPadding(key: string, value: number): void {
+    private setPadding(
+      key: 'paddingLeft' | 'paddingRight' | 'paddingTop' | 'paddingBottom',
+      value: number,
+    ): void {
       this.entry[key] = value;
       this.entry.applyPadding();
       this.editor.layout();
@@ -145,7 +165,7 @@ export function createBitmapInputAdapter(api: API, resolve: Resolve): any {
       this.entry.setFocus();
     }
     clearFocus(): void {
-      this.entry.element.blur();
+      this.entry.element?.blur();
     }
     selectRange(begin: number, end: number): void {
       this.entry.selectRange(begin, end);

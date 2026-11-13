@@ -1,10 +1,10 @@
-import type { Raw } from '../api/Types';
+import type { Mesh } from '../game/Bindings';
 import { NativeUI } from '../ui/NativeUI';
 import { BossSpawnLocation, spawnIntersects, type SpawnViewport } from './BossSpawnLocation';
 
 /** Original cached five-band heat, independent of enemy population/probability. */
 export class MinibossSpawnHeat {
-  readonly node: Raw;
+  readonly node: Mesh;
   private outerRadius = 0;
   private extentRatio = 1;
   private geometryValid = false;

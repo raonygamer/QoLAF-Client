@@ -1,3 +1,5 @@
+import { installNativeChatValidation } from '../src/chat/NativeChatValidation';
+import { bindGameClasses, type GameScene } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatArtifactChannelPolicy as Policy } from '../src/chat/ChatArtifactChannelPolicy';
@@ -19,6 +21,8 @@ function fixture() {
   const history = new ChatHistory();
   const chat: Raw = {
     chatMode: 'local',
+    active: true,
+    rejectSubmission: false,
     input: {
       text: '',
       get_text() {
@@ -28,13 +32,17 @@ function fixture() {
         this.text = value;
       },
       selectRange() {},
+      setFocus() {},
       addEventListener() {},
       removeEventListener() {},
     },
     isActive() {
-      return true;
+      return this.active;
     },
-    toggleChatMode() {},
+    toggleChatMode() {
+      this.active = !this.active;
+      if (!this.active) this.sendMessage();
+    },
     previous() {},
     next() {},
     // The inspected Haxe parser: slash commands override the selected tab.
@@ -49,6 +57,7 @@ function fixture() {
       return [this.chatMode, text];
     },
     sendMessage() {
+      if (this.rejectSubmission) return false;
       sent.push(['composer', this.input.get_text()]);
       this.input.set_text('');
     },
@@ -72,8 +81,10 @@ function fixture() {
       cleanups.push(hooks.add(target, name, 'after', fn)),
     defer: (fn: () => void) => cleanups.push(fn),
   };
-  installNativeChatArtifactPolicy(api as any, { chatInput: chat });
-  installNativeChatHistory(api as any, { chatInput: chat }, history);
+  bindGameClasses(api as any);
+  installNativeChatValidation(api as any, { chatInput: chat } as unknown as GameScene);
+  installNativeChatArtifactPolicy(api as any, { chatInput: chat } as unknown as GameScene);
+  installNativeChatHistory(api as any, { chatInput: chat } as unknown as GameScene, history);
   return { chat, sent, errors, history, cleanup: () => cleanups.reverse().forEach((fn) => fn()) };
 }
 
@@ -165,4 +176,67 @@ test('malformed prose remains sendable, later valid tokens are blocked, and clea
   cleanup();
   chat.sendGlobal(token);
   assert.equal(sent.length, 5);
+});
+
+test('malformed markup keeps the main composer open and never enters sent history', () => {
+  const { chat, sent, errors, history, cleanup } = fixture();
+  try {
+    chat.input.set_text('<b>unfinished');
+    chat.toggleChatMode();
+    assert.equal(chat.isActive(), true);
+    assert.equal(chat.input.get_text(), '<b>unfinished');
+    assert.equal(sent.length, 0);
+    assert.equal(history.length, 0);
+    assert.deepEqual(errors, ['Message not sent: Unclosed b formatting.']);
+    chat.sendMessage();
+    assert.equal(sent.length, 0, 'direct submissions use the same guard');
+    assert.equal(history.length, 0);
+    chat.input.set_text('<b>finished</b>');
+    chat.toggleChatMode();
+    assert.equal(chat.isActive(), false);
+    assert.deepEqual(sent, [['composer', '<b>finished</b>']]);
+    assert.equal(history.length, 1);
+  } finally {
+    cleanup();
+  }
+});
+
+test('artifact rejection during toggle preserves the composer and draft', () => {
+  const { chat, sent, errors, history, cleanup } = fixture();
+  try {
+    chat.chatMode = 'local';
+    chat.input.set_text(token);
+    chat.toggleChatMode();
+    assert.equal(chat.isActive(), true);
+    assert.equal(chat.input.get_text(), token);
+    assert.equal(sent.length, 0);
+    assert.equal(history.length, 0);
+    assert.deepEqual(errors, [Policy.restrictionMessage]);
+    chat.chatMode = 'clan';
+    chat.toggleChatMode();
+    assert.equal(chat.isActive(), false);
+    assert.equal(sent.length, 1);
+    assert.equal(history.length, 1);
+  } finally {
+    cleanup();
+  }
+});
+
+test('a rejected channel send keeps the composer open and a retry submits only once', () => {
+  const { chat, sent, history, cleanup } = fixture();
+  try {
+    chat.input.set_text('retained message');
+    chat.rejectSubmission = true;
+    chat.toggleChatMode();
+    assert.equal(chat.isActive(), true);
+    assert.equal(chat.input.get_text(), 'retained message');
+    assert.equal(sent.length, 0);
+    chat.rejectSubmission = false;
+    chat.toggleChatMode();
+    assert.equal(chat.isActive(), false);
+    assert.deepEqual(sent, [['composer', 'retained message']]);
+    assert.equal(history.length, 1);
+  } finally {
+    cleanup();
+  }
 });

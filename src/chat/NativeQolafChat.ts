@@ -1,51 +1,69 @@
-import { read, type API, type Raw } from '../api/Types';
-import { ClientIpcService } from '../ipc/ClientIpcService';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import { MessageLog, MD5, DataLocator, PlayerManager, type GameScene } from '../game/Bindings';
+import { ClientIPCService } from '../ipc/ClientIPCService';
 import { ClientQolafChat, type QolafChatRow } from './ClientQolafChat';
 import { PodRewardNotice } from './PodRewardNotice';
 import { RareArtifactNotice } from './RareArtifactNotice';
 import { PurchaseNotice } from './PurchaseNotice';
+import type { ChatSubmission } from '../game/ChatSubmission';
 
 /** Called at authentication as well as scene attachment: warping must not drop the inbox. */
 export function ensureNativeQolafChat(api: API, id: string, name = '') {
-  return ClientQolafChat.ensure(ClientIpcService.instance, id, name, {
+  return ClientQolafChat.ensure(ClientIPCService.instance, id, name, {
     now: () => performance.now(),
     interval: (callback, ms) => {
       const timer = setInterval(callback, ms);
       return () => clearInterval(timer);
     },
-    hash: (text) => api.cls('com.adobe.crypto.MD5')!.hash(text),
-    skinName: (key) =>
-      api.cls('data.DataLocator')?.getService().loadKey('Skins', key)?.name ?? null,
+    hash: (text) => MD5.hash(text),
+    skinName: (key) => {
+      const skin: unknown = DataLocator.getService().loadKey('Skins', key);
+      if (!skin || typeof skin !== 'object' || !('name' in skin)) return null;
+      return typeof skin.name === 'string' ? skin.name : null;
+    },
   });
 }
 
 /** Original QoLAF channel on the native composer and its existing rich-message pipeline. */
-export function installNativeQolafChat(api: API, game: Raw): void {
-  const chat = game.chatInput;
-  const log = api.cls('core.hud.components.chat.MessageLog');
-  if (!chat?.tabs || !log || !game.client?.connectUserId) return;
-  api.cls('af.ChatCommandRegistry')?.reserveBuiltInCommands(['qolaf']);
+export function installNativeQolafChat(api: API, game: GameScene): void {
+  const chat: ChatSubmission | null = game.chatInput;
+  const reflection = new GameReflection(api);
+  const log = MessageLog;
+  const messageLog = game.messageLog;
+  if (!chat?.tabs || !messageLog || !game.client?.connectUserId) return;
+  const registry: unknown = api.cls('af.ChatCommandRegistry');
+  if (registry && (typeof registry === 'object' || typeof registry === 'function')) {
+    const reserve: unknown = Reflect.get(registry, 'reserveBuiltInCommands');
+    if (typeof reserve === 'function') Reflect.apply(reserve, registry, [['qolaf']]);
+  }
   const ownerId = game.client.connectUserId;
   const entry = { label: 'QoLAF', chatMode: 'qolaf' };
   const previousTabs = chat.tabs.dataProvider.slice();
-  if (!previousTabs.some((tab: Raw) => tab.chatMode === 'qolaf'))
-    chat.tabs.set_dataProvider([...previousTabs, entry]);
+  if (!previousTabs.some((tab) => tab.chatMode === 'qolaf')) {
+    const tabs = previousTabs.slice();
+    // Native sendPrivate updates the final tab. Keep it last when enabling
+    // the plugin in a session that already has a private recipient.
+    const privateIndex = tabs.findIndex((tab) => tab.chatMode === 'privateSaved');
+    tabs.splice(privateIndex < 0 ? tabs.length : privateIndex, 0, entry);
+    chat.tabs.set_dataProvider(tabs);
+  }
   chat.updateTab();
   // Session history survives warps, but IPC rows belong to one authenticated account.
-  log.textQueue = log.textQueue.filter((row: Raw) => !row.qolafOwner || row.qolafOwner === ownerId);
+  log.textQueue = log.textQueue.filter((row) => !row.qolafOwner || row.qolafOwner === ownerId);
   let service: ClientQolafChat | null = null;
   let receiving: QolafChatRow | null = null;
   const current = () =>
     api.game === game &&
-    !game.isLeaving &&
+    !game.get_isLeaving() &&
     game.client?.connectUserId === ownerId &&
     log.g === game &&
     !!game.messageLog;
-  api.around(log, 'colorCoding', function (next, text: string) {
+  reflection.around(log, 'colorCoding', function (next, text: string) {
     return next(text).replaceAll('[qolaf]', "<font color='#82cfff'>[qolaf]</font>");
   });
-  api.around(game.messageLog, 'updateTexts', function (next, row, ...args) {
-    if (receiving) {
+  reflection.around(messageLog, 'updateTexts', function (next, row, ...args) {
+    if (receiving && row) {
       row.qolafOwner = ownerId;
       row.playerId = row.playerKey = receiving.senderId;
       row.playerName = receiving.senderName;
@@ -66,18 +84,16 @@ export function installNativeQolafChat(api: API, game: Raw): void {
               : PurchaseNotice.format(row.senderName, row.body);
         if (text) log.write(text, 'system');
       } else {
-        const players = read(game.playerManager, 'playersById');
+        const me = game.get_me();
         const sender =
-          row.senderId === game.me?.id
-            ? game.me
-            : (players?.h?.[row.senderId] ?? players?.[row.senderId]);
+          row.senderId === me?.id ? me : game.playerManager?.get_playersById().h[row.senderId];
         log.writeChatMsg(
           'qolaf',
           row.body,
           row.senderId,
           PodRewardNotice.escape(row.senderName),
           '',
-          !!read(sender, 'isSupporter', false),
+          sender?.hasSupporter() ?? false,
         );
       }
       return true;
@@ -87,7 +103,7 @@ export function installNativeQolafChat(api: API, game: Raw): void {
   };
   const attach = () => {
     if (!current()) return;
-    const next = ensureNativeQolafChat(api, ownerId, read(game.me, 'name', ''));
+    const next = ensureNativeQolafChat(api, ownerId, game.get_me()?.get_name() ?? '');
     if (service !== next) {
       service?.detachReceiver(receive);
       service = next;
@@ -97,33 +113,37 @@ export function installNativeQolafChat(api: API, game: Raw): void {
   attach();
   api.interval(attach, 250);
   const error = (message: string) => {
-    if (current()) log.write('[error] ' + PodRewardNotice.escape(message), 'error');
+    if (current()) log.write(message, 'error');
   };
-  api.around(chat, 'sendMessage', function (next, ...args) {
-    const text = read(chat.input, 'text', '');
+  reflection.around(chat, 'sendMessage', function (next, ...args) {
+    const text = chat.input.get_text();
     const command = chat.parseCommand(text);
     if (command[0] !== 'qolaf') return next(...args);
     chat.chatMode = 'qolaf';
     chat.updateTab();
     if (command.length < 2 || !command[1]) {
       chat.input.set_text('');
-      return;
+      return true;
     }
     attach();
-    if (!service || !ClientIpcService.instance?.connected) {
+    if (!current() || !service || !ClientIPCService.instance?.connected) {
       error('QoLAF chat is not connected yet. Your message was kept in the input.');
       return false;
     }
-    const PlayerManager = api.cls('core.player.PlayerManager');
     if (PlayerManager && PlayerManager.banMinutes > 0 && PlayerManager.isAllChannels) {
-      error('You are currently silenced in all channels.');
+      error('You are banned from chat for ' + PlayerManager.banMinutes + ' more minutes.');
       return false;
     }
-    if (game.messageLog.isMuted('qolaf')) {
-      error('QoLAF chat is muted. Unmute it before sending.');
+    if (messageLog.isMuted('qolaf')) {
+      error('You have muted QoLAF chat.');
       return false;
     }
-    if (!service.send(command[1], error)) return false;
+    if (
+      !service.send(command[1], (reason) =>
+        error('QoLAF message could not be sent: ' + PodRewardNotice.escape(reason)),
+      )
+    )
+      return false;
     chat.input.set_text('');
     chat.updateTab();
     return true;
@@ -131,8 +151,8 @@ export function installNativeQolafChat(api: API, game: Raw): void {
   api.defer(() => {
     service?.detachReceiver(receive);
     service = null;
-    if (!game.isLeaving) {
-      const tabs = chat.tabs.dataProvider.filter((tab: Raw) => tab !== entry);
+    if (!game.get_isLeaving()) {
+      const tabs = chat.tabs.dataProvider.filter((tab) => tab !== entry);
       chat.tabs.set_dataProvider(tabs);
       if (chat.chatMode === 'qolaf') chat.chatMode = 'local';
       chat.updateTab();

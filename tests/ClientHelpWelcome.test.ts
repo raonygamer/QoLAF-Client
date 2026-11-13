@@ -1,3 +1,5 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ClientHelpWelcomeState } from '../src/dialogs/ClientHelpWelcomeState';
@@ -46,7 +48,22 @@ test('storage failures do not repeat a dismissed welcome across room changes', (
 test('welcome waits for modals and reconnects, survives teardown, and opens help once', async () => {
   const { installNativeClientWelcome } = await import('../src/dialogs/NativeClientWelcome');
   class NativePopup {
-    textField = { width: 0 };
+    get_visible() {
+      return true;
+    }
+    get_alpha() {
+      return 1;
+    }
+    textField = {
+      width: 0,
+      set_width(value: number) {
+        this.width = value;
+      },
+    };
+    set_text() {}
+    get_parent() {
+      return this.parent;
+    }
     confirmButton = { callback: null };
     closeButton = { callback: null };
     parent: object | null = null;
@@ -77,6 +94,16 @@ test('welcome waits for modals and reconnects, survives teardown, and opens help
     const game: any = {
       sharedObj: storage,
       me: {},
+      get_me() {
+        return this.me;
+      },
+      get_isLeaving() {
+        return this.isLeaving === true;
+      },
+      get_isRecoveringGameConnection() {
+        return this.isRecoveringGameConnection === true;
+      },
+      overlay: { get_numChildren: () => 0 },
       blockHotkeys: true,
       addChildToOverlay(popup: NativePopup) {
         popup.parent = this;
@@ -99,6 +126,7 @@ test('welcome waits for modals and reconnects, survives teardown, and opens help
     };
     let opened = 0;
     let waitingForRelease = false;
+    bindGameClasses({ cls: () => NativePopup } as unknown as API);
     const dismiss = installNativeClientWelcome(
       api,
       game,

@@ -1,6 +1,10 @@
+import type { ArtifactLabelResolver } from './ArtifactLabelResolver';
 import { placeNativeInput } from '../../ui/NativeInputPlacement';
-import { read, type API, type Raw } from '../../api/Types';
-import type { Resolve } from '../../runtime/As3';
+import { GameReflection } from '../../api/GameReflection';
+import type { API } from '../../api/Types';
+import { GameScene, type TextEntry } from '../../game/Bindings';
+import { BitmapFontTextFormat } from '../../ui/BitmapFontTextFormat';
+import type { Resolve } from '../../runtime/HaxeInterop';
 import { RichBitmapEditorModel } from './RichBitmapEditorModel';
 import { RichBitmapEditorView } from './RichBitmapEditorView';
 import { RichBitmapInputBinding } from './RichBitmapInputBinding';
@@ -16,21 +20,22 @@ export interface NativeBitmapInput {
 /** One native TextEntry's document, bitmap drawing, browser transport and lifecycle. */
 export function bindNativeBitmapInput(
   owner: API,
-  input: Raw,
+  input: TextEntry,
   resolve: Resolve,
   active = () => true,
-  artifactResolver: Function | null = null,
+  artifactResolver: ArtifactLabelResolver | null = null,
 ): NativeBitmapInput {
-  const element: HTMLInputElement = input.element;
+  const element = input.element;
+  if (!element) throw new Error('Bitmap input requires an initialized TextEntry element');
   const cleanups: (() => void)[] = [];
   const api: API = {
     ...owner,
-    around: (...args) => {
+    around: (...args: Parameters<API['around']>) => {
       const off = owner.around(...args);
       cleanups.push(off);
       return off;
     },
-    after: (...args) => {
+    after: (...args: Parameters<API['after']>) => {
       const off = owner.after(...args);
       cleanups.push(off);
       return off;
@@ -40,19 +45,19 @@ export function bindNativeBitmapInput(
       return fn;
     },
   };
-  const Format = resolve('feathers.text.BitmapFontTextFormat');
-  const initialFormat = read(input, 'textFormat');
+  const overlay = new GameReflection(api).find('core.hud.components.ui.DomOverlay');
+  const initialFormat = input.textFormat;
   const model = new RichBitmapEditorModel(
     initialFormat?.size ?? 13,
     initialFormat?.color ?? 0xffffff,
     artifactResolver,
   );
-  model.text = read(input, 'text', '');
+  model.text = input.get_text();
   model.maxChars = input.maxChars;
   const makeFormat = () =>
     // AstroTheme's bitmap chat format deliberately uses the 48px atlas: it
     // contains the synthetic full-color emoji glyphs that smaller text faces lack.
-    new Format('verdana48_bitmap', model.defaultSize, model.defaultColor);
+    new BitmapFontTextFormat('verdana48_bitmap', model.defaultSize, model.defaultColor);
   const view = new RichBitmapEditorView(resolve, model, makeFormat(), artifactResolver);
   view.node.set_name('QoLAF.RichComposer');
   input.addChild(view.node);
@@ -69,6 +74,7 @@ export function bindNativeBitmapInput(
     element,
     () => input.dispatchEventWith('change', true),
     () => view.refresh(),
+    () => GameScene.playerPerformedAction(),
   );
   // DOM retains focus, clipboard and IME services; only Starling paints text.
   element.style.opacity = '0';
@@ -87,7 +93,7 @@ export function bindNativeBitmapInput(
     if (disposed) return;
     model.enabled = !element.disabled;
     model.editable = !element.readOnly;
-    const format = read(input, 'textFormat');
+    const format = input.textFormat;
     const size = format?.size ?? 13;
     const color = format?.color ?? 0xffffff;
     if (model.defaultSize !== size || model.defaultColor !== color) {
@@ -96,8 +102,8 @@ export function bindNativeBitmapInput(
     }
     const left = input.paddingLeft ?? 0;
     const top = input.paddingTop ?? 0;
-    const width = Math.max(0, read(input, 'width') - left - (input.paddingRight ?? 0));
-    const height = Math.max(0, read(input, 'height') - top - (input.paddingBottom ?? 0));
+    const width = Math.max(0, input.get_width() - left - (input.paddingRight ?? 0));
+    const height = Math.max(0, input.get_height() - top - (input.paddingBottom ?? 0));
     const key = [left, top, width, height].join(':');
     if (key !== dimensions) {
       dimensions = key;
@@ -135,7 +141,7 @@ export function bindNativeBitmapInput(
     return count;
   });
   api.after(input, 'updatePlacement', (shown: boolean) => {
-    if (shown) placeNativeInput(input, api.cls?.('core.hud.components.ui.DomOverlay'));
+    if (shown) placeNativeInput(input, overlay);
     layout();
   });
   api.after(input, 'set_textFormat', layout);
@@ -145,7 +151,7 @@ export function bindNativeBitmapInput(
     const rect = element.getBoundingClientRect();
     if (rect.width <= 0) return;
     const x =
-      ((event.clientX - rect.left) * read(input, 'width')) / rect.width - (input.paddingLeft ?? 0);
+      ((event.clientX - rect.left) * input.get_width()) / rect.width - (input.paddingLeft ?? 0);
     view.selectAt(x, extend, clicks);
     binding.project();
   };

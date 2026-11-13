@@ -1,10 +1,19 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import {
+  ShipManager,
+  ShipFactory,
+  SpawnManager,
+  BossManager,
+  GameObject,
+  type GameScene,
+} from '../game/Bindings';
 import { BossSpawnTimers, type EnemySpawnIdentity } from './BossSpawnTimers';
 
-const identities = new WeakMap<Raw, EnemySpawnIdentity>();
-const models = new WeakMap<Raw, BossSpawnTimers>();
+const identities = new WeakMap<GameObject, EnemySpawnIdentity>();
+const models = new WeakMap<GameScene, BossSpawnTimers>();
 
-export function bossSpawnTimers(game: Raw): BossSpawnTimers {
+export function bossSpawnTimers(game: GameScene): BossSpawnTimers {
   let model = models.get(game);
   if (!model) {
     model = new BossSpawnTimers(game, (enemy) => identities.get(enemy));
@@ -15,15 +24,11 @@ export function bossSpawnTimers(game: Raw): BossSpawnTimers {
 
 /** Install before Haxe caches bound message handlers. Copy identities before destruction. */
 export function installBossSpawnTimerHooks(api: API): void {
-  const manager = api.cls('core.ship.ShipManager')?.prototype;
-  const factory = api.cls('core.ship.ShipFactory')!;
-  const bossManager = api.cls('core.boss.BossManager')?.prototype;
-  if (!manager || !factory || !bossManager) return;
-  const spawnerManager = api.cls('core.spawner.SpawnManager')?.prototype;
+  const reflection = new GameReflection(api);
   // The native factory does not retain the definition key, and only orbiting
   // enemies keep their spawner. Observe the lookup inside each spawn record.
-  let spawning: { game: Raw; spawnerKey: string } | undefined;
-  api.around(manager, 'spawnEnemy', function (next, ...args) {
+  let spawning: { game: GameScene; spawnerKey: string } | undefined;
+  reflection.around(ShipManager.prototype, 'spawnEnemy', function (next, ...args) {
     const previous = spawning;
     spawning = { game: this.g, spawnerKey: '' };
     try {
@@ -32,27 +37,26 @@ export function installBossSpawnTimerHooks(api: API): void {
       spawning = previous;
     }
   });
-  if (spawnerManager)
-    api.before(spawnerManager, 'getSpawnerByKey', function (key: string) {
-      if (spawning && spawning.game === this.g) spawning.spawnerKey = String(key ?? '');
-    });
-  api.after(factory, 'createEnemy', function (enemy: Raw | null, game: Raw, key: string) {
+  reflection.before(SpawnManager.prototype, 'getSpawnerByKey', function (key: string) {
+    if (spawning && spawning.game === this.g) spawning.spawnerKey = String(key ?? '');
+  });
+  reflection.after(ShipFactory, 'createEnemy', function (enemy, game, key) {
     if (enemy)
       identities.set(enemy, {
         definitionKey: key,
         spawnerKey: spawning?.game === game ? spawning.spawnerKey : '',
       });
   });
-  api.after(
-    manager,
+  reflection.after(
+    ShipManager.prototype,
     'createSetEnemy',
-    function (_result, enemy: Raw, _id, _heading, _count, _time, spawner: Raw | null) {
+    function (_result, enemy, _id, _heading, _count, _time, spawner) {
       const identity = identities.get(enemy);
       if (identity && spawner?.key != null) identity.spawnerKey = String(spawner.key);
     },
   );
-  api.before(manager, 'killed', function (message: Raw, start: number) {
-    const enemy = this.enemiesById.h[String(message.getInt(start))];
+  reflection.before(ShipManager.prototype, 'killed', function (message, start) {
+    const enemy = this.enemiesById.h[message.getInt(start)];
     if (!enemy?.alive || enemy.rareType === 6) return;
     const identity = identities.get(enemy);
     if (identity)
@@ -60,18 +64,16 @@ export function installBossSpawnTimerHooks(api: API): void {
         'enemy',
         identity.definitionKey,
         identity.spawnerKey,
-        read(enemy, 'id'),
+        enemy.get_id(),
       );
   });
-  api.before(bossManager, 'killBoss', function (boss: Raw) {
+  reflection.before(BossManager.prototype, 'killBoss', function (boss) {
     if (this.bosses.includes(boss))
       bossSpawnTimers(this.g).recordDeath('boss', String(boss.key), '', null);
   });
-  const object = api.cls('core.GameObject')?.prototype;
-  if (object)
-    api.before(object, 'reset', function () {
-      identities.delete(this);
-    });
+  reflection.before(GameObject.prototype, 'reset', function () {
+    identities.delete(this);
+  });
   api.onGame((game, session) => {
     bossSpawnTimers(game);
     session.defer(() => {

@@ -1,3 +1,10 @@
+import {
+  bindGameClasses,
+  type GameObject,
+  type Sprite,
+  type Image as NativeImage,
+  type GlowFilter,
+} from '../src/game/Bindings';
 import { installMapTextureKeys } from '../src/map/MapTextureKeys';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -37,6 +44,23 @@ test('Nexar classification uses the original exact named-Emperor exception', () 
   assert.equal(NexarEnemyIdentification.isImportant('Nexar Commander', false, true), false);
 });
 
+function miniature(
+  ui: NativeUI,
+  parent: Display,
+  owner: object,
+  boss: boolean,
+  life: (object: GameObject) => number,
+) {
+  if (!('get_movieClip' in owner))
+    Object.assign(owner, {
+      get_movieClip: () => null,
+      get_x: () => Reflect.get(owner, 'x'),
+      get_y: () => Reflect.get(owner, 'y'),
+      get_rotation: () => Reflect.get(owner, 'rotation'),
+    });
+  return new MapLiveMiniature(ui, parent as unknown as Sprite, owner as GameObject, boss, life);
+}
+
 function fixture() {
   class Unit {
     alive = true;
@@ -48,6 +72,21 @@ function fixture() {
     x = 0;
     y = 0;
     rotation = 0;
+    get_movieClip() {
+      return this.movieClip ?? null;
+    }
+    get_x() {
+      return this.x;
+    }
+    get_y() {
+      return this.y;
+    }
+    get_rotation() {
+      return this.rotation;
+    }
+    get_visible() {
+      return this.visible;
+    }
   }
   class Image extends Display {
     texture: any;
@@ -91,6 +130,9 @@ function fixture() {
       public blur: number,
       public quality: number,
     ) {}
+    get_color() {
+      return this.color;
+    }
     set_resolution(v: number) {
       this.resolution = v;
     }
@@ -107,7 +149,8 @@ function fixture() {
     'starling.display.Image': Image,
     'starling.filters.GlowFilter': Glow,
   };
-  const api: any = { cls: (name: string) => classes[name] };
+  const api: any = { cls: (name: string) => classes[name] ?? class {} };
+  bindGameClasses(api);
   const lives = new WeakMap(),
     life = (o: any) => lives.get(o) ?? 0;
   const unit = (texture: any = { name: 'hull', disposed: false }) => {
@@ -124,6 +167,19 @@ function fixture() {
       color: 0x123456,
       alpha: 0.4,
     };
+    for (const property of [
+      'texture',
+      'x',
+      'y',
+      'rotation',
+      'pivotX',
+      'pivotY',
+      'scaleX',
+      'scaleY',
+      'color',
+      'alpha',
+    ])
+      u.movieClip['get_' + property] = () => u.movieClip[property];
     return u;
   };
   return { classes, api, ui: new NativeUI(api), lives, life, unit };
@@ -134,7 +190,7 @@ test('live miniature copies animation, tint, pivot and rendered pose without own
     parent = new Display(),
     owner = f.unit(),
     texture = owner.movieClip.texture;
-  const marker = new MapLiveMiniature(f.ui, parent, owner, false, f.life);
+  const marker = miniature(f.ui, parent, owner, false, f.life);
   marker.update(0.1);
   const image: any = marker.layer.getChildAt(0),
     glow: any = marker.layer.get_filter();
@@ -201,14 +257,14 @@ test('multipart boss miniatures preserve component offsets, explosion frames and
     allComponents: [part],
     key: 'normal',
   };
-  const marker = new MapLiveMiniature(f.ui, parent, boss, true, f.life);
+  const marker = miniature(f.ui, parent, boss, true, f.life);
   marker.update(0.1);
   const image: any = marker.layer.getChildAt(0);
   assert.deepEqual(
     [marker.layer.get_x(), marker.layer.get_y(), image.get_x(), image.get_y(), image.get_scaleX()],
     [10, 20, 5, 5, 0.2],
   );
-  assert.equal(marker.layer.get_filter().color, 0xffffff);
+  assert.equal((marker.layer.get_filter() as GlowFilter).get_color(), 0xffffff);
   part.alive = false;
   marker.update(0.1);
   assert.equal(image.get_visible(), false, 'dead hull is hidden');
@@ -235,7 +291,14 @@ test('multipart boss miniatures preserve component offsets, explosion frames and
 test('map reconciliation handles spawn/death, active boss identity and pooled miniboss reuse', () => {
   const f = fixture(),
     boss: any = { alive: true, awaitingActivation: true },
-    enemy: any = { alive: true, miniboss: true, id: 5 };
+    enemy: any = {
+      alive: true,
+      miniboss: true,
+      id: 5,
+      get_id() {
+        return this.id;
+      },
+    };
   const game: any = {
     bossManager: { bosses: [boss] },
     shipManager: { enemies: [enemy], enemiesById: { h: { 5: enemy } } },
@@ -297,7 +360,9 @@ test('map reconciliation handles spawn/death, active boss identity and pooled mi
 
 test('native map hook replaces only its own skull layers and restores them on cleanup', () => {
   const f = fixture(),
-    hooks = new Hooks(),
+    hooks = new Hooks((error: unknown) => {
+      throw error;
+    }),
     cleanups: Function[] = [],
     listeners = new Map();
   const boss: any = {
@@ -307,6 +372,14 @@ test('native map hook replaces only its own skull layers and restores them on cl
     y: 0,
     isHostile: true,
     allComponents: [],
+    get_movieClip: () => null,
+    get_x() {
+      return this.x;
+    },
+    get_y() {
+      return this.y;
+    },
+    get_rotation: () => 0,
   };
   const game: any = {
     bossManager: { bosses: [boss] },
@@ -333,6 +406,7 @@ test('native map hook replaces only its own skull layers and restores them on cl
     on: (n: string, fn: Function) => listeners.set(n, fn),
     defer: (fn: Function) => cleanups.push(fn),
   });
+  bindGameClasses({ ...f.api, cls: (name: string) => f.classes[name] ?? class {} });
   installMapLiveMiniatures(f.api, game);
   const map = new MapView();
   assert.equal(map.load(), 42);
@@ -352,7 +426,9 @@ test('native map hook replaces only its own skull layers and restores them on cl
 });
 
 test('map texture keys isolate source kind and scale while preserving native rasterization', () => {
-  const hooks = new Hooks(),
+  const hooks = new Hooks((error: unknown) => {
+      throw error;
+    }),
     cleanups: Function[] = [],
     calls: any[] = [];
   const textures = {
@@ -395,4 +471,62 @@ test('map texture keys isolate source kind and scale while preserving native ras
   );
   cleanups.reverse().forEach((fn) => fn());
   assert.equal(new Body().addOrbits(), 'shared');
+});
+
+test('miniatures recover late textures in component order and reject recycled pending parts', () => {
+  const f = fixture();
+  const first = f.unit();
+  const second = f.unit();
+  const third = f.unit();
+  const firstTexture = first.movieClip.texture;
+  const secondTexture = second.movieClip.texture;
+  first.movieClip.texture = null;
+  second.movieClip.texture = null;
+  const boss = {
+    alive: true,
+    awaitingActivation: false,
+    x: 0,
+    y: 0,
+    rotation: 0,
+    isHostile: true,
+    allComponents: [first, second, third],
+    key: 'normal',
+  };
+  const marker = miniature(f.ui, new Display(), boss, true, f.life);
+  assert.equal(marker.layer.get_numChildren(), 1);
+  second.movieClip.texture = secondTexture;
+  marker.update(0.1);
+  first.movieClip.texture = firstTexture;
+  marker.update(0.1);
+  assert.equal(marker.layer.get_numChildren(), 3);
+  assert.deepEqual(
+    [0, 1, 2].map((index) => (marker.layer.getChildAt(index) as NativeImage).get_texture()),
+    [firstTexture, secondTexture, third.movieClip.texture],
+  );
+  const replacement = f.unit();
+  boss.allComponents[1] = replacement;
+  marker.update(0.1);
+  assert.equal(
+    (marker.layer.getChildAt(1) as NativeImage).get_texture(),
+    replacement.movieClip.texture,
+  );
+  marker.dispose();
+
+  const late = f.unit();
+  const texture = late.movieClip.texture;
+  late.movieClip.texture = null;
+  const single = miniature(f.ui, new Display(), late, false, f.life);
+  assert.equal(single.hasParts, false);
+  late.movieClip.texture = texture;
+  single.update(0.1);
+  assert.equal(single.hasParts, true);
+  single.dispose();
+
+  first.movieClip.texture = null;
+  const pending = miniature(f.ui, new Display(), boss, true, f.life);
+  f.lives.set(first, 42);
+  first.movieClip.texture = firstTexture;
+  pending.update(0.1);
+  assert.equal(pending.layer.get_numChildren(), 2);
+  pending.dispose();
 });

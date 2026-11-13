@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { bindGameClasses, type Unit, type GameScene } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import { NativeUI } from '../src/ui/NativeUI';
 import { NearbyTargetBar } from '../src/ui/NearbyTargetBar';
 import { createTargetBossIcon } from '../src/ui/TargetBossIcon';
@@ -26,18 +28,19 @@ function fixture() {
       getService: () => ({ getTextureGUIByTextureName: () => texture }),
     },
   };
+  bindGameClasses({ cls: (name: string) => classes[name] ?? {} } as unknown as API);
   return { ui: new NativeUI({ cls: (name: string) => classes[name] } as any), texture };
 }
 
 test('both boss icon sizes apply the source white RGB transform and preserve alpha', () => {
   const { ui, texture } = fixture();
   for (const size of [16, 18]) {
-    const icon = createTargetBossIcon(ui, size);
+    const icon = createTargetBossIcon(size) as unknown as Image;
     assert.equal(icon.texture, texture);
     assert.equal(icon.get_width(), size);
     assert.equal(icon.get_height(), size * 0.75);
     assert.equal(icon.get_touchable(), false);
-    const matrix = icon.get_filter().matrix;
+    const matrix = (icon.get_filter() as Filter & { matrix: number[] }).matrix;
     const pixel = [19, 88, 137, 0.4];
     const output = [0, 1, 2, 3].map(
       (row) =>
@@ -60,13 +63,14 @@ test('nearby row keeps its pressed background across refresh and restores hidden
     values: () => ({ hp: 50, hpMax: 100, shield: 0, shieldMax: 100 }),
   };
   const selected: any[] = [],
-    unit = {};
-  const row = new NearbyTargetBar(ui, info, (unit) => selected.push(unit));
-  const background = row.node.getChildAt(0),
-    health = row.node.getChildAt(1),
-    shield = row.node.getChildAt(2);
+    unit = {} as Unit;
+  const row = new NearbyTargetBar(info, (unit) => selected.push(unit));
+  const display = row.node as unknown as Display;
+  const background = display.getChildAt(0) as Quad,
+    health = display.getChildAt(1) as Quad,
+    shield = display.getChildAt(2) as Quad;
   const touch = (phase?: string) => {
-    for (const listener of row.node.listeners('touch'))
+    for (const listener of display.listeners('touch'))
       listener({ getTouch: () => (phase ? { get_phase: () => phase } : null) });
   };
   row.show(unit, 100, 0.01);
@@ -103,17 +107,24 @@ test('hostile player statistics are obscured except for matching group identity'
   }
   let group: any = null;
   const game = { get_me: () => ({ get_group: () => ({ get_id: () => 'ours' }) }) };
-  const info = new TargetPresentation({ cls: () => PlayerShip } as any, game);
-  const ship = new PlayerShip();
+  bindGameClasses({
+    cls: (name: string) => (name === 'core.ship.PlayerShip' ? PlayerShip : {}),
+  } as unknown as API);
+  const info = new TargetPresentation(game as unknown as Pick<GameScene, 'get_me'>);
+  const ship = new PlayerShip() as PlayerShip & Unit;
   assert.equal(info.hideStats(ship), true);
   group = { get_id: () => 'theirs' };
   assert.equal(info.hideStats(ship), true);
   group = { get_id: () => 'ours' };
   assert.equal(info.hideStats(ship), false);
-  group = {};
+  group = { get_id: () => undefined };
   assert.equal(info.hideStats(ship), true, 'missing group IDs never establish membership');
   group = null;
   ship.isHostile = false;
   assert.equal(info.hideStats(ship), false);
-  assert.equal(info.hideStats({ isHostile: true }), false, 'NPCs retain visible statistics');
+  assert.equal(
+    info.hideStats({ isHostile: true } as Unit),
+    false,
+    'NPCs retain visible statistics',
+  );
 });

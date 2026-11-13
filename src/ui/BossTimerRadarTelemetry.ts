@@ -1,13 +1,13 @@
-import { read, type Raw } from '../api/Types';
+import type { Sprite, StarlingTextField } from '../game/Bindings';
 import type { BossTimerRow } from '../boss/BossSpawnTimers';
 import { NativeUI } from './NativeUI';
 
 /** Original wrapped Verdana rows; height belongs to the telemetry, not the radar. */
 export class BossTimerRadarTelemetry {
-  readonly node: Raw;
+  readonly node: Sprite;
   blockHeight = 0;
   private slots: {
-    label: Raw;
+    label: StarlingTextField;
     text: string | null;
     width: number;
     color: number;
@@ -31,7 +31,7 @@ export class BossTimerRadarTelemetry {
       let slot = this.slots[count];
       if (!slot) {
         const label = this.ui.text(420, 15, '', 10, 0xbfc4cc, 'left', 'QoLAF_Verdana16');
-        read(label, 'format').set_verticalAlign('top');
+        label.get_format().set_verticalAlign('top');
         label.set_wordWrap(true);
         label.set_batchable(true);
         this.node.addChild(label);
@@ -39,14 +39,14 @@ export class BossTimerRadarTelemetry {
       }
       const { label } = slot;
       if (slot.color !== row.color) {
-        read(label, 'format').set_color(row.color);
+        label.get_format().set_color(row.color);
         slot.color = row.color;
       }
       if (slot.text !== row.text || slot.width !== width) {
         label.set_autoSize('vertical');
         label.set_width(width);
         label.set_text(row.text);
-        slot.height = Math.max(15, Math.ceil(read(read(label, 'textBounds'), 'height') / 15) * 15);
+        slot.height = Math.max(15, Math.ceil(label.get_textBounds().height / 15) * 15);
         label.set_autoSize('none');
         label.set_height(slot.height);
         slot.text = row.text;

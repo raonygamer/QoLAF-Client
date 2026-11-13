@@ -1,9 +1,8 @@
 // Source port of core/hud/components/PodRewardPulseColor.as.
-import type { Resolve } from '../runtime/As3';
-import { read } from '../api/Types';
-export function createPodRewardPulseColor(resolve: Resolve): any {
-  const Game: any = resolve('core.scene.Game');
-  type Game = any;
+import type { Resolve } from '../runtime/HaxeInterop';
+import type { GameScene } from '../game/Bindings';
+export function createPodRewardPulseColor(resolve: Resolve) {
+  const Game: typeof GameScene = resolve('core.scene.Game');
 
   /** Chat-only reward celebration; lower-level relics have a separate cyan/teal pulse. */
 
@@ -61,8 +60,8 @@ export function createPodRewardPulseColor(resolve: Resolve): any {
     }
 
     private static sampleColors(): void {
-      let game: Game = Game.instance;
-      if (game == null || read(game, 'isLeaving', false) || game.time <= 0) {
+      const game = Game.instance;
+      if (game == null || game.get_isLeaving() || game.time <= 0) {
         PodRewardPulseColor.sampledAt = NaN;
         PodRewardPulseColor.sampledColor = PodRewardPulseColor.MARKER_COLOR;
         PodRewardPulseColor.sampledLowRelicColor = PodRewardPulseColor.LOW_RELIC_MARKER_COLOR;

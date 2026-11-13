@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { DamageObserver, installDamageObserver } from '../src/telemetry/DamageObserver';
@@ -40,7 +41,7 @@ function fixture() {
     collisionRadius: 5,
     canBeDamage: () => true,
   };
-  const game: any = { time: 1000, me: { ship }, unitManager: { units: [target] } };
+  const game: any = { time: 1000, hud: {}, me: { ship }, unitManager: { units: [target] } };
   const config = { ...defaults };
   const weapon: any = { unit: ship, dmg: { type: 0, dmg: () => 500 } };
   const projectile: any = {
@@ -114,6 +115,19 @@ test('homing estimates require swept contact, reject pooled target reuse, and di
   assert.equal(f.observer.estimate.perSecond(7000), 0);
 });
 
+test('homing observations follow the native lifecycle even without a local reset notification', () => {
+  const f = fixture();
+  let lifecycle = 1;
+  Object.assign(f.target, { get_lifecycleId: () => lifecycle });
+  f.projectile.ai = 'homingMissile';
+  f.observer.activate(f.projectile);
+  lifecycle++;
+  f.projectile.course.pos.x = 60;
+  f.observer.step(f.projectile, 20, 0);
+  assert.equal(f.observer.estimate.perSecond(1000), 0);
+  assert.equal(f.observer.estimate.isPartial(1000), true);
+});
+
 test('mine reports one closest blast contact; disabling DPS prevents collection', () => {
   const f = fixture();
   f.projectile.ai = 'mine';
@@ -172,6 +186,22 @@ test('beam adapter counts actual successful heat checks without consuming extra 
       });
     },
   };
+  class ContactFixture {
+    canBeDamage() {
+      return false;
+    }
+    destroy() {}
+    explode() {}
+    enter() {}
+    execute() {}
+  }
+  api.before = (target: object, name: string, hook: Function) => {
+    api.around(target, name, function (this: object, next: Function, ...args: unknown[]) {
+      hook.apply(this, args);
+      return next(...args);
+    });
+  };
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? ContactFixture });
   const contacts: unknown[] = [];
   const observer = installDamageObserver(api, f.game, f.config, (target) => contacts.push(target));
   const beam = new Beam();
@@ -201,4 +231,21 @@ test('native bullet contact coverage never enables the separate mine blast estim
   assert.equal(f.observer.estimate.perSecond(1000), 0);
   f.observer.hit(f.weapon, f.target);
   assert.equal(f.observer.estimate.perSecond(1000), 100);
+});
+
+test('server retarget refreshes estimate lifecycle without allowing repeated damage claims', () => {
+  const f = fixture();
+  f.projectile.ai = 'homingMissile';
+  f.observer.activate(f.projectile);
+  const replacement = { ...f.target, pos: { x: 50, y: 0 }, get_lifecycleId: () => 7 };
+  f.projectile.target = replacement;
+  f.projectile.course.pos.x = 60;
+  f.observer.step(f.projectile, 20, 0);
+  assert.equal(f.observer.estimate.perSecond(1000), 0);
+  f.observer.captureTarget(f.projectile);
+  f.observer.step(f.projectile, 20, 0);
+  assert.equal(f.observer.estimate.perSecond(1000), 100);
+  f.observer.captureTarget(f.projectile);
+  f.observer.step(f.projectile, 20, 0);
+  assert.equal(f.observer.estimate.perSecond(1000), 100, 'retarget must not reset one-hit claim');
 });

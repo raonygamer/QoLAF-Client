@@ -1,5 +1,5 @@
 // Source port of core/hud/components/chat/ChatArtifactToken.as.
-import { bound } from '../../runtime/As3';
+import { bound } from '../../runtime/HaxeInterop';
 
 /**
  * Strict, inert wire representation for a shared artifact reference.

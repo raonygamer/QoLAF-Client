@@ -1,6 +1,6 @@
 import { installBeamEmitterTint } from './BeamEmitterTint';
 import { read, type API, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { ClientDevVisual, type ClientDevVisualSettings } from './ClientDevVisual';
 import { createClientDevVisualStyles } from './ClientDevVisualStyle';
 import { createPhaseBladeBloomFilter } from './PhaseBladeBloomFilter';
@@ -126,6 +126,7 @@ export function installNativePhaseBlade(
     const style = cached.style;
     style.set_texture(read(segment, 'texture'));
     style.set_textureSmoothing(read(segment, 'textureSmoothing'));
+    style.set_textureRepeat(read(segment, 'textureRepeat', false));
     segment.setStyle(style, false);
     try {
       segment.set_color(0xffffff);

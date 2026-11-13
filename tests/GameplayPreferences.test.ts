@@ -1,3 +1,5 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import { DeviceSettings } from '../src/settings/DeviceSettings';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { installRespawn } from '../src/runtime/Respawn';
@@ -37,7 +39,15 @@ test('respawn respects readiness, manual Space, and current PvP/survival prompts
     isSystemTypeSurvival: () => true,
     hud: { uberStats: { getMyLives: () => 0 } },
   };
-  const me = { commandable: false, respawnNextReady: 10500, isMe: true, respawnReady: () => ready };
+  const me = {
+    get_commandable() {
+      return this.commandable;
+    },
+    commandable: false,
+    respawnNextReady: 10500,
+    isMe: true,
+    respawnReady: () => ready,
+  };
   const state: any = {
     g: game,
     me,
@@ -52,8 +62,18 @@ test('respawn respects readiness, manual Space, and current PvP/survival prompts
       alignPivot() {},
     },
   };
-  installRespawn(api, game);
-  const update = () => hooks.updateInput.call(state, () => nativeCalls++);
+  bindGameClasses(api);
+  const preferences = new DeviceSettings({ get: (_key, fallback) => fallback, set() {} });
+  preferences.set('disableSpaceToRespawn', false);
+  installRespawn(api, game, preferences);
+  const update = () =>
+    hooks.updateInput.call(state, () => {
+      nativeCalls++;
+      if (!me.commandable && ready && space) {
+        me.respawnNextReady = 0;
+        game.send('respawn');
+      }
+    });
   update();
   assert.equal(sends, 0);
   space = true;
@@ -61,7 +81,7 @@ test('respawn respects readiness, manual Space, and current PvP/survival prompts
   assert.equal(sends, 1);
   assert.equal(me.respawnNextReady, 0);
   space = false;
-  settings.disableSpaceToRespawn = true;
+  preferences.set('disableSpaceToRespawn', true);
   ready = false;
   update();
   assert.equal(sends, 1);
@@ -70,7 +90,7 @@ test('respawn respects readiness, manual Space, and current PvP/survival prompts
   assert.equal(sends, 2);
   me.commandable = true;
   update();
-  assert.equal(nativeCalls, 1);
+  assert.equal(nativeCalls, 3);
   hooks.execute.call(state);
   assert.equal(state.respawnText.text, 'Leaving...');
   game.solarSystem.isPvpSystemInEditor = true;

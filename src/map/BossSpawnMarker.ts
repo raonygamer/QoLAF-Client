@@ -1,3 +1,4 @@
+import type { Sprite } from '../game/Bindings';
 import { read, type Raw } from '../api/Types';
 import { NativeUI } from '../ui/NativeUI';
 import { BossSpawnAreaRing } from './BossSpawnAreaRing';
@@ -5,8 +6,8 @@ import { BossSpawnLocation, spawnIntersects, type SpawnViewport } from './BossSp
 
 /** Original hollow diamond and labels, distinct from the live boss icon. */
 export class BossSpawnMarker {
-  readonly node: Raw;
-  private readonly badge: Raw;
+  readonly node: Sprite;
+  private readonly badge: Sprite;
   private readonly badgeRadius: number;
   private outerRing?: BossSpawnAreaRing;
   private innerRing?: BossSpawnAreaRing;

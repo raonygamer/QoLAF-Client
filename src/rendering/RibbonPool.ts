@@ -1,10 +1,13 @@
-import type { API, Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import { RibbonTrail, RibbonTrailPool } from '../game/Bindings';
 
 /** RibbonTrail.resetAllTo writes the reset geometry before the next game tick. */
-export function writeRibbonSegments(trail: Raw): void {
-  if (trail.mNumRibbonSegments > trail.mRibbonSegments.length) return;
+export function writeRibbonSegments(trail: RibbonTrail): void {
+  const segments = trail.mRibbonSegments;
+  if (!segments || trail.mNumRibbonSegments > segments.length) return;
   for (let index = 0; index < trail.mNumRibbonSegments; index++) {
-    const segment = trail.mRibbonSegments[index];
+    const segment = segments[index];
     trail.setVertexPosition(index * 2, segment.x0, segment.y0);
     trail.setVertexPosition(index * 2 + 1, segment.x1, segment.y1);
     trail.setVertexAlpha(index * 2, segment.alpha);
@@ -14,7 +17,7 @@ export function writeRibbonSegments(trail: Raw): void {
 }
 
 /** Original per-life defaults; geometry remains owned by the native trail. */
-export function resetRibbonForPool(trail: Raw): void {
+export function resetRibbonForPool(trail: RibbonTrail): void {
   trail.mIsPlaying = false;
   trail.set_visible(false);
   trail.mFollowingRibbonSegmentLine = null;
@@ -28,28 +31,31 @@ export function resetRibbonForPool(trail: Raw): void {
 }
 
 export function installRibbonPool(api: API): void {
-  const trail = api.cls('extensions.RibbonTrail')?.prototype;
-  const pool = api.cls('core.pools.RibbonTrailPool')?.prototype;
-  if (!trail || !pool) return;
-  api.after(trail, 'resetAllTo', function () {
+  const trail = RibbonTrail.prototype;
+  const pool = RibbonTrailPool.prototype;
+  const reflection = new GameReflection(api);
+  reflection.after(trail, 'resetAllTo', function () {
     writeRibbonSegments(this);
   });
-  api.after(pool, 'getRibbonTrail', function (trail: Raw) {
+  reflection.after(pool, 'getRibbonTrail', function (trail) {
     resetRibbonForPool(trail);
   });
-  api.around(pool, 'removeRibbonTrail', function (next, trail: Raw) {
-    const active = this.activeRibbonTrails.includes(trail);
-    const result = next(trail);
-    if (active) resetRibbonForPool(trail);
+  reflection.around(pool, 'removeRibbonTrail', function (next, trail) {
+    const inactiveCount = this.inactiveRibbonTrails?.length ?? 0;
+    next(trail);
+    const inactive = this.inactiveRibbonTrails;
+    // Native removal validates poolIndex and swaps in O(1). Reset only a trail
+    // it actually returned, without scanning or changing that newer pool logic.
+    if (inactive && inactive.length > inactiveCount && inactive.at(-1) === trail)
+      resetRibbonForPool(trail);
+  });
+  reflection.around(pool, 'reclaimOrphans', function (next) {
+    const count = this.inactiveRibbonTrails?.length ?? 0;
+    const result = next();
+    const inactive = this.inactiveRibbonTrails;
+    if (inactive) {
+      for (let index = count; index < inactive.length; index++) resetRibbonForPool(inactive[index]);
+    }
     return result;
   });
-  if (typeof pool.reclaimOrphans === 'function') {
-    api.around(pool, 'reclaimOrphans', function (next, ...args) {
-      const count = this.inactiveRibbonTrails.length;
-      const result = next(...args);
-      for (let index = count; index < this.inactiveRibbonTrails.length; index++)
-        resetRibbonForPool(this.inactiveRibbonTrails[index]);
-      return result;
-    });
-  }
 }

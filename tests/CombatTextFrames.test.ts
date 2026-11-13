@@ -13,18 +13,46 @@ import { reset as nativeParticleReset } from './fixtures/UpstreamTextParticle.js
 import { Hooks } from './fixtures/HostCore.js';
 import { Text } from './fixtures/NativeGame';
 import type { Raw } from '../src/api/Types';
+import {
+  bindGameClasses,
+  type Unit,
+  type TextParticle,
+  type TextHandler,
+} from '../src/game/Bindings';
 
 function fixture() {
   const frames = new CombatTextFrames();
-  const owner: Raw = {
+  const ownerState = {
     alive: true,
     pos: { x: 100, y: 200 },
     isAddedToCanvas: true,
-    _mc: { x: 105, y: 210 },
+    _mc: {
+      x: 105,
+      y: 210,
+      get_x() {
+        return this.x;
+      },
+      get_y() {
+        return this.y;
+      },
+    },
+    get_pos() {
+      return this.pos;
+    },
   };
-  const particle: Raw = {
+  const owner = ownerState as unknown as typeof ownerState & Unit;
+  const particleState = {
     x: 100,
     y: 185,
+    alpha: 1,
+    scaleX: 1,
+    scaleY: 1,
+    get_x() {
+      return this.x;
+    },
+    get_y() {
+      return this.y;
+    },
     alive: true,
     ttl: 1000,
     maxTtl: 1000,
@@ -48,14 +76,20 @@ function fixture() {
       this.scaleY = v;
     },
   };
+  const particle = particleState as unknown as typeof particleState & TextParticle;
   const handler = {
     texts: [particle],
-    g: { me: { zoom: 2 } },
+    g: {
+      me: { zoom: 2 },
+      get_me() {
+        return this.me;
+      },
+    },
     remove(_p: Raw, index: number) {
       this.texts.splice(index, 1);
     },
   };
-  return { frames, owner, particle, handler };
+  return { frames, owner, particle, handler: handler as typeof handler & TextHandler };
 }
 function near(actual: number, expected: number) {
   assert.ok(Math.abs(actual - expected) < 1e-8, `${actual} != ${expected}`);
@@ -67,24 +101,24 @@ test('recycled combat text releases only its own damage or healing slot', () => 
     particle.set_text = () => {};
     particle.autoWidth = () => {};
     owner[slot] = particle;
-    owner[slot + 'Offset'] = -15;
+    owner[slot === 'lastDmgText' ? 'lastDmgTextOffset' : 'lastHealTextOffset'] = -15;
     frames.attach(particle, owner, -15, slot);
     // Losing the live movement attachment must not lose the source for cleanup.
     owner.alive = false;
     frames.update(handler, 0.01);
     frames.reset(particle);
     assert.equal(owner[slot], null);
-    assert.equal(owner[slot + 'Offset'], 0);
+    assert.equal(owner[slot === 'lastDmgText' ? 'lastDmgTextOffset' : 'lastHealTextOffset'], 0);
 
     owner.alive = true;
     owner[slot] = particle;
     frames.attach(particle, owner, -15, slot);
-    const replacement = {};
+    const replacement = { ...particle };
     owner[slot] = replacement;
-    owner[slot + 'Offset'] = -30;
+    owner[slot === 'lastDmgText' ? 'lastDmgTextOffset' : 'lastHealTextOffset'] = -30;
     frames.reset(particle);
     assert.equal(owner[slot], replacement);
-    assert.equal(owner[slot + 'Offset'], -30);
+    assert.equal(owner[slot === 'lastDmgText' ? 'lastDmgTextOffset' : 'lastHealTextOffset'], -30);
 
     owner[slot] = particle;
     frames.attach(particle, owner, -15, slot);
@@ -178,13 +212,19 @@ test('merged hits keep rise, owner reuse detaches and particle reuse starts a fr
 
 test('source anchor offsets survive subclassing and sustained hits stop rising after 120 units', () => {
   const { frames, owner, particle, handler } = fixture();
-  owner.__class__ = {
-    __name__: 'core.spawner.Boss',
-    __super__: { __name__: 'core.spawner.Spawner' },
-  };
+  Object.defineProperty(owner, '__class__', {
+    configurable: true,
+    value: {
+      __name__: 'core.spawner.Boss',
+      __super__: { __name__: 'core.spawner.Spawner' },
+    },
+  });
   assert.equal(combatTextAnchor(owner, false), -25);
   assert.equal(combatTextAnchor(owner, true), -10);
-  owner.__class__ = { __name__: 'core.turret.Turret' };
+  Object.defineProperty(owner, '__class__', {
+    configurable: true,
+    value: { __name__: 'core.turret.Turret' },
+  });
   assert.equal(combatTextAnchor(owner, false), -20);
   assert.equal(combatTextAnchor(owner, true), -5);
   frames.attach(particle, owner, combatTextAnchor(owner, false));
@@ -200,14 +240,14 @@ test('source anchor offsets survive subclassing and sustained hits stop rising a
 
 test('replacement damage numbers stop following without losing their rise limit or healing attachment', () => {
   const { frames, owner, particle, handler } = fixture();
-  const heal: Raw = { ...particle, speed: { x: 0, y: -40 } };
+  const heal = { ...particle, speed: { ...particle.speed, x: 0, y: -40 } };
   owner.lastDmgText = particle;
   owner.lastHealText = heal;
   handler.texts.push(heal);
   frames.attach(particle, owner, -15, 'lastDmgText');
   frames.attach(heal, owner, -15, 'lastHealText');
   frames.update(handler, 0.01);
-  owner.lastDmgText = {}; // A later hit starts another number outside the merge window.
+  owner.lastDmgText = { ...particle }; // A later hit starts another number outside the merge window.
   owner._mc.x += 100;
   owner._mc.y += 100;
   frames.update(handler, 0.01);
@@ -250,7 +290,8 @@ test('native particle pooling resets left alignment after right and center messa
 
   const hooks = new Hooks();
   const cleanups: Array<() => void> = [];
-  installCombatTextFrames({
+  const api = {
+    defer: (cleanup: () => void) => cleanups.push(cleanup),
     cls: (name: string) =>
       name === 'core.text.TextHandler'
         ? Handler
@@ -261,7 +302,9 @@ test('native particle pooling resets left alignment after right and center messa
       cleanups.push(hooks.add(target, key, 'before', fn)),
     around: (target: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'around', fn)),
-  } as any);
+  } as any;
+  bindGameClasses(api);
+  installCombatTextFrames(api);
   try {
     for (const alignment of ['right', 'left', 'center', 'left', undefined]) {
       assert.equal(add(alignment), particle);

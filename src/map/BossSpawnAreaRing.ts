@@ -1,9 +1,9 @@
-import type { Raw } from '../api/Types';
+import type { Mesh } from '../game/Bindings';
 import { NativeUI } from '../ui/NativeUI';
 
 /** Original cached 96-segment dashed outline, with no textures or filters. */
 export class BossSpawnAreaRing {
-  readonly node: Raw;
+  readonly node: Mesh;
   private lastRadius = -1;
   private lastThickness = -1;
 

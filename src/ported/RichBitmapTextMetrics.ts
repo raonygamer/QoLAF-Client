@@ -1,30 +1,23 @@
 // Source port of core/hud/components/chat/rich/RichBitmapTextMetrics.as.
-import { bound, type Resolve } from '../runtime/As3';
-export function createRichBitmapTextMetrics(resolve: Resolve): any {
-  const RichBitmapEmojiMatch: any = resolve('core.hud.components.chat.rich.RichBitmapEmojiMatch');
-  type RichBitmapEmojiMatch = any;
-  const RichBitmapMarkup: any = resolve('core.hud.components.chat.rich.RichBitmapMarkup');
-  type RichBitmapMarkup = any;
-  const RichBitmapTextNavigation: any = resolve(
-    'core.hud.components.chat.rich.RichBitmapTextNavigation',
-  );
-  type RichBitmapTextNavigation = any;
-  const RichBitmapEmojiResolver: any = resolve(
-    'core.hud.components.chat.rich.RichBitmapEmojiResolver',
-  );
-  type RichBitmapEmojiResolver = any;
-  const JapaneseCachedGlyph: any = resolve('core.hud.components.chat.rich.JapaneseCachedGlyph');
-  type JapaneseCachedGlyph = any;
-  const JapaneseGlyphCache: any = resolve('core.hud.components.chat.rich.JapaneseGlyphCache');
-  type JapaneseGlyphCache = any;
-  const RichBitmapGlyph: any = resolve('core.hud.components.chat.rich.RichBitmapGlyph');
-  type RichBitmapGlyph = any;
-  const BitmapFontTextFormat: any = resolve('feathers.text.BitmapFontTextFormat');
-  type BitmapFontTextFormat = any;
-  const BitmapChar: any = resolve('starling.text.BitmapChar');
-  type BitmapChar = any;
-  const BitmapFont: any = resolve('starling.text.BitmapFont');
-  type BitmapFont = any;
+import { bound, type Resolve } from '../runtime/HaxeInterop';
+import type { BitmapChar, BitmapFont } from '../game/Bindings';
+import type {} from '../game/BitmapFont';
+import type { BitmapFontTextFormat } from '../ui/BitmapFontTextFormat';
+import { RichBitmapEmojiMatch } from '../chat/rich/RichBitmapEmojiMatch';
+import { RichBitmapEmojiResolver } from '../chat/rich/RichBitmapEmojiResolver';
+import { RichBitmapTextNavigation } from '../chat/rich/RichBitmapTextNavigation';
+import type { RichBitmapMarkup } from '../chat/rich/RichBitmapMarkup';
+import { RichBitmapGlyph } from './RichBitmapGlyph';
+import type { JapaneseCachedGlyph } from './JapaneseCachedGlyph';
+import type { createJapaneseGlyphCache } from './JapaneseGlyphCache';
+
+export function createRichBitmapTextMetrics(resolve: Resolve) {
+  // Source metrics use the property aliases installed by native class resolution.
+  resolve('starling.text.BitmapFont');
+  resolve('starling.text.BitmapChar');
+  const JapaneseGlyphCache = resolve(
+    'core.hud.components.chat.rich.JapaneseGlyphCache',
+  ) as ReturnType<typeof createJapaneseGlyphCache>;
 
   /** Allocation-conscious, single-line caret metrics shared by bitmap input. */
 
@@ -38,8 +31,8 @@ export function createRichBitmapTextMetrics(resolve: Resolve): any {
 
     @bound
     public update(
-      markup: RichBitmapMarkup,
-      format: BitmapFontTextFormat,
+      markup: RichBitmapMarkup | null,
+      format: BitmapFontTextFormat | null,
       displayAsPassword: boolean = false,
       passwordCharCode: number = 42,
       emojiScale: number = 1,
@@ -64,7 +57,7 @@ export function createRichBitmapTextMetrics(resolve: Resolve): any {
         RichBitmapTextMetrics.normalizedSize(font, format.size) / font.size;
       this.measuredHeight = font.lineHeight * defaultScale;
       this.measuredBaseline = font.baseline * defaultScale;
-      if (this.value.length == 0) {
+      if (markup == null || this.value.length == 0) {
         return;
       }
       let cursor: number = 0;
@@ -76,7 +69,7 @@ export function createRichBitmapTextMetrics(resolve: Resolve): any {
       while (clusterStart < this.value.length) {
         let clusterEnd: number = RichBitmapTextNavigation.nextClusterEnd(this.value, clusterStart);
         if (displayAsPassword) {
-          let maskCharacter: BitmapChar = RichBitmapTextMetrics.resolveCharacter(
+          let maskCharacter: BitmapChar | null = RichBitmapTextMetrics.resolveCharacter(
             font,
             passwordCharCode,
           );
@@ -110,8 +103,8 @@ export function createRichBitmapTextMetrics(resolve: Resolve): any {
 
           let isEmoji: boolean = this.match.isEmoji;
           let charID: number = isEmoji ? this.match.glyphID : Number(this.match.codePoint);
-          let character: BitmapChar = font.getChar(charID);
-          let japaneseGlyph: JapaneseCachedGlyph;
+          let character: BitmapChar | null = font.getChar(charID);
+          let japaneseGlyph: JapaneseCachedGlyph | null = null;
           if (character == null && !isEmoji) {
             japaneseGlyph = JapaneseGlyphCache.acquire(this.match.codePoint);
             if (japaneseGlyph != null) {
@@ -208,8 +201,8 @@ export function createRichBitmapTextMetrics(resolve: Resolve): any {
     }
 
     @bound
-    private static resolveCharacter(font: BitmapFont, charID: number): BitmapChar {
-      let character: BitmapChar = font.getChar(charID);
+    private static resolveCharacter(font: BitmapFont, charID: number): BitmapChar | null {
+      let character: BitmapChar | null = font.getChar(charID);
       if (character == null) {
         character = font.getChar(65533);
       }

@@ -1,4 +1,4 @@
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 
 /** Original one-sample grayscale conversion before vertex tint; alpha is preserved. */
 export function createGrayscaleTintStyle(resolve: Resolve): any {

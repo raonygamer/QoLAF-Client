@@ -1,17 +1,23 @@
 // Source port of core/hud/components/chat/ChatRoleTags.as.
-import type { Resolve } from '../runtime/As3';
-import { read } from '../api/Types';
-export function createChatRoleTags(resolve: Resolve): any {
-  const Style: any = resolve('core.hud.components.Style');
-  type RichBitmapMarkup = import('../chat/rich/RichBitmapMarkup').RichBitmapMarkup;
-  type DisplayObject = any;
+import type { DisplayObject } from '../game/Bindings';
+import type { RichBitmapMarkup } from '../chat/rich/RichBitmapMarkup';
+
+interface PlayerRoleTag {
+  label: string;
+  color: number;
+}
+
+export function createChatRoleTags(
+  resolve: (name: 'core.hud.components.Style') => { COLOR_CLIENT_DEVELOPER: number },
+) {
+  const Style = resolve('core.hud.components.Style');
 
   /** Presentation-only player badges and explanations; these never change permissions. */
 
   class ChatRoleTags {
     /** Match authenticated player IDs, never display names or typed tags. */
 
-    public static forPlayer(playerId: string): any {
+    public static forPlayer(playerId: string | null): PlayerRoleTag | null {
       if (playerId == 'simple1394732616658') {
         return { label: 'darkness', color: 0x5e5e5e };
       }
@@ -48,8 +54,8 @@ export function createChatRoleTags(resolve: Resolve): any {
 
     /** Match authenticated sender IDs, never display names or typed chat tags. */
 
-    public static prependPlayerTags(playerId: string, text: string): string | null {
-      let role: any = ChatRoleTags.forPlayer(playerId);
+    public static prependPlayerTags(playerId: string | null, text: string): string {
+      const role = ChatRoleTags.forPlayer(playerId);
       if (role == null) return text;
       let color: string = (Number(role.color) >>> 0).toString(16);
       while (color.length < 6) color = '0' + color;
@@ -100,17 +106,19 @@ export function createChatRoleTags(resolve: Resolve): any {
 
     /** Simple chat stays click-through, but covered text must not show a card. */
 
-    public static isCoveredBy(hit: DisplayObject, view: DisplayObject): boolean {
-      let branch: DisplayObject = view;
-      while (branch != null && branch.parent != null) {
-        let hitBranch: DisplayObject = hit;
-        while (hitBranch != null && hitBranch.parent !== branch.parent) {
-          hitBranch = hitBranch.parent;
+    public static isCoveredBy(hit: DisplayObject | null, view: DisplayObject | null): boolean {
+      let branch = view;
+      while (branch) {
+        const parent = branch.get_parent();
+        if (!parent) break;
+        let hitBranch = hit;
+        while (hitBranch && hitBranch.get_parent() !== parent) {
+          hitBranch = hitBranch.get_parent();
         }
-        if (hitBranch != null && hitBranch !== branch) {
-          return branch.parent.getChildIndex(hitBranch) > branch.parent.getChildIndex(branch);
+        if (hitBranch && hitBranch !== branch) {
+          return parent.getChildIndex(hitBranch) > parent.getChildIndex(branch);
         }
-        branch = branch.parent;
+        branch = parent;
       }
       return false;
     }

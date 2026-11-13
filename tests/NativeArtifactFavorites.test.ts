@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installNativeArtifactFavorites } from '../src/artifacts/NativeArtifactFavorites';
@@ -11,7 +12,9 @@ test('favorite menu toggles source outline, prunes recycle selection and drafts 
   t.after(bitmap.cleanup);
   const cleanup: Function[] = [];
   t.after(() => cleanup.reverse().forEach((fn) => fn()));
-  const hooks = new Hooks();
+  const hookErrors: unknown[] = [];
+  const hooks = new Hooks((error: unknown) => hookErrors.push(error));
+  t.after(() => assert.deepEqual(hookErrors, []));
   const artifact = { id: 'a', revealed: true };
   const player = { id: 'p', getArtifactById: (id: string) => (id === 'a' ? artifact : null) };
   class Box extends bitmap.Sprite {
@@ -35,6 +38,8 @@ test('favorite menu toggles source outline, prunes recycle selection and drafts 
   const actions: any[] = [];
   const game = {
     me: player,
+    get_me: () => player,
+    get_isLeaving: () => false,
     artifactRecyclePending: false,
     chatInput: { insertArtifactLink: (...args: any[]) => actions.push(['draft', ...args]) },
     showMessageDialog: (message: string) => actions.push(['message', message]),
@@ -52,24 +57,34 @@ test('favorite menu toggles source outline, prunes recycle selection and drafts 
     onRecycle() {}
     onRecycleMessage() {}
   }
+  class ActiveBox extends Box {
+    locked = false;
+  }
   const classes: any = {
     'core.artifact.ArtifactOverview': Overview,
     'core.artifact.ArtifactCargoBox': Box,
-    'core.artifact.ArtifactBox': class extends Box {},
+    'core.artifact.ArtifactBox': ActiveBox,
     'core.hud.components.ToolTip': { disposeType() {} },
   };
   let saved: any = {};
   const api: any = {
-    cls: (name: string) => classes[name],
+    game,
+    cls: (name: string) => {
+      if (classes[name]) return classes[name];
+      try {
+        return bitmap.resolve(name);
+      } catch {
+        return {};
+      }
+    },
     defer: (fn: Function) => cleanup.push(fn),
     storage: { get: () => saved, set: (_key: string, value: any) => (saved = value) },
   };
   for (const type of ['before', 'after', 'around'])
     api[type] = (target: any, key: string, fn: Function) =>
       cleanup.push(hooks.add(target, key, type, fn));
-  installNativeArtifactFavorites(api, (name) =>
-    name === 'starling.text.TextField' ? Text : bitmap.resolve(name),
-  );
+  bindGameClasses(api);
+  installNativeArtifactFavorites(api);
   const view = new Overview();
   const parent: any = new bitmap.Sprite();
   parent.sm = { parent: { closeMenu: () => actions.push(['close']) } };
@@ -87,6 +102,20 @@ test('favorite menu toggles source outline, prunes recycle selection and drafts 
   assert.equal(marker.getChildAt(0).color, 0xffcc55);
   assert.equal(marker.getChildAt(0).get_x(), 3);
   assert.equal(marker.getChildAt(0).get_width(), 26);
+  const partial = new Box();
+  partial.frame = null;
+  partial.update();
+  assert.equal(partial.get_numChildren(), 0, 'favorite refresh waits for the frame');
+  const active = new ActiveBox();
+  active.update();
+  const activeMarker = active.getChildAt(0);
+  assert.equal(activeMarker.get_visible(), true);
+  active.locked = true;
+  active.update();
+  assert.equal(activeMarker.get_visible(), false, 'a locked slot must hide its retained favorite');
+  active.locked = false;
+  active.update();
+  assert.equal(activeMarker.get_visible(), true);
   view.g.artifactRecyclePending = true;
   popup.dispatchEventWith('artifactShareContextFavorite', false, artifact);
   assert.equal(saved['account:p']['artifact:a'], true);
@@ -100,6 +129,22 @@ test('favorite menu toggles source outline, prunes recycle selection and drafts 
   popup.dispatchEventWith('artifactShareContextShare', false, artifact);
   await Promise.resolve();
   assert.deepEqual(actions.slice(-2), [['close'], ['draft', 'p', artifact]]);
+  actions.length = 0;
+  popup.dispatchEventWith('artifactShareContextShare', false, artifact);
+  api.game = {};
+  await Promise.resolve();
+  assert.deepEqual(actions, [['close']], 'a queued share cannot draft into a retired room');
+  api.game = game;
+  actions.length = 0;
+  popup.dispatchEventWith('artifactShareContextShare', false, artifact);
+  game.chatInput.insertArtifactLink = () => actions.push(['replacement']);
+  await Promise.resolve();
+  assert.deepEqual(actions, [['close']], 'a queued share cannot call a replacement plugin handler');
+  actions.length = 0;
+  popup.dispatchEventWith('artifactShareContextShare', false, artifact);
+  for (const dispose of cleanup.splice(0).reverse()) dispose();
+  await Promise.resolve();
+  assert.deepEqual(actions, [['close']], 'unsafe disable cancels a queued share');
   view.dispose();
   assert.equal(popup.disposed, true);
 });

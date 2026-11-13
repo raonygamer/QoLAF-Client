@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createSettingsState } from '../src/ported/SettingsState';
-import { aliasProperties } from '../src/runtime/As3';
+import { aliasProperties } from '../src/runtime/HaxeInterop';
 import { Display } from './fixtures/NativeGame';
 
 test('source Settings window switches all available categories, saves, and disposes pages', (t) => {
@@ -68,6 +68,30 @@ test('source Settings window switches all available categories, saves, and dispo
     'generics.Localize': { t: (value: string) => value },
   };
   const State = createSettingsState((name) => definitions[name] ?? {});
+  const nativeContainer = new Display();
+  const nativeChildren = Object.fromEntries(
+    [
+      'activePage',
+      'bg',
+      'generalButton',
+      'bindingsButton',
+      'chatButton',
+      'closeButton',
+      'exitButton',
+    ].map((key) => {
+      const child = new Display();
+      nativeContainer.addChild(child);
+      return [key, child];
+    }),
+  );
+  const native = { ...nativeChildren };
+  State.initializeNative(native);
+  assert.equal(
+    nativeContainer.get_numChildren(),
+    0,
+    'hot-enable removes all vanilla page and tab nodes',
+  );
+  assert.ok(Object.values(nativeChildren).every((child) => child.disposed));
   const state = new State(game);
   state.enter();
   assert.equal(state.activeCategory, 'graphics', 'resume the saved category');
@@ -86,6 +110,18 @@ test('source Settings window switches all available categories, saves, and dispo
     assert.equal(scene.clientSettings.settingsCategory, category.id);
     if (changed) assert.equal(previous.disposed, true);
   }
+  const pluginPage = new Page(game, 'plugins');
+  state.addExternalCategory('plugins', 'Plugins', () => pluginPage);
+  state.addExternalCategory('plugins', 'Plugins', () => pluginPage);
+  assert.equal(
+    state.categories.filter((entry: { id: string }) => entry.id === 'plugins').length,
+    1,
+  );
+  state.showCategory('plugins');
+  assert.equal(state.activePage, pluginPage);
+  assert.equal(state.pageTitle.text, 'Plugins');
+  assert.equal(pluginPage.x, 170);
+  assert.equal(pluginPage.y, 8);
   const page = state.activePage;
   state.close();
   state.close();

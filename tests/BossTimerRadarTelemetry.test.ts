@@ -39,7 +39,7 @@ test('boss rows wrap to 15px multiples, update colors, reuse slots and release u
   ];
   view.refresh(rows, 420);
   assert.equal(view.blockHeight, 30);
-  const labels = view.node.children as Label[];
+  const labels = (view.node as unknown as Display).children as Label[];
   assert.equal(labels[1].values.y, 15);
   assert.equal(labels[0].values.color, 0x88e1a0);
   assert.equal(labels[0].values.autoSize, 'none');

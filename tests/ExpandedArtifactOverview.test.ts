@@ -43,7 +43,7 @@ test('expanded native controls use source chrome, wrapping sort rows, guide and 
     expandedView = true;
     p = {
       isLanded: false,
-      level: 120,
+      get_level: () => 120,
       artifactCount: 0,
       get_artifactLimit: () => 250,
       artifacts: [],

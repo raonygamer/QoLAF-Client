@@ -1,18 +1,18 @@
-import type { Raw } from '../api/Types';
+import type { Texture, BitmapData } from '../game/Bindings';
 
 /** Source ChatImageAsset: shared GPU frames and CPU pixels for context restoration. */
 export class ChatImageAsset {
   refCount = 0;
   lastUse = 0;
-  readonly frames: Raw[];
+  readonly frames: Texture[];
   readonly delays: number[];
 
   constructor(
-    frames: Raw[] | null,
+    frames: Texture[] | null,
     delays: number[] | null,
     readonly width: number,
     readonly height: number,
-    private restoreBitmaps: Raw[] | null = null,
+    private restoreBitmaps: Pick<BitmapData, 'dispose'>[] | null = null,
   ) {
     this.frames = frames ?? [];
     this.delays = delays ?? [];

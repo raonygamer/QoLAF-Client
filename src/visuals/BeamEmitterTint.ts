@@ -1,7 +1,7 @@
 import { getActiveBeamGeometry } from '../weapon/BeamRenderGeometry';
 import { networkTime } from '../rendering/NetworkTime';
 import { read, type API, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { ClientDevVisual } from './ClientDevVisual';
 import type { HullPalette } from './NativePhaseBlade';
 import { createGrayscaleTintStyle } from './GrayscaleTintStyle';
@@ -64,6 +64,7 @@ export function installBeamEmitterTint(api: API, resolve: Resolve) {
     const style = new Style();
     style.set_texture(read(particle, 'texture'));
     style.set_textureSmoothing(read(particle, 'textureSmoothing'));
+    style.set_textureRepeat(read(particle, 'textureRepeat', false));
     state.particles.set(particle, { previous: current, owned: style });
     particle.setStyle(style, false);
   };

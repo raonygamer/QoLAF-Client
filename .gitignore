@@ -1,2 +1,5 @@
 node_modules/
 dist/
+
+# Never publish or commit the private compilation output.
+/private-dist/

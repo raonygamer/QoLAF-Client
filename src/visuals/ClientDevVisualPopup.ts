@@ -1,4 +1,4 @@
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 import { ClientDevVisual } from './ClientDevVisual';
 import { createClientDevVisualStyles } from './ClientDevVisualStyle';
 import { createPhaseBladeBloomFilter } from './PhaseBladeBloomFilter';
@@ -119,7 +119,7 @@ export function createClientDevVisualPopup(resolve: Resolve, InputText: any) {
       this.reverse.addEventListener('change', this.changed);
       this.box.addChild(this.reverse);
       this.note = this.label(
-        'Preview only. Apply saves locally; sharing is still being ported.',
+        'Preview only. Apply saves and shares with updated clients.',
         0,
         493,
         11,
@@ -265,8 +265,8 @@ export function createClientDevVisualPopup(resolve: Resolve, InputText: any) {
       }
       this.confirmButton.enabled = this.validSettings;
       this.note.text = this.validSettings
-        ? 'Preview only. Apply saves locally; sharing is still being ported.'
-        : 'Enter six ClientDevVisualPopup.hex digits for each color (for example, #00FFAA).';
+        ? 'Preview only. Apply saves and shares with updated clients.'
+        : 'Enter six hex digits for each color (for example, #00FFAA).';
       if (this.mode == 'default') this.preview.setStyle(null);
       else {
         let hullStyle: any = new ClientDevVisualStyle(

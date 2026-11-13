@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatFriendPingFormatter as Formatter } from '../src/chat/ChatFriendPingFormatter';
@@ -38,17 +39,17 @@ test('ping snapshots use own/online/offline priority and survive player and frie
     id: 'friend',
     get_name: () => 'Pilot',
     get_level: () => 90,
-    get_activeSkin: () => 'skin',
+    activeSkin: 'skin',
     clanName: 'Clan',
     getActiveFleetObj: () => ({ shipHue: 0.5 }),
   };
   const online = { id: 'friend', name: 'Pilot', level: 2 };
   const game: any = {
-    get_me: () => ({ get_name: () => 'Me' }),
+    get_me: () => ({ get_name: () => 'Me', get_level: () => 1, getActiveFleetObj: () => null }),
     client: { connectUserId: 'self' },
     solarSystem: { key: 'fulzar', name: 'Fulzar' },
     room: { id: 'room', data: { systemType: 'ELITE' } },
-    playerManager: { get_players: () => [live] },
+    playerManager: { get_players: () => [live], get_playersById: () => ({ h: { friend: live } }) },
     dataManager: { loadKey: () => ({ name: 'Fulzar' }) },
   };
   const api: any = {
@@ -61,6 +62,7 @@ test('ping snapshots use own/online/offline priority and survive player and frie
       ],
     }),
   };
+  bindGameClasses(api);
   const targets = friendPingTargets(api, game);
   assert.deepEqual(
     targets.map((target) => target.playerId),
@@ -86,7 +88,7 @@ test('native pings run after length/filter checks, preserve supporter/sender/rol
   const cleanup: (() => void)[] = [];
   const received: any[] = [];
   const game: any = {
-    get_me: () => ({ get_name: () => 'Pilot' }),
+    get_me: () => ({ get_name: () => 'Pilot', get_level: () => 1, getActiveFleetObj: () => null }),
     client: { connectUserId: 'self' },
     messageLog: { updateTexts: (message: any) => received.push(message) },
   };
@@ -113,12 +115,16 @@ test('native pings run after length/filter checks, preserve supporter/sender/rol
       game.messageLog.updateTexts({ text: '[' + channel + '] ' + text });
     },
   };
+  class Game {}
+  Object.setPrototypeOf(game, Game.prototype);
   const api: any = {
-    cls: (name: string) => (name.endsWith('MessageLog') ? log : {}),
+    cls: (name: string) =>
+      name === 'core.scene.Game' ? Game : name.endsWith('MessageLog') ? log : {},
     around: (object: any, key: string, fn: Function) =>
       cleanup.push(hooks.add(object, key, 'around', fn)),
   };
   let notifications = 0;
+  bindGameClasses(api);
   installNativeChatPresentation(api, game, () => {
     notifications++;
   });
@@ -126,7 +132,7 @@ test('native pings run after length/filter checks, preserve supporter/sender/rol
   const row = received[0];
   assert.match(
     row.text,
-    /\[mod\] <font color='#ffff66'>&#9733;<\/font>@Pilot: <font color='#66aaff'>@Pilot<\/font> \*{9}$/,
+    /\[mod\] <font color='#ffff66'>&#11088;<\/font> @Pilot: <font color='#66aaff'>@Pilot<\/font> \*{9}$/,
   );
   assert.equal(row.pings.at(-1).playerId, 'self');
   assert.equal(notifications, 1);

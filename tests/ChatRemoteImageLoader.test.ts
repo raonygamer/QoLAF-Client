@@ -1,3 +1,4 @@
+import type { Texture } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatRemoteImageLoader, type ChatImagePlatform } from '../src/chat/ChatRemoteImageLoader';
@@ -25,14 +26,14 @@ function fixture(overrides: Partial<ChatImagePlatform> = {}) {
     async decodeStatic() {
       return bitmap;
     },
-    beginGif() {
+    beginGIF() {
       throw Error('unexpected GIF');
     },
     async nextFrame(signal) {
       signal.throwIfAborted();
     },
     upload() {
-      return texture;
+      return texture as unknown as Texture;
     },
     ...overrides,
   };
@@ -178,7 +179,7 @@ test('animated GIF uploads yield between frames and dispose partial uploads on f
     async fetch() {
       return new Response(gifHeader(16, 16));
     },
-    beginGif() {
+    beginGIF() {
       return {
         width: 16,
         height: 16,
@@ -199,7 +200,7 @@ test('animated GIF uploads yield between frames and dispose partial uploads on f
     },
     upload() {
       if (index === 2) throw Error('second frame upload');
-      return texture;
+      return texture as unknown as Texture;
     },
   });
   await assert.rejects(load(f.loader), /second frame upload/);

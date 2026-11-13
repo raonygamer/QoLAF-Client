@@ -1,31 +1,32 @@
-import { read, type API, type Raw } from '../api/Types';
+import {
+  Sound,
+  SoundTransform,
+  SoundLocator,
+  URLRequest,
+  type SoundChannel,
+} from '../game/Bindings';
 
 /** Original embedded ping through OpenFL, sharing the game's SoundMixer and effect volume. */
 export class ChatPingSound {
-  private sound: Raw | null = null;
+  private sound: Sound | null = null;
   private loading = false;
   private pending = 0;
   private disposed = false;
-  private channels = new Map<Raw, () => void>();
+  private channels = new Map<SoundChannel, () => void>();
 
-  constructor(
-    private api: API,
-    private url: string,
-  ) {}
+  constructor(private readonly url: string) {}
 
   play(): void {
     if (this.disposed || this.volume() <= 0) return;
     try {
       if (!this.sound) {
-        const Sound = this.api.cls('openfl.media.Sound') as any;
-        const Request = this.api.cls('openfl.net.URLRequest') as any;
-        if (!Sound || !Request) return;
+        if (!Sound || !URLRequest) return;
         this.sound = new Sound();
         this.loading = true;
         this.pending = 1;
-        this.sound!.addEventListener('complete', this.loaded);
-        this.sound!.addEventListener('ioError', this.failed);
-        this.sound!.load(new Request(this.url));
+        this.sound.addEventListener('complete', this.loaded);
+        this.sound.addEventListener('ioError', this.failed);
+        this.sound.load(new URLRequest(this.url));
       } else if (this.loading) this.pending++;
       else this.playLoaded();
     } catch {
@@ -34,8 +35,8 @@ export class ChatPingSound {
   }
 
   private volume(): number {
-    const manager = this.api.cls('sound.SoundLocator')?.getService();
-    const value = Number(read(manager, 'effectVolume', 0));
+    const manager = SoundLocator?.getService();
+    const value = Number(manager?.get_effectVolume() ?? 0);
     return Number.isFinite(value) && value > 0 ? value : 0;
   }
 
@@ -52,9 +53,8 @@ export class ChatPingSound {
     const volume = this.volume();
     if (!this.sound || volume <= 0 || this.disposed) return;
     try {
-      const Transform = this.api.cls('openfl.media.SoundTransform') as any;
-      if (!Transform) return;
-      const channel = this.sound.play(0, 0, new Transform(volume));
+      if (!SoundTransform) return;
+      const channel = this.sound.play(0, 0, new SoundTransform(volume));
       if (!channel) return;
       const finished = () => {
         channel.removeEventListener('soundComplete', finished);

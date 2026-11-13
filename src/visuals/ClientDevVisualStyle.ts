@@ -1,5 +1,5 @@
 import { read, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { ClientDevVisual } from './ClientDevVisual';
 import { clientDevVisualShader } from './ClientDevVisualShader';
 import { networkTime } from '../rendering/NetworkTime';

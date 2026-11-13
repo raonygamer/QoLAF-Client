@@ -129,12 +129,18 @@ test('source aim diagnostics retain panel geometry, ray styling, click-through a
     assert.ok(Math.abs(lines[index][1] - expected[0]) < 1e-9);
     assert.ok(Math.abs(lines[index][2] - expected[1]) < 1e-9);
   }
-  assist.resetDiagnostics();
-  assist.release('automation owns aim control');
+  assist.automate(1000, NaN);
   view.update(overlay, { ...snapshot, eligibility: undefined, mode: 'AutomationControlled' });
   assert.equal(overlay.children[1], container, 'reuse one panel rather than accumulate overlays');
   assert.equal(shape.calls.filter((call) => call[0] === 'line').length, 1);
   assert.match(field.text, /confirmed hit: -/);
+  assert.match(field.text, /reason: automation owns aim control; waiting for angle/);
+  assert.match(field.text, /raw\/final: 0.00 deg\/-/);
+  assist.automate(1016, Math.PI / 2);
+  view.update(overlay, { ...snapshot, eligibility: undefined, mode: 'AutomationControlled' });
+  assert.match(field.text, /raw\/final: 0.00 deg\/90.00 deg/);
+  assert.doesNotMatch(field.text, /waiting for angle/);
+  assert.equal(shape.calls.filter((call) => call[0] === 'line').length, 1);
   assert.match(
     aimAssistDebugText({ ...snapshot, ship: null, activeTarget: null }),
     /weapon: - \| fire=false/,

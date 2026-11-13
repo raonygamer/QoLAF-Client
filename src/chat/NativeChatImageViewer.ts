@@ -1,5 +1,5 @@
 import { read, type API, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import type { ChatImageCache } from './ChatImageCache';
 import type { ChatDiscordImageLink } from './ChatDiscordImageLink';
 import { createChatImageViewerWindow } from '../ported/ChatImageViewerWindow';
@@ -20,7 +20,8 @@ export function installNativeChatImageViewer(
   if (!stage || !scroll) return;
   let Viewer: ReturnType<typeof createChatImageViewerWindow> | undefined;
   const onTouch = (event: Raw) => {
-    if (game.isLeaving || !log.contains(advanced) || !read(scroll, 'touchable')) return;
+    if (read(game, 'isLeaving', false) || !log.contains(advanced) || !read(scroll, 'touchable'))
+      return;
     for (let node: Raw | null = advanced; node; node = read(node, 'parent')) {
       if (!read(node, 'visible') || read(node, 'alpha') <= 0) return;
     }

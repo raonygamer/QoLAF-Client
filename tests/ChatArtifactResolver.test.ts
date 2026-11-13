@@ -1,3 +1,4 @@
+import type { Artifact } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatArtifactLinkResolver } from '../src/chat/ChatArtifactLinkResolver';
@@ -23,7 +24,7 @@ function fixture(owner = '', shared = false) {
     game,
     (record) => {
       constructed.push(record);
-      return { ...record, getColor: () => 0x55ccff };
+      return { ...record, getColor: () => 0x55ccff } as unknown as Artifact;
     },
     (name) => 'Localized ' + name,
     () => time,
@@ -147,7 +148,7 @@ test('local registration wins over an older request and reentrant disposal suppr
   f.resolver.resolve('pilot', 'artifact');
   f.requests.shift()!.ok(f.player());
   const request = f.requests.shift()!;
-  const local = { ...f.artifact(), name: 'Fresh', stats: [] };
+  const local = { ...f.artifact(), name: 'Fresh', stats: [] } as unknown as Artifact;
   const registered = f.resolver.registerLocal('pilot', local);
   assert.ok(registered);
   request.fail();
@@ -191,7 +192,7 @@ test('room recreation reuses verified cache; account changes invalidate old call
 
 test('artifact eviction also removes its projected label and local registration rejects hidden items', () => {
   const f = fixture();
-  const local = (id: string) => ({ ...f.artifact(id), stats: [] });
+  const local = (id: string) => ({ ...f.artifact(id), stats: [] }) as unknown as Artifact;
   assert.equal(f.resolver.registerLocal('pilot', { ...local('hidden'), revealed: false }), null);
   for (let index = 0; index < 513; index++) f.resolver.registerLocal('pilot', local('a' + index));
   assert.equal(f.resolver.cached('pilot', 'a0'), null);

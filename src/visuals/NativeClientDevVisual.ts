@@ -3,7 +3,7 @@ import { read, type API, type Raw } from '../api/Types';
 import { portedClasses } from '../ported/Registry';
 import { createBitmapClasses } from '../ui/BitmapClasses';
 import { createBitmapInputAdapter } from '../ui/BitmapInputAdapter';
-import { bridgeNativeProperties } from '../runtime/As3';
+import { bridgeNativeProperties } from '../runtime/HaxeInterop';
 import { installPopupKeyboard } from '../dialogs/NativePopupKeyboard';
 import { ClientDevVisual } from './ClientDevVisual';
 import { createClientDevVisualStyles } from './ClientDevVisualStyle';
@@ -11,6 +11,8 @@ import { createClientDevVisualPopup } from './ClientDevVisualPopup';
 
 import { installNativePhaseBlade, type HullPalette } from './NativePhaseBlade';
 import { isClientDeveloper } from './ClientVisualAuthority';
+import { ShipVisualStateStore } from './ShipVisualStateStore';
+import { installNativeRemoteHullPalette } from './NativeRemoteHullPalette';
 
 /** Draft-only native editor. Hull application never modifies course, hitboxes or weapons. */
 export function installNativeClientDevVisual(api: API, game: Raw): void {
@@ -22,6 +24,12 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
   let popup: any = null;
   let mode = 'default';
   let settings = ClientDevVisual.defaults();
+  api.defer(
+    ShipVisualStateStore.forGame(game).bind('developer', () => ({
+      devvis: mode,
+      devvisSettings: { ...settings },
+    })),
+  );
   let palette: HullPalette | null = null;
   const cooldown = ShipVisualCooldown.forGame(game);
   let clip: any = null;
@@ -54,7 +62,9 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
           };
   };
   refreshPalette();
+  const remotePalette = installNativeRemoteHullPalette(api, game, resolve);
   installNativePhaseBlade(api, game, resolve, (ship) => {
+    if (ship && ship !== game.me?.ship) return remotePalette(ship);
     if (
       !ship ||
       ship !== game.me?.ship ||
@@ -133,6 +143,7 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
     clear();
     update();
     cooldown.mark(performance.now());
+    ShipVisualStateStore.forGame(game).changed();
     try {
       api.storage.set(storageKey, { devvis: mode, devvisSettings: settings });
     } catch {
@@ -168,6 +179,18 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
     game.addChildToOverlay(popup, true);
   };
   const previousOpen = Object.getOwnPropertyDescriptor(chat, 'openDevVisualPopup');
+  const previousReset = Object.getOwnPropertyDescriptor(chat, 'resetClientDevVisual');
+  chat.resetClientDevVisual = () => {
+    mode = 'default';
+    settings = ClientDevVisual.defaults();
+    refreshPalette();
+    clear();
+    try {
+      api.storage.set(storageKey, { devvis: mode, devvisSettings: settings });
+    } catch {
+      api.log('Could not persist default hull colors');
+    }
+  };
   chat.openDevVisualPopup = open;
   api.around(chat, 'sendMessage', (next, ...args) => {
     const text = read(chat.input, 'text', '').trim();
@@ -193,5 +216,7 @@ export function installNativeClientDevVisual(api: API, game: Raw): void {
     clear();
     if (previousOpen) Object.defineProperty(chat, 'openDevVisualPopup', previousOpen);
     else delete chat.openDevVisualPopup;
+    if (previousReset) Object.defineProperty(chat, 'resetClientDevVisual', previousReset);
+    else delete chat.resetClientDevVisual;
   });
 }

@@ -1,11 +1,12 @@
 import { createSettingsAutomations } from './SettingsAutomations';
-import { createFontRegistries } from '../ui/FontRegistries';
+import { RussoBitmapFontRegistry } from '../ui/RussoBitmapFontRegistry';
+import { VerdanaBitmapFontRegistry } from '../ui/VerdanaBitmapFontRegistry';
 import { createButtonAdapter } from '../ui/ButtonAdapter';
 import { createSettingsBindings } from './SettingsBindings';
 import { createSettingsChat } from './SettingsChat';
 import { createSettingsKeybind } from './SettingsKeybind';
 import type { API, Raw } from '../api/Types';
-import { aliasProperties } from '../runtime/As3';
+import { aliasProperties } from '../runtime/HaxeInterop';
 import { createLoginButton } from './LoginButton';
 import { createLoginProfilePanel } from './LoginProfilePanel';
 import { createLoginAccountTypePanel } from './LoginAccountTypePanel';
@@ -36,9 +37,8 @@ export function portedClasses(api: API) {
       name === 'core.text.RussoBitmapFontRegistry' ||
       name === 'core.text.VerdanaBitmapFontRegistry'
     ) {
-      const fonts = createFontRegistries(resolve);
-      cache['core.text.RussoBitmapFontRegistry'] = fonts.RussoBitmapFontRegistry;
-      cache['core.text.VerdanaBitmapFontRegistry'] = fonts.VerdanaBitmapFontRegistry;
+      cache['core.text.RussoBitmapFontRegistry'] = RussoBitmapFontRegistry;
+      cache['core.text.VerdanaBitmapFontRegistry'] = VerdanaBitmapFontRegistry;
       return cache[name];
     }
     if (name.startsWith('feathers.controls.')) {
@@ -52,7 +52,11 @@ export function portedClasses(api: API) {
     }
     if (name === 'core.hud.components.SettingsKeybind')
       return (cache[name] = createSettingsKeybind(resolve));
-    if (name === 'core.states.gameStates.SettingsAutomations')
+    if (
+      typeof __QOLAF_PRIVATE__ !== 'undefined' &&
+      __QOLAF_PRIVATE__ &&
+      name === 'core.states.gameStates.SettingsAutomations'
+    )
       return (cache[name] = createSettingsAutomations(resolve));
     if (name === 'core.states.gameStates.SettingsChat')
       return (cache[name] = createSettingsChat(resolve));

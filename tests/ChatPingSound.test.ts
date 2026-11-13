@@ -1,17 +1,19 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import type { API } from '../src/api/Types';
+import { bindGameClasses } from '../src/game/Bindings';
 import { ChatPingSound } from '../src/chat/ChatPingSound';
 
 function fixture() {
   let volume = 0.5;
   const sounds: Sound[] = [];
   class Events {
-    handlers = new Map<string, Set<Function>>();
-    addEventListener(event: string, fn: Function) {
+    handlers = new Map<string, Set<() => void>>();
+    addEventListener(event: string, fn: () => void) {
       if (!this.handlers.has(event)) this.handlers.set(event, new Set());
       this.handlers.get(event)!.add(fn);
     }
-    removeEventListener(event: string, fn: Function) {
+    removeEventListener(event: string, fn: () => void) {
       this.handlers.get(event)?.delete(fn);
     }
     dispatch(event: string) {
@@ -25,43 +27,43 @@ function fixture() {
     }
   }
   class Sound extends Events {
-    request: any;
+    request!: { url: string };
     closed = false;
     channels: Channel[] = [];
-    calls: any[][] = [];
+    calls: [number, number, { volume: number }][] = [];
     constructor() {
       super();
       sounds.push(this);
     }
-    load(request: any) {
+    load(request: { url: string }) {
       this.request = request;
     }
     close() {
       this.closed = true;
     }
-    play(...args: any[]) {
+    play(...args: [number, number, { volume: number }]) {
       this.calls.push(args);
       const channel = new Channel();
       this.channels.push(channel);
       return channel;
     }
   }
-  const api: any = {
-    cls: (name: string) =>
-      ({
-        'openfl.media.Sound': Sound,
-        'openfl.net.URLRequest': class {
-          constructor(public url: string) {}
-        },
-        'openfl.media.SoundTransform': class {
-          constructor(public volume: number) {}
-        },
-        'sound.SoundLocator': { getService: () => ({ get_effectVolume: () => volume }) },
-      })[name],
+  const classes: Record<string, unknown> = {
+    'openfl.media.Sound': Sound,
+    'openfl.media.SoundChannel': Channel,
+    'openfl.net.URLRequest': class {
+      constructor(public url: string) {}
+    },
+    'openfl.media.SoundTransform': class {
+      constructor(public volume: number) {}
+    },
+    'sound.SoundLocator': { getService: () => ({ get_effectVolume: () => volume }) },
   };
+  const api = { cls: (name: string) => classes[name] ?? {} } as unknown as API;
+  bindGameClasses(api);
   return {
     sounds,
-    ping: new ChatPingSound(api, 'data:audio/mpeg;base64,test'),
+    ping: new ChatPingSound('data:audio/mpeg;base64,test'),
     setVolume: (next: number) => {
       volume = next;
     },

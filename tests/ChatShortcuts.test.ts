@@ -1,3 +1,4 @@
+import type { ChatInputText } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatEmojiAutocompleteParser as Parser } from '../src/chat/ChatEmojiAutocompleteParser';
@@ -61,7 +62,15 @@ test('native alias expansion preserves styles, waits for IME and leaves disallow
       focused++;
     },
   });
-  const chat = { input, chatMode: 'clan', visible: true, isActive: () => true };
+  const chat = {
+    input,
+    chatMode: 'clan',
+    visible: true,
+    get_visible() {
+      return this.visible;
+    },
+    isActive: () => true,
+  };
   const model = new RichBitmapEditorModel();
   const binding = new RichBitmapInputBinding(model, element as unknown as HTMLInputElement, () =>
     input.dispatchEventWith('change', true),
@@ -75,7 +84,7 @@ test('native alias expansion preserves styles, waits for IME and leaves disallow
   const cleanups: (() => void)[] = [];
   installNativeChatShortcuts(
     { defer: (fn: () => void) => cleanups.push(fn) } as any,
-    chat,
+    chat as unknown as ChatInputText,
     { model, binding } as any,
     shortcuts,
   );

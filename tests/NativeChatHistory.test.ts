@@ -1,3 +1,4 @@
+import type { GameScene } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatHistory } from '../src/chat/ChatHistory';
@@ -58,7 +59,7 @@ function fixture(history: ChatHistory) {
       cleanups.push(hooks.add(object, name, 'around', fn)),
     defer: (fn: () => void) => cleanups.push(fn),
   };
-  installNativeChatHistory(api as any, { chatInput: chat }, history);
+  installNativeChatHistory(api as any, { chatInput: chat } as unknown as GameScene, history);
   return { chat, input, listeners, cleanup: () => cleanups.reverse().forEach((fn) => fn()) };
 }
 

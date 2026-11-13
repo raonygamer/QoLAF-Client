@@ -1,3 +1,5 @@
+import type { Artifact } from '../src/game/Bindings';
+import type { GameScene } from '../src/game/Bindings';
 import { EmojiGlyphLookup } from '../src/chat/rich/EmojiGlyphLookup';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -127,7 +129,7 @@ function fixture(artifacts?: Parameters<typeof installNativeRichChatInput>[4], o
   };
   const editor = installNativeRichChatInput(
     Object.freeze(api) as any,
-    { chatInput: chat },
+    { chatInput: chat } as unknown as GameScene,
     bitmap.resolve,
     undefined,
     artifacts,
@@ -263,7 +265,7 @@ test('live composer resolves artifact labels without changing wire tokens or sel
         },
       },
     },
-    (record) => ({ ...record, stats: [{}], getColor: () => 0x123456 }),
+    (record) => ({ ...record, stats: [{}], getColor: () => 0x123456 }) as unknown as Artifact,
   );
   const { input, element, editor, cleanup } = fixture(resolver);
   const token = '$artifact:player-1:item$';

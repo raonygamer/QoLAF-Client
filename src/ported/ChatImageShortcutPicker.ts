@@ -1,5 +1,5 @@
 // Source port of core/hud/components/chat/ChatImageShortcutPicker.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 import { ChatImageShortcutStore } from '../chat/ChatImageShortcutStore';
 import { ChatDiscordImageLink } from '../chat/ChatDiscordImageLink';
 export function createChatImageShortcutPicker(
@@ -259,7 +259,7 @@ export function createChatImageShortcutPicker(
       let label: TextField = new TextField(
         247,
         26,
-        ChatImageShortcutPicker.compactUrl(url),
+        ChatImageShortcutPicker.compactURL(url),
         new TextFormat(
           VerdanaBitmapFontRegistry.fontNameForSize(10),
           10,
@@ -384,7 +384,7 @@ export function createChatImageShortcutPicker(
     }
 
     @bound
-    private static compactUrl(url: string): string {
+    private static compactURL(url: string): string {
       if (url == null) return '';
       let result: string = url.replace(/^https?:\/\//i, '');
       return result.length <= 42 ? result : result.substring(0, 39) + '...';

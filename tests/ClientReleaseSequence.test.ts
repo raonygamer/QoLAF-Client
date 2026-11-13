@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ClientReleaseSequence } from '../src/dialogs/ClientReleaseSequence';
@@ -12,10 +13,22 @@ function fixture(sequence = new ClientReleaseSequence(), version = '0.2.0-dev') 
   let ready = true;
   class Modal {
     visible = true;
+    get_visible() {
+      return this.visible;
+    }
   }
   const children: Modal[] = [];
   const game: any = {
     me: {},
+    get_me() {
+      return this.me;
+    },
+    get_isLeaving() {
+      return this.isLeaving === true;
+    },
+    get_isRecoveringGameConnection() {
+      return this.isRecoveringGameConnection === true;
+    },
     overlay: { get_numChildren: () => children.length, getChildAt: (i: number) => children[i] },
   };
   const api: any = {
@@ -35,6 +48,7 @@ function fixture(sequence = new ClientReleaseSequence(), version = '0.2.0-dev') 
       cleanups.push(fn);
     },
   };
+  bindGameClasses(api);
   const show = sequence.install(api, game, version, () => {
     if (!ready) return false;
     opened++;
@@ -79,6 +93,10 @@ test('release waits for Sale, connection recovery and a current playable game', 
   f.tick();
   assert.equal(f.opened, 0);
   f.game.me = {};
+  f.game.isLeaving = true;
+  f.tick();
+  assert.equal(f.opened, 0);
+  f.game.isLeaving = false;
   f.tick();
   f.tick();
   assert.equal(f.opened, 1);

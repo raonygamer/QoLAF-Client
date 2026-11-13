@@ -1,5 +1,5 @@
 // Source port of af/PlayerInspectViewModel.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createPlayerInspectViewModel(resolve: Resolve): any {
   type Player = any;
   const DataLocator: any = resolve('data.DataLocator');
@@ -427,7 +427,7 @@ export function createPlayerInspectViewModel(resolve: Resolve): any {
      * Missing live stats are unavailable, never a guessed base value or zero.
      */
     @bound
-    public static weaponDps(weapon: any): any {
+    public static weaponDPS(weapon: any): any {
       var damage: any = PlayerInspectViewModel.get(weapon, 'dmg');
       var amount: any = null;
       try {
@@ -475,7 +475,7 @@ export function createPlayerInspectViewModel(resolve: Resolve): any {
         card = byKey['$' + key];
         if (card == null || seen['$' + key] === true) continue;
         seen['$' + key] = true;
-        card.dps = PlayerInspectViewModel.weaponDps(weapon);
+        card.dps = PlayerInspectViewModel.weaponDPS(weapon);
         var primary: any[] = [];
         var secondary: any[] = [];
         var damage: any = PlayerInspectViewModel.get(weapon, 'dmg');

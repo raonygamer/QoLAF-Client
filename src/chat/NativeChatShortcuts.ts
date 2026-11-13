@@ -1,4 +1,5 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import type { ChatInputText } from '../game/Bindings';
 import type { NativeBitmapInput } from './rich/NativeBitmapInput';
 import type { ChatImageShortcutStore } from './ChatImageShortcutStore';
 import type { DeviceSettings } from '../settings/DeviceSettings';
@@ -8,20 +9,21 @@ import { ChatDiscordImageLink } from './ChatDiscordImageLink';
 /** Expand the original :image_alias: syntax at the visible caret, without submitting chat. */
 export function installNativeChatShortcuts(
   api: API,
-  chat: Raw,
+  chat: ChatInputText,
   editor: NativeBitmapInput,
   shortcuts: ChatImageShortcutStore,
   preferences?: DeviceSettings,
 ): void {
   const input = chat.input;
-  const element: HTMLInputElement = input.element;
+  const element = input.element;
+  if (!element) return;
   let resolving = false;
   const refresh = () => {
     if (
       resolving ||
       editor.binding.isComposing ||
       !chat.isActive() ||
-      !read(chat, 'visible') ||
+      !chat.get_visible() ||
       !(preferences?.get('enableNewChatIntegrationSystem') ?? true)
     )
       return;

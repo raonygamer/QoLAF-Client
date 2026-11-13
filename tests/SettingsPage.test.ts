@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createSettingsQoLAF } from '../src/ported/SettingsQoLAF';
 import { createClientSettings } from '../src/ported/ClientSettings';
 import { Display } from './fixtures/NativeGame';
-import { aliasProperties } from '../src/runtime/As3';
+import { aliasProperties } from '../src/runtime/HaxeInterop';
 
 // Exercise the original page's controls/callbacks through real Starling event
 // invocation. This checks source behavior and teardown, not visual rendering.
@@ -130,16 +130,17 @@ test('settings slider retains upstream drag behavior with original skin geometry
   assert.equal(slider.get_value(), 40);
   assert.equal(changes, 1);
   assert.equal(slider.getThumb().get_x(), 75);
-  assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x282828);
+  assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x505050);
   const oldThumb = slider.getThumb();
   touch('ended', 79);
-  assert.equal(oldThumb.disposed, true);
+  assert.equal(oldThumb.disposed, false);
+  assert.equal(slider.getThumb(), oldThumb, 'source defaultSkin is reused for every state');
   assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x505050);
   slider.isEnabled = false;
   assert.equal(slider.touchable, false);
-  assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x080808);
+  assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x505050);
   slider.setThumbState('hover');
-  assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x080808);
+  assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x505050);
   slider.isEnabled = true;
   assert.equal(slider.touchable, true);
   assert.equal(slider.getThumb().getChildAt(1).get_color(), 0x505050);

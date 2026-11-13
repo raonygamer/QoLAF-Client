@@ -1,69 +1,107 @@
-import { bound, type Resolve } from '../runtime/As3';
-import type { Raw } from '../api/Types';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
+import {
+  Artifact,
+  Sprite,
+  Quad,
+  Image,
+  StarlingTextField as TextField,
+  TextFormat,
+  Localize,
+  TextureLocator,
+  ToolTip,
+  type GameScene,
+} from '../game/Bindings';
+import type { Game } from '../game/Game';
+import { VerdanaBitmapFontRegistry as Verdana } from '../ui/VerdanaBitmapFontRegistry';
+
+interface ArtifactType {
+  type: string;
+  name: string;
+  bitmap: string;
+}
+
+function artifactTypes(value: unknown): ArtifactType[] {
+  if (!value || typeof value !== 'object') throw new Error('ArtifactTypes table is unavailable');
+  const entries: unknown[] = Object.values(value);
+  const types = entries.map((entry): ArtifactType => {
+    if (
+      !entry ||
+      typeof entry !== 'object' ||
+      !('type' in entry) ||
+      typeof entry.type !== 'string' ||
+      !('name' in entry) ||
+      typeof entry.name !== 'string' ||
+      !('bitmap' in entry) ||
+      typeof entry.bitmap !== 'string'
+    )
+      throw new Error('Invalid ArtifactTypes record');
+    return { type: entry.type, name: entry.name, bitmap: entry.bitmap };
+  });
+  // ObjUtils.ToVector uses this exact name comparison, not locale collation.
+  return types.sort((left, right) => (left.name > right.name ? 1 : -1));
+}
 
 /** Original ArtifactSorting panel, geometry and controls on the native display tree. */
-export function createArtifactSorting(resolve: Resolve): any {
-  const Sprite = resolve('starling.display.Sprite');
-  const Quad = resolve('starling.display.Quad');
-  const Image = resolve('starling.display.Image');
-  const TextField = resolve('starling.text.TextField');
-  const TextFormat = resolve('starling.text.TextFormat');
-  const Verdana = resolve('core.text.VerdanaBitmapFontRegistry');
-  const Button = resolve('core.hud.components.Button');
-  const ToolTip = resolve('core.hud.components.ToolTip');
-  const Scroll = resolve('feathers.controls.ScrollContainer');
-  const localize = resolve('generics.Localize');
-  const textures = resolve('textures.TextureLocator');
-  const objects = resolve('generics.ObjUtils');
-  const Artifact = resolve('core.artifact.Artifact');
+export function createArtifactSorting(resolve: Resolve) {
+  // These two source controls are adapters around native Button and ScrollBox.
+  const Button = resolve('core.hud.components.Button') as new (
+    callback: () => void,
+    text: string,
+    style: string,
+    size: number,
+    family: string,
+  ) => Game.core.hud.components.Button;
+  const Scroll = resolve(
+    'feathers.controls.ScrollContainer',
+  ) as new () => Game.core.hud.components.ui.ScrollBox & { clipContent: boolean };
 
   class ArtifactSorting extends Sprite {
     static readonly PANEL_WIDTH = 665;
     static readonly PANEL_HEIGHT = 520;
     private nextX = 20;
     private nextY = 0;
-    private mainBody: Raw;
+    private mainBody: Sprite;
     private closed = false;
 
     constructor(
-      private game: Raw,
+      private game: GameScene,
       private callback: (order: string) => void,
-      private closeCallback: ((popup: Raw) => void) | null = null,
+      private closeCallback: ((popup: ArtifactSorting) => void) | null = null,
       blackTheme = false,
     ) {
       super();
       const background = new Quad(665, 520, blackTheme ? 0x000000 : 0x05080d);
-      background.alpha = 0.88;
+      background.set_alpha(0.88);
       this.addChild(background);
       this.drawBorder(1, 1, 663, 518, blackTheme ? 0x707070 : 0x7892aa, 2, 0.95);
       this.drawBorder(5, 5, 655, 510, blackTheme ? 0x282828 : 0x263b4e, 1, 0.8);
       const headline = new TextField(
         485,
         36,
-        localize.t('Choose stat type'),
+        Localize.t('Choose stat type'),
         new TextFormat(Verdana.fontNameForSize(20), 20, 0xfff1a8, 'left', 'center'),
       );
-      headline.x = 18;
-      headline.y = 14;
+      headline.set_x(18);
+      headline.set_y(14);
       this.addChild(headline);
-      const close = new Button(() => this.close(), localize.t('Close'), 'highlight', 12, 'Verdana');
-      close.x = 665 - close.width - 14;
-      close.y = 14;
+      const close = new Button(() => this.close(), Localize.t('Close'), 'highlight', 12, 'Verdana');
+      close.set_x(665 - close.get_width() - 14);
+      close.set_y(14);
       this.addChild(close);
       const panel = new Quad(637, 350, blackTheme ? 0x080808 : 0x101722);
-      panel.x = 14;
-      panel.y = 60;
-      panel.alpha = 0.76;
+      panel.set_x(14);
+      panel.set_y(60);
+      panel.set_alpha(0.76);
       this.addChild(panel);
       this.drawBorder(14, 60, 637, 350, blackTheme ? 0x505050 : 0x526c83, 1, 0.8);
       const scroll = new Scroll();
-      scroll.x = 20;
-      scroll.y = 66;
-      scroll.width = 625;
-      scroll.height = 338;
+      scroll.set_x(20);
+      scroll.set_y(66);
+      scroll.set_width(625);
+      scroll.set_height(338);
       scroll.clipContent = true;
       this.mainBody = new Sprite();
-      const types = objects.ToVector(game.dataManager.loadTable('ArtifactTypes'), true, 'name');
+      const types = artifactTypes(game.dataManager.loadTable('ArtifactTypes'));
       const rows = [
         ['health', 'convShield'],
         ['armor'],
@@ -108,39 +146,41 @@ export function createArtifactSorting(resolve: Resolve): any {
         for (const [label, order] of row) {
           const button = new Button(
             () => this.closeAndSort(order),
-            localize.t(label),
+            Localize.t(label),
             'normal',
             12,
             'Verdana',
           );
-          button.x = x;
-          button.y = 420 + index * 34;
+          button.set_x(x);
+          button.set_y(420 + index * 34);
           this.addChild(button);
-          x += button.width + 20;
+          x += button.get_width() + 20;
         }
       });
     }
 
-    private addStat(type: Raw): void {
-      const icon = new Image(textures.getService().getTextureGUIByKey(type.bitmap));
-      icon.scaleX = icon.scaleY = 0.7;
-      icon.x = this.nextX;
-      icon.y = this.nextY;
-      icon.name = type.type;
+    private addStat(type: ArtifactType): void {
+      const icon = new Image(TextureLocator.getService().getTextureGUIByKey(type.bitmap));
+      icon.set_scaleX(0.7);
+      icon.set_scaleY(0.7);
+      icon.set_x(this.nextX);
+      icon.set_y(this.nextY);
+      icon.set_name(type.type);
       this.mainBody.addChild(icon);
-      this.nextX += icon.width + 10;
-      new ToolTip(this.game, icon, localize.t(type.name), null, 'artifactBox');
+      this.nextX += icon.get_width() + 10;
+      new ToolTip(this.game, icon, Localize.t(type.name), null, 'artifactBox');
       icon.addEventListener('touch', this.onTouch);
-      icon.useHandCursor = true;
+      icon.set_useHandCursor(true);
     }
 
     @bound
-    private onTouch(event: Raw): void {
-      const icon = event.currentTarget;
+    private onTouch(event: Game.starling.events.TouchEvent): void {
+      const icon: unknown = event.currentTarget;
+      if (!(icon instanceof Image)) return;
       if (event.getTouch(icon, 'ended')) {
-        icon.filter = null;
-        this.closeAndSort(icon.name);
-      } else icon.alpha = event.interactsWith(icon) ? 0.5 : 1;
+        icon.set_filter(null);
+        this.closeAndSort(icon.get_name());
+      } else icon.set_alpha(event.interactsWith(icon) ? 0.5 : 1);
     }
 
     public closeAndSort(order: string): void {
@@ -155,7 +195,7 @@ export function createArtifactSorting(resolve: Resolve): any {
       const handler = this.closeCallback;
       this.closeCallback = null;
       if (handler) handler(this);
-      else if (this.parent) this.parent.removeChild(this, true);
+      else this.removeFromParent(true);
     }
 
     private drawBorder(
@@ -174,9 +214,9 @@ export function createArtifactSorting(resolve: Resolve): any {
         [x + width - thickness, y, thickness, height],
       ]) {
         const border = new Quad(w, h, color);
-        border.x = left;
-        border.y = top;
-        border.alpha = alpha;
+        border.set_x(left);
+        border.set_y(top);
+        border.set_alpha(alpha);
         this.addChild(border);
       }
     }

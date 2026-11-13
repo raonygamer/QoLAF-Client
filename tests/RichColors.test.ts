@@ -57,8 +57,10 @@ for (const [name, factory] of Object.entries({
       now = index * 17.137;
       assert.equal(Color.currentColor, scope.currentColor(), `time ${now}`);
       assert.equal(Color.currentColor, scope.currentColor(), 'cached sample');
-      if (name === 'PodRewardPulseColor')
+      if (name === 'PodRewardPulseColor') {
+        assert.ok('currentLowRelicColor' in Color);
         assert.equal(Color.currentLowRelicColor, scope.currentLowRelicColor());
+      }
       assert.equal(nativeGame.time, 33);
     }
     for (const invalid of [0, -1, NaN, Infinity]) {

@@ -1,5 +1,5 @@
 // Source port of core/hud/components/chat/ChatImageViewerWindow.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 import type { Raw } from '../api/Types';
 import type { ChatImageCache } from '../chat/ChatImageCache';
 import type { ChatImageAsset } from '../chat/ChatImageAsset';
@@ -89,7 +89,7 @@ export function createChatImageViewerWindow(
         if (
           current.game === owner &&
           current.link != null &&
-          current.link.rawUrl == imageLink.rawUrl
+          current.link.rawURL == imageLink.rawURL
         ) {
           current.bringToFront();
           return;

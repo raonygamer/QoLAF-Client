@@ -1,14 +1,15 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { DomOverlay, Point, type DisplayObject } from '../game/Bindings';
 
 interface WheelPopup {
-  node: Raw;
+  node: DisplayObject;
   height: number;
   scroll(direction: number): void;
 }
 
 /** Native wheel events must honor the Starling hit target, including covering windows. */
 export function routeAutocompleteWheel(
-  api: API,
+  _api: API,
   candidates: readonly (WheelPopup | undefined)[],
   event: Pick<
     WheelEvent,
@@ -16,20 +17,18 @@ export function routeAutocompleteWheel(
   >,
 ): boolean {
   if (!event.deltaY) return false;
-  const overlay = api.cls('core.hud.components.ui.DomOverlay');
-  const Point = api.cls('openfl.geom.Point') as any;
-  if (!overlay || !Point) return false;
+  const overlay = DomOverlay;
   for (const popup of candidates) {
     if (!popup) continue;
     let shown = true;
-    for (let node: Raw | null = popup.node; node; node = read(node, 'parent')) {
-      if (!read(node, 'visible', true) || read(node, 'alpha', 1) <= 0) {
+    for (let node: DisplayObject | null = popup.node; node; node = node.get_parent()) {
+      if (!node.get_visible() || node.get_alpha() <= 0) {
         shown = false;
         break;
       }
     }
     if (!shown) continue;
-    const stage = read(popup.node, 'stage');
+    const stage = popup.node.get_stage();
     if (!stage) continue;
     const bounds = overlay.globalRect(popup.node);
     if (!bounds) continue;
@@ -50,7 +49,7 @@ export function routeAutocompleteWheel(
       bounds.y + ((event.clientY - rect.y) * bounds.height) / rect.height,
     );
     let hit = stage.hitTest(point);
-    while (hit && hit !== popup.node) hit = read(hit, 'parent');
+    while (hit && hit !== popup.node) hit = hit.get_parent();
     if (!hit) continue;
     popup.scroll(event.deltaY);
     event.preventDefault();

@@ -1,3 +1,6 @@
+import type { Emitter as NativeEmitter } from '../src/game/Bindings';
+import type { Engine as NativeEngine, EnemyShip } from '../src/game/Bindings';
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { EmitterTargets } from '../src/rendering/EmitterTargets';
@@ -16,7 +19,10 @@ class Enemy {
   }
 }
 function fixture(target: Raw) {
-  const targets = new EmitterTargets(Engine, Enemy);
+  const targets = new EmitterTargets(
+    Engine as unknown as typeof NativeEngine,
+    Enemy as unknown as typeof EnemyShip,
+  );
   const emitter: Raw = {
     followTarget: true,
     target,
@@ -43,12 +49,11 @@ test('effects capture pooled target generation before their first rendered frame
   emitter.followTarget = false;
   assert.equal(
     targets.stale(emitter),
-    false,
-    'detached explosions keep their independent lifetime',
+    true,
+    'stopping position-following does not detach a stale pooled owner',
   );
-  emitter.followTarget = true;
   emitter.target = null;
-  assert.equal(targets.stale(emitter), false);
+  assert.equal(targets.stale(emitter), false, 'detached explosions retain independent lifetime');
 });
 
 test('engine effects reject a removed mount, missing ship and dead ship', () => {
@@ -58,6 +63,8 @@ test('engine effects reject a removed mount, missing ship and dead ship', () => 
   assert.equal(targets.stale(emitter), false);
   engine.ship.engine = new Engine();
   assert.equal(targets.stale(emitter), true);
+  emitter.followTarget = false;
+  assert.equal(targets.stale(emitter), true, 'non-following effects still reject removed mounts');
   engine.ship.engine = engine;
   engine.ship.alive = false;
   assert.equal(targets.stale(emitter), true);
@@ -86,35 +93,72 @@ test('stale emitter is killed before particle emission, positioning or batch wri
     emitter.alive = false;
   };
   // Deliberately no particle pools: any continued update would fail.
-  const frames = new EmitterFrames(null, {}, {}, targets);
-  frames.update(emitter, 5.5);
+  const frames = new EmitterFrames(
+    class {
+      constructor() {
+        throw Error('Stale emitter allocated a particle');
+      }
+    } as new () => import('../src/game/Bindings').Particle,
+    { POOL_SIZE_MAX: 0, POOL_SIZE_MIN: 0, IS_HIGH_GRAPHICS: false, setHighGraphics() {} },
+    {
+      interpolateColor() {
+        throw Error('Stale emitter interpolated color');
+      },
+    },
+    targets,
+  );
+  frames.update(emitter as NativeEmitter, 5.5);
   assert.equal(kills, 1);
   assert.equal(emitter.alive, false);
 });
 
 test('factory capture and native reset hooks invalidate effects before their first frame and clean up', () => {
   class GameObject {
+    get_movieClip() {
+      return null;
+    }
+    get_x() {
+      return 0;
+    }
+    get_y() {
+      return 0;
+    }
     reset() {}
   }
   class EngineObject extends GameObject {
     reset() {}
   }
   class Emitter {
+    static setHighGraphics() {}
     dispose() {}
     updateOnScreen() {}
+    update() {}
+    play() {}
+    killEmitter() {}
+    removeFromCollectiveMeshBatch() {}
   }
   const hooks = new Hooks();
   const cleanups: Array<() => void> = [];
   const manager: Raw = {
     emitters: [],
     update() {},
-    removeEmitter(_emitter: Raw, index: number) {
+    removeEmitter(emitter: Raw, index: number) {
+      emitter.killEmitter();
       this.emitters.splice(index, 1);
+      emitter.dispose();
     },
   };
-  const game = { emitterManager: manager, parallaxManager: { update(_seconds: number) {} } };
+  class GameScene {}
+  const game = Object.assign(new GameScene(), {
+    get_isLeaving: () => false,
+    emitterManager: manager,
+    parallaxManager: { update(_seconds: number) {} },
+  });
   const factory = {
-    create(target: Raw) {
+    resolveTexture() {
+      return null;
+    },
+    create(_key: string, _game: Raw, _x: number, _y: number, target: Raw) {
       const emitter = Object.assign(new Emitter(), {
         target,
         followTarget: true,
@@ -130,13 +174,18 @@ test('factory capture and native reset hooks invalidate effects before their fir
     },
   };
   const classes: Raw = {
+    'core.scene.Game': GameScene,
     'core.GameObject': GameObject,
     'core.engine.Engine': EngineObject,
     'core.particle.Emitter': Emitter,
     'core.particle.Particle': class {},
     'generics.Color': {},
-    'core.particle.CollectiveMeshBatch': { AllMeshesAreUpdated() {} },
+    'core.particle.CollectiveMeshBatch': { AllMeshesAreUpdated() {}, disposeAll() {} },
     'core.particle.EmitterFactory': factory,
+    'core.weapon.Beam': class {
+      initEffects() {}
+      destroy() {}
+    },
   };
   const api: any = {
     cls: (name: string) => classes[name],
@@ -146,10 +195,30 @@ test('factory capture and native reset hooks invalidate effects before their fir
       cleanups.push(hooks.add(target, key, 'after', fn)),
     around: (target: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'around', fn)),
+    defer: (cleanup: () => void) => cleanups.push(cleanup),
     onGame: (callback: Function) => callback(game, api),
   };
   const originalCreate = factory.create;
   const originalReset = GameObject.prototype.reset;
+  class BindingFixture {
+    removeEmitter() {}
+    loadKey() {
+      return null;
+    }
+    getEmitter() {
+      return null;
+    }
+    static getService() {
+      return { loadKey: () => ({ emitters: [] }) };
+    }
+    enter() {}
+    execute() {}
+    reset() {}
+    clean() {}
+    dispose() {}
+    update() {}
+  }
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? BindingFixture });
   installEmitterFrames(api);
   try {
     for (const target of [
@@ -157,7 +226,7 @@ test('factory capture and native reset hooks invalidate effects before their fir
       Object.assign(new EngineObject(), { ship: {} as Raw }),
     ]) {
       if ('ship' in target) Object.assign(target.ship as Raw, { engine: target, alive: true });
-      const [emitter] = factory.create(target);
+      const [emitter] = factory.create('effect', game, 0, 0, target);
       target.reset();
       game.parallaxManager.update(0.0055);
       assert.equal(emitter.kills, 1);

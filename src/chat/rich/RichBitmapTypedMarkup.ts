@@ -1,5 +1,6 @@
+import type { ArtifactLabelResolver } from './ArtifactLabelResolver';
 // Source port of core/hud/components/chat/rich/RichBitmapTypedMarkup.as.
-import { bound } from '../../runtime/As3';
+import { bound } from '../../runtime/HaxeInterop';
 import { RichBitmapMarkup } from './RichBitmapMarkup';
 import { RichChatMarkupValidator } from './RichChatMarkupValidator';
 import { RichBitmapMarkupParser } from './RichBitmapMarkupParser';
@@ -17,7 +18,7 @@ export class RichBitmapTypedMarkup {
     editEndAfter: number,
     defaultSize: number,
     defaultColor: number,
-    artifactResolver: Function | null = null,
+    artifactResolver: ArtifactLabelResolver | null = null,
   ): any {
     if (candidate == null || candidate.text.indexOf('<') < 0) return null;
     let fragments: any[] = RichBitmapTypedMarkup.completedFragments(candidate);

@@ -1,6 +1,9 @@
-import { read, type API, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
-import { ClientHelpWelcomeState } from './ClientHelpWelcomeState';
+import type { API } from '../api/Types';
+import { PopupMessage, type GameScene } from '../game/Bindings';
+import type { Game } from '../game/Game';
+import type {} from '../game/GameRecovery';
+import type { Resolve } from '../runtime/HaxeInterop';
+import { ClientHelpWelcomeState, type ClientWelcomeStorage } from './ClientHelpWelcomeState';
 import { createClientHelpWelcomePopup } from './ClientHelpWelcomePopup';
 
 const profileState = new ClientHelpWelcomeState();
@@ -8,25 +11,25 @@ const profileState = new ClientHelpWelcomeState();
 /** Defer the invitation until existing modal/reconnect screens have finished. */
 export function installNativeClientWelcome(
   api: API,
-  game: Raw,
+  game: GameScene,
   resolve: Resolve,
   openHelp: () => void,
   waitingForRelease: () => boolean = () => false,
 ): () => void {
   const storage = createClientWelcomeStorage(api);
   profileState.initialize(storage);
-  let popup: any = null;
+  let popup: InstanceType<ReturnType<typeof createClientHelpWelcomePopup>> | null = null;
   let stopped = false;
   let stopPolling = () => {};
-  const isCurrent = () => api.game === game && !game.isLeaving;
+  const isCurrent = () => api.game === game && !game.get_isLeaving();
   const remove = () => {
     const previous = popup;
     popup = null;
     if (!previous) return;
     previous.removeEventListener('accept', accept);
     previous.removeEventListener('close', close);
-    if (read(previous, 'parent') && !game.isLeaving) {
-      const recovering = game.isRecoveringGameConnection;
+    if (previous.get_parent() && !game.get_isLeaving()) {
+      const recovering = game.get_isRecoveringGameConnection?.();
       game.removeChildFromOverlay(previous, true);
       if (recovering) game.blockHotkeys = true;
     } else previous.dispose();
@@ -36,30 +39,29 @@ export function installNativeClientWelcome(
     stopPolling();
     remove();
   };
-  const canDismiss = (event: Raw) =>
+  const canDismiss = (event: Game.starling.events.Event) =>
     isCurrent() &&
-    !game.isRecoveringGameConnection &&
+    !game.get_isRecoveringGameConnection?.() &&
     popup &&
-    read(event, 'currentTarget') === popup &&
-    read(popup, 'parent');
-  const accept = (event: Raw) => {
+    event.currentTarget === popup &&
+    popup.get_parent();
+  const accept = (event: Game.starling.events.Event) => {
     if (!canDismiss(event)) return;
     dismiss();
     openHelp();
   };
-  const close = (event: Raw) => {
+  const close = (event: Game.starling.events.Event) => {
     if (canDismiss(event)) dismiss();
   };
   if (profileState.pending) {
     const Popup = createClientHelpWelcomePopup(resolve);
-    const Modal = resolve('core.hud.components.dialogs.PopupMessage');
     stopPolling = api.interval(() => {
       if (stopped || !isCurrent() || !profileState.pending || popup || waitingForRelease()) return;
-      if (!read(game, 'me') || game.isRecoveringGameConnection || game.blockHotkeys) return;
+      if (!game.get_me() || game.get_isRecoveringGameConnection?.() || game.blockHotkeys) return;
       const overlay = game.overlay;
-      for (let index = 0; index < read(overlay, 'numChildren', 0); index++) {
+      for (let index = 0; index < overlay.get_numChildren(); index++) {
         const child = overlay.getChildAt(index);
-        if (child instanceof Modal && read(child, 'visible', true)) return;
+        if (child instanceof PopupMessage && child.get_visible()) return;
       }
       popup = new Popup();
       popup.addEventListener('accept', accept);
@@ -76,11 +78,11 @@ export function installNativeClientWelcome(
 }
 
 /** The browser game has no AS3 sharedObj; keep profile flags in plugin storage. */
-export function createClientWelcomeStorage(api: API): Raw {
+export function createClientWelcomeStorage(api: API): ClientWelcomeStorage {
   const key = 'client-welcome';
-  let data: Raw = {};
+  let data: Record<string, unknown> = {};
   try {
-    const saved = api.storage.get<Raw | null>(key, null);
+    const saved = api.storage.get<Record<string, unknown> | null>(key, null);
     if (saved && typeof saved === 'object' && !Array.isArray(saved)) data = { ...saved };
   } catch {
     // Session state still works when the browser denies persistent storage.

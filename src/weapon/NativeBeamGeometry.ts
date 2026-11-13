@@ -1,4 +1,8 @@
-import { read, type API, type Raw } from '../api/Types';
+import { installNativeBeamContinuity } from './NativeBeamContinuity';
+import { Beam, Matrix, PlayerShip, type GameScene, type Unit } from '../game/Bindings';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import type { RenderPoint } from './PhaseBladeMounts';
 import {
   BeamRenderGeometry,
   renderPosition,
@@ -8,16 +12,25 @@ import {
 import { writePhaseBladeMounts } from './PhaseBladeMounts';
 import { ClientDevVisual } from '../visuals/ClientDevVisual';
 
+interface BeamMountShip extends PlayerShip {
+  experimentalVisual?: object;
+  writePhaseBladeMounts?(first: RenderPoint, second: RenderPoint): number;
+}
+
 /** Redirect only Beam.draw's geometry arguments. Native shoot/update never sees render points. */
-export function installNativeBeamGeometry(api: API, game: Raw): void {
-  const Beam = api.cls('core.weapon.Beam')?.prototype;
-  const Matrix = api.cls('openfl.geom.Matrix') as any;
-  const PlayerShip = api.cls('core.ship.PlayerShip') as any;
-  if (!Beam || !Matrix) return;
-  const geometry = new WeakMap<Raw, BeamRenderGeometry>();
+export function installNativeBeamGeometry(api: API, game: GameScene): void {
+  const reflection = new GameReflection(api);
+  const continuity = installNativeBeamContinuity(api, game);
+  const geometry = new WeakMap<Beam, BeamRenderGeometry>();
   const matrix = new Matrix();
-  let drawing: { weapon: Raw; view: BeamRenderGeometry; chainIndex: number } | null = null;
-  api.around(Beam, 'draw', function (next, ...args) {
+  let drawing: {
+    weapon: Beam;
+    view: BeamRenderGeometry;
+    chainIndex: number;
+    targets: readonly Unit[];
+  } | null = null;
+  reflection.around(Beam.prototype, 'draw', function (next, ...args) {
+    const targets = this.g === game ? continuity.prepare(this) : undefined;
     if (this.g !== game || !this.drawBeam || !this.unit?.weaponPos) return next(...args);
     let view = geometry.get(this);
     if (!view) {
@@ -25,33 +38,42 @@ export function installNativeBeamGeometry(api: API, game: Raw): void {
       geometry.set(this, view);
     }
     const ship = this.unit;
+    const mountShip: BeamMountShip | null = ship instanceof PlayerShip ? ship : null;
     const mounts =
-      this.key === ClientDevVisual.PHASE_BLADE && PlayerShip && ship instanceof PlayerShip
-        ? (first: any, second: any) =>
-            writePhaseBladeMounts(
-              ship.experimentalVisual ?? ship.obj,
-              ship.imgObj,
-              read(ship, 'movieClip', ship._mc),
-              game.canvasEffects,
-              first,
-              second,
-              matrix,
-            )
+      this.key === ClientDevVisual.PHASE_BLADE && mountShip
+        ? (first: RenderPoint, second: RenderPoint) =>
+            typeof mountShip.writePhaseBladeMounts === 'function'
+              ? mountShip.writePhaseBladeMounts(first, second)
+              : writePhaseBladeMounts(
+                  mountShip.experimentalVisual ?? mountShip.obj,
+                  mountShip.imgObj,
+                  mountShip.get_movieClip(),
+                  game.canvasEffects,
+                  first,
+                  second,
+                  matrix,
+                )
         : undefined;
-    view.update(this, mounts);
+    view.update(this, mounts, targets?.target);
     view.updateEmitters(this);
     const previous = drawing;
-    drawing = { weapon: this, view, chainIndex: 0 };
+    drawing = {
+      weapon: this,
+      view,
+      chainIndex: 0,
+      targets: targets?.secondary ?? this.secondaryTargets,
+    };
     const previousGeometry = getActiveBeamGeometry(this);
     setActiveBeamGeometry(this, view);
     try {
+      if (targets) return continuity.draw(this, view, targets);
       return next(...args);
     } finally {
       drawing = previous;
       setActiveBeamGeometry(this, previousGeometry);
     }
   });
-  api.around(Beam, 'drawBeamEffect', function (next, index, start, end, strands) {
+  reflection.around(Beam.prototype, 'drawBeamEffect', function (next, index, start, end, strands) {
     if (drawing?.weapon !== this) return next(index, start, end, strands);
     const view = drawing.view;
     if (start === this.startPos) {
@@ -61,8 +83,8 @@ export function installNativeBeamGeometry(api: API, game: Raw): void {
     if (start === this.startPos2)
       return view.twin ? next(index, view.second, view.end, strands) : index;
     // Native draw walks only alive secondary targets, retaining its own order.
-    const targets = this.secondaryTargets;
-    let target: Raw | undefined;
+    const targets = drawing.targets;
+    let target: Unit | undefined;
     while (drawing.chainIndex < targets.length) {
       const candidate = targets[drawing.chainIndex++];
       if (candidate.alive) {

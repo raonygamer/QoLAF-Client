@@ -1,16 +1,31 @@
-import type { Resolve } from '../runtime/As3';
+import {
+  Sprite,
+  Rectangle,
+  type DisplayObject,
+  type Point,
+  type TextFormat,
+} from '../game/Bindings';
+interface FontStyles {
+  getTextFormatForTarget(target: DisplayObject): TextFormat | null;
+}
+import { BitmapFontTextFormat } from './BitmapFontTextFormat';
+import type { Resolve } from '../runtime/HaxeInterop';
+import { ClientErrorDiagnostics } from '../diagnostics/ClientErrorDiagnostics';
 
 /** Feathers' measurement/invalidation boundary, backed by native Starling nodes. */
-export function createBitmapTextAdapter(resolve: Resolve): any {
-  const Sprite = resolve('starling.display.Sprite');
-  const Rectangle = resolve('openfl.geom.Rectangle');
+export function createBitmapTextAdapter(resolve: Resolve) {
+  // Source-ported subclasses also use the native display property aliases.
+  resolve('starling.display.Sprite');
   abstract class BitmapTextAdapter extends Sprite {
+    isQuickHitAreaEnabled = false;
+    minTouchWidth = 0;
+    minTouchHeight = 0;
     protected _text = '';
     protected _wordWrap = false;
     protected _explicitWidth = NaN;
     protected _explicitHeight = NaN;
     protected _explicitMaxWidth = Infinity;
-    protected _fontStyles: any = null;
+    protected _fontStyles: FontStyles | null = null;
     private measuredWidthValue = 0;
     private measuredHeightValue = 0;
     private initialized = false;
@@ -61,10 +76,10 @@ export function createBitmapTextAdapter(resolve: Resolve): any {
       this._explicitMaxWidth = value;
       this.invalidate('size');
     }
-    get fontStyles(): any {
+    get fontStyles(): TextFormat | null | undefined {
       return this._fontStyles?.getTextFormatForTarget(this);
     }
-    set fontStyles(value: any) {
+    set fontStyles(value: TextFormat | null | undefined) {
       this._fontStyles = value == null ? null : { getTextFormatForTarget: () => value };
       this.invalidate('styles');
     }
@@ -92,7 +107,7 @@ export function createBitmapTextAdapter(resolve: Resolve): any {
     }
 
     /** FeathersControl bounds describe the layout box, not only the visible ink. */
-    getBounds(targetSpace: any, result: any = null): any {
+    getBounds(targetSpace: DisplayObject | null, result: Rectangle | null = null): Rectangle {
       result ??= new Rectangle();
       const width = this.get_width();
       const height = this.get_height();
@@ -114,6 +129,27 @@ export function createBitmapTextAdapter(resolve: Resolve): any {
         );
       }
       return result;
+    }
+
+    /** Feathers labels hit their layout rectangle, not the untouchable glyph batches. */
+    hitTest(localPoint: Point): DisplayObject | null {
+      if (!this.isQuickHitAreaEnabled) return super.hitTest(localPoint);
+      if (!this.get_visible() || !this.get_touchable() || !this.hitTestMask(localPoint))
+        return null;
+      const width = this.get_width();
+      const height = this.get_height();
+      const hitWidth = width < this.minTouchWidth ? this.minTouchWidth : width;
+      const hitHeight = height < this.minTouchHeight ? this.minTouchHeight : height;
+      const offsetX = (width - hitWidth) / 2;
+      const offsetY = (height - hitHeight) / 2;
+      const left = Number.isNaN(offsetX) ? 0 : offsetX;
+      const top = Number.isNaN(offsetY) ? 0 : offsetY;
+      return localPoint.x >= left &&
+        localPoint.y >= top &&
+        localPoint.x < left + hitWidth &&
+        localPoint.y < top + hitHeight
+        ? this
+        : null;
     }
 
     initializeNow(): void {
@@ -140,6 +176,10 @@ export function createBitmapTextAdapter(resolve: Resolve): any {
       try {
         this.draw();
       } catch (error) {
+        ClientErrorDiagnostics.record(
+          error,
+          'UI validation: ' + (this.__class__?.__name__ ?? this.constructor.name),
+        );
         for (const flag of this.flagsDuringDraw) this.invalidFlags.add(flag);
         throw error;
       } finally {
@@ -166,22 +206,7 @@ export function createBitmapTextAdapter(resolve: Resolve): any {
   return BitmapTextAdapter;
 }
 
-/** The original format owns metrics only; the registry owns the font texture. */
-export function createBitmapFontTextFormat(resolve: Resolve): any {
-  const TextField = resolve('starling.text.TextField');
-  return class BitmapFontTextFormat {
-    font: any;
-    letterSpacing = 0;
-    isKerningEnabled = true;
-    constructor(
-      font: any,
-      public size = NaN,
-      public color = 0xffffff,
-      public align = 'left',
-      public leading = 0,
-    ) {
-      this.font = typeof font === 'string' ? TextField.getBitmapFont(font) : font;
-      if (!this.font) throw Error('Bitmap font is not registered: ' + font);
-    }
-  };
+/** Compatibility entry point for the source-class registry. */
+export function createBitmapFontTextFormat(_resolve: Resolve): typeof BitmapFontTextFormat {
+  return BitmapFontTextFormat;
 }

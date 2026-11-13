@@ -1,9 +1,19 @@
+import type { createText } from '../ported/Text';
+type EmojiText = InstanceType<ReturnType<typeof createText>>;
+import type { Texture, Sprite, Quad, StarlingTextField, Image } from '../game/Bindings';
+import { GameReflection } from '../api/GameReflection';
+import { ClientIPCService } from '../ipc/ClientIPCService';
+import {
+  knownVisualResetPlayers,
+  playerAutocompleteSource,
+  playerAutocompleteReplacementBegin,
+} from './ChatPlayerAutocompleteSource';
 import { routeAutocompleteWheel } from './ChatAutocompleteWheel';
 import { ChatFriendRoster } from './ChatFriendRoster';
 import { ChatFriendAutocompleteModel } from './ChatFriendAutocompleteModel';
 import { ChatFriendAutocompleteParser } from './ChatFriendAutocompleteParser';
 import type { ChatCommandSuggestion } from './ChatCommandSuggestion';
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import type { NativeBitmapInput } from './rich/NativeBitmapInput';
 import type { DeviceSettings } from '../settings/DeviceSettings';
 import { ChatEmojiAutocompleteModel } from './ChatEmojiAutocompleteModel';
@@ -30,30 +40,30 @@ type AutocompleteModel = Pick<
 >;
 
 interface Row {
-  background: Raw;
-  command: Raw;
-  description: Raw;
-  emoji?: Raw;
-  preview?: Raw;
-  texture?: Raw;
+  background: Quad;
+  command: StarlingTextField;
+  description: StarlingTextField;
+  emoji?: EmojiText;
+  preview?: Image;
+  texture?: Texture;
   paintKey?: string;
   paintFilter?: Raw;
 }
 
 /** Native Starling command rows, using the source popup's dimensions and colors. */
 export class ChatCommandAutocompletePopup {
-  readonly node: Raw;
-  private background: Raw;
+  readonly node: Sprite;
+  private background: Quad;
   private rows: Row[] = [];
   private offset = 0;
   private width = 400;
   private capacity = 8;
   private availableHeight = Number.POSITIVE_INFINITY;
-  private sectionField: Raw;
+  private sectionField: StarlingTextField;
   private title = '';
-  private track: Raw;
-  private thumb: Raw;
-  private scrollHit: Raw;
+  private track: Quad;
+  private thumb: Quad;
+  private scrollHit: Quad;
   private dragOffset: number | null = null;
   private cleanups: (() => void)[] = [];
 
@@ -61,8 +71,8 @@ export class ChatCommandAutocompletePopup {
     private ui: NativeUI,
     readonly model: AutocompleteModel,
     private complete: (text: string) => void,
-    createEmoji?: () => Raw,
-    private resolvePreviewTexture?: (skin: string) => Raw | null,
+    createEmoji?: () => EmojiText,
+    private resolvePreviewTexture?: (skin: string) => Texture | null,
   ) {
     this.node = ui.sprite();
     this.node.set_name('qolaf.commandAutocomplete');
@@ -288,7 +298,7 @@ export class ChatCommandAutocompletePopup {
     }
   }
 
-  private previewTexture(suggestion: ChatCommandSuggestion): Raw | null {
+  private previewTexture(suggestion: ChatCommandSuggestion): Texture | null {
     if (!suggestion.previewSkinKey || !this.resolvePreviewTexture) return null;
     try {
       return this.resolvePreviewTexture(suggestion.previewSkinKey);
@@ -297,7 +307,7 @@ export class ChatCommandAutocompletePopup {
     }
   }
 
-  private updatePreview(row: Row, texture: Raw | null, rowY: number): void {
+  private updatePreview(row: Row, texture: Texture | null, rowY: number): void {
     if (!texture) {
       row.texture = undefined;
       return;
@@ -385,19 +395,29 @@ export function installCommandAutocomplete(
   game: Raw,
   isFormatting = () => false,
   rich?: { editor: NativeBitmapInput; resolve: Resolve; preferences?: DeviceSettings },
-): void {
+  isolatedSuggestions?: readonly ChatCommandSuggestion[],
+): { close(): void } | undefined {
   const chat = game.chatInput,
     input = chat?.input;
   if (!input?.element) return;
-  const model = new ChatCommandAutocompleteModel(builtInCommandSuggestions(), 128, () =>
-    registryCommandSuggestions(
-      api.cls('af.ChatCommandRegistry') as ChatCommandRegistry | undefined,
-    ),
+  const model = new ChatCommandAutocompleteModel(
+    isolatedSuggestions ?? builtInCommandSuggestions(),
+    128,
+    () =>
+      isolatedSuggestions
+        ? []
+        : registryCommandSuggestions(
+            api.cls('af.ChatCommandRegistry') as ChatCommandRegistry | undefined,
+          ),
   );
   const ui = new NativeUI(api);
+  const ipc = ClientIPCService.instance;
   let lastText = '';
   let lastSelection = '';
   let resolving = false;
+  let disposed = false;
+  const ownsFocus = () =>
+    !isolatedSuggestions || input.element.ownerDocument.activeElement === input.element;
   const emojiModel = new ChatEmojiAutocompleteModel();
   const popup = new ChatCommandAutocompletePopup(ui, model, (text) => {
     input.set_text(text);
@@ -408,7 +428,7 @@ export function installCommandAutocomplete(
   chat.addChild(popup.node);
   const emojiPopup = rich
     ? new ChatCommandAutocompletePopup(ui, emojiModel, completeEmoji, () => {
-        const Text = rich.resolve('core.hud.components.Text');
+        const Text = rich.resolve('core.hud.components.Text') as ReturnType<typeof createText>;
         const field = new Text(0, 0, false, 'verdana48_bitmap');
         field.size = 20;
         return field;
@@ -419,7 +439,7 @@ export function installCommandAutocomplete(
     chat.addChild(emojiPopup.node);
   }
   const friendModel = new ChatFriendAutocompleteModel();
-  const friendRoster = new ChatFriendRoster(api, game);
+  const friendRoster = new ChatFriendRoster(new GameReflection(api).cast(game, 'core.scene.Game'));
   const friendPopup = rich
     ? new ChatCommandAutocompletePopup(ui, friendModel, completeFriend, undefined, (skin) =>
         friendRoster.texture(skin),
@@ -445,7 +465,12 @@ export function installCommandAutocomplete(
     resolving = true;
     let changed = false;
     try {
-      changed = rich.editor.model.replaceRange(token.beginIndex, token.endIndex, text + ' ');
+      const begin = playerAutocompleteReplacementBegin(
+        rich.editor.model.visibleText,
+        token,
+        isolatedSuggestions !== undefined,
+      );
+      changed = rich.editor.model.replaceRange(begin, token.endIndex, text + ' ');
       if (changed) {
         rich.editor.binding.project();
         input.dispatchEventWith('change', true);
@@ -458,28 +483,40 @@ export function installCommandAutocomplete(
   }
   function refreshFriends() {
     const token = friendTokenAtCaret();
-    const command = /^\/([^\s]+)(?:\s|$)/
-      .exec(rich?.editor.model.visibleText ?? '')?.[1]
-      .toLowerCase();
-    // These commands use authenticated IPC/saved-visual rosters in the source.
-    // Never substitute friends for those independent providers.
-    const independent = [
-      'ssv',
-      'invitetoroom',
-      'kickfromroom',
-      'invitetoradio',
-      'roominvite',
-      'radioinvite',
-    ].includes(command ?? '');
-    if (!token || independent || emojiModel.active || (model.active && !model.argumentMode)) {
+    if (!token || emojiModel.active || (model.active && !model.argumentMode)) {
       friendPopup?.update(null);
       return;
     }
-    friendModel.setFriends(friendRoster.records());
+    const source = playerAutocompleteSource(
+      rich!.editor.model.visibleText,
+      token,
+      isolatedSuggestions !== undefined,
+    );
+    if (source === 'none') {
+      friendPopup?.update(null);
+      return;
+    }
+    if (source === 'ipc') {
+      friendModel.setPlayers(
+        ipc && ipc === ClientIPCService.instance && ipc.connected ? ipc.onlinePlayers : [],
+        'IPC peer online',
+      );
+      if (friendPopup) friendPopup.sectionTitle = 'IPC Peers Online';
+    } else if (source === 'visual-reset') {
+      friendModel.setPlayers(
+        knownVisualResetPlayers(new GameReflection(api).cast(game, 'core.scene.Game')),
+        'Saved visual',
+      );
+      if (friendPopup) friendPopup.sectionTitle = 'Local and Saved Visuals';
+    } else {
+      friendModel.setFriends(friendRoster.records());
+      if (friendPopup) friendPopup.sectionTitle = '';
+    }
     friendPopup?.update(token.query);
-    friendRoster.refresh(() => {
-      refresh();
-    });
+    if (source === 'friends' && !isolatedSuggestions)
+      friendRoster.refresh(() => {
+        refresh();
+      });
   }
   function tokenAtCaret() {
     const model = rich?.editor.model;
@@ -518,6 +555,7 @@ export function installCommandAutocomplete(
       : '';
     if (
       !chat.isActive() ||
+      !ownsFocus() ||
       !read(chat, 'visible', true) ||
       isFormatting() ||
       !(rich?.preferences?.get('enableNewChatIntegrationSystem') ?? true)
@@ -552,7 +590,9 @@ export function installCommandAutocomplete(
   };
   const place = () => {
     const top = read(input, 'y', 0);
-    popup.layout(read(input, 'width', 400), read(chat, 'y', 0) + top - 4);
+    const Point = api.cls('openfl.geom.Point') as any;
+    const available = Point ? input.localToGlobal(new Point()).y - 4 : read(chat, 'y', 0) + top - 4;
+    popup.layout(read(input, 'width', 400), available);
     // Native toggleChatMode adds the tabs after our popup. Keep suggestions
     // above those tabs, as in the source composer's child order.
     const lastChild = read(chat, 'numChildren', 0) - 1;
@@ -561,7 +601,7 @@ export function installCommandAutocomplete(
     popup.node.set_x(read(input, 'x', 0));
     let commandBottom = top - 4;
     if (emojiPopup) {
-      emojiPopup.layout(read(input, 'width', 400), read(chat, 'y', 0) + top - 4);
+      emojiPopup.layout(read(input, 'width', 400), available);
       emojiPopup.node.set_x(read(input, 'x', 0));
       emojiPopup.node.set_y(top - 4 - emojiPopup.height);
       if (emojiModel.active) {
@@ -570,7 +610,7 @@ export function installCommandAutocomplete(
       }
     }
     if (friendPopup) {
-      friendPopup.layout(read(input, 'width', 400), read(chat, 'y', 0) + top - 4);
+      friendPopup.layout(read(input, 'width', 400), available);
       friendPopup.node.set_x(read(input, 'x', 0));
       friendPopup.node.set_y(top - 4 - friendPopup.height);
       if (friendModel.active) {
@@ -590,23 +630,51 @@ export function installCommandAutocomplete(
     model.dismiss();
     popup.node.set_visible(false);
   };
-  api.after(chat, 'previous', hideForHistory);
-  api.after(chat, 'next', hideForHistory);
+  for (const method of ['previous', 'next'] as const) {
+    api.around(chat, method, function (next) {
+      const previousResolving = resolving;
+      resolving = true;
+      try {
+        next();
+      } finally {
+        resolving = previousResolving;
+      }
+      hideForHistory();
+    });
+  }
   input.addEventListener('change', refresh);
+  input.element.addEventListener('focus', refresh);
+  input.element.addEventListener('blur', refresh);
   const keydown = (event: KeyboardEvent) => {
     if (
       event.target !== input.element ||
       !chat.isActive() ||
       isFormatting() ||
       event.isComposing ||
+      rich?.editor.binding.isComposing ||
       event.ctrlKey ||
       event.altKey ||
       event.metaKey
     )
       return;
+    // Source ChatInputText owns Escape before any completion list. Dismissing
+    // only the list leaves the composer active and requires a second Escape.
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      hideForHistory();
+      chat.closeChat();
+      return;
+    }
+    // Source consumes Tab before synchronous completion changes the hidden
+    // editor/caret; an unhandled Tab must not traverse away from the composer.
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
     let handled =
-      emojiPopup?.handleKey(event.key) ||
       friendPopup?.handleKey(event.key) ||
+      emojiPopup?.handleKey(event.key) ||
       popup.handleKey(event.key);
     if (!handled && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
       if (event.key === 'ArrowUp') chat.previous();
@@ -626,7 +694,7 @@ export function installCommandAutocomplete(
   };
   window.addEventListener('wheel', wheel, { capture: true, passive: false });
   api.on('frame', () => {
-    if (!chat.isActive() || isFormatting()) {
+    if (!chat.isActive() || !ownsFocus() || isFormatting()) {
       friendPopup?.update(null);
       emojiPopup?.update(null);
       if (model.active) {
@@ -643,7 +711,10 @@ export function installCommandAutocomplete(
     else place();
   });
   api.defer(() => {
+    disposed = true;
     input.removeEventListener('change', refresh);
+    input.element.removeEventListener('focus', refresh);
+    input.element.removeEventListener('blur', refresh);
     window.removeEventListener('keydown', keydown, true);
     window.removeEventListener('wheel', wheel, true);
     friendRoster.dispose();
@@ -651,4 +722,10 @@ export function installCommandAutocomplete(
     emojiPopup?.dispose();
     popup.dispose();
   });
+  return {
+    close() {
+      if (disposed) return;
+      hideForHistory();
+    },
+  };
 }

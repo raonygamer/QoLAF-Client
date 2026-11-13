@@ -90,13 +90,19 @@ test('rarity owns its batch, releases on death/pool cleanup and restores native 
     },
     set_blendMode() {},
   };
+  class MeshBatch extends Sprite {
+    vertices = 0;
+    clear() {
+      this.vertices = 0;
+    }
+  }
   const collective = { disposeAll() {}, Create: () => shared };
   const factory = { createRareType: (emitters: Emitter[] | null) => emitters };
   const classes: Raw = {
     'core.particle.EmitterFactory': factory,
     'core.particle.Emitter': Emitter,
     'core.particle.CollectiveMeshBatch': collective,
-    'starling.display.MeshBatch': Sprite,
+    'starling.display.MeshBatch': MeshBatch,
     'starling.display.Sprite': Sprite,
     'openfl.geom.Matrix': Matrix,
   };
@@ -130,9 +136,13 @@ test('rarity owns its batch, releases on death/pool cleanup and restores native 
     );
     emitter.setBatchParent();
     assert.equal(emitter.nativeParents, 0);
+    batch.vertices = 4;
+    emitter.setBatchParent();
+    assert.equal(batch.vertices, 4, 'parent synchronization preserves this frame’s particles');
     owner.set_visible(false);
     prepareFrame(emitter); // Includes frames that cull or early-return before drawing.
     assert.equal(layer.get_visible(), false);
+    assert.equal(batch.vertices, 0, 'a skipped draw cannot retain the previous frame’s particles');
     batch.remove({});
     assert.equal(batch.disposed, false);
     batch.remove(emitter);

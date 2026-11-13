@@ -1,4 +1,23 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import {
+  HealthAndShield as NativeHealthAndShield,
+  SceneBase,
+  type GameScene,
+  type Ship,
+  type Image,
+  type StarlingTextField,
+} from '../game/Bindings';
+
+interface HealthDisplay {
+  playerHPBar: Pick<Image, 'set_width'>;
+  playerShieldBar: Pick<Image, 'set_width'>;
+  playerHPText: Pick<StarlingTextField, 'get_text' | 'set_text'>;
+  playerShieldText: Pick<StarlingTextField, 'get_text' | 'set_text'>;
+}
+interface HealthSettings {
+  formatHealthAndShield?: boolean;
+}
 
 /** Original generics.Util.formatAmount thresholds, including rollover before rounding. */
 export function formatAmount(value: number): string {
@@ -36,15 +55,15 @@ export class HealthAndShield {
   initialized = false;
 
   constructor(
-    private readonly native: Raw,
-    private readonly settings: () => Raw | null,
+    private readonly native: HealthDisplay,
+    private readonly settings: () => HealthSettings | null,
   ) {}
 
-  update(ship: Raw): void {
+  update(ship: Pick<Ship, 'hp' | 'shieldHp' | 'get_hpMax' | 'get_shieldHpMax'>): void {
     this.targetHP = Math.max(0, ship.hp);
     this.targetShield = Math.max(0, ship.shieldHp);
-    this.targetHPMax = Math.max(1, read(ship, 'hpMax'));
-    this.targetShieldMax = Math.max(1, read(ship, 'shieldHpMax'));
+    this.targetHPMax = Math.max(1, ship.get_hpMax());
+    this.targetShieldMax = Math.max(1, ship.get_shieldHpMax());
     if (!this.initialized) {
       this.displayedHP = this.targetHP;
       this.displayedShield = this.targetShield;
@@ -76,19 +95,19 @@ export class HealthAndShield {
     const format = settings == null || settings.formatHealthAndShield ? formatAmount : String;
     const hp = format(Math.max(0, Math.round(this.displayedHP)));
     const shield = format(Math.max(0, Math.round(this.displayedShield)));
-    if (read(native.playerHPText, 'text') !== hp) native.playerHPText.set_text(hp);
-    if (read(native.playerShieldText, 'text') !== shield) native.playerShieldText.set_text(shield);
+    if (native.playerHPText.get_text() !== hp) native.playerHPText.set_text(hp);
+    if (native.playerShieldText.get_text() !== shield) native.playerShieldText.set_text(shield);
   }
 }
 
-export function installHealthAndShield(api: API, game: Raw): void {
-  const prototype = api.cls('core.hud.components.HealthAndShield')?.prototype;
+export function installHealthAndShield(api: API, game: GameScene): void {
+  const prototype = NativeHealthAndShield.prototype;
   if (typeof prototype?.update !== 'function') return;
-  const instances = new Map<Raw, HealthAndShield>();
-  const settings = () => api.cls('core.scene.SceneBase')?.settings ?? null;
-  api.around(prototype, 'update', function (next) {
+  const instances = new Map<NativeHealthAndShield, HealthAndShield>();
+  const settings = () => SceneBase.settings ?? null;
+  new GameReflection(api).around(prototype, 'update', function (next) {
     if (this.g !== game) return next();
-    const ship = read(game, 'me')?.ship;
+    const ship = game.get_me()?.ship;
     if (!ship) return;
     // Keep current upstream warning, texture, tooltip and shield calculations.
     next();
@@ -102,7 +121,7 @@ export function installHealthAndShield(api: API, game: Raw): void {
   api.on('frame', ({ game: current, event }) => {
     if (current !== game) return;
     for (const [native, display] of instances) {
-      if (read(native, 'stage')) display.animate(read(event, 'passedTime', 0));
+      if (native.get_stage()) display.animate(event.get_passedTime());
     }
   });
   api.defer(() => instances.clear());

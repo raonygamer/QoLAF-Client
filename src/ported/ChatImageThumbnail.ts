@@ -1,29 +1,23 @@
-import { bound, type Resolve } from '../runtime/As3';
-import type { Raw } from '../api/Types';
+import { bound } from '../runtime/HaxeInterop';
+import { Sprite, Image, StarlingTextField, TextFormat } from '../game/Bindings';
+import { VerdanaBitmapFontRegistry } from '../ui/VerdanaBitmapFontRegistry';
 import type { ChatImageCache } from '../chat/ChatImageCache';
 import type { ChatImageAsset } from '../chat/ChatImageAsset';
 import type { ChatDiscordImageLink } from '../chat/ChatDiscordImageLink';
 
 /** Source ChatImageThumbnail, sharing the browser cache and the native frame clock. */
 export function createChatImageThumbnail(
-  resolve: Resolve,
   cache: ChatImageCache,
   now: () => number = () => performance.now(),
 ) {
-  const Sprite = resolve('starling.display.Sprite');
-  const Image = resolve('starling.display.Image');
-  const TextField = resolve('starling.text.TextField');
-  const TextFormat = resolve('starling.text.TextFormat');
-  const Fonts = resolve('core.text.VerdanaBitmapFontRegistry');
-
   class ChatImageThumbnail extends Sprite {
     static readonly MAX_PREVIEW_WIDTH = 220;
     static readonly MAX_PREVIEW_HEIGHT = 140;
     static readonly LOADING_WIDTH = 92;
     static readonly LOADING_HEIGHT = 16;
     onPreviewSizeChanged: (() => void) | null = null;
-    private status: Raw;
-    private image: Raw | null = null;
+    private readonly status: StarlingTextField;
+    private image: Image | null = null;
     private asset: ChatImageAsset | null = null;
     private current: ChatDiscordImageLink | null = null;
     private generation = 0;
@@ -35,13 +29,19 @@ export function createChatImageThumbnail(
 
     constructor() {
       super();
-      this.status = new TextField(
+      this.status = new StarlingTextField(
         1,
         1,
         '',
-        new TextFormat(Fonts.fontNameForSize(10), 10, 0xb9c4d2, 'left', 'center'),
+        new TextFormat(
+          VerdanaBitmapFontRegistry.fontNameForSize(10),
+          10,
+          0xb9c4d2,
+          'left',
+          'center',
+        ),
       );
-      this.status.touchable = false;
+      this.status.set_touchable(false);
       this.addChild(this.status);
       this.layoutPlaceholder();
     }
@@ -59,17 +59,17 @@ export function createChatImageThumbnail(
       if (
         this.disposed ||
         this.current === value ||
-        (this.current && value && this.current.rawUrl === value.rawUrl)
+        (this.current && value && this.current.rawURL === value.rawURL)
       )
         return;
       this.generation++;
       this.stopAnimation();
       this.releaseAsset();
       this.current = value;
-      if (this.image) this.image.visible = false;
+      if (this.image) this.image.set_visible(false);
       if (!value) {
-        this.status.text = '';
-        this.status.visible = false;
+        this.status.set_text('');
+        this.status.set_visible(false);
         return;
       }
       // Prime geometry before synchronous cache delivery; reopening Advanced
@@ -82,13 +82,13 @@ export function createChatImageThumbnail(
           ChatImageThumbnail.LOADING_HEIGHT,
           false,
         );
-      this.status.format.horizontalAlign = 'left';
-      this.status.text = '[Image loading]';
-      this.status.visible = true;
+      this.status.get_format().set_horizontalAlign('left');
+      this.status.set_text('[Image loading]');
+      this.status.set_visible(true);
       const expected = this.generation;
-      const expectedUrl = value.rawUrl;
+      const expectedURL = value.rawURL;
       const stale = () =>
-        this.disposed || expected !== this.generation || this.current?.rawUrl !== expectedUrl;
+        this.disposed || expected !== this.generation || this.current?.rawURL !== expectedURL;
       cache.acquire(
         value,
         (asset) => {
@@ -107,9 +107,9 @@ export function createChatImageThumbnail(
     }
 
     private showError(): void {
-      this.status.format.horizontalAlign = 'left';
-      this.status.text = '[Image unavailable]';
-      this.status.visible = true;
+      this.status.get_format().set_horizontalAlign('left');
+      this.status.set_text('[Image unavailable]');
+      this.status.set_visible(true);
       this.setPreviewSize(110, 16, true);
     }
 
@@ -122,17 +122,20 @@ export function createChatImageThumbnail(
       }
       if (!this.image) {
         this.image = new Image(asset.frames[0]);
-        this.image!.touchable = false;
+        this.image.set_touchable(false);
         this.addChildAt(this.image, 1);
       } else {
-        this.image.texture = asset.frames[0];
+        this.image.set_texture(asset.frames[0]);
         this.image.readjustSize();
       }
-      const image = this.image!;
-      image.scaleX = image.scaleY = this.previewScale(asset.width, asset.height);
-      image.x = image.y = 0;
-      image.visible = true;
-      this.status.visible = false;
+      const image = this.image;
+      const scale = this.previewScale(asset.width, asset.height);
+      image.set_scaleX(scale);
+      image.set_scaleY(scale);
+      image.set_x(0);
+      image.set_y(0);
+      image.set_visible(true);
+      this.status.set_visible(false);
       this.animationFrame = 0;
       if (asset.animated) {
         this.nextFrameAt = now() + asset.delayAt(0);
@@ -158,14 +161,14 @@ export function createChatImageThumbnail(
     }
 
     @bound
-    private onAnimationFrame(_event: Raw): void {
+    private onAnimationFrame(): void {
       const asset = this.asset;
       if (!asset?.animated || !this.image) return;
       const time = now();
       let guard = 0;
       while (time >= this.nextFrameAt && guard++ < asset.frames.length + 1) {
         this.animationFrame = (this.animationFrame + 1) % asset.frames.length;
-        this.image.texture = asset.frames[this.animationFrame];
+        this.image.set_texture(asset.frames[this.animationFrame]);
         this.nextFrameAt += asset.delayAt(this.animationFrame);
       }
     }
@@ -187,9 +190,10 @@ export function createChatImageThumbnail(
     }
 
     private layoutPlaceholder(): void {
-      this.status.x = this.status.y = 0;
-      this.status.width = this.previewWidthValue;
-      this.status.height = this.previewHeightValue;
+      this.status.set_x(0);
+      this.status.set_y(0);
+      this.status.set_width(this.previewWidthValue);
+      this.status.set_height(this.previewHeightValue);
     }
 
     private releaseAsset(): void {

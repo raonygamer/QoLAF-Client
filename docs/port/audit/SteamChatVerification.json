@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-12",
+  "runtime": "Steam Electron, actual deployed Public client",
+  "initialization": "Passed private prompt using Use Public; auto-login reached RoamingState. No private-setting persistence changed.",
+  "chatAvailableAndFocused": [
+    "settings",
+    "map",
+    "ship",
+    "cargo",
+    "leaderboard",
+    "clan",
+    "portable hangar",
+    "portable upgrade",
+    "classic artifacts"
+  ],
+  "expandedArtifacts": {
+    "chatActive": false,
+    "logVisible": false
+  },
+  "escape": "Closed chat without leaving each tested screen; empty draft",
+  "visual": "Inspected actual settings screenshot: chat input and log render above the settings modal",
+  "liveRoom": {
+    "bodies": 111,
+    "observedAnchorRadius": 0.5,
+    "observedAnchorSpritesAllocated": false,
+    "missionMarkers": 2,
+    "missionMarkerFont": "DAIDRR_COMBAT",
+    "missionMarkerPixelSnapping": true,
+    "clientErrorDiagnostics": ""
+  },
+  "remaining": [
+    "Death overlay not exercised in this live pass",
+    "Original SWF side-by-side comparison not performed",
+    "Node Integration.test.ts remains blocked by outdated NativeGame fixture bindings",
+    "Broad movement, combat, and full-diff parity still unverified"
+  ]
+}

@@ -1,20 +1,11 @@
 // Source port of core/hud/components/chat/ChatSelectionValueSlider.as.
-import { bound, type Resolve } from '../runtime/As3';
-export function createChatSelectionValueSlider(resolve: Resolve): any {
-  const Point: any = resolve('openfl.geom.Point');
-  type Point = any;
-  const Quad: any = resolve('starling.display.Quad');
-  type Quad = any;
-  const Sprite: any = resolve('starling.display.Sprite');
-  type Sprite = any;
-  const Event: any = resolve('starling.events.Event');
-  type Event = any;
-  const Touch: any = resolve('starling.events.Touch');
-  type Touch = any;
-  const TouchEvent: any = resolve('starling.events.TouchEvent');
-  type TouchEvent = any;
-  const TouchPhase: any = resolve('starling.events.TouchPhase');
-  type TouchPhase = any;
+import { bound, type Resolve } from '../runtime/HaxeInterop';
+import { Point, Quad, Sprite, type TouchEvent } from '../game/Bindings';
+
+export function createChatSelectionValueSlider(resolve: Resolve) {
+  // Preserve aliases consumed by the source popup around this native Sprite.
+  resolve('starling.display.Sprite');
+  resolve('starling.display.Quad');
 
   /** Lightweight charcoal slider used only by ChatSelectionFormatPopup. */
 
@@ -25,16 +16,16 @@ export function createChatSelectionValueSlider(resolve: Resolve): any {
     private static KNOB_ACTIVE_COLOR: number = 0xffffff;
     private static KNOB_WIDTH: number = 12;
 
-    private interactionArea: Quad = null;
-    private track: Quad = null;
-    private fill: Quad = null;
-    private knob: Quad = null;
+    private interactionArea: Quad;
+    private track: Quad;
+    private fill: Quad;
+    private knob: Quad;
     private controlWidth: number = NaN;
     private _minimum: number = NaN;
     private _maximum: number = NaN;
     private _step: number = NaN;
     private _value: number = NaN;
-    private point: Point = new Point();
+    private point: Point | null = new Point();
     private activeTouchID: number = -1;
 
     constructor(minimum: number, maximum: number, step: number, width: number, height: number) {
@@ -44,7 +35,7 @@ export function createChatSelectionValueSlider(resolve: Resolve): any {
       this._step = step;
       this._value = minimum;
       this.controlWidth = width;
-      this.useHandCursor = true;
+      this.set_useHandCursor(true);
 
       // Sprite hit testing only considers the actual pixels occupied by its
       // children. Previously that made most of this nominally 24 px-high
@@ -52,24 +43,24 @@ export function createChatSelectionValueSlider(resolve: Resolve): any {
       // begin a drag. Keep one nearly transparent quad behind the chrome so
       // the complete advertised rectangle is a reliable interaction area.
       this.interactionArea = new Quad(width, height, ChatSelectionValueSlider.TRACK_COLOR);
-      this.interactionArea.alpha = 0.001;
+      this.interactionArea.set_alpha(0.001);
       this.addChild(this.interactionArea);
       this.track = new Quad(width, 4, ChatSelectionValueSlider.TRACK_COLOR);
-      this.track.y = Math.round((height - this.track.height) / 2);
-      this.track.touchable = false;
+      this.track.set_y(Math.round((height - this.track.get_height()) / 2));
+      this.track.set_touchable(false);
       this.addChild(this.track);
       this.fill = new Quad(1, 4, ChatSelectionValueSlider.FILL_COLOR);
-      this.fill.y = this.track.y;
-      this.fill.touchable = false;
+      this.fill.set_y(this.track.get_y());
+      this.fill.set_touchable(false);
       this.addChild(this.fill);
       this.knob = new Quad(
         ChatSelectionValueSlider.KNOB_WIDTH,
         height,
         ChatSelectionValueSlider.KNOB_COLOR,
       );
-      this.knob.touchable = false;
+      this.knob.set_touchable(false);
       this.addChild(this.knob);
-      this.addEventListener(TouchEvent.TOUCH, this.onTouch);
+      this.addEventListener('touch', this.onTouch);
       this.updateVisuals();
     }
 
@@ -88,38 +79,40 @@ export function createChatSelectionValueSlider(resolve: Resolve): any {
 
     @bound
     private onTouch(event: TouchEvent): void {
-      let touch: Touch =
+      const point = this.point;
+      if (!point) return;
+      const touch =
         this.activeTouchID < 0
           ? event.getTouch(this)
           : event.getTouch(this, null, this.activeTouchID);
       if (touch == null) {
         this.activeTouchID = -1;
-        this.knob.color = ChatSelectionValueSlider.KNOB_COLOR;
+        this.knob.set_color(ChatSelectionValueSlider.KNOB_COLOR);
         return;
       }
-      if (touch.phase == TouchPhase.BEGAN) {
-        this.activeTouchID = touch.id;
+      if (touch.get_phase() == 'began') {
+        this.activeTouchID = touch.get_id();
       }
       if (
-        touch.phase == TouchPhase.BEGAN ||
-        touch.phase == TouchPhase.MOVED ||
-        touch.phase == TouchPhase.STATIONARY
+        touch.get_phase() == 'began' ||
+        touch.get_phase() == 'moved' ||
+        touch.get_phase() == 'stationary'
       ) {
-        this.knob.color = ChatSelectionValueSlider.KNOB_ACTIVE_COLOR;
+        this.knob.set_color(ChatSelectionValueSlider.KNOB_ACTIVE_COLOR);
       } else {
-        this.knob.color = ChatSelectionValueSlider.KNOB_COLOR;
+        this.knob.set_color(ChatSelectionValueSlider.KNOB_COLOR);
       }
-      if (touch.phase == TouchPhase.ENDED) {
+      if (touch.get_phase() == 'ended') {
         this.activeTouchID = -1;
       }
-      if (touch.phase != TouchPhase.BEGAN && touch.phase != TouchPhase.MOVED) {
+      if (touch.get_phase() != 'began' && touch.get_phase() != 'moved') {
         return;
       }
-      touch.getLocation(this, this.point);
+      touch.getLocation(this, point);
       let range: number = Math.max(1, this.controlWidth - ChatSelectionValueSlider.KNOB_WIDTH);
       let next: number =
         this._minimum +
-        Math.max(0, Math.min(1, (this.point.x - ChatSelectionValueSlider.KNOB_WIDTH / 2) / range)) *
+        Math.max(0, Math.min(1, (point.x - ChatSelectionValueSlider.KNOB_WIDTH / 2) / range)) *
           (this._maximum - this._minimum);
       next = this.clampAndSnap(next);
       if (this._value == next) {
@@ -127,7 +120,7 @@ export function createChatSelectionValueSlider(resolve: Resolve): any {
       }
       this._value = next;
       this.updateVisuals();
-      this.dispatchEventWith(Event.CHANGE);
+      this.dispatchEventWith('change');
     }
 
     @bound
@@ -149,16 +142,18 @@ export function createChatSelectionValueSlider(resolve: Resolve): any {
         this._maximum == this._minimum
           ? 0
           : (this._value - this._minimum) / (this._maximum - this._minimum);
-      this.knob.x = Math.round(ratio * (this.controlWidth - ChatSelectionValueSlider.KNOB_WIDTH));
-      this.knob.y = 0;
-      this.fill.width = Math.max(1, this.knob.x + ChatSelectionValueSlider.KNOB_WIDTH / 2);
-      this.fill.height = 4;
+      this.knob.set_x(
+        Math.round(ratio * (this.controlWidth - ChatSelectionValueSlider.KNOB_WIDTH)),
+      );
+      this.knob.set_y(0);
+      this.fill.set_width(Math.max(1, this.knob.get_x() + ChatSelectionValueSlider.KNOB_WIDTH / 2));
+      this.fill.set_height(4);
     }
 
     @bound
     /*override*/
     public dispose(): void {
-      this.removeEventListener(TouchEvent.TOUCH, this.onTouch);
+      this.removeEventListener('touch', this.onTouch);
       this.activeTouchID = -1;
       this.point = null;
       super.dispose();

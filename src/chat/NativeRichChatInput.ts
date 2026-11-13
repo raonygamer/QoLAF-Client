@@ -1,5 +1,6 @@
-import { type API, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { API } from '../api/Types';
+import { Localize, type GameScene } from '../game/Bindings';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { bindNativeBitmapInput, type NativeBitmapInput } from './rich/NativeBitmapInput';
 import type { DeviceSettings } from '../settings/DeviceSettings';
 import { GlobalChatSanitizer } from './GlobalChatSanitizer';
@@ -8,13 +9,14 @@ import type { ChatArtifactLinkResolver } from './ChatArtifactLinkResolver';
 /** Keep native chat identity and source channel restrictions around the shared bitmap input. */
 export function installNativeRichChatInput(
   api: API,
-  game: Raw,
+  game: GameScene,
   resolve: Resolve,
   preferences?: DeviceSettings,
   artifacts?: Pick<ChatArtifactLinkResolver, 'resolvePresentation' | 'resolveText' | 'onResolved'>,
 ): NativeBitmapInput | undefined {
   const chat = game.chatInput;
-  const input = chat?.input;
+  if (!chat) return;
+  const input = chat.input;
   if (!input?.element) return;
   const editor = bindNativeBitmapInput(
     api,
@@ -38,10 +40,7 @@ export function installNativeRichChatInput(
   }
   const syncPrompt = () => {
     const integrated = preferences?.get('enableNewChatIntegrationSystem') ?? true;
-    const localize = api.cls?.('generics.Localize');
-    editor.view.setPrompt(
-      integrated ? (localize?.t('Type text here...') ?? 'Type text here...') : '',
-    );
+    editor.view.setPrompt(integrated ? Localize.t('Type text here...') : '');
   };
   if (preferences)
     api.defer(

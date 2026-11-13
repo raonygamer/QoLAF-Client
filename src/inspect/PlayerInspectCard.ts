@@ -1,5 +1,5 @@
 // Source port of core/hud/components/dialogs/PlayerInspectCard.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createPlayerInspectCard(resolve: Resolve): any {
   type AS3Utils = any;
   const Text: any = resolve('core.hud.components.Text');

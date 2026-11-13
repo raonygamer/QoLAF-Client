@@ -1,15 +1,53 @@
+import { installEnemyCourseOwnership } from '../movement/EnemyCourseOwnership';
+import { installBossFrames } from './BossFrames';
+import { installBossCulling } from './BossCulling';
+import { installBossEffects } from './BossEffects';
+import { installDropExpiry } from './DropExpiry';
+import { installUniqueDropEffects } from './UniqueDropEffects';
+import { installDropFrames } from './DropFrames';
+import { installPlayerNameStyle } from '../ship/PlayerNameStyle';
+import type { HeadingState } from '../game/HeadingState';
+import {
+  GameStateMachine,
+  Ship,
+  GameScene,
+  PlayerShip,
+  EnemyShip,
+  type Engine,
+  type Player,
+} from '../game/Bindings';
+import { updateSimulation, resetSimulationTiming } from './SimulationTiming';
+export { updateSimulation } from './SimulationTiming';
 import { installProjectileFrames } from './ProjectileFrames';
 import { installRenderPosition } from './RenderPosition';
 import { installWorldLabels } from './WorldLabels';
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import { installCameraFrames } from './CameraFrames';
+export { updateCamera } from './CameraMotion';
 import { installRemoteShips } from './RemoteShips';
 import { installCameraView } from './CameraView';
 import { installBodyVisibility } from './BodyVisibility';
+import { installUnitFlashes } from './UnitFlashes';
+import { installEnemyCloakPresentation } from '../ship/EnemyCloakPresentation';
+import { installTeleportAnimation } from '../ship/TeleportScaleAnimation';
 
 export interface RenderPose {
   x: number;
   y: number;
   rotation: number;
+}
+
+interface ShipPoseState {
+  get_course(): Pick<
+    HeadingState,
+    'pos' | 'speed' | 'rotation' | 'rotateLeft' | 'rotateRight'
+  > | null;
+  player?: Pick<Player, 'isMe' | 'isLanded'> | null;
+  engine: Pick<Engine, 'get_rotationSpeed'> | null;
+  forcedRotation?: boolean;
+  get_landed?(): boolean;
+  sampleRemoteRotation?(): number;
 }
 
 function wrapRadians(angle: number): number {
@@ -19,16 +57,18 @@ function wrapRadians(angle: number): number {
 
 /** Ship.as: local extrapolation, remote interpolation, and tween-owned landing. */
 export function sampleShipPose(
-  ship: Raw,
+  ship: ShipPoseState,
   previous: RenderPose | undefined,
   alpha: number,
-): RenderPose {
-  const course = read(ship, 'course');
-  const position = course.pos;
+  completedPose?: RenderPose,
+): RenderPose | null {
+  const course = ship.get_course();
+  if (!course) return null;
+  const position = completedPose ?? course.pos;
   const localPlayer = ship.player?.isMe === true;
-  const landingTween = ship.player?.isLanded === true && !read(ship, 'landed', false);
+  const landingTween = ship.player?.isLanded === true && !ship.get_landed?.();
   let { x, y } = position;
-  let rotation = course.rotation;
+  let rotation = completedPose?.rotation ?? course.rotation;
 
   if (!landingTween) {
     if (localPlayer) {
@@ -42,7 +82,7 @@ export function sampleShipPose(
   }
 
   if (localPlayer && !ship.forcedRotation && ship.engine) {
-    const turn = 0.001 * read(ship.engine, 'rotationSpeed') * 33 * alpha;
+    const turn = 0.001 * ship.engine.get_rotationSpeed() * 33 * alpha;
     if (course.rotateLeft) rotation -= turn;
     if (course.rotateRight) rotation += turn;
     rotation = wrapRadians(rotation);
@@ -54,151 +94,101 @@ export function sampleShipPose(
   return { x, y, rotation };
 }
 
-/** GameStateMachine.as uses local elapsed time, never the corrected server clock. */
-export function updateSimulation(machine: Raw): void {
-  if (!machine._clock) return;
-  machine.newTime = read(machine._clock, 'elapsedTime');
-  machine.frameTime = Math.max(0, Math.min(500, machine.newTime - machine.currentTime));
-  machine.currentTime = machine.newTime;
-  machine.accumulator += machine.frameTime;
-  while (machine.accumulator >= 33) {
-    machine.currentState?.tickUpdate();
-    machine.accumulator -= 33;
-  }
-  if (
-    machine.currentState &&
-    read(machine.currentState, 'loaded') &&
-    (!machine.previousState || read(machine.previousState, 'unloaded'))
-  ) {
-    machine.currentState.execute();
-  }
-  machine.inputManager.reset();
-}
-
-function resetTiming(machine: Raw): void {
-  machine.accumulator = 0;
-  machine.frameTime = 0;
-  machine.currentTime = machine._clock ? read(machine._clock, 'elapsedTime') : 0;
-  machine.newTime = machine.currentTime;
-}
-
-/** StarlingCameraFocus.as: the original easing rate, independent of display FPS. */
-export function updateCamera(camera: Raw, milliseconds: number): void {
-  if (!camera._switch) return;
-  const focus = camera.focusTarget;
-  if (!focus) {
-    camera.speed.x = 0;
-    camera.speed.y = 0;
-    return;
-  }
-  camera._tempStep = camera.trackStep;
-  camera._step = camera._tempStep;
-  const frames = Math.max(0, Math.min(3, milliseconds / 33));
-  const tracking = 1 - Math.pow(1 - 1 / camera._step, frames);
-  const focusX = read(focus, 'x');
-  const focusY = read(focus, 'y');
-  if ((focusX - camera._focusTracker.x) * (focusY - camera._focusTracker.y) <= 1000) {
-    if (camera.isSwaping) {
-      camera.isSwaping = false;
-      if (camera.enableCallBack) camera._stage.dispatchEvent(camera._swapFinishedEvent);
-    }
-    camera.isFocused = true;
-  } else {
-    camera.isFocused = false;
-  }
-  camera.speed.x = (focusX - camera._focusTracker.x) * tracking;
-  camera.speed.y = (focusY - camera._focusTracker.y) * tracking;
-  camera._focusTracker.x += camera.speed.x;
-  camera._focusTracker.y += camera.speed.y;
-  camera._focusLastLoc.x = camera._focusCurrentLoc.x;
-  camera._focusLastLoc.y = camera._focusCurrentLoc.y;
-  camera._focusCurrentLoc.x = camera._focusTracker.x;
-  camera._focusCurrentLoc.y = camera._focusTracker.y;
-  camera._targetLastX = camera._targetCurrentX;
-  camera._targetLastY = camera._targetCurrentY;
-  camera._targetCurrentX = focusX;
-  camera._targetCurrentY = focusY;
-  if (camera.isZooming) {
-    const zoom = 1 - Math.pow(1 - 1 / camera.zoomStep, frames);
-    const container = camera._stageContainer;
-    container.set_scaleX(
-      read(container, 'scaleX') + (camera._zoomFactor - read(container, 'scaleX')) * zoom,
+/** Keep fixed-step endpoints across AI state changes, but reset explicit relocations. */
+export function installShipPoseHistory(api: API) {
+  const reflection = new GameReflection(api);
+  const previous = new WeakMap<Ship, RenderPose>();
+  const completed = new WeakMap<Ship, RenderPose>();
+  const updating = new WeakSet<Ship>();
+  const clearPose = (ship: Ship) => {
+    previous.delete(ship);
+    completed.delete(ship);
+  };
+  reflection.around(Ship.prototype, 'update', function (next) {
+    const course = this.get_course();
+    if (!course || Number.isNaN(this.get_pos().x)) return next();
+    previous.set(
+      this,
+      (this instanceof EnemyShip ? completed.get(this) : undefined) ?? {
+        x: course.pos.x,
+        y: course.pos.y,
+        rotation: course.rotation,
+      },
     );
-    container.set_scaleY(
-      read(container, 'scaleY') + (camera._zoomFactor - read(container, 'scaleY')) * zoom,
-    );
-    if (Math.abs(read(container, 'scaleX') - camera._zoomFactor) < 0.00001) {
-      camera.isZooming = false;
-      container.set_scaleX(camera._zoomFactor);
-      container.set_scaleY(camera._zoomFactor);
-      if (camera.enableCallBack) camera._stage.dispatchEvent(camera._zoomFinishedEvent);
+    updating.add(this);
+    try {
+      const result = next();
+      const current = this.get_course();
+      if (this instanceof EnemyShip && current)
+        completed.set(this, {
+          x: current.pos.x,
+          y: current.pos.y,
+          rotation: current.rotation,
+        });
+      return result;
+    } finally {
+      updating.delete(this);
     }
+  });
+  reflection.before(Ship.prototype, 'reset', function () {
+    clearPose(this);
+  });
+  for (const method of ['set_course', 'initCourse'] as const) {
+    reflection.before(Ship.prototype, method, function () {
+      // AIOrbit.exit replaces the heading within Ship.update. Clearing here
+      // erases that tick's starting pose and makes the next draw jump ahead.
+      // Outside a simulation step, cloak/spawn/teleport must not reuse history.
+      if (this instanceof EnemyShip && !updating.has(this)) clearPose(this);
+    });
   }
-  camera.positionStageContainer();
-  camera.positionParallax(camera.testBounds());
-  camera.updateViewRectangle();
-  if (camera.isShaking && camera._shakeTimer > 0) {
-    camera._shakeTimer -= milliseconds;
-    if (camera._shakeTimer <= 0) {
-      camera._shakeTimer = 0;
-      camera.isShaking = false;
-      if (camera.enableCallBack) camera._stage.dispatchEvent(camera._shakeFinishedEvent);
-    } else {
-      camera._intensity -= camera._shakeDecay * milliseconds;
-      const container = camera._stageContainer;
-      const width = read(camera._stage, 'stageWidth');
-      const height = read(camera._stage, 'stageHeight');
-      container.set_x(
-        Math.random() * camera._intensity * width * 2 -
-          camera._intensity * width +
-          read(container, 'x'),
-      );
-      container.set_y(
-        Math.random() * camera._intensity * height * 2 -
-          camera._intensity * height +
-          read(container, 'y'),
-      );
-    }
-  }
+  return { previous, completed };
 }
 
 export function installInterpolation(api: API): void {
-  const machine = api.cls('core.states.GameStateMachine')?.prototype;
-  const ship = api.cls('core.ship.Ship')?.prototype;
-  const game = api.cls('core.scene.Game')?.prototype;
+  const reflection = new GameReflection(api);
+  const machine = GameStateMachine.prototype;
+  const ship = Ship.prototype;
+  const game = GameScene.prototype;
   if (!machine || !ship || !game) throw Error('Interpolation runtime classes are missing');
+  installEnemyCourseOwnership(api);
   installRenderPosition(api);
+  installBossFrames(api);
+  installBossCulling(api);
+  installBossEffects(api);
   installCameraView(api);
   installBodyVisibility(api);
+  installUnitFlashes(api);
+  installEnemyCloakPresentation(api);
+  installTeleportAnimation(api);
   installProjectileFrames(api);
-  const previous = new WeakMap<Raw, RenderPose>();
+  installDropFrames(api);
+  installDropExpiry(api);
+  installUniqueDropEffects(api);
+  const { previous, completed } = installShipPoseHistory(api);
   const remoteShips = installRemoteShips(api);
   installWorldLabels(api);
+  installPlayerNameStyle(api);
 
-  api.around(machine, 'update', function () {
+  reflection.around(machine, 'update', function () {
     updateSimulation(this);
   });
-  api.after(machine, 'set_clock', function () {
-    resetTiming(this);
+  reflection.after(machine, 'set_clock', function () {
+    resetSimulationTiming(this);
   });
-  api.before(game, 'runGameLoop', function () {
-    if (this.gameStateMachine) resetTiming(this.gameStateMachine);
+  reflection.before(game, 'runGameLoop', function () {
+    if (this.gameStateMachine) resetSimulationTiming(this.gameStateMachine);
   });
-  api.before(ship, 'update', function () {
-    const course = this.converger?.course;
-    if (!course || Number.isNaN(read(this, 'pos')?.x)) return;
-    previous.set(this, { x: course.pos.x, y: course.pos.y, rotation: course.rotation });
-  });
-  api.before(ship, 'reset', function () {
-    previous.delete(this);
-  });
-  api.after(ship, 'draw', function () {
-    const course = read(this, 'course');
+  reflection.after(ship, 'draw', function () {
+    const course = this.get_course();
     const clip = this._mc;
     if (!course || !clip || !this.imgObj) return;
-    const alpha = Math.max(0, Math.min(1, this.g.gameStateMachine.accumulator / 33));
-    const pose = sampleShipPose(this, previous.get(this), alpha);
-    const remoteRotation = remoteShips.sample(this);
+    const alpha = Math.max(0, Math.min(1, (this.g.gameStateMachine?.accumulator ?? 0) / 33));
+    // Enemy packets replace course positions between simulation ticks. Keep
+    // both render endpoints fixed until the next completed step; otherwise the
+    // same interpolation interval changes shape when a correction arrives.
+    const pose = sampleShipPose(this, previous.get(this), alpha, completed.get(this));
+    if (!pose) return;
+    const remoteRotation = this instanceof PlayerShip ? remoteShips.sample(this) : NaN;
     if (Number.isFinite(remoteRotation)) pose.rotation = remoteRotation;
     clip.set_x(pose.x);
     clip.set_y(pose.y);
@@ -206,26 +196,9 @@ export function installInterpolation(api: API): void {
     if (this.miniBarsAreAddedToCanvas) {
       for (const bar of [this.hpBar, this.shieldBar]) {
         bar.set_x(pose.x);
-        bar.set_y(read(bar, 'y') + pose.y - course.pos.y);
+        bar.set_y(bar.get_y() + pose.y - course.pos.y);
       }
     }
   });
-  // The camera used to run inside tickUpdate. Move it to the render-frame path.
-  api.onGame((instance, session) => {
-    const camera = instance.camera;
-    session.around(camera, 'update', function () {});
-    // Game.update is already bound as an enterFrame listener before onGame.
-    // Read the frame delta at its direct parallax call instead of replacing
-    // the instance method behind that cached listener. Haxe passes seconds.
-    // EmitterFrames runs in the before phase. An around hook keeps the original
-    // frame order (emitters, camera, parallax), independent of install order.
-    session.around(instance.parallaxManager, 'update', function (next, seconds: number, ...args) {
-      updateCamera(camera, seconds * 1000);
-      return next(seconds, ...args);
-    });
-    // The original client's shake() is deliberately empty.
-    session.around(camera, 'shake', function () {});
-    camera.isShaking = false;
-    camera._shakeTimer = 0;
-  });
+  installCameraFrames(api);
 }

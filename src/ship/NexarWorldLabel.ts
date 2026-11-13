@@ -1,19 +1,39 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import {
+  EnemyShip,
+  SceneBase,
+  StarlingTextField,
+  TextFormat,
+  type Sprite,
+  type Quad,
+  type GameScene,
+  type ClientSettings,
+} from '../game/Bindings';
+import type { RenderedGameObject } from '../game/RenderedGameObject';
+import { RussoBitmapFontRegistry } from '../ui/RussoBitmapFontRegistry';
+
+type LabelOptions = Pick<
+  ClientSettings,
+  'showNexarFactionLabels' | 'showNexarEnemyNames' | 'showNexarHealthBars' | 'showNexarHealthValues'
+>;
+type RenderedEnemy = EnemyShip & RenderedGameObject;
+
 import { NativeUI } from '../ui/NativeUI';
 import { formatAmount } from '../hud/HealthAndShield';
 import { NexarEnemyIdentification } from './NexarEnemyIdentification';
 
 /** Source fixed bitmap viewports and native quads; shield values remain native. */
 export class NexarWorldLabel {
-  readonly node: Raw;
-  private readonly faction: Raw;
-  private readonly enemyName: Raw;
-  private readonly shieldBackground: Raw;
-  private readonly shieldFill: Raw;
-  private readonly hpBackground: Raw;
-  private readonly hpFill: Raw;
-  private readonly shieldValue: Raw;
-  private readonly hpValue: Raw;
+  readonly node: Sprite;
+  private readonly faction: Sprite;
+  private readonly enemyName: StarlingTextField;
+  private readonly shieldBackground: Quad;
+  private readonly shieldFill: Quad;
+  private readonly hpBackground: Quad;
+  private readonly hpFill: Quad;
+  private readonly shieldValue: StarlingTextField;
+  private readonly hpValue: StarlingTextField;
   private displayedOptions = -1;
   private contentHeight = 0;
   private nextValueUpdate = 0;
@@ -44,9 +64,12 @@ export class NexarWorldLabel {
       this.faction.addChild(badge);
     }
     const text = (width: number, height: number, value: string, size: number, color: number) => {
-      const TextField = ui.cls('starling.text.TextField'),
-        TextFormat = ui.cls('starling.text.TextFormat');
-      const field = new TextField(width, height, value, new TextFormat('DAIDRR_16', size, color));
+      const field = new StarlingTextField(
+        width,
+        height,
+        value,
+        new TextFormat(RussoBitmapFontRegistry.fontNameForSize(size), size, color),
+      );
       field.set_batchable(true);
       field.set_touchable(false);
       return field;
@@ -77,7 +100,7 @@ export class NexarWorldLabel {
     }
   }
 
-  static options(settings: Raw): number {
+  static options(settings: Partial<LabelOptions>): number {
     return (
       (settings.showNexarFactionLabels ? 1 : 0) |
       (settings.showNexarEnemyNames ? 2 : 0) |
@@ -86,21 +109,23 @@ export class NexarWorldLabel {
     );
   }
 
-  draw(game: Raw, ship: Raw, flags: number): void {
-    const clip = read(ship, 'movieClip');
+  draw(game: GameScene, ship: RenderedEnemy, flags: number): void {
+    const clip = ship.get_movieClip();
+    const canvas = game.canvas;
     if (
       !flags ||
+      !canvas ||
       !ship.alive ||
-      !read(ship, 'isAddedToCanvas') ||
+      !ship.isAddedToCanvas ||
       !clip ||
-      !read(clip, 'visible') ||
-      read(clip, 'alpha') <= 0 ||
+      !clip.get_visible() ||
+      clip.get_alpha() <= 0 ||
       ship.owner != null
     ) {
       this.hide();
       return;
     }
-    const worldScale = Math.abs(read(game.canvas, 'scaleX') * read(game.canvasTexts, 'scaleX'));
+    const worldScale = Math.abs(canvas.get_scaleX() * game.canvasTexts.get_scaleX());
     if (!Number.isFinite(worldScale) || worldScale <= 0) {
       this.hide();
       return;
@@ -110,8 +135,8 @@ export class NexarWorldLabel {
       this.nextValueUpdate = 0;
     }
     if (flags & 4) {
-      this.updateFill(this.shieldFill, ship.shieldHp, ship.shieldHpMax);
-      this.updateFill(this.hpFill, ship.hp, ship.hpMax);
+      this.updateFill(this.shieldFill, ship.shieldHp, ship.get_shieldHpMax());
+      this.updateFill(this.hpFill, ship.hp, ship.get_hpMax());
     }
     const now = this.now();
     if (flags & 8 && now >= this.nextValueUpdate) {
@@ -121,17 +146,17 @@ export class NexarWorldLabel {
     const inverse = 1 / worldScale;
     this.node.set_scaleX(inverse);
     this.node.set_scaleY(inverse);
-    this.node.set_x(read(ship, 'renderX', read(clip, 'x')));
+    this.node.set_x(ship.get_renderX?.() ?? clip.get_x());
     const headroom = Math.max(
       ship.collisionRadius,
-      Math.abs(read(clip, 'pivotX') * read(clip, 'scaleX')),
-      Math.abs(read(clip, 'pivotY') * read(clip, 'scaleY')),
+      Math.abs(clip.get_pivotX() * clip.get_scaleX()),
+      Math.abs(clip.get_pivotY() * clip.get_scaleY()),
     );
     this.node.set_y(
-      read(ship, 'renderY', read(clip, 'y')) - headroom - (this.contentHeight + 8) * inverse,
+      (ship.get_renderY?.() ?? clip.get_y()) - headroom - (this.contentHeight + 8) * inverse,
     );
-    this.node.set_alpha(read(clip, 'alpha'));
-    if (!read(this.node, 'parent')) game.canvasTexts.addChild(this.node);
+    this.node.set_alpha(clip.get_alpha());
+    if (!this.node.get_parent()) game.canvasTexts.addChild(this.node);
   }
 
   private updateLayout(flags: number): void {
@@ -172,7 +197,7 @@ export class NexarWorldLabel {
     this.contentHeight = row;
   }
 
-  private updateFill(fill: Raw, value: number, maximum: number): void {
+  private updateFill(fill: Quad, value: number, maximum: number): void {
     const ratio = maximum > 0 ? Math.max(0, Math.min(1, value / maximum)) : 0;
     fill.set_visible(ratio > 0);
     if (ratio > 0) {
@@ -181,19 +206,22 @@ export class NexarWorldLabel {
     }
   }
 
-  private updateValues(ship: Raw): void {
-    if (ship.shieldHp !== this.previousShield || ship.shieldHpMax !== this.previousShieldMax) {
+  private updateValues(ship: RenderedEnemy): void {
+    if (
+      ship.shieldHp !== this.previousShield ||
+      ship.get_shieldHpMax() !== this.previousShieldMax
+    ) {
       this.previousShield = ship.shieldHp;
-      this.previousShieldMax = ship.shieldHpMax;
+      this.previousShieldMax = ship.get_shieldHpMax();
       this.shieldValue.set_text(
         formatAmount(Math.max(0, this.previousShield)) +
           ' / ' +
           formatAmount(Math.max(0, this.previousShieldMax)),
       );
     }
-    if (ship.hp !== this.previousHp || ship.hpMax !== this.previousHpMax) {
+    if (ship.hp !== this.previousHp || ship.get_hpMax() !== this.previousHpMax) {
       this.previousHp = ship.hp;
-      this.previousHpMax = ship.hpMax;
+      this.previousHpMax = ship.get_hpMax();
       this.hpValue.set_text(
         formatAmount(Math.max(0, this.previousHp)) +
           ' / ' +
@@ -210,15 +238,15 @@ export class NexarWorldLabel {
   }
 }
 
-export function installNexarWorldLabels(api: API, game: Raw): void {
-  const enemy = api.cls('core.ship.EnemyShip')?.prototype;
-  if (typeof enemy?.draw !== 'function') return;
+export function installNexarWorldLabels(api: API, game: GameScene): void {
+  const enemy = EnemyShip.prototype;
+  const reflection = new GameReflection(api);
   const ui = new NativeUI(api),
-    labels = new Map<Raw, NexarWorldLabel>(),
-    eligibility = new WeakMap<Raw, boolean>();
-  api.after(enemy, 'draw', function () {
+    labels = new Map<EnemyShip, NexarWorldLabel>(),
+    eligibility = new WeakMap<EnemyShip, boolean>();
+  reflection.after(enemy, 'draw', function () {
     if (this.g !== game) return;
-    if (!this.alive || !read(this, 'isAddedToCanvas')) {
+    if (!this.alive || !this.isAddedToCanvas) {
       labels.get(this)?.hide();
       return;
     }
@@ -227,7 +255,7 @@ export function installNexarWorldLabels(api: API, game: Raw): void {
       eligible =
         this.owner == null &&
         NexarEnemyIdentification.isImportant(
-          read(this, 'name'),
+          this.get_name(),
           this.hasFaction('Nexar'),
           this.miniboss,
           this.isBossUnit,
@@ -235,21 +263,21 @@ export function installNexarWorldLabels(api: API, game: Raw): void {
       eligibility.set(this, eligible);
     }
     if (!eligible) return;
-    const flags = NexarWorldLabel.options(api.cls('core.scene.SceneBase')?.clientSettings ?? {});
+    const flags = NexarWorldLabel.options(SceneBase.clientSettings ?? {});
     let label = labels.get(this);
     if (!label && flags) {
-      label = new NexarWorldLabel(ui, read(this, 'name'));
+      label = new NexarWorldLabel(ui, this.get_name());
       labels.set(this, label);
     }
     label?.draw(game, this, flags);
   });
   if (typeof enemy.removeFromCanvas === 'function')
-    api.before(enemy, 'removeFromCanvas', function () {
+    reflection.before(enemy, 'removeFromCanvas', function () {
       labels.get(this)?.hide();
     });
-  for (const method of ['reset', 'destroy'])
+  for (const method of ['reset', 'destroy'] as const)
     if (typeof enemy[method] === 'function')
-      api.before(enemy, method, function () {
+      reflection.before(enemy, method, function () {
         labels.get(this)?.dispose();
         labels.delete(this);
         eligibility.delete(this);

@@ -1,28 +1,30 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import { DomOverlay, NativeTextFormat, type GameScene } from '../game/Bindings';
 import type { DeviceSettings } from '../settings/DeviceSettings';
 import { ChatLayout } from './ChatLayout';
 
 /** Apply legacy composer preferences to the current game's native TextEntry. */
 export function installNativeChatPreferences(
   api: API,
-  game: Raw,
+  game: GameScene,
   preferences?: DeviceSettings,
 ): void {
   const chat = game.chatInput;
   const input = chat?.input;
-  const TextFormat = api.cls('openfl.text.TextFormat') as any;
-  if (!preferences || !input?.set_textFormat || !TextFormat) return;
+  if (!preferences || !chat || !input) return;
+  const reflection = new GameReflection(api);
   const originalFormat = input.textFormat;
-  const originalWidth = read(input, 'width');
-  const originalX = read(chat, 'x');
-  const originalY = read(chat, 'y');
-  const originalTabsWidth = read(chat.tabs, 'width');
+  const originalWidth = input.get_width();
+  const originalX = chat.get_x();
+  const originalY = chat.get_y();
+  const originalTabsWidth = chat.tabs.get_width();
   const element = input.element;
   const originalFontSize = element?.style.fontSize;
   const originalFontFamily = element?.style.fontFamily;
   const cssFontSize = () => {
     if (!element) return;
-    const overlay = api.cls('core.hud.components.ui.DomOverlay');
+    const overlay = DomOverlay;
     // Use the same logical-to-CSS transform as native placement, including DPI,
     // browser zoom and a CSS-scaled canvas.
     const scale = overlay?.toCss({ x: 0, y: 0, width: 1, height: 1 }).height ?? 1;
@@ -32,32 +34,32 @@ export function installNativeChatPreferences(
     element.style.fontFamily = 'Verdana, Arial, sans-serif';
   };
   const layout = () => {
-    const stage = read(game, 'stage');
+    const stage = game.get_stage();
     if (!stage) return;
     if (preferences.get('enableNewChatIntegrationSystem') && game.messageLog) {
-      const view = ChatLayout.fit(read(stage, 'stageWidth'), read(stage, 'stageHeight'));
+      const view = ChatLayout.fit(stage.get_stageWidth(), stage.get_stageHeight());
       input.set_width(view.width);
       chat.tabs.set_width(Math.max(1, view.width - 8));
-      chat.set_x(Math.max(0, Math.min(view.x, read(stage, 'stageWidth') - view.width - 10)));
-      chat.set_y(Math.max(0, Math.min(view.y + 20 + view.height, read(stage, 'stageHeight') - 81)));
+      chat.set_x(Math.max(0, Math.min(view.x, stage.get_stageWidth() - view.width - 10)));
+      chat.set_y(Math.max(0, Math.min(view.y + 20 + view.height, stage.get_stageHeight() - 81)));
       cssFontSize();
       return;
     }
-    const width = Math.max(1, Math.min(originalWidth, read(stage, 'stageWidth') - 20));
+    const width = Math.max(1, Math.min(originalWidth, stage.get_stageWidth() - 20));
     input.set_width(width);
     chat.tabs.set_width(width);
     chat.set_x(
       Math.max(
         0,
-        Math.min(read(stage, 'stageWidth') / 2 - width / 2, read(stage, 'stageWidth') - width - 10),
+        Math.min(stage.get_stageWidth() / 2 - width / 2, stage.get_stageWidth() - width - 10),
       ),
     );
     chat.set_y(
       Math.max(
         0,
         Math.min(
-          read(stage, 'stageHeight') - 100,
-          read(stage, 'stageHeight') - read(input, 'y') - read(input, 'height') - 10,
+          stage.get_stageHeight() - 100,
+          stage.get_stageHeight() - input.get_y() - input.get_height() - 10,
         ),
       ),
     );
@@ -65,7 +67,7 @@ export function installNativeChatPreferences(
   };
   const apply = () => {
     input.set_textFormat(
-      new TextFormat('Verdana', preferences.get('legacyChatFontSize'), 0xffffff),
+      new NativeTextFormat('Verdana', preferences.get('legacyChatFontSize'), 0xffffff),
     );
     layout();
   };
@@ -88,10 +90,11 @@ export function installNativeChatPreferences(
         apply();
     }),
   );
-  if (typeof input.updatePlacement === 'function') api.after(input, 'updatePlacement', cssFontSize);
-  if (typeof chat.toggleChatMode === 'function') api.after(chat, 'toggleChatMode', apply);
+  if (typeof input.updatePlacement === 'function')
+    reflection.after(input, 'updatePlacement', cssFontSize);
+  if (typeof chat.toggleChatMode === 'function') reflection.after(chat, 'toggleChatMode', apply);
   // Game.resize may be a cached callback; stage events preserve native listener order.
-  const stage = read(game, 'stage');
+  const stage = game.get_stage();
   if (stage?.addEventListener) {
     stage.addEventListener('resize', layout);
     api.defer(() => stage.removeEventListener('resize', layout));

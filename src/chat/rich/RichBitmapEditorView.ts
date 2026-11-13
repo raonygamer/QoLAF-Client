@@ -1,5 +1,12 @@
-import type { Raw } from '../../api/Types';
-import type { Resolve } from '../../runtime/As3';
+import type { ArtifactLabelResolver } from './ArtifactLabelResolver';
+import { Sprite, Quad } from '../../game/Bindings';
+import type { BitmapFontTextFormat } from '../../ui/BitmapFontTextFormat';
+import type { createRichBitmapFontTextRenderer } from '../../ported/RichBitmapFontTextRenderer';
+import type { createRichBitmapTextMetrics } from '../../ported/RichBitmapTextMetrics';
+
+type TextRenderer = InstanceType<ReturnType<typeof createRichBitmapFontTextRenderer>>;
+type TextMetrics = InstanceType<ReturnType<typeof createRichBitmapTextMetrics>>;
+import type { Resolve } from '../../runtime/HaxeInterop';
 import { RichBitmapEditorModel } from './RichBitmapEditorModel';
 import { RichBitmapMarkup } from './RichBitmapMarkup';
 import { RichBitmapMarkupParser } from './RichBitmapMarkupParser';
@@ -7,14 +14,14 @@ import { RichBitmapTextNavigation } from './RichBitmapTextNavigation';
 
 /** Starling drawing and caret geometry from the original RichBitmapFontTextEditor. */
 export class RichBitmapEditorView {
-  readonly node: Raw;
-  private readonly renderer: Raw;
-  private readonly metrics: Raw;
-  private readonly promptRenderer: Raw;
+  readonly node: Sprite;
+  private readonly renderer: TextRenderer;
+  private readonly metrics: TextMetrics;
+  private readonly promptRenderer: TextRenderer;
   private prompt = '';
-  private readonly selection: Raw;
-  private readonly cursor: Raw;
-  private readonly mask: Raw;
+  private readonly selection: Quad;
+  private readonly cursor: Quad;
+  private readonly mask: Quad;
   private readonly markup = new RichBitmapMarkup();
   private scrollX = 0;
   private width = 0;
@@ -25,13 +32,17 @@ export class RichBitmapEditorView {
   constructor(
     resolve: Resolve,
     readonly model: RichBitmapEditorModel,
-    private format: Raw,
-    private readonly artifactResolver: Function | null = null,
+    private format: BitmapFontTextFormat,
+    private readonly artifactResolver: ArtifactLabelResolver | null = null,
   ) {
-    const Sprite = resolve('starling.display.Sprite');
-    const Quad = resolve('starling.display.Quad');
-    const Renderer = resolve('core.hud.components.chat.rich.RichBitmapFontTextRenderer');
-    const Metrics = resolve('core.hud.components.chat.rich.RichBitmapTextMetrics');
+    resolve('starling.display.Sprite');
+    resolve('starling.display.Quad');
+    const Renderer = resolve(
+      'core.hud.components.chat.rich.RichBitmapFontTextRenderer',
+    ) as ReturnType<typeof createRichBitmapFontTextRenderer>;
+    const Metrics = resolve('core.hud.components.chat.rich.RichBitmapTextMetrics') as ReturnType<
+      typeof createRichBitmapTextMetrics
+    >;
     this.node = new Sprite();
     this.renderer = new Renderer();
     this.metrics = new Metrics();
@@ -79,7 +90,7 @@ export class RichBitmapEditorView {
     this.refresh();
   }
 
-  setFormat(format: Raw): void {
+  setFormat(format: BitmapFontTextFormat): void {
     this.format = format;
     this.refresh();
   }
@@ -116,7 +127,7 @@ export class RichBitmapEditorView {
       this.promptRenderer.set_width(this.width);
       this.promptRenderer.validate();
       this.promptRenderer.set_y(
-        Math.max(0, Math.round((this.height - this.promptRenderer.height) / 2)),
+        Math.max(0, Math.round((this.height - this.promptRenderer.get_height()) / 2)),
       );
     }
 

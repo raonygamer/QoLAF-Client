@@ -1,25 +1,17 @@
-// Ported from core/hud/components/LoginAccountTypePanel.as; retain original layout and behavior.
-import { bound, type Resolve } from '../runtime/As3';
-export function createLoginAccountTypePanel(resolve: Resolve): any {
-  const LoginButton: any = resolve('core.hud.components.LoginButton');
-  type LoginButton = any;
-  const RussoBitmapFontRegistry: any = resolve('core.text.RussoBitmapFontRegistry');
-  type RussoBitmapFontRegistry = any;
-  const VerdanaBitmapFontRegistry: any = resolve('core.text.VerdanaBitmapFontRegistry');
-  type VerdanaBitmapFontRegistry = any;
-  const Quad: any = resolve('starling.display.Quad');
-  type Quad = any;
-  const Sprite: any = resolve('starling.display.Sprite');
-  type Sprite = any;
-  const TouchEvent: any = resolve('starling.events.TouchEvent');
-  type TouchEvent = any;
-  const TextField: any = resolve('starling.text.TextField');
-  type TextField = any;
-  const TextFormat: any = resolve('starling.text.TextFormat');
-  type TextFormat = any;
-  const Align: any = resolve('starling.utils.Align');
-  type Align = any;
+// Ported from core/hud/components/LoginAccountTypePanel.as.
+import { Sprite, Quad, StarlingTextField as TextField, TextFormat } from '../game/Bindings';
+import type { Game } from '../game/Game';
+import type { Provider } from '../login/LoginProfile';
+import type { createLoginButton } from './LoginButton';
+import { RussoBitmapFontRegistry } from '../ui/RussoBitmapFontRegistry';
+import { VerdanaBitmapFontRegistry } from '../ui/VerdanaBitmapFontRegistry';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 
+export function createLoginAccountTypePanel(resolve: Resolve) {
+  const LoginButton = resolve('core.hud.components.LoginButton') as ReturnType<
+    typeof createLoginButton
+  >;
+  resolve('starling.display.Sprite');
   /** Account-provider chooser shown before the add-credentials form. */
 
   class LoginAccountTypePanel extends Sprite {
@@ -30,48 +22,52 @@ export function createLoginAccountTypePanel(resolve: Resolve): any {
     private static OPTION_HEIGHT: number = 42;
     private static OPTION_GAP: number = 6;
 
-    private onProviderSelected!: Function | null;
-    private onCreateSimple!: Function | null;
-    private onBack!: Function | null;
+    private onProviderSelected: ((provider: Provider) => void) | null;
+    private onCreateSimple: (() => void) | null;
+    private onBack: (() => void) | null;
     private optionRows: Sprite[] = [];
 
-    constructor(param1: Function | null, param2: Function | null, param3: Function | null) {
+    constructor(
+      onProviderSelected: ((provider: Provider) => void) | null,
+      onCreateSimple: (() => void) | null,
+      onBack: (() => void) | null,
+    ) {
       super();
-      this.onProviderSelected = param1;
-      this.onCreateSimple = param2;
-      this.onBack = param3;
+      this.onProviderSelected = onProviderSelected;
+      this.onCreateSimple = onCreateSimple;
+      this.onBack = onBack;
       this.build();
     }
 
     @bound
     private build(): void {
-      var background: Quad = new Quad(
+      const background: Quad = new Quad(
         LoginAccountTypePanel.PANEL_WIDTH,
         LoginAccountTypePanel.PANEL_HEIGHT,
         0x000000,
       );
-      background.alpha = 0.78;
+      background.set_alpha(0.78);
       this.addChild(background);
 
-      var titleFormat: TextFormat = new TextFormat(
+      const titleFormat: TextFormat = new TextFormat(
         RussoBitmapFontRegistry.fontNameForSize(15),
         15,
         0xffffff,
       );
-      titleFormat.horizontalAlign = Align.LEFT;
-      var title: TextField = new TextField(
+      titleFormat.set_horizontalAlign('left');
+      const title: TextField = new TextField(
         LoginAccountTypePanel.PANEL_WIDTH - LoginAccountTypePanel.CONTENT_PADDING * 2,
         28,
         'ADD ACCOUNT',
         titleFormat,
       );
-      title.pixelSnapping = false;
-      title.x = LoginAccountTypePanel.CONTENT_PADDING;
-      title.y = 9;
-      title.touchable = false;
+      title.set_pixelSnapping(false);
+      title.set_x(LoginAccountTypePanel.CONTENT_PADDING);
+      title.set_y(9);
+      title.set_touchable(false);
       this.addChild(title);
 
-      var y: number = 43;
+      let y: number = 43;
       this.addOption('simple', 'Simple account', 'E-mail and password', y);
       y += LoginAccountTypePanel.OPTION_HEIGHT + LoginAccountTypePanel.OPTION_GAP;
       this.addOption('kongregate', 'Kongregate account', 'User ID and auth token', y);
@@ -86,84 +82,81 @@ export function createLoginAccountTypePanel(resolve: Resolve): any {
         true,
       );
 
-      var backButton: LoginButton = new LoginButton('back', this.handleBack, 0xffffff, 0x222222);
-      backButton.x = LoginAccountTypePanel.PANEL_WIDTH / 2 - backButton.width / 2;
-      backButton.y = LoginAccountTypePanel.PANEL_HEIGHT - backButton.height - 8;
+      const backButton = new LoginButton('back', this.handleBack, 0xffffff, 0x222222);
+      backButton.set_x(LoginAccountTypePanel.PANEL_WIDTH / 2 - backButton.get_width() / 2);
+      backButton.set_y(LoginAccountTypePanel.PANEL_HEIGHT - backButton.get_height() - 8);
       this.addChild(backButton);
     }
 
     @bound
     private addOption(
-      param1: string,
-      param2: string,
-      param3: string,
-      param4: number,
-      param5: boolean = false,
+      provider: Provider | 'create',
+      label: string,
+      description: string,
+      y: number,
+      createAccount: boolean = false,
     ): void {
-      var row: Sprite = new Sprite();
-      row.name = param1;
-      row.x = LoginAccountTypePanel.CONTENT_PADDING;
-      row.y = param4;
+      const row: Sprite = new Sprite();
+      row.set_name(provider);
+      row.set_x(LoginAccountTypePanel.CONTENT_PADDING);
+      row.set_y(y);
 
-      var background: Quad = new Quad(
+      const background: Quad = new Quad(
         LoginAccountTypePanel.PANEL_WIDTH - LoginAccountTypePanel.CONTENT_PADDING * 2,
         LoginAccountTypePanel.OPTION_HEIGHT,
-        param5 ? 0x163b2d : 0x101820,
+        createAccount ? 0x163b2d : 0x101820,
       );
-      background.alpha = 0.9;
+      background.set_alpha(0.9);
       row.addChild(background);
 
-      var titleFormat: TextFormat = new TextFormat(
+      const titleFormat: TextFormat = new TextFormat(
         RussoBitmapFontRegistry.fontNameForSize(12),
         12,
-        param5 ? 0x66e6a1 : 0xffffff,
+        createAccount ? 0x66e6a1 : 0xffffff,
       );
-      titleFormat.horizontalAlign = Align.LEFT;
-      var title: TextField = new TextField(
+      titleFormat.set_horizontalAlign('left');
+      const title: TextField = new TextField(
         205,
         LoginAccountTypePanel.OPTION_HEIGHT,
-        param2,
+        label,
         titleFormat,
       );
-      title.pixelSnapping = false;
-      title.x = 12;
-      title.touchable = false;
+      title.set_pixelSnapping(false);
+      title.set_x(12);
+      title.set_touchable(false);
       row.addChild(title);
 
-      var detailFormat: TextFormat = new TextFormat(
+      const detailFormat: TextFormat = new TextFormat(
         VerdanaBitmapFontRegistry.fontNameForSize(9),
         9,
         0xaab6c2,
       );
-      detailFormat.horizontalAlign = Align.LEFT;
-      var detail: TextField = new TextField(
+      detailFormat.set_horizontalAlign('left');
+      const detail: TextField = new TextField(
         185,
         LoginAccountTypePanel.OPTION_HEIGHT,
-        param3,
+        description,
         detailFormat,
       );
-      detail.pixelSnapping = false;
-      detail.x = 220;
-      detail.touchable = false;
+      detail.set_pixelSnapping(false);
+      detail.set_x(220);
+      detail.set_touchable(false);
       row.addChild(detail);
 
-      row.useHandCursor = true;
+      row.set_useHandCursor(true);
       row.addEventListener('touch', this.onOptionTouch);
       this.optionRows.push(row);
       this.addChild(row);
     }
 
     @bound
-    private onOptionTouch(param1: TouchEvent): void {
-      var row: Sprite = <Sprite>param1.currentTarget;
-      if (row == null || param1.getTouch(row, 'ended') == null) {
-        return;
-      }
-      if (row.name == 'create') {
-        this.invoke(this.onCreateSimple);
-      } else if (this.onProviderSelected != null) {
-        this.onProviderSelected(row.name);
-      }
+    private onOptionTouch(event: Game.starling.events.TouchEvent): void {
+      const row = this.optionRows.find((candidate) => candidate === event.currentTarget);
+      if (!row || !event.getTouch(row, 'ended')) return;
+      const provider = row.get_name();
+      if (provider === 'create') this.onCreateSimple?.();
+      else if (provider === 'simple' || provider === 'kongregate' || provider === 'armor')
+        this.onProviderSelected?.(provider);
     }
 
     @bound
@@ -172,15 +165,14 @@ export function createLoginAccountTypePanel(resolve: Resolve): any {
     }
 
     @bound
-    private invoke(param1: Function | null): void {
-      if (param1 != null) {
-        param1();
+    private invoke(callback: (() => void) | null): void {
+      if (callback != null) {
+        callback();
       }
     }
 
     @bound
-    /*override*/
-    public dispose(): void {
+    override dispose(): void {
       for (const row of this.optionRows) {
         row.removeEventListener('touch', this.onOptionTouch);
       }

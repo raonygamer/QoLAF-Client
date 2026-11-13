@@ -3,10 +3,12 @@ import { portedClasses } from '../ported/Registry';
 import { installPopupKeyboard } from '../dialogs/NativePopupKeyboard';
 import { createMusicPlayer, type MusicPlayerService } from './MusicPlayer';
 import { createMusicPlayerPopup } from './MusicPlayerPopup';
+import { installNativeSoundChannels } from './NativeSoundChannels';
 import { installNativeMusicPlayback } from './NativeMusicPlayback';
 
 export function installMusicService(api: API): MusicPlayerService {
   const player = createMusicPlayer(portedClasses(api).resolve);
+  installNativeSoundChannels(api);
   installNativeMusicPlayback(api, player);
   return player;
 }

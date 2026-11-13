@@ -1,10 +1,8 @@
-import type { Resolve } from '../runtime/As3';
+import { BitmapData, Rectangle, Point } from '../game/Bindings';
+import type { Resolve } from '../runtime/HaxeInterop';
 
 /** Replaces Flash TextLine rasterization while retaining the source cache metrics. */
-export function createJapaneseRasterizer(resolve: Resolve) {
-  const BitmapData = resolve('openfl.display.BitmapData');
-  const Rectangle = resolve('openfl.geom.Rectangle');
-  const Point = resolve('openfl.geom.Point');
+export function createJapaneseRasterizer(_resolve: Resolve) {
   let canvas: HTMLCanvasElement | undefined;
   let context: CanvasRenderingContext2D | null = null;
   const sourceRect = new Rectangle();
@@ -35,13 +33,17 @@ export function createJapaneseRasterizer(resolve: Resolve) {
       context.fillText(text, -left, -top);
       return { left, top, width, height, advance: metrics.width };
     },
-    copyTo(bitmap: any, x: number, y: number) {
+    copyTo(bitmap: BitmapData, x: number, y: number) {
       if (!canvas) throw Error('Rasterize a glyph before copying its pixels');
       const glyphBitmap = BitmapData.fromCanvas(canvas, true);
+      if (!glyphBitmap) throw Error('Unable to create glyph bitmap');
       sourceRect.setTo(0, 0, width, height);
       destination.setTo(x, y);
-      bitmap.copyPixels(glyphBitmap, sourceRect, destination);
-      glyphBitmap.dispose();
+      try {
+        bitmap.copyPixels(glyphBitmap, sourceRect, destination);
+      } finally {
+        glyphBitmap.dispose();
+      }
     },
   };
 }

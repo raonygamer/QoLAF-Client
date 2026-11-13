@@ -1,8 +1,10 @@
-import { read, type API, type Raw } from '../api/Types';
-import { isBoundMethod } from '../runtime/As3';
+import { type API, type Raw } from '../api/Types';
+import { isBoundMethod } from '../runtime/HaxeInterop';
 import { portedClasses } from '../ported/Registry';
 import { createSettingsState } from '../ported/SettingsState';
 import { devicePreferenceKeys, type DeviceSettings } from './DeviceSettings';
+import { GameReflection } from '../api/GameReflection';
+import { closeSettingsForUnload, detachSettingsResizeListeners } from './SettingsUnload';
 
 /** Retain the game's state identity and host Plugins hooks, replacing its pages. */
 export function installNativeSettings(api: API, preferences?: DeviceSettings): void {
@@ -25,30 +27,9 @@ export function installNativeSettings(api: API, preferences?: DeviceSettings): v
       });
     }
     api.before(settings, 'save', () => preferences.flush());
-    const originalStarling = api.cls('starling.core.Starling')?.get_current();
-    const originalStage = read(originalStarling, 'nativeStage');
-    const originalFrameRate = read(originalStage, 'frameRate');
-    const originalSkipFrames = read(originalStarling, 'skipUnchangedFrames');
-    api.defer(() => {
-      if (originalFrameRate !== undefined) originalStage.set_frameRate(originalFrameRate);
-      if (originalSkipFrames !== undefined)
-        originalStarling.set_skipUnchangedFrames(originalSkipFrames);
-    });
-    const applyFrameRate = () => {
-      const starling = api.cls('starling.core.Starling')?.get_current();
-      if (!starling) return;
-      const limit = preferences.get('renderFrameRate');
-      starling.set_skipUnchangedFrames(false);
-      starling.get_nativeStage().set_frameRate(limit >= 241 ? 1000 : limit);
-    };
-    api.defer(
-      preferences.subscribe((key) => {
-        if (key === 'renderFrameRate') applyFrameRate();
-      }),
-    );
-    applyFrameRate();
   }
   const source = createSettingsState(portedClasses(api).resolve);
+  const reflection = new GameReflection(api);
   const initialized = new WeakSet<Raw>();
   const live = new Set<Raw>();
   for (const [name, descriptor] of Object.entries(
@@ -61,8 +42,27 @@ export function installNativeSettings(api: API, preferences?: DeviceSettings): v
     if (typeof method !== 'function') continue;
     const invoke = function (this: Raw, ...args: any[]) {
       if (!initialized.has(this)) {
+        // The open vanilla state may retain a closure bound before these hooks.
+        // Rebuilding it enters PlayState again and registers the new closure.
+        if (
+          name === 'enter' ||
+          (name !== 'exit' && name !== 'close' && this.g?.gameStateMachine?.currentState === this)
+        )
+          detachSettingsResizeListeners(
+            reflection.cast(this, 'core.states.gameStates.SettingsState'),
+          );
         source.initializeNative(this);
         initialized.add(this);
+        // Hot enable can encounter a SettingsState that already entered while
+        // this adapter was absent. Re-enter through the native dispatcher so
+        // the host also remounts its Plugins category on the rebuilt panel.
+        if (
+          name !== 'enter' &&
+          name !== 'exit' &&
+          name !== 'close' &&
+          this.g?.gameStateMachine?.currentState === this
+        )
+          this.enter();
       }
       if (name === 'enter') live.add(this);
       if (name === 'exit') live.delete(this);
@@ -81,7 +81,16 @@ export function installNativeSettings(api: API, preferences?: DeviceSettings): v
     }
   }
   api.defer(() => {
-    for (const state of live) state.close();
+    for (const state of live)
+      closeSettingsForUnload(reflection.cast(state, 'core.states.gameStates.SettingsState'));
     live.clear();
   });
+  const game = api.game;
+  const current = game?.gameStateMachine?.currentState;
+  if (
+    game &&
+    !game.get_isLeaving() &&
+    reflection.is(current, 'core.states.gameStates.SettingsState')
+  )
+    current.enter();
 }

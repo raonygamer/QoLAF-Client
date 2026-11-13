@@ -1,3 +1,5 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { Display } from './fixtures/NativeGame';
@@ -5,6 +7,11 @@ import { NativeUI } from '../src/ui/NativeUI';
 import { NexarWorldLabel, installNexarWorldLabels } from '../src/ship/NexarWorldLabel';
 // @ts-expect-error actual host hooks
 import { Hooks } from './fixtures/HostCore.js';
+
+function display(node: object): Display {
+  assert.ok(node instanceof Display);
+  return node;
+}
 
 function fixture() {
   class Quad extends Display {
@@ -87,7 +94,15 @@ function fixture() {
       scaleY: 1,
     },
   };
-  return { api, ui, game, ship, classes, settings };
+  for (const key of ['x', 'y', 'visible', 'alpha', 'pivotX', 'pivotY', 'scaleX', 'scaleY'])
+    ship.movieClip['get_' + key] = () => ship.movieClip[key];
+  ship.get_movieClip = () => ship.movieClip;
+  ship.get_hpMax = () => ship.hpMax;
+  ship.get_shieldHpMax = () => ship.shieldHpMax;
+  const bind = () =>
+    bindGameClasses({ cls: (name: string) => classes[name] ?? {} } as unknown as API);
+  bind();
+  return { api, ui, game, ship, classes, settings, bind };
 }
 
 test('all original label option combinations use the source layout and live shield values', () => {
@@ -96,7 +111,7 @@ test('all original label option combinations use the source layout and live shie
   let now = 0;
   const label = new NexarWorldLabel(f.ui, 'Emperor Xhersix lvl 150', () => now);
   const [faction, name, shieldBackground, shieldFill, hpBackground, hpFill, shieldValue, hpValue] =
-    label.node.children as any[];
+    display(label.node).children as any[];
   assert.equal(name.text, 'Emperor Xhersix');
   assert.equal(name.format.font, 'DAIDRR_16');
   assert.deepEqual([name.get_width(), name.get_height(), name.get_x()], [400, 22, -200]);
@@ -105,10 +120,10 @@ test('all original label option combinations use the source layout and live shie
   for (let flags = 0; flags < 16; flags++) {
     label.draw(f.game, f.ship, flags);
     if (!flags) {
-      assert.equal(label.node.parent, null);
+      assert.equal(label.node.get_parent(), null);
       continue;
     }
-    assert.equal(label.node.parent, f.game.canvasTexts);
+    assert.equal(label.node.get_parent(), f.game.canvasTexts);
     assert.equal(faction.get_visible(), !!(flags & 1));
     assert.equal(name.get_visible(), !!(flags & 2));
     assert.equal(shieldBackground.get_visible(), !!(flags & 4));
@@ -163,22 +178,22 @@ test('all original label option combinations use the source layout and live shie
   for (const key of ['alive', 'isAddedToCanvas']) {
     f.ship[key] = false;
     label.draw(f.game, f.ship, 3);
-    assert.equal(label.node.parent, null);
+    assert.equal(label.node.get_parent(), null);
     f.ship[key] = true;
   }
   f.ship.owner = {};
   label.draw(f.game, f.ship, 3);
-  assert.equal(label.node.parent, null);
+  assert.equal(label.node.get_parent(), null);
   f.ship.owner = null;
   f.ship.movieClip.alpha = 0;
   label.draw(f.game, f.ship, 3);
-  assert.equal(label.node.parent, null);
+  assert.equal(label.node.get_parent(), null);
   f.ship.movieClip.alpha = 1;
   f.game.canvas.set_scaleX(0);
   label.draw(f.game, f.ship, 3);
-  assert.equal(label.node.parent, null);
+  assert.equal(label.node.get_parent(), null);
   label.dispose();
-  assert.equal(label.node.disposed, true);
+  assert.equal(display(label.node).disposed, true);
 });
 
 test('native Nexar label hooks exclude ordinary elites, honor toggles and reset cached eligibility', () => {
@@ -200,6 +215,18 @@ test('native Nexar label hooks exclude ordinary elites, honor toggles and reset 
     shieldHpMax = 1000;
     collisionRadius = 30;
     movieClip = f.ship.movieClip;
+    get_movieClip() {
+      return this.movieClip;
+    }
+    get_hpMax() {
+      return this.hpMax;
+    }
+    get_shieldHpMax() {
+      return this.shieldHpMax;
+    }
+    get_name() {
+      return this.name;
+    }
     hasFaction(name: string) {
       assert.equal(name, 'Nexar');
       return this.nexar;
@@ -219,6 +246,7 @@ test('native Nexar label hooks exclude ordinary elites, honor toggles and reset 
     }
   }
   f.classes['core.ship.EnemyShip'] = Enemy;
+  f.bind();
   Object.assign(f.api, {
     after: (t: any, k: string, fn: Function) => cleanups.push(hooks.add(t, k, 'after', fn)),
     before: (t: any, k: string, fn: Function) => cleanups.push(hooks.add(t, k, 'before', fn)),

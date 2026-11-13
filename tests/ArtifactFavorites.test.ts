@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ArtifactFavorites } from '../src/artifacts/ArtifactFavorites';
@@ -37,14 +38,21 @@ test('favorite recycle guards exclude protected items before selection and nativ
   class Box {
     p = p;
     recycleMode = true;
-    frame = { color: 6513507 };
+    frame = {
+      color: 6513507,
+      get_color() {
+        return this.color;
+      },
+    };
     toolTip = {
       text: '',
       set_text(text: string) {
         this.text = text;
       },
     };
-    constructor(public a: any) {}
+    constructor(public a: any) {
+      a.get_isUnique ??= () => false;
+    }
     setNotSelected() {
       this.frame.color = 6513507;
     }
@@ -67,6 +75,9 @@ test('favorite recycle guards exclude protected items before selection and nativ
   const button = () => ({
     enabled: false,
     visible: true,
+    get_visible() {
+      return this.visible;
+    },
     set_enabled(value: boolean) {
       this.enabled = value;
     },
@@ -83,7 +94,15 @@ test('favorite recycle guards exclude protected items before selection and nativ
     recycleButton = button();
     toggleRecycleButton = button();
     cancelRecycleButton = button();
-    g = { myCargo: { isFull: false }, artifactRecyclePending: false };
+    g = {
+      myCargo: {
+        isFull: false,
+        get_isFull() {
+          return this.isFull;
+        },
+      },
+      artifactRecyclePending: false,
+    };
     submissions: string[][] = [];
     onRecycleSelect(event: any) {
       this.markedForRecycle.push(event.target.a);
@@ -102,9 +121,10 @@ test('favorite recycle guards exclude protected items before selection and nativ
     'core.artifact.ArtifactOverview': Overview,
   };
   const hooks = new Hooks();
-  const api: any = { cls: (name: string) => classes[name] };
+  const api: any = { cls: (name: string) => classes[name] ?? {} };
   for (const type of ['before', 'around', 'after'])
     api[type] = (obj: any, key: string, fn: Function) => hooks.add(obj, key, type, fn);
+  bindGameClasses(api);
   installArtifactRecycleProtection(api, favorites);
   const view = new Overview(),
     box = view.cargoBoxes[0];
@@ -114,6 +134,12 @@ test('favorite recycle guards exclude protected items before selection and nativ
   box.frame.color = 123;
   box.toggleRecycle();
   assert.equal(box.frame.color, 123, 'upgrade selection is not cleared');
+  const frame = box.frame;
+  Reflect.set(box, 'frame', null);
+  assert.doesNotThrow(() => box.setSelectedForRecycle());
+  assert.doesNotThrow(() => box.toggleRecycle());
+  assert.doesNotThrow(() => box.onClick());
+  Reflect.set(box, 'frame', frame);
   box.addToolTip();
   assert.match(box.toolTip.text, /unfavorite/);
   view.onRecycleSelect({ target: box });

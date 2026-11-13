@@ -4,6 +4,35 @@ export interface RenderPoint {
   y: number;
 }
 
+/** Original PlayerShip assembly traversal: the first two authored mounts own the blades. */
+export function writeMultipartPhaseBladeMounts(
+  parts: readonly { visual: Raw; image: Raw; clip: Raw }[],
+  space: Raw,
+  first: RenderPoint,
+  second: RenderPoint,
+  transform: Raw,
+  scratch: RenderPoint,
+): number {
+  let count = 0;
+  for (const part of parts) {
+    count += writePhaseBladeMounts(
+      part.visual,
+      part.image,
+      part.clip,
+      space,
+      count === 0 ? first : second,
+      count === 0 ? second : scratch,
+      transform,
+    );
+    if (count >= 2) return 2;
+  }
+  if (count === 1) {
+    second.x = first.x;
+    second.y = first.y;
+  }
+  return count;
+}
+
 /** Source authored mounts, transformed through the actual displayed hull once. */
 export function writePhaseBladeMounts(
   visual: Raw | null,

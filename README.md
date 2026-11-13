@@ -34,7 +34,7 @@ npm run build
 
 Use `npm run format` after editing. Owned folders use single lowercase words; split multiword concepts into nested folders (for example, `docs/port/audit`). TypeScript filenames, classes, and our own namespace/module groupings use PascalCase; methods and functions use camelCase. Preserve original game namespace chains (`qolaf.*`, `core.*`, etc.) and runtime boundary identifiers such as `get_width` and `set_visible`. Keep readable source with descriptive names and separate statements; the one-file distribution does not require compressed source files.
 
-`src/Index.ts` registers the plugin. `src/runtime/GameSession.ts` owns per-game hooks and native HUD objects. `src/ported` retains source class boundaries; adapters translate original APIs to the Haxe runtime.
+`src/index.ts` registers the plugin. `src/runtime/GameSession.ts` owns per-game hooks and native HUD objects. `src/ported` retains source class boundaries; adapters translate original APIs to the Haxe runtime.
 
 `npm test` builds and exercises the emitted module alongside source-level tests. `dist/qolaf-client.js` is one self-contained ES module with no external imports. The build also emits a download page and SHA-256 metadata. Actions checks formatting, types and tests, uploads the module artifact, and publishes Pages from `main`. The host's separate upstream-update workflow remains responsible for the official game snapshot.
 

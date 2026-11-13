@@ -1,3 +1,5 @@
+import { bindGameClasses, type GameScene, type Unit as NativeUnit } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { NearbyTargets } from '../src/target/NearbyTargets';
@@ -13,9 +15,27 @@ function fixture() {
     level = 10;
     parentObj: any = null;
     constructor(public id: number) {}
+    get_pos() {
+      return this.pos;
+    }
+    hasFaction() {
+      return false;
+    }
+    get_id() {
+      return this.id;
+    }
   }
   class PlayerShip extends Unit {
-    player = { isMe: false, group: null as any };
+    get_landed() {
+      return false;
+    }
+    player = {
+      isMe: false,
+      group: null as any,
+      get_group() {
+        return this.group;
+      },
+    };
   }
   class Boss {
     level = 100;
@@ -30,11 +50,20 @@ function fixture() {
   const config = { ...defaults };
   const game = { me: { ship: new Unit(0), group: { get_id: () => 1 } } };
   game.me.ship.pos.x = 0;
-  const target = new TargetSystem(game, config, PlayerShip);
-  const info = new TargetPresentation({ cls: (name: string) => classes[name] } as any, game);
+  const target = new TargetSystem(
+    { get_me: () => ({ ship: game.me.ship, get_group: () => game.me.group }) } as unknown as Pick<
+      GameScene,
+      'get_me'
+    >,
+    config,
+  );
+  bindGameClasses({ cls: (name: string) => classes[name] ?? {} } as unknown as API);
+  const info = new TargetPresentation({
+    get_me: () => ({ get_group: () => game.me.group }),
+  } as unknown as Pick<GameScene, 'get_me'>);
   return {
-    Unit,
-    PlayerShip,
+    Unit: Unit as unknown as new (id: number) => Unit & NativeUnit,
+    PlayerShip: PlayerShip as unknown as new (id: number) => PlayerShip & NativeUnit,
     Boss,
     config,
     target,
@@ -84,7 +113,7 @@ test('source priority and distance sorting changes only when refreshing the snap
   high.level = 20;
   const player = new PlayerShip(4);
   const group = new PlayerShip(5);
-  group.player.group = { id: 1 };
+  group.player.group = { get_id: () => 1 };
   const units = [group, far, near, high, player];
   nearby.refresh(units, 5);
   assert.deepEqual(
@@ -146,4 +175,55 @@ test('Haxe group ID getters distinguish groupmates in radar sorting and automati
   nearby.refresh([groupmate, hostile], 2);
   assert.equal(nearby.at(0), hostile);
   assert.equal(nearby.at(1), groupmate);
+});
+
+test('native reset invalidates a snapshot even without a manager removal notification', () => {
+  const { Unit, target, nearby } = fixture();
+  let generation = 12;
+  const unit = Object.assign(new Unit(1), { get_lifecycleId: () => generation });
+  nearby.refresh([unit], 1);
+  assert.equal(nearby.at(0), unit);
+  generation++;
+  unit.id = 2;
+  assert.equal(nearby.at(0), null);
+  assert.equal(nearby.select(unit), false);
+  assert.equal(target.current, null);
+  nearby.refresh([unit], 1);
+  assert.equal(nearby.at(0), unit);
+  target.remove(unit);
+  assert.equal(nearby.at(0), null, 'removal invalidates before the next native reset');
+  generation++;
+  assert.equal(nearby.select(unit), false);
+  nearby.refresh([unit], 1);
+  assert.equal(nearby.select(unit), true);
+});
+
+test('equal-distance rows keep source ID order when manager iteration order changes', () => {
+  const { Unit, nearby } = fixture();
+  const units = [new Unit(9), new Unit(2), new Unit(5)];
+  for (const order of [units, [...units].reverse(), [units[1], units[0], units[2]]]) {
+    nearby.refresh(order, 3);
+    assert.deepEqual(
+      [0, 1, 2].map((index) => nearby.at(index)?.get_id()),
+      [2, 5, 9],
+    );
+  }
+});
+
+test('source boss priority outranks ordinary level and excludes the active boss identity', () => {
+  const { Unit, Boss, target, nearby } = fixture();
+  const ordinary = new Unit(1);
+  ordinary.level = 200;
+  ordinary.pos.x = 1;
+  const firstPart = new Unit(2);
+  const secondPart = new Unit(3);
+  firstPart.parentObj = secondPart.parentObj = new Boss();
+  nearby.refresh([ordinary, firstPart, secondPart], 3);
+  assert.equal(nearby.at(0), firstPart);
+  assert.equal(nearby.at(1), ordinary);
+  assert.equal(nearby.at(2), null);
+  target.select(secondPart, true);
+  nearby.refresh([ordinary, firstPart, secondPart], 3);
+  assert.equal(nearby.at(0), ordinary);
+  assert.equal(nearby.at(1), null);
 });

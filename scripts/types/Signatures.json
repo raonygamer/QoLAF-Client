@@ -1,0 +1,3439 @@
+{
+  "playerio.Connection": {
+    "instance": {
+      "get_connected": "() => boolean",
+      "get_roomId": "() => string",
+      "joinedRoomId": "string",
+      "disconnect": "() => void",
+      "createMessage": "(type: string, ...values: (string | number | boolean | Uint8Array)[]) => Game.playerio.Message",
+      "send": "(type: string, ...values: (string | number | boolean | Uint8Array)[]) => void",
+      "sendMessage": "(message: Game.playerio.Message) => void",
+      "addMessageHandler": "(type: string, handler: (message: Game.playerio.Message) => void) => void",
+      "removeMessageHandler": "(type: string, handler: (message: Game.playerio.Message) => void) => void",
+      "addDisconnectHandler": "(handler: () => void) => void",
+      "removeDisconnectHandler": "(handler: () => void) => void",
+      "raw": "import('./PlayerIOSDKConnection').PlayerIOSDKConnection",
+      "rawSend": "(message: import('./PlayerIOMessageSerializer').PlayerIOSDKMessage) => void",
+      "messageHandlers": "{ type: string; handler: (message: Game.playerio.Message) => void; cb: (message: import('./PlayerIOMessageSerializer').PlayerIOSDKMessage) => void }[]"
+    },
+    "statics": {
+      "runMessageHandler": "(type: string, handler: (message: Game.playerio.Message) => void, sdkMessage: import('./PlayerIOMessageSerializer').PlayerIOSDKMessage) => void"
+    }
+  },
+  "playerio.Message": {
+    "instance": {
+      "type": "string",
+      "length": "number",
+      "add": "(value: string | number | boolean | Uint8Array) => void",
+      "getInt": "(index: number) => number",
+      "getUInt": "(index: number) => number",
+      "getNumber": "(index: number) => number",
+      "getBoolean": "(index: number) => boolean",
+      "getString": "(index: number) => string",
+      "addInt": "(value: number) => void",
+      "addUInt": "(value: number) => void",
+      "addDouble": "(value: number) => void",
+      "addBoolean": "(value: boolean) => void",
+      "addString": "(value: string) => void",
+      "fieldType": "(index: number) => number | undefined",
+      "kindAt": "(index: number) => number | undefined"
+    }
+  },
+  "playerio.Multiplayer": {
+    "instance": {
+      "raw": "import('./PlayerIOMultiplayer').PlayerIOMultiplayer",
+      "createJoinRoom": "(roomId: string | null, roomType: string, visible: boolean, roomData: Record<string, string | number | boolean | null>, joinData: Record<string, string | number | boolean | null>, success: (connection: Game.playerio.Connection) => void, failure: (error: Game.playerio.PlayerIOError) => void) => void",
+      "joinRoom": "(roomId: string, joinData: Record<string, string | number | boolean | null>, success: (connection: Game.playerio.Connection) => void, failure: (error: Game.playerio.PlayerIOError) => void) => void",
+      "listRooms": "(roomType: string, criteria: Record<string, string | number | boolean | null> | null, limit: number, offset: number, success: (rooms: Game.playerio.RoomInfo[]) => void, failure: (error: Game.playerio.PlayerIOError) => void) => void",
+      "get_developmentServer": "() => string | null",
+      "set_developmentServer": "(value: string | null) => string | null"
+    }
+  },
+  "playerio.Client": {
+    "instance": {
+      "multiplayer": "Game.playerio.Multiplayer",
+      "connectUserId": "string",
+      "errorLog": "Game.playerio.ErrorLog",
+      "bigDB": "Game.playerio.BigDB",
+      "payVault": "Game.playerio.PayVault"
+    },
+    "statics": {
+      "wrap": "(sdkClient: unknown) => Game.playerio.Client"
+    }
+  },
+  "playerio.PlayerIOError": {
+    "statics": {
+      "wrap": "(error: import('./PlayerIOMultiplayer').PlayerIOSDKError | null) => Game.playerio.PlayerIOError"
+    },
+    "instance": {
+      "code": "string | number",
+      "errorID": "number",
+      "message": "string",
+      "stackText": "string | null",
+      "getStackTrace": "() => string | null"
+    },
+    "arguments": "[code: string | number, message: string, stackText?: string | null, errorID?: number]"
+  },
+  "starling.display.Stage": {
+    "instance": {
+      "get_stageWidth": "() => number",
+      "get_stageHeight": "() => number",
+      "set_stageWidth": "(width: number) => number",
+      "set_stageHeight": "(height: number) => number"
+    }
+  },
+  "core.login.ServiceRoomSelector": {
+    "arguments": "[rooms: Game.playerio.RoomInfo[], select: (roomId: string) => void]",
+    "statics": {
+      "playerLevel": "number",
+      "isSupporter": "boolean"
+    },
+    "instance": {
+      "roomPreviews": "Game.core.login.ServiceRoomPreview[]",
+      "callback": "(roomId: string) => void",
+      "isAutoSelectingRoom": "boolean",
+      "onSelect": "(preview: Game.core.login.ServiceRoomPreview, roomId: string) => void",
+      "setNewPlayer": "() => void",
+      "connectToBestNoobRoom": "() => void"
+    }
+  },
+  "joinRoom.JoinRoomManager": {
+    "instance": {
+      "client": "Game.playerio.Client",
+      "session": "string",
+      "login": "Game.Login",
+      "serviceConnection": "Game.playerio.Connection | null",
+      "connection": "Game.playerio.Connection | null",
+      "init": "() => void",
+      "joinServiceRoom": "(roomId: string) => void",
+      "joinServiceRoomAttempt": "(roomId: string, retry: number) => void",
+      "createJoin": "(retry?: number) => void",
+      "startServicePing": "(connection: Game.playerio.Connection) => void",
+      "stopServicePing": "() => void",
+      "onJoinedServiceRoom": "(message: Game.playerio.Message) => void",
+      "playerInfo": "Partial<ServicePlayerInfo>",
+      "roomStateMachine": "Game.core.states.SceneStateMachine",
+      "room": "Game.joinRoom.Room",
+      "joinGame": "(solarSystem: string, joinData: Record<string, string | number | boolean | null>) => void",
+      "showErrorDialog": "(message: string, logError?: boolean, error?: Game.playerio.PlayerIOError | null, onClose?: (() => void) | null, disableClose?: boolean) => void",
+      "handleJoin": "(connection: Game.playerio.Connection) => void",
+      "set_desiredRoomId": "(id: string | null) => string | null",
+      "set_desiredSystemType": "(type: string) => string",
+      "_desiredRoomId": "string | null",
+      "_desiredSystemType": "string",
+      "get_desiredRoomId": "() => string | null",
+      "get_desiredSystemType": "() => string",
+      "inited": "boolean",
+      "stage": "Game.starling.display.Stage",
+      "dataManager": "Game.data.IDataManager",
+      "joinData": "Record<string, string | number | boolean | null>",
+      "joinCurrentSolarSystem": "() => void",
+      "handleRooms": "(rooms: Game.playerio.RoomInfo[]) => void",
+      "handleServiceRooms": "(rooms: Game.playerio.RoomInfo[]) => void",
+      "handleJoinServiceRoom": "(connection: Game.playerio.Connection) => void",
+      "dialogClose": "(event: Game.starling.events.Event) => void",
+      "reconnectServiceRoom": "(roomId: string, success: (connection: Game.playerio.Connection) => void, failure: (reason?: string, retryable?: boolean) => void) => void",
+      "tryWarpJumpToFriend": "(player: Game.core.player.Player, system: string, success: () => void, failure: (message: string) => void) => void",
+      "rpcServiceRoom": "(type: string, callback: (message: Game.playerio.Message) => void, ...values: (string | number | boolean | Uint8Array)[]) => void",
+      "servicePingTimer": "Game.haxe.Timer | null"
+    },
+    "arguments": "[client: Game.playerio.Client, stage: Game.starling.display.Stage, joinData: Record<string, string | number | boolean | null>, login: Game.Login]",
+    "statics": {
+      "retryDelayMs": "(attempt: number) => number",
+      "getServiceRoomID": "(index: number) => string",
+      "isValidServiceRoomId": "(id: string | null) => boolean"
+    }
+  },
+  "LoadingBar": {
+    "arguments": "[x: number, y: number]",
+    "instance": {
+      "status": "Game.core.hud.components.TextBitmap",
+      "percent": "Game.starling.text.TextField",
+      "update": "(text: string, percent: number) => void"
+    }
+  },
+  "Preload": {
+    "arguments": "[container: Game.starling.display.Sprite]",
+    "instance": {
+      "loadData": "() => void",
+      "loadingBar": "Game.LoadingBar",
+      "embeddedLoaded": "boolean",
+      "imagesLoaded": "boolean",
+      "imageLoadingStarted": "boolean",
+      "finishIfReady": "() => void",
+      "preloadComplete": "() => void",
+      "onImagePreloadProgress": "(event: Game.starling.events.Event) => void",
+      "onImagePreloadComplete": "(event: Game.starling.events.Event) => void",
+      "onImagePreloadFailed": "(event: Game.starling.events.Event) => void",
+      "textureManager": "Game.textures.TextureManager"
+    }
+  },
+  "core.hud.components.TextBitmap": {
+    "arguments": "[x?: number, y?: number, text?: string, size?: number]",
+    "instance": {
+      "get_color": "() => number",
+      "set_color": "(color: number) => number",
+      "set_text": "(text: string) => string",
+      "set_size": "(size: number) => number",
+      "autoWidth": "() => void"
+    }
+  },
+  "Login": {
+    "arguments": "[]",
+    "instance": {
+      "isLoggedIn": "boolean",
+      "enterPressed": "boolean",
+      "bgWidth": "number",
+      "bgHeight": "number",
+      "connectAttempt": "number",
+      "preload": "Game.Preload | null",
+      "joinRoomManager": "Game.joinRoom.JoinRoomManager | null",
+      "playerInfo": "Partial<ServicePlayerInfo>",
+      "joinData": "Record<string, string | number | boolean | null>",
+      "connectStatus": "Game.core.login.ConnectStatus",
+      "textureManager": "Game.textures.TextureManager | null",
+      "soundManager": "Game.sound.SoundManager | null",
+      "handleConnect": "(client: Game.playerio.Client) => void",
+      "handleConnectSteam": "(client: Game.playerio.Client) => void",
+      "handleError": "(error: Game.playerio.PlayerIOError) => void",
+      "handleLoginError": "(error: Game.playerio.PlayerIOError) => void",
+      "preloadComplete": "(event: Game.starling.events.Event) => void",
+      "onJoinedServiceRoom": "(event: Game.starling.events.Event & { data: ServicePlayerInfo }) => void",
+      "updateStatus": "(status: string) => void",
+      "selectServiceRoom": "(rooms: Game.playerio.RoomInfo[], select: (roomId: string) => void) => void",
+      "init": "() => void",
+      "initStartSetup": "() => void",
+      "joinServiceRoom": "() => void",
+      "joinGameRoom": "() => void",
+      "removeLoginScreen": "() => void",
+      "removeEffects": "() => void",
+      "removeEmbeddedAssets": "() => void",
+      "scaleBackground": "() => void",
+      "centerLogin": "() => void",
+      "hideLogin": "() => void",
+      "connectSteam": "() => void",
+      "stopConnectTimer": "() => void",
+      "loginContainer": "Game.starling.display.Sprite | null",
+      "logoContainer": "Game.starling.display.Sprite | null",
+      "recoverDialog": "Game.core.login.RecoverDialog | null",
+      "registerDialog": "Game.core.login.RegisterDialog2 | null",
+      "loginForm": "() => void",
+      "recoverForm": "() => void",
+      "registerForm": "() => void",
+      "setState": "(state: string) => void",
+      "showLoginError": "(message: string) => void",
+      "onConnectStatus": "(event: Game.core.login.ConnectEvent) => void",
+      "onKeyPress": "(event: Game.starling.events.KeyboardEvent) => void",
+      "resize": "(event?: Game.starling.events.Event) => void",
+      "onKeyUp": "(event: Game.starling.events.KeyboardEvent) => void"
+    },
+    "statics": {
+      "client": "Game.playerio.Client | null",
+      "currentState": "string",
+      "setDevServer": "(client: Game.playerio.Client) => void",
+      "gameId": "string",
+      "partnerId": "string | null",
+      "START_SETUP_IS_ACTIVE": "boolean",
+      "fadeScreen": "Game.core.hud.components.FadeScreen | null"
+    }
+  },
+  "joinRoom.JoinRoomLocator": {
+    "statics": {
+      "getService": "() => Game.joinRoom.JoinRoomManager | null",
+      "register": "(manager: Game.joinRoom.JoinRoomManager) => void"
+    }
+  },
+  "EmbeddedAssets": {
+    "statics": {
+      "loadLibrary": "(success: () => void, failure: (error: unknown) => void) => void"
+    }
+  },
+  "starling.events.Event": {
+    "instance": {
+      "data": "unknown",
+      "type": "string",
+      "bubbles": "boolean",
+      "stopsImmediatePropagation": "boolean",
+      "stopsPropagation": "boolean",
+      "setData": "(data: unknown) => void",
+      "stopPropagation": "() => void",
+      "stopImmediatePropagation": "() => void",
+      "toString": "() => string"
+    },
+    "arguments": "[type: string, bubbles?: boolean, data?: unknown]"
+  },
+  "core.login.ConnectStatus": {
+    "arguments": "[]",
+    "instance": {
+      "clean": "() => void",
+      "connectText": "Game.core.hud.components.Text",
+      "connectSubText": "Game.core.hud.components.Text",
+      "set_text": "(text: string) => string",
+      "set_subText": "(text: string | null) => string | null",
+      "update": "(event: Game.core.login.ConnectEvent) => void"
+    }
+  },
+  "sound.SoundManager": {
+    "instance": {
+      "set_musicVolume": "(volume: number) => number",
+      "set_effectVolume": "(volume: number) => number",
+      "callbackQueue": "{ h: Record<string, Array<(sound: Game.sound.SoundObject | null) => void>> }",
+      "soundObjects": "{ h: Record<string, Game.sound.SoundObject> }",
+      "musicObjects": "{ h: Record<string, Game.sound.SoundObject> }",
+      "effectObjects": "{ h: Record<string, Game.sound.SoundObject> }",
+      "cacheSound": "(type: string, key: string, metadata: { type: string; fileName: string; volume: number }) => void",
+      "loadSoundFromUrl": "(url: string, ready: (sound: Game.sound.SoundObject | null) => void) => void",
+      "loadSoundFromFS": "(fileName: string, ready: (sound: Game.sound.SoundObject | null) => void) => void",
+      "getSoundObject": "(key: string | null, ready: (sound: Game.sound.SoundObject | null) => void, type?: string) => void",
+      "get_musicVolume": "() => number",
+      "_musicVolume": "number",
+      "preCacheSound": "(key: string, ready?: () => void, type?: string) => void",
+      "playMusic": "(key: string, loop?: boolean, resume?: boolean, onLoad?: (channel: Game.openfl.media.SoundChannel | null) => void, onComplete?: () => void, fade?: boolean) => void",
+      "internalPlay": "(type: string, key: string, loop: boolean, resume: boolean, onLoad?: (channel: Game.openfl.media.SoundChannel | null) => void, onComplete?: () => void) => void",
+      "stop": "(key: string, complete?: () => void) => void",
+      "stopMusic": "() => void",
+      "stopAllMusicExcept": "(key: string, fade?: boolean) => void",
+      "stopAll": "() => void"
+    }
+  },
+  "starling.display.DisplayObject": {
+    "instance": {
+      "get_width": "() => number",
+      "set_width": "(value: number) => number",
+      "get_height": "() => number",
+      "set_height": "(value: number) => number",
+      "get_x": "() => number",
+      "set_x": "(value: number) => number",
+      "get_y": "() => number",
+      "set_y": "(value: number) => number",
+      "get_alpha": "() => number",
+      "set_alpha": "(value: number) => number",
+      "get_scaleX": "() => number",
+      "set_scaleX": "(value: number) => number",
+      "get_scaleY": "() => number",
+      "set_scaleY": "(value: number) => number",
+      "get_rotation": "() => number",
+      "set_rotation": "(value: number) => number",
+      "get_visible": "() => boolean",
+      "set_visible": "(visible: boolean) => boolean",
+      "get_stage": "() => Game.starling.display.Stage | null",
+      "set_pivotX": "(value: number) => number",
+      "dispose": "() => void",
+      "get_touchable": "() => boolean",
+      "set_touchable": "(value: boolean) => boolean",
+      "get_useHandCursor": "() => boolean",
+      "set_useHandCursor": "(value: boolean) => boolean",
+      "removeFromParent": "(dispose?: boolean) => void",
+      "get_filter": "() => Game.starling.filters.FragmentFilter | null",
+      "set_filter": "(filter: Game.starling.filters.FragmentFilter | null) => Game.starling.filters.FragmentFilter | null",
+      "get_parent": "() => Game.starling.display.DisplayObjectContainer | null",
+      "set_name": "(value: string) => string",
+      "set_blendMode": "(value: string) => string",
+      "set_pivotY": "(value: number) => number",
+      "set_mask": "(mask: Game.starling.display.DisplayObject | null) => Game.starling.display.DisplayObject | null",
+      "alignPivot": "(horizontalAlign?: string, verticalAlign?: string) => void",
+      "getTransformationMatrix": "(targetSpace: Game.starling.display.DisplayObject | null, result?: Game.openfl.geom.Matrix | null) => Game.openfl.geom.Matrix",
+      "setRequiresRedraw": "() => void",
+      "hitTestMask": "(localPoint: Game.openfl.geom.Point) => boolean",
+      "hitTest": "(localPoint: Game.openfl.geom.Point) => Game.starling.display.DisplayObject | null",
+      "dispatchEvent": "(event: Game.starling.events.Event) => void"
+    }
+  },
+  "textures.TextureManager": {
+    "instance": {
+      "get_percLoaded": "() => number",
+      "loadTextures": "(files: string[]) => void",
+      "getTextureAtlas": "(name: string) => Game.starling.textures.TextureAtlas | Game.starling.textures.Texture | null",
+      "disposeCustomTextures": "() => void",
+      "getTextureByTextureName": "(texture: string, atlas: string) => Game.starling.textures.Texture | null",
+      "getTextureMainByTextureName": "(texture: string) => Game.starling.textures.Texture | null",
+      "pLoaded": "number",
+      "itemsArray": "string[]",
+      "totalItems": "number",
+      "textureUrl": "(name: string) => string",
+      "getTexturesByTextureName": "(name: string, atlas: string) => Game.starling.textures.Texture[]",
+      "getTexturesMainByKey": "(key: string) => Game.starling.textures.Texture[] | null",
+      "getTextureGUIByTextureName": "(name: string) => Game.starling.textures.Texture | null"
+    },
+    "statics": {
+      "textureAtlasDict": "{ h: Record<string, Game.starling.textures.TextureAtlas | Game.starling.textures.Texture> }",
+      "xmlDict": "{ h: Record<string, Game.Xml> }",
+      "LOAD_ATTEMPTS": "number",
+      "LOAD_TIMEOUT_MS": "number",
+      "RETRY_DELAY_MS": "number"
+    }
+  },
+  "playerio.QuickConnect": {
+    "instance": {
+      "simpleRecoverPassword": "(gameId: string, email: string, success: () => void, failure: (error: Game.playerio.PlayerIOError) => void) => void",
+      "simpleRegister": "(stage: Game.openfl.display.Stage, gameId: string, usernameOrEmail: string, password: string, email: string, captchaKey: string | null, captchaValue: string | null, extraData: Record<string, string> | null, partnerId: string | null, segments: string[], success: (client: Game.playerio.Client) => void, failure: (error: Game.playerio.PlayerIORegistrationError) => void) => void",
+      "simpleConnect": "{ (stage: Game.openfl.display.Stage, gameId: string, usernameOrEmail: string, password: string, success: (client: Game.playerio.Client) => void, failure: (error: Game.playerio.PlayerIOError) => void): void; (stage: Game.openfl.display.Stage, gameId: string, usernameOrEmail: string, password: string, segments: string[], success: (client: Game.playerio.Client) => void, failure: (error: Game.playerio.PlayerIOError) => void): void; }"
+    },
+    "statics": {
+      "convertFor": "(channel: PlayerIOChannel, gameId: string) => (response: AuthenticationResponse) => unknown"
+    }
+  },
+  "playerio.PlayerIO": {
+    "statics": {
+      "quickConnect": "Game.playerio.QuickConnect"
+    }
+  },
+  "core.login.RecoverDialog": {
+    "arguments": "[login: Game.Login]",
+    "instance": {
+      "recoverButton": "Game.core.hud.components.LoginButton",
+      "cancelButton": "Game.core.hud.components.LoginButton",
+      "recoverEmail": "Game.core.hud.components.LoginInput",
+      "login": "Game.Login",
+      "onRecover": "() => void"
+    }
+  },
+  "core.hud.components.LoginButton": {
+    "instance": {
+      "callback": "() => void",
+      "get_enabled": "() => boolean",
+      "set_enabled": "(enabled: boolean) => boolean",
+      "get_text": "() => string",
+      "set_text": "(text: string) => string",
+      "displayText": "Game.starling.text.TextField",
+      "bg": "Game.starling.display.Quad",
+      "border": "Game.starling.display.Sprite",
+      "onTouch": "(event: Game.starling.events.TouchEvent) => void"
+    }
+  },
+  "core.hud.components.LoginInput": {
+    "instance": {
+      "get_text": "() => string",
+      "set_text": "(text: string) => string",
+      "get_error": "() => string",
+      "set_error": "(error: string) => string",
+      "setFocus": "() => void",
+      "setPrevious": "(previous: Game.core.hud.components.LoginInput) => void",
+      "placeholder": "Game.starling.text.TextField",
+      "errorText": "Game.starling.text.TextField",
+      "border": "Game.starling.display.Sprite",
+      "input": "Game.core.hud.components.ui.TextEntry"
+    }
+  },
+  "playerio.PlayerIORegistrationError": {
+    "instance": {
+      "emailError": "string | null",
+      "passwordError": "string | null",
+      "usernameError": "string | null",
+      "captchaError": "string | null"
+    }
+  },
+  "core.login.RegisterDialog2": {
+    "instance": {
+      "registerBox": "Game.starling.display.Sprite",
+      "registerButton": "Game.core.hud.components.LoginButton",
+      "client": "Game.playerio.Client | null",
+      "username": "string",
+      "onRegisterSimple": "() => void",
+      "trim": "(text: string) => string",
+      "isValidEmail": "(email: string) => boolean",
+      "handleConnect": "(client: Game.playerio.Client) => void",
+      "updateStatus": "(message?: string) => void",
+      "emailInput": "Game.core.hud.components.LoginInput",
+      "nameInput": "Game.core.hud.components.LoginInput",
+      "passwordInput": "Game.core.hud.components.LoginInput",
+      "passwordConfirmInput": "Game.core.hud.components.LoginInput"
+    }
+  },
+  "generics.Localize": {
+    "statics": {
+      "t": "(text: string | null) => string",
+      "language": "string",
+      "langObj": "Record<string, Record<string, string>> | null",
+      "setLocale": "(locale?: string | null) => void",
+      "cacheLanguageData": "() => void",
+      "newData": "(json: string) => void"
+    }
+  },
+  "starling.core.Starling": {
+    "statics": {
+      "get_current": "() => Game.starling.core.Starling | null"
+    },
+    "instance": {
+      "get_nativeStage": "() => Game.openfl.display.Stage",
+      "get_nativeOverlay": "() => Game.openfl.display.Sprite",
+      "get_contextValid": "() => boolean",
+      "get_frameID": "() => number",
+      "setRequiresRedraw": "() => void",
+      "render": "() => void",
+      "get_stage": "() => Game.starling.display.Stage",
+      "get_skipUnchangedFrames": "() => boolean",
+      "set_skipUnchangedFrames": "(skip: boolean) => boolean",
+      "start": "() => void",
+      "get_showStats": "() => boolean",
+      "set_showStats": "(visible: boolean) => boolean"
+    }
+  },
+  "starling.display.DisplayObjectContainer": {
+    "instance": {
+      "get_numChildren": "() => number",
+      "getChildAt": "(index: number) => Game.starling.display.DisplayObject",
+      "addChildAt": "<T extends Game.starling.display.DisplayObject>(child: T, index: number) => T",
+      "getChildIndex": "(child: Game.starling.display.DisplayObject) => number",
+      "setChildIndex": "(child: Game.starling.display.DisplayObject, index: number) => void",
+      "addChild": "<T extends Game.starling.display.DisplayObject>(child: T) => T",
+      "removeChildren": "(beginIndex?: number, endIndex?: number, dispose?: boolean) => void",
+      "hitTest": "(localPoint: Game.openfl.geom.Point) => Game.starling.display.DisplayObject | null"
+    }
+  },
+  "RymdenRunt": {
+    "statics": {
+      "partnerSegmentArray": "string[]",
+      "s": "Game.starling.core.Starling | null"
+    }
+  },
+  "playerio.sdk.PlayerIOSdk": {
+    "statics": {
+      "keepChannels": "() => void"
+    }
+  },
+  "core.scene.SceneBase": {
+    "instance": {
+      "client": "Game.playerio.Client",
+      "get_isLeaving": "() => boolean",
+      "serviceConnection": "Game.playerio.Connection | null",
+      "replaceServiceConnection": "(connection: Game.playerio.Connection) => void",
+      "disconnect": "() => void",
+      "rpcServiceRoom": "(type: string, callback: (message: Game.playerio.Message) => void, values?: (string | number | boolean | Uint8Array)[]) => void",
+      "serviceHandlers": "{ h: Record<string, (message: Game.playerio.Message) => void> }",
+      "serviceRoomId": "string",
+      "addServiceMessageHandler": "(type: string, callback: (message: Game.playerio.Message) => void) => void",
+      "removeServiceMessageHandler": "(type: string, callback: (message: Game.playerio.Message) => void) => void",
+      "handleServiceDisconnect": "() => void",
+      "joinReady": "() => void",
+      "clockInitComplete": "boolean",
+      "userJoinedComplete": "boolean",
+      "connection": "Game.playerio.Connection | null",
+      "sendToServiceRoom": "(type: string, values?: (string | number | boolean | Uint8Array)[]) => void",
+      "sendMessageToServiceRoom": "(message: Game.playerio.Message) => void",
+      "sendMessage": "(message: Game.playerio.Message) => void",
+      "rpc": "(type: string, callback: (message: Game.playerio.Message) => void, values?: (string | number | boolean | Uint8Array)[]) => void",
+      "rpcMessage": "(message: Game.playerio.Message, callback: (response: Game.playerio.Message) => void) => void",
+      "rpcServiceMessage": "(message: Game.playerio.Message, callback: (response: Game.playerio.Message) => void) => () => void",
+      "connectionHandlers": "{ h: Record<string, (message: Game.playerio.Message) => void> }",
+      "addMessageHandler": "(type: string, callback: (message: Game.playerio.Message) => void) => void",
+      "removeMessageHandler": "(type: string, callback: (message: Game.playerio.Message) => void) => void",
+      "clock": "Game.clock.Clock | null",
+      "room": "Game.joinRoom.Room",
+      "onClockReady": "(event: Game.starling.events.Event) => void",
+      "canvas": "Game.starling.display.Sprite | null",
+      "blockHotkeys": "boolean",
+      "camera": "Game.camerafocus.StarlingCameraFocus | null",
+      "time": "number",
+      "canvasBackground": "Game.starling.display.Sprite | null",
+      "layersInfo": "{ name: string; instance: Game.starling.display.DisplayObject; ratio: number }[]",
+      "removeChildFromOverlay": "(child: Game.starling.display.DisplayObject, dispose?: boolean) => void",
+      "refreshClock": "() => void",
+      "onRefreshClockReady": "(event: Game.starling.events.Event) => void",
+      "handleGameDisconnect": "() => void",
+      "canvasProjectiles": "Game.starling.display.Sprite | null",
+      "addChildToOverlay": "(child: Game.starling.display.DisplayObject, blockHotkeys?: boolean) => void",
+      "get_connected": "() => boolean",
+      "overlay": "Game.starling.display.Sprite",
+      "errorFromServer": "(message: Game.playerio.Message) => void",
+      "message": "(message: Game.playerio.Message) => void",
+      "isSystemTypeSurvival": "() => boolean",
+      "myCargo": "Game.core.hud.components.cargo.Cargo | null"
+    },
+    "statics": {
+      "settings": "Game.data.Settings | null"
+    }
+  },
+  "core.scene.Game": {
+    "instance": {
+      "get_me": "() => Game.core.player.Player | null",
+      "noAutoReconnect": "boolean",
+      "initSolarSystemComplete": "boolean",
+      "initPlayerComplete": "boolean",
+      "initEnemyPlayersComplete": "boolean",
+      "initEnemiesComplete": "boolean",
+      "initDropsComplete": "boolean",
+      "initServerComplete": "boolean",
+      "synchedEnemies": "boolean",
+      "friendManager": "Game.core.friend.FriendManager | null",
+      "warpJump": "(system: string, roomId?: string, systemType?: string) => void",
+      "reload": "() => void",
+      "solarSystem": "{ key: string; name: string; type: string; isPvpSystemInEditor?: boolean } | null",
+      "handleGameDisconnect": "() => void",
+      "update": "(event: Game.starling.events.EnterFrameEvent) => void",
+      "tickUpdate": "() => void",
+      "gameStateMachine": "Game.core.states.GameStateMachine | null",
+      "parallaxManager": "Game.core.parallax.ParallaxManager | null",
+      "runGameLoop": "() => void",
+      "drawWelcomeText": "() => void",
+      "tryOpenTOSPopup": "() => void",
+      "tryOpenSaleSpinner": "() => void",
+      "onInitSyncEnemies": "(message: Game.playerio.Message) => void",
+      "enableTrackFPS": "boolean",
+      "enterState": "(state: Game.core.states.IGameState) => void",
+      "fadeIntoState": "(state: Game.core.states.IGameState) => void",
+      "handleServiceDisconnect": "() => void",
+      "messageLog": "Game.core.hud.components.chat.MessageLog | null",
+      "scheduleServiceReconnect": "() => void",
+      "stopServiceReconnect": "() => void",
+      "updateServiceRoom": "() => void",
+      "serviceReconnectAttempt": "number",
+      "disconnectPopup": "Game.core.hud.components.dialogs.PopupMessage | null",
+      "queueManager": "Game.core.queue.QueueManager | null",
+      "hud": "Game.core.hud.Hud | null",
+      "idleDisconnected": "boolean",
+      "nextSync": "number",
+      "updateSync": "() => void",
+      "chatInput": "Game.core.hud.components.chat.ChatInputText | null",
+      "playerManager": "Game.core.player.PlayerManager | null",
+      "shipManager": "Game.core.ship.ShipManager",
+      "unitManager": "Game.core.unit.UnitManager",
+      "turretManager": "Game.core.turret.TurretManager",
+      "bodyManager": "Game.core.solarSystem.BodyManager | null",
+      "weaponManager": "Game.core.weapon.WeaponManager | null",
+      "projectileManager": "Game.core.projectile.ProjectileManager",
+      "textManager": "Game.core.text.TextManager",
+      "emitterManager": "Game.core.particle.EmitterManager | null",
+      "deathLineManager": "Game.core.deathLine.DeathLineManager | null",
+      "commandManager": "Game.movement.CommandManager",
+      "beamLinePool": "Game.core.pools.BeamLinePool",
+      "disconnectIfInactive": "() => void",
+      "idleTimer": "{ run: () => void; stop: () => void } | null",
+      "spawnManager": "Game.core.spawner.SpawnManager",
+      "dropManager": "Game.core.drops.DropManager",
+      "bossManager": "Game.core.boss.BossManager"
+    },
+    "statics": {
+      "instance": "Game.core.scene.Game | null",
+      "trackEvent": "(category: string, action: string, label: string, value: number) => void",
+      "playerPerformedAction": "() => void",
+      "lastActive": "number"
+    }
+  },
+  "core.player.Player": {
+    "instance": {
+      "id": "string",
+      "get_name": "() => string",
+      "zoom": "number",
+      "get_isWarpJumping": "() => boolean",
+      "get_level": "() => number",
+      "clanId": "string",
+      "set_isWarpJumping": "(value: boolean) => boolean",
+      "ship": "Game.core.ship.PlayerShip | null",
+      "get_group": "() => Game.core.group.Group | null",
+      "isModerator": "boolean",
+      "isDeveloper": "boolean",
+      "hasSupporter": "() => boolean",
+      "clanName": "string",
+      "activeSkin": "string",
+      "getActiveFleetObj": "() => Game.core.player.FleetObj | null",
+      "isMe": "boolean",
+      "loadArtifactsFromMessage": "(message: Game.playerio.Message, index: number, isLoot?: boolean) => number",
+      "isLanded": "boolean",
+      "get_commandable": "() => boolean",
+      "get_inSafeZone": "() => boolean",
+      "clanLogo": "Game.starling.display.Image | null",
+      "clanLogoColor": "number",
+      "clanRankName": "string",
+      "crewMembers": "Game.core.player.CrewMember[]",
+      "artifacts": "Game.core.artifact.Artifact[]",
+      "getArtifactById": "(id: string) => Game.core.artifact.Artifact | null",
+      "get_activeArtifacts": "() => string[]",
+      "artifactCount": "number",
+      "get_artifactLimit": "() => number",
+      "respawnReady": "() => boolean",
+      "respawnNextReady": "number",
+      "dailyMissions": "Game.core.states.gameStates.missions.Daily[]",
+      "compressorLevel": "number",
+      "changeWeapon": "(message: Game.playerio.Message, offset: number) => void",
+      "sendChangeWeapon": "(hotkey: number) => void",
+      "selectedWeaponIndex": "number",
+      "unlockedWeaponSlots": "number"
+    },
+    "statics": {
+      "onlineFriends": "Game.core.friend.Friend[] | null",
+      "friends": "Game.core.friend.Friend[] | null"
+    }
+  },
+  "core.player.PlayerManager": {
+    "statics": {
+      "banMinutes": "number",
+      "isAllChannels": "boolean"
+    },
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "initPlayer": "(message: Game.playerio.Message, offset?: number) => number",
+      "get_playersById": "() => { h: Record<string, Game.core.player.Player | undefined> }",
+      "get_players": "() => Game.core.player.Player[]",
+      "damaged": "(message: Game.playerio.Message, offset: number) => void",
+      "killed": "(message: Game.playerio.Message) => void",
+      "update": "() => void",
+      "m_teleportToPosition": "(message: Game.playerio.Message) => void",
+      "initWarpJump": "(message: Game.playerio.Message) => void",
+      "setSpeed": "(message: Game.playerio.Message) => void",
+      "landFailed": "(message: Game.playerio.Message) => void",
+      "weaponChangeFailed": "(message: Game.playerio.Message) => void",
+      "fire": "(message: Game.playerio.Message, offset?: number, length?: number) => void",
+      "onPlayerUpdate": "(message: Game.playerio.Message) => void"
+    }
+  },
+  "core.GameObject": {
+    "instance": {
+      "get_pos": "() => Game.openfl.geom.Point",
+      "_mc": "Game.starling.display.MovieClip | null",
+      "isAddedToCanvas": "boolean",
+      "get_movieClip": "() => Game.starling.display.MovieClip | null",
+      "get_radius": "() => number",
+      "get_rotation": "() => number",
+      "draw": "() => void",
+      "set_x": "(value: number) => number",
+      "set_y": "(value: number) => number",
+      "set_rotation": "(value: number) => number",
+      "set_id": "(value: number) => number",
+      "get_x": "() => number",
+      "get_y": "() => number",
+      "get_hasImage": "() => boolean",
+      "reset": "() => void",
+      "addToCanvas": "() => void",
+      "removeFromCanvas": "() => void",
+      "get_id": "() => number",
+      "get_name": "() => string",
+      "distanceToCamera": "number",
+      "distanceToCameraX": "number",
+      "distanceToCameraY": "number",
+      "nextDistanceCalculation": "number",
+      "forcedRotation": "boolean",
+      "_rotation": "number",
+      "switchTexturesByObj": "(definition: unknown, atlas?: string) => void"
+    }
+  },
+  "core.unit.Unit": {
+    "instance": {
+      "lastDmgText": "Game.core.text.TextParticle | null",
+      "lastHealText": "Game.core.text.TextParticle | null",
+      "lastDmgTextOffset": "number",
+      "lastHealTextOffset": "number",
+      "reset": "() => void",
+      "alive": "boolean",
+      "doDOTEffect": "(seconds: number, effect: string | null, type?: number, text?: string) => void",
+      "g": "Game.core.scene.Game",
+      "destroy": "(effects?: boolean) => void",
+      "invulnerable": "boolean",
+      "collisionRadius": "number",
+      "canBeDamage": "(attacker: Game.core.unit.Unit, projectile: Game.core.projectile.Projectile) => boolean",
+      "hp": "number",
+      "shieldHp": "number",
+      "stateMachine": "Game.core.states.StateMachine",
+      "hpBar": "Game.starling.display.Image",
+      "shieldBar": "Game.starling.display.Image",
+      "miniBarsAreAddedToCanvas": "boolean",
+      "parentObj": "Game.core.GameObject | null",
+      "level": "number",
+      "isBossUnit": "boolean",
+      "isHostile": "boolean",
+      "factions": "string[] | null",
+      "get_hpMax": "() => number",
+      "get_shieldHpMax": "() => number",
+      "hasFaction": "(faction: string) => boolean",
+      "syncId": "number",
+      "isInjured": "boolean",
+      "essential": "boolean",
+      "owner": "Game.core.unit.Unit | null",
+      "weaponPos": "Game.openfl.geom.Point"
+    }
+  },
+  "core.text.TextParticle": {
+    "instance": {
+      "alive": "boolean",
+      "ttl": "number",
+      "maxTtl": "number",
+      "createdZoom": "number",
+      "baseScale": "number",
+      "speed": "Game.openfl.geom.Point",
+      "owner": "Game.core.unit.Unit | null",
+      "reset": "() => void",
+      "fixed": "boolean"
+    },
+    "arguments": "[id: number, game: Game.core.scene.Game]"
+  },
+  "core.text.TextHandler": {
+    "instance": {
+      "texts": "Game.core.text.TextParticle[] | null",
+      "g": "Game.core.scene.Game | null",
+      "remove": "(particle: Game.core.text.TextParticle, index: number) => void",
+      "update": "(seconds?: number) => void",
+      "add": "(text: string, position: Game.openfl.geom.Point, speed: Game.openfl.geom.Point, ttl?: number, color?: number, size?: number, fixed?: boolean, alignment?: string, blendMode?: string) => Game.core.text.TextParticle",
+      "inactiveTexts": "Game.core.text.TextParticle[] | null",
+      "dispose": "() => void"
+    }
+  },
+  "core.text.TextManager": {
+    "instance": {
+      "createDmgText": "(amount: number, owner: Game.core.unit.Unit, critical?: boolean) => void",
+      "g": "Game.core.scene.Game",
+      "textHandler": "Game.core.text.TextHandler | null",
+      "inactiveTexts": "Game.core.text.TextParticle[] | null",
+      "loadHandlers": "() => void",
+      "update": "(seconds?: number) => void",
+      "createBossSpawnedText": "(text: string) => void",
+      "dispose": "() => void"
+    }
+  },
+  "openfl.geom.Point": {
+    "instance": {
+      "x": "number",
+      "y": "number",
+      "get_length": "() => number",
+      "clone": "() => Game.openfl.geom.Point"
+    }
+  },
+  "starling.text.TextField": {
+    "instance": {
+      "get_format": "() => Game.starling.text.TextFormat",
+      "get_pixelSnapping": "() => boolean",
+      "set_pixelSnapping": "(value: boolean) => boolean",
+      "set_format": "(value: Game.starling.text.TextFormat) => Game.starling.text.TextFormat",
+      "get_text": "() => string",
+      "set_text": "(text: string) => string",
+      "get_textBounds": "() => Game.openfl.geom.Rectangle",
+      "set_autoScale": "(value: boolean) => boolean",
+      "set_autoSize": "(value: string) => string",
+      "set_isHtmlText": "(value: boolean) => boolean",
+      "set_wordWrap": "(value: boolean) => boolean",
+      "set_width": "(value: number) => number",
+      "set_height": "(value: number) => number",
+      "get_isHtmlText": "() => boolean",
+      "_recomposing": "boolean",
+      "_requiresRecomposition": "boolean",
+      "_meshBatch": "Game.starling.display.MeshBatch | null",
+      "setRequiresRecomposition": "() => void",
+      "recompose": "() => void",
+      "render": "(painter: Game.starling.rendering.Painter) => void",
+      "dispose": "() => void"
+    },
+    "statics": {
+      "getBitmapFont": "(name: string) => Game.starling.text.BitmapFont | null"
+    },
+    "arguments": "[width: number, height: number, text?: string, format?: Game.starling.text.TextFormat | null]"
+  },
+  "starling.text.TextFormat": {
+    "instance": {
+      "get_font": "() => string",
+      "set_font": "(value: string) => string",
+      "get_size": "() => number",
+      "set_size": "(value: number) => number",
+      "clone": "() => Game.starling.text.TextFormat",
+      "set_color": "(value: number) => number",
+      "set_horizontalAlign": "(value: string) => string",
+      "set_leading": "(value: number) => number",
+      "set_verticalAlign": "(value: string) => string",
+      "get_color": "() => number",
+      "get_horizontalAlign": "() => string",
+      "get_verticalAlign": "() => string",
+      "get_leading": "() => number",
+      "get_kerning": "() => boolean"
+    },
+    "arguments": "[font?: string, size?: number, color?: number, horizontalAlign?: string, verticalAlign?: string]"
+  },
+  "starling.events.TouchEvent": {
+    "instance": {
+      "getTouch": "(target: Game.starling.display.DisplayObject, phase?: string | null, id?: number) => Game.starling.events.Touch | null"
+    }
+  },
+  "core.hud.components.ui.DomOverlay": {
+    "statics": {
+      "globalRect": "(display: Game.starling.display.DisplayObject) => Game.openfl.geom.Rectangle",
+      "toCss": "(bounds: { x: number; y: number; width: number; height: number }) => { x: number; y: number; width: number; height: number }",
+      "place": "(element: HTMLElement | null, bounds: { x: number; y: number; width: number; height: number }, visible: boolean) => void"
+    }
+  },
+  "core.hud.components.ui.TextEntry": {
+    "instance": {
+      "get_isEnabled": "() => boolean",
+      "set_isEnabled": "(value: boolean) => boolean",
+      "applyPadding": "() => void",
+      "setBackground": "(skin: Game.starling.display.DisplayObject) => void",
+      "displayAsPassword": "boolean",
+      "maxChars": "number",
+      "paddingLeft": "number",
+      "paddingRight": "number",
+      "paddingTop": "number",
+      "paddingBottom": "number",
+      "restrict": "string | null",
+      "sanitize": "(value: string) => string",
+      "selectRange": "(begin: number, end: number) => void",
+      "get_length": "() => number",
+      "updatePlacement": "() => boolean",
+      "textFormat": "Game.openfl.text.TextFormat | null",
+      "set_textFormat": "(value: Game.openfl.text.TextFormat | null) => Game.openfl.text.TextFormat | null",
+      "get_text": "() => string",
+      "set_text": "(value: string) => string",
+      "element": "HTMLInputElement | null",
+      "set_paddingLeft": "(value: number) => number",
+      "set_displayAsPassword": "(value: boolean) => boolean",
+      "set_maxChars": "(value: number) => number",
+      "set_restrict": "(value: string | null) => string | null",
+      "setFocus": "() => void",
+      "get_width": "() => number",
+      "get_height": "() => number",
+      "skinLayer": "Game.starling.display.Sprite",
+      "showSkin": "() => void"
+    },
+    "arguments": "[styleName?: string]"
+  },
+  "starling.display.Quad": {
+    "arguments": "[width: number, height: number, color?: number]",
+    "instance": {
+      "readjustSize": "(width?: number, height?: number) => void"
+    }
+  },
+  "openfl.text.TextFormat": {
+    "arguments": "[font?: string | null, size?: number | null, color?: number | null, bold?: boolean | null, italic?: boolean | null, underline?: boolean | null, url?: string | null, target?: string | null, align?: number | null, leftMargin?: number | null, rightMargin?: number | null, indent?: number | null, leading?: number | null]",
+    "instance": {
+      "font": "string | null",
+      "size": "number | null",
+      "color": "number | null",
+      "align": "number | null",
+      "leading": "number | null",
+      "letterSpacing": "number | null",
+      "bold": "boolean | null"
+    }
+  },
+  "clock.Clock": {
+    "instance": {
+      "getServerTime": "() => number",
+      "connection": "Game.playerio.Connection",
+      "latency": "number",
+      "start": "() => void",
+      "requestServerTime": "() => void",
+      "onServerTime": "(message: Game.playerio.Message) => void",
+      "responsePending": "boolean",
+      "lockedInServerTime": "boolean",
+      "client": "Game.playerio.Client",
+      "syncTimeDelta": "number",
+      "latencyError": "number",
+      "setTargetSyncTimeDelta": "(delta: number) => void",
+      "deltas": "Game.clock.TimeDelta[]",
+      "maxDeltas": "number",
+      "addTimeDelta": "(sent: number, received: number, server: number) => void",
+      "get_elapsedTime": "() => number"
+    }
+  },
+  "core.hud.components.chat.MessageLog": {
+    "statics": {
+      "write": "(text: string, type?: string) => void",
+      "textQueue": "import('./ChatMessage').ChatMessage[]",
+      "extendedMaxLines": "number",
+      "g": "Game.core.scene.Game | null",
+      "colorRights": "(rights: string, text: string) => string",
+      "colorCoding": "(text: string) => string",
+      "profanities": "Record<string, unknown> | null",
+      "writeChatMsg": "(channel: string, text: string, playerId?: string | null, playerName?: string | null, extra?: string, supporter?: boolean) => void",
+      "writeDeathNote": "(victim: Game.core.player.Player, killer: string | null, cause: string | null) => void"
+    },
+    "instance": {
+      "isMuted": "(channel: string) => boolean",
+      "updateTexts": "(message?: import('./ChatMessage').ChatMessage | null) => void",
+      "advanced": "Game.core.hud.components.chat.ChatAdvanced",
+      "simple": "Game.core.hud.components.chat.ChatSimple",
+      "toggleView": "(view: string) => void",
+      "getQueue": "() => import('./ChatMessage').ChatMessage[]"
+    }
+  },
+  "core.hud.components.FadeScreen": {
+    "instance": {
+      "screen": "Game.starling.display.Sprite",
+      "stage": "Game.starling.display.Stage",
+      "screenText": "Game.core.hud.components.ScreenTextField",
+      "loadingText": "Game.core.hud.components.TextBitmap",
+      "fadeInTimer": "Game.openfl.utils.Timer",
+      "fadeOutTimer": "Game.openfl.utils.Timer",
+      "show": "() => void",
+      "fadeIn": "() => void",
+      "fadeOut": "() => void",
+      "dispose": "() => void",
+      "onFadeOutTimerComplete": "(event: Game.openfl.events.TimerEvent | null) => void",
+      "onFadeOutTimerUpdate": "(event: Game.openfl.events.TimerEvent) => void",
+      "update": "(event: Game.starling.events.EnterFrameEvent) => void",
+      "repositionScreen": "(container: Game.starling.display.DisplayObjectContainer) => void",
+      "promotionButton": "Game.core.hud.components.NativeImageButton | null",
+      "bgrQuad": "Game.starling.display.Quad",
+      "topPvpPlayersList": "Game.core.hud.components.TopPvPPlayersList | null",
+      "onFadeInTimerUpdate": "(event: Game.openfl.events.TimerEvent) => void",
+      "onFadeInTimerComplete": "(event: Game.openfl.events.TimerEvent) => void",
+      "resize": "(event?: Game.starling.events.Event | null) => void",
+      "textsPvp": "string[][][]",
+      "loadingImage": "Game.starling.display.Image",
+      "loadingImage2": "Game.starling.display.Image",
+      "showHighscore": "(message: Game.playerio.Message) => void"
+    }
+  },
+  "core.hud.components.ScreenTextField": {
+    "instance": {
+      "stop": "() => void",
+      "play": "() => void",
+      "start": "(pages?: string[][] | null, calculateDuration?: boolean) => void",
+      "caretDelay": "number",
+      "caretIncrement": "number",
+      "paragraphReadTime": "number",
+      "pageReadTime": "number",
+      "paragraphInitTime": "number",
+      "randomCharAmount": "number",
+      "period": "number",
+      "newRowTime": "number",
+      "fadeOutDelay": "number",
+      "fadeOutTime": "number",
+      "duration": "number",
+      "currentPage": "number",
+      "currentParagraph": "number",
+      "_textArray": "string[][] | null",
+      "pageText": "string",
+      "showCaret": "boolean",
+      "stopPlaying": "boolean",
+      "CARET_SOUND": "string",
+      "soundManager": "Game.sound.ISound",
+      "glowFilter": "Game.starling.filters.GlowFilter | null",
+      "toggleCaret": "(text: string) => void",
+      "randText": "(count: number) => string",
+      "resetStyle": "() => void",
+      "doFadeOut": "() => void",
+      "createFadeOutPage": "(text: string) => () => void",
+      "onAnimationFinished": "(event?: Game.starling.events.Event | null) => void"
+    }
+  },
+  "openfl.utils.Timer": {
+    "instance": {
+      "stop": "() => void",
+      "reset": "() => void"
+    }
+  },
+  "core.hud.components.TopPvPPlayersList": {
+    "instance": {
+      "showHighscore": "(message: Game.playerio.Message) => void"
+    }
+  },
+  "core.states.SceneStateMachine": {
+    "instance": {
+      "currentRoom": "Game.core.states.ISceneState | null",
+      "closeCurrentRoom": "() => void",
+      "changeRoom": "(room: Game.core.states.ISceneState) => void",
+      "stage": "Game.starling.display.Stage"
+    }
+  },
+  "joinRoom.Room": {
+    "instance": {
+      "id": "string | null",
+      "roomType": "string",
+      "data": "Record<string, string | number | boolean | null>",
+      "joinData": "Record<string, string | number | boolean | null>"
+    }
+  },
+  "generics.GUID": {
+    "statics": {
+      "create": "() => string"
+    }
+  },
+  "startSetup.StartSetup": {
+    "statics": {
+      "showProgressText": "(text: string) => void"
+    },
+    "instance": {
+      "pm": "Game.core.parallax.ParallaxManager | null",
+      "isRunning": "boolean",
+      "description": "Game.core.hud.components.Text | null",
+      "changeSkin": "(skin: string, button: Game.startSetup.PickButton) => void",
+      "addAnimatedText": "(text: string, duration: number, pageReadTime: number, x?: number, y?: number, id?: string, size?: number, color?: number, glowColor?: number, fadeOutDelay?: number) => void"
+    }
+  },
+  "core.friend.FriendManager": {
+    "instance": {
+      "updateOnlineFriends": "(callback: (() => void) | null) => void",
+      "g": "Game.core.scene.Game",
+      "onlineFriendsCallbacks": "(() => void)[]",
+      "onlineFriendsTimer": "Game.haxe.Timer | null",
+      "runOnlineFriendsCallbacks": "() => void",
+      "onOnlineFriends": "(message: Game.playerio.Message) => void"
+    }
+  },
+  "core.friend.Friend": {
+    "instance": {
+      "id": "string",
+      "name": "string",
+      "currentSolarSystem": "string",
+      "currentRoom": "string",
+      "skin": "string | null",
+      "level": "number",
+      "isOnline": "boolean"
+    }
+  },
+  "playerio.RoomInfo": {
+    "instance": {
+      "id": "string",
+      "data": "Record<string, string | number | boolean | null>",
+      "onlineUsers": "number"
+    }
+  },
+  "com.adobe.crypto.MD5": {
+    "statics": {
+      "hash": "(value: string) => string"
+    }
+  },
+  "data.DataLocator": {
+    "statics": {
+      "getService": "() => Game.data.IDataManager"
+    }
+  },
+  "data.IDataManager": {
+    "instance": {
+      "cacheCommonData": "() => void",
+      "loadKey": "{ (table: \"SolarSystems\", key: string): { name: string; pvpLvlCap: number; background: string; x: number; y: number; galaxy: string } | null; (table: \"Images\", key: string): { fileName: string; textureName: string } | null; (table: \"Effects\", key: string): import('./EffectSequence').EffectSequence | null; (table: \"Projectiles\", key: string): import('./ProjectileAISettings').ProjectileAISettings | null; (table: string, key: string): unknown; }"
+    }
+  },
+  "core.states.GameStateMachine": {
+    "instance": {
+      "currentState": "Game.core.states.IGameState | null",
+      "_clock": "Game.clock.Clock | null",
+      "newTime": "number",
+      "currentTime": "number",
+      "frameTime": "number",
+      "accumulator": "number",
+      "previousState": "Game.core.states.IGameState | null",
+      "inputManager": "Game.io.InputManager",
+      "update": "(seconds?: number) => void",
+      "set_clock": "(clock: Game.clock.Clock) => Game.clock.Clock"
+    }
+  },
+  "core.states.IGameState": {
+    "instance": {
+      "get_loaded": "() => boolean",
+      "get_unloaded": "() => boolean",
+      "tickUpdate": "() => void",
+      "execute": "() => void"
+    }
+  },
+  "core.states.gameStates.GameState": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "_loaded": "boolean",
+      "get_loaded": "() => boolean",
+      "me": "Game.core.player.Player | null",
+      "keybinds": "Game.data.KeyBinds"
+    }
+  },
+  "core.states.gameStates.PlayState": {
+    "instance": {
+      "loadCompleted": "() => void",
+      "exit": "(completed: () => void) => void",
+      "execute": "() => void",
+      "checkAccelerate": "(blocked?: boolean) => void",
+      "handleTurn": "() => void",
+      "checkBoost": "() => void",
+      "updateCommands": "() => void",
+      "fireWithHotkeys": "boolean",
+      "sendCommand": "(type: number, active: boolean) => void",
+      "handleWeaponFire": "() => void",
+      "container": "Game.starling.display.Sprite"
+    }
+  },
+  "core.states.gameStates.LandedState": {
+    "instance": {
+      "loadCompleted": "() => void",
+      "execute": "() => void",
+      "leaveButton": "Game.core.hud.components.ButtonExpandableHud",
+      "menuHud": "Game.core.hud.MenuHud | null",
+      "input": "Game.io.InputManager",
+      "hideMenu": "() => void",
+      "leave": "() => void"
+    }
+  },
+  "core.parallax.ParallaxManager": {
+    "instance": {
+      "initialized": "boolean",
+      "glow": "() => void",
+      "removeGlow": "() => void",
+      "clear": "() => void",
+      "refresh": "() => void",
+      "starBatch": "Game.starling.display.MeshBatch",
+      "nebulaContainer": "Game.starling.display.Sprite",
+      "nebulas": "Game.starling.display.Image[]",
+      "stars": "Game.starling.display.Image[]",
+      "miniStars": "Game.starling.display.Image[]",
+      "miniDusts": "Game.starling.display.Image[]",
+      "load": "(system: { background: string; x: number; y: number; galaxy: string }, callback?: (() => void) | null) => void",
+      "g": "Game.core.scene.SceneBase | null",
+      "starTxt": "Game.starling.textures.Texture | null",
+      "nebulaTxt": "Game.starling.textures.Texture | null",
+      "nebulaType": "string",
+      "random": "Game.generics.Random",
+      "NEBULAS": "number",
+      "isIntro": "boolean",
+      "visible": "boolean",
+      "nebulaUpdateCount": "number",
+      "NEBULA_UPDATE_INTERVAL": "number",
+      "target": "Game.starling.display.DisplayObjectContainer",
+      "resize": "(event?: Game.starling.events.Event) => void",
+      "update": "(seconds?: number) => void",
+      "draw": "() => void"
+    }
+  },
+  "core.ship.PlayerShip": {
+    "instance": {
+      "enterRoaming": "() => void",
+      "player": "Game.core.player.Player | null",
+      "get_landed": "() => boolean",
+      "runCommand": "(command: Game.movement.Command) => void",
+      "boost": "() => void",
+      "land": "() => void",
+      "enterWarpJump": "() => void",
+      "boostDuration": "number",
+      "boostEndTime": "number",
+      "boostCD": "number",
+      "boostNextRdy": "number",
+      "artifact_cooldownReduction": "number",
+      "boostEndedLastTick": "boolean",
+      "speedBoostEffect": "Game.core.particle.Emitter[]",
+      "boostEffect": "() => void",
+      "updateHeading": "() => void",
+      "hasBoost": "boolean",
+      "get_weapon": "() => Game.core.weapon.Weapon | null",
+      "channelingEnd": "number",
+      "get_isShooting": "() => boolean",
+      "nameText": "Game.core.hud.components.TextBitmap",
+      "shadowImage": "Game.starling.display.Image | null",
+      "supporterIcon": "Game.starling.display.Image",
+      "levelText": "Game.core.hud.components.TextBitmap",
+      "weapons": "Game.core.weapon.Weapon[]",
+      "weaponHeat": "Game.core.weapon.Heat | null",
+      "weaponIsChanging": "boolean"
+    }
+  },
+  "core.states.gameStates.RoamingState": {
+    "arguments": "[game: Game.core.scene.Game]",
+    "instance": {
+      "updateInput": "() => void"
+    }
+  },
+  "core.states.gameStates.WarpJumpState": {
+    "arguments": "[game: Game.core.scene.Game, destination: string, roomId?: string, systemType?: string]",
+    "instance": {
+      "destination": "string",
+      "roomId": "string",
+      "systemType": "string",
+      "warpJump": "() => void",
+      "enter": "() => void",
+      "execute": "() => void",
+      "darkOverlay": "Game.starling.display.Quad",
+      "flashOverlay": "Game.starling.display.Quad",
+      "ship": "Game.core.ship.PlayerShip | null",
+      "hyperDriveEngaged": "boolean",
+      "timeout": "number"
+    }
+  },
+  "camerafocus.StarlingCameraFocus": {
+    "instance": {
+      "trackStep": "number",
+      "getCameraCenter": "() => Game.openfl.geom.Point",
+      "_stage": "Game.starling.display.Stage | null",
+      "_stageContainer": "Game.starling.display.DisplayObject | null",
+      "_upperLeftX": "number",
+      "_upperLeftY": "number",
+      "_lowerRightX": "number",
+      "_lowerRightY": "number",
+      "updateViewRectangle": "() => void",
+      "isCircleOnScreen": "(x: number, y: number, radius: number) => boolean",
+      "setFocusPosition": "(x: number, y: number) => void",
+      "isZooming": "boolean",
+      "zoomFocus": "(factor: number, steps?: number) => void",
+      "_intensity": "number",
+      "_shakeDecay": "number",
+      "_shakeTimer": "number",
+      "_step": "number",
+      "_tempStep": "number",
+      "_targetCurrentX": "number",
+      "_targetCurrentY": "number",
+      "_targetLastX": "number",
+      "_targetLastY": "number",
+      "_zoomFactor": "number",
+      "zoomStep": "number",
+      "_switch": "boolean",
+      "isFocused": "boolean",
+      "isShaking": "boolean",
+      "isSwaping": "boolean",
+      "enableCallBack": "boolean",
+      "_focusTracker": "Game.openfl.geom.Point",
+      "_focusCurrentLoc": "Game.openfl.geom.Point",
+      "_focusLastLoc": "Game.openfl.geom.Point",
+      "speed": "Game.openfl.geom.Point",
+      "_swapFinishedEvent": "Game.camerafocus.events.CameraFocusEvent | null",
+      "_zoomFinishedEvent": "Game.camerafocus.events.CameraFocusEvent | null",
+      "_shakeFinishedEvent": "Game.camerafocus.events.CameraFocusEvent | null",
+      "focusTarget": "Game.starling.display.DisplayObject | Pick<Game.openfl.geom.Point, 'x' | 'y'> | null",
+      "positionStageContainer": "() => void",
+      "positionParallax": "(bounds: import('./CameraBounds').CameraBounds) => void",
+      "testBounds": "() => import('./CameraBounds').CameraBounds",
+      "update": "() => void",
+      "shake": "(intensity: number, duration: number) => void"
+    }
+  },
+  "core.ship.Ship": {
+    "instance": {
+      "get_speed": "() => Game.openfl.geom.Point",
+      "get_course": "() => Game.movement.Heading | null",
+      "get_usingBoost": "() => boolean",
+      "engine": "Game.core.engine.Engine | null",
+      "enginePos": "Game.openfl.geom.Point | null",
+      "weapons": "Game.core.weapon.Weapon[]",
+      "get_pos": "() => Game.openfl.geom.Point",
+      "getConverger": "() => Game.core.sync.Converger",
+      "initCourse": "(heading: Game.movement.Heading) => void",
+      "set_course": "(heading: Game.movement.Heading) => Game.movement.Heading",
+      "isTeleporting": "boolean",
+      "_usingBoost": "boolean",
+      "runConverger": "() => void",
+      "convergerUpdateHeading": "(heading: Game.movement.Heading) => void",
+      "clearConvergeTarget": "() => void"
+    }
+  },
+  "starling.filters.FragmentFilter": {
+    "instance": {
+      "dispose": "() => void",
+      "get_isCached": "() => boolean",
+      "cache": "() => void",
+      "_target": "Game.starling.display.DisplayObject | null",
+      "render": "(painter: Game.starling.rendering.Painter) => void"
+    }
+  },
+  "starling.filters.GlowFilter": {
+    "arguments": "[color?: number, alpha?: number, blur?: number, quality?: number, inner?: boolean, knockout?: boolean]",
+    "instance": {
+      "dispose": "() => void",
+      "get_alpha": "() => number",
+      "set_alpha": "(value: number) => number",
+      "get_color": "() => number",
+      "set_color": "(value: number) => number"
+    }
+  },
+  "com.greensock.TweenMax": {
+    "statics": {
+      "to": " <T extends object>(target: T, duration: number, options: Partial<{ [K in keyof T as T[K] extends number ? K : never]: number }> & { volume?: number; alpha?: number; onUpdate?: () => void; onComplete?: () => void }) => Game.com.greensock.TweenMax",
+      "killTweensOf": "(target: object, onlyActive?: boolean) => void",
+      "delayedCall": " <Args extends unknown[]>(delay: number, callback: (...params: Args) => unknown, params?: Args, useFrames?: boolean) => Game.com.greensock.TweenMax",
+      "from": "(target: object, duration: number, options: { alpha?: number; scaleX?: number; scaleY?: number; rotation?: number; paused?: boolean }) => Game.com.greensock.TweenMax"
+    },
+    "instance": {
+      "kill": "() => void"
+    }
+  },
+  "data.Settings": {
+    "instance": {
+      "save": "() => void",
+      "get_showBackground": "() => boolean"
+    }
+  },
+  "starling.display.MeshBatch": {
+    "instance": {
+      "clear": "() => void",
+      "dispose": "() => void",
+      "canAddMesh": "(mesh: Game.starling.display.Mesh, numVertices?: number) => boolean",
+      "addMesh": "(mesh: Game.starling.display.Mesh, matrix?: Game.openfl.geom.Matrix | null, alpha?: number, subset?: Game.starling.utils.MeshSubset | null, ignoreTransformations?: boolean) => void",
+      "set_batchable": "(enabled: boolean) => boolean"
+    },
+    "arguments": "[]"
+  },
+  "starling.display.Sprite": {
+    "arguments": "[]"
+  },
+  "starling.textures.TextureAtlas": {
+    "instance": {
+      "dispose": "() => void",
+      "getTextures": "(prefix?: string) => HaxeIterable<Game.starling.textures.Texture>"
+    },
+    "arguments": "[texture: Game.starling.textures.Texture, xml: Game.Xml]"
+  },
+  "textures.TextureLocator": {
+    "statics": {
+      "getService": "() => Game.textures.TextureManager"
+    }
+  },
+  "starling.display.Image": {
+    "arguments": "[texture: Game.starling.textures.Texture]",
+    "instance": {
+      "set_texture": "(texture: Game.starling.textures.Texture | null) => Game.starling.textures.Texture | null"
+    }
+  },
+  "generics.Random": {
+    "arguments": "[seed: number]"
+  },
+  "openfl.display.Loader": {
+    "arguments": "[]",
+    "instance": {
+      "content": "Game.openfl.display.DisplayObject | null",
+      "contentLoaderInfo": "Game.openfl.display.LoaderInfo",
+      "load": "(request: Game.openfl.net.URLRequest, context?: Game.openfl.system.LoaderContext) => void",
+      "close": "() => void",
+      "unloadAndStop": "(gc?: boolean) => void"
+    }
+  },
+  "openfl.net.URLLoader": {
+    "arguments": "[request?: Game.openfl.net.URLRequest | null]",
+    "instance": {
+      "data": "unknown",
+      "bytesLoaded": "number",
+      "bytesTotal": "number",
+      "load": "(request: Game.openfl.net.URLRequest) => void",
+      "close": "() => void"
+    }
+  },
+  "openfl.net.URLRequest": {
+    "arguments": "[url?: string]"
+  },
+  "openfl.system.LoaderContext": {
+    "arguments": "[checkPolicyFile?: boolean]"
+  },
+  "openfl.display.LoaderInfo": {
+    "instance": {
+      "bytesLoaded": "number",
+      "bytesTotal": "number"
+    }
+  },
+  "openfl.display.Bitmap": {
+    "instance": {
+      "get_bitmapData": "() => Game.openfl.display.BitmapData | null",
+      "set_bitmapData": "(data: Game.openfl.display.BitmapData | null) => Game.openfl.display.BitmapData | null"
+    }
+  },
+  "openfl.display.BitmapData": {
+    "instance": {
+      "dispose": "() => void",
+      "draw": "(source: Game.openfl.display.DisplayObject | Game.openfl.display.BitmapData, matrix?: Game.openfl.geom.Matrix | null, colorTransform?: Game.openfl.geom.ColorTransform | null, blendMode?: number | null, clipRect?: Game.openfl.geom.Rectangle | null, smoothing?: boolean) => void",
+      "fillRect": "(rect: Game.openfl.geom.Rectangle, color: number) => void",
+      "copyPixels": "(source: Game.openfl.display.BitmapData, sourceRect: Game.openfl.geom.Rectangle, destPoint: Game.openfl.geom.Point, alphaBitmap?: Game.openfl.display.BitmapData | null, alphaPoint?: Game.openfl.geom.Point | null, mergeAlpha?: boolean) => void",
+      "clone": "() => Game.openfl.display.BitmapData",
+      "setPixel32": "(x: number, y: number, color: number) => void",
+      "getPixel32": "(x: number, y: number) => number",
+      "width": "number",
+      "height": "number"
+    },
+    "arguments": "[width: number, height: number, transparent?: boolean, fillColor?: number]",
+    "statics": {
+      "loadFromBase64": "(base64: string, mimeType: string) => import('./Future').Future<Game.openfl.display.BitmapData>",
+      "fromCanvas": "(canvas: HTMLCanvasElement, transparent?: boolean) => Game.openfl.display.BitmapData | null"
+    }
+  },
+  "starling.textures.Texture": {
+    "instance": {
+      "dispose": "() => void",
+      "get_root": "() => Game.starling.textures.ConcreteTexture | null",
+      "get_frame": "() => Game.openfl.geom.Rectangle | null",
+      "get_width": "() => number",
+      "get_height": "() => number"
+    },
+    "statics": {
+      "fromBitmap": "(bitmap: Game.openfl.display.Bitmap, mipMaps?: boolean) => Game.starling.textures.Texture",
+      "fromBitmapData": "(data: Game.openfl.display.BitmapData, mipMaps?: boolean, optimizeForRenderToTexture?: boolean, scale?: number, format?: number, forcePowerOfTwo?: boolean, onReady?: ((texture: Game.starling.textures.Texture) => void) | null) => Game.starling.textures.Texture",
+      "fromTexture": "(texture: Game.starling.textures.Texture, region?: Game.openfl.geom.Rectangle | null, frame?: Game.openfl.geom.Rectangle | null, rotated?: boolean, scale?: number) => Game.starling.textures.Texture"
+    }
+  },
+  "Xml": {
+    "statics": {
+      "parse": "(source: string) => Game.Xml"
+    }
+  },
+  "core.hud.components.dialogs.PopupMessage": {
+    "arguments": "[buttonText?: string]",
+    "instance": {
+      "set_text": "(text: string) => string",
+      "textField": "Game.core.hud.components.Text",
+      "box": "Game.core.hud.components.Box",
+      "closeButton": "Game.core.hud.components.Button"
+    }
+  },
+  "haxe.Timer": {
+    "instance": {
+      "stop": "() => void"
+    }
+  },
+  "core.queue.QueueManager": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "queues": "Game.core.queue.QueueInfoHolder[]",
+      "getQueue": "(type: string) => Game.core.queue.QueueInfoHolder | null",
+      "handleQueueInfo": "(message: Game.playerio.Message) => void"
+    }
+  },
+  "core.queue.QueueInfoHolder": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "type": "string",
+      "startTime": "number",
+      "avgTime": "number",
+      "isWaiting": "boolean",
+      "isInQueue": "boolean",
+      "isReady": "boolean",
+      "accepted": "boolean",
+      "roomId": "string | null",
+      "solarSystem": "string | null",
+      "acceptPopup": "Game.core.hud.components.dialogs.QueuePopupMessage | null",
+      "update": "() => void",
+      "getTimeout": "() => string",
+      "createAcceptPopup": "() => void"
+    }
+  },
+  "core.hud.components.dialogs.QueuePopupMessage": {
+    "instance": {
+      "updateTime": "(time: string) => void",
+      "setPopupText": "(time: string) => void"
+    },
+    "arguments": "[type: string]"
+  },
+  "core.hud.Hud": {
+    "instance": {
+      "resize": "() => void",
+      "abilities": "Game.core.hud.components.hotkeys.Abilities",
+      "radar": "Game.core.hud.components.radar.Radar | null",
+      "bossHealth": "Game.core.hud.components.BossHealth | null",
+      "uberStats": "Game.core.hud.components.UberStats | null",
+      "safeZoneText": "Game.core.hud.components.TextBitmap",
+      "repairText": "Game.core.hud.components.TextBitmap",
+      "landText": "Game.core.hud.components.TextBitmap",
+      "weaponHotkeys": "Game.core.hud.components.hotkeys.WeaponHotkeys"
+    }
+  },
+  "sound.SoundLocator": {
+    "statics": {
+      "getService": "() => Game.sound.SoundManager",
+      "register": "(service: Game.sound.SoundManager) => void"
+    }
+  },
+  "sound.ISound": {
+    "instance": {
+      "preCacheSound": "(key: string, complete: () => void, type?: string) => void",
+      "play": "(key: string) => void"
+    }
+  },
+  "core.group.Group": {
+    "arguments": "[game: Game.core.scene.Game, id: string]",
+    "instance": {
+      "get_id": "() => string",
+      "get_players": "() => Game.core.player.Player[]",
+      "get_length": "() => number"
+    }
+  },
+  "starling.events.KeyboardEvent": {
+    "instance": {
+      "get_keyCode": "() => number",
+      "get_ctrlKey": "() => boolean",
+      "get_altKey": "() => boolean",
+      "get_shiftKey": "() => boolean"
+    }
+  },
+  "io.InputManager": {
+    "instance": {
+      "reset": "() => void",
+      "mouseDown": "(event: Game.starling.events.TouchEvent) => void",
+      "_isMousePressed": "boolean",
+      "_mouseJustPressed": "boolean",
+      "isKeyPressed": "(key: number) => boolean"
+    }
+  },
+  "core.hud.components.ToolTip": {
+    "instance": {
+      "s": "string | null",
+      "c": "number",
+      "container": "Game.starling.display.Sprite | null",
+      "imgs": "Game.starling.display.Image[] | null",
+      "imgsData": "import('./TooltipImage').TooltipImage[] | null",
+      "set_text": "(text: string | null) => string | null",
+      "set_color": "(color: number) => number",
+      "hide": "() => void",
+      "type": "string",
+      "target": "Game.starling.display.DisplayObject | null",
+      "dispose": "() => void",
+      "removeListeners": "() => void",
+      "addImage": "(image: import('./TooltipImage').TooltipImage, label?: Game.core.hud.components.ui.WrapText | null) => void",
+      "addListeners": "() => void",
+      "hover": "boolean",
+      "maxWidth": "number",
+      "mOut": "(event: Game.starling.events.TouchEvent) => void",
+      "mOver": "(event: Game.starling.events.TouchEvent) => void",
+      "onClick": "(event: Game.starling.events.TouchEvent) => void",
+      "onTouch": "(event: Game.starling.events.TouchEvent) => void",
+      "onTargetRemoved": "(event: Game.starling.events.Event) => void"
+    },
+    "statics": {
+      "toolTips": "Game.core.hud.components.ToolTip[]",
+      "shown": "Game.core.hud.components.ToolTip[]",
+      "g": "Game.core.scene.SceneBase | null",
+      "disposeType": "(type?: string) => void",
+      "disposeAll": "() => void",
+      "watching": "boolean",
+      "watchPointer": "() => void",
+      "hideShown": "() => void",
+      "hitPoint": "Game.openfl.geom.Point",
+      "onStageTouch": "(event: Game.starling.events.TouchEvent) => void"
+    },
+    "arguments": "[game: Game.core.scene.SceneBase, target: Game.starling.display.DisplayObject, text: string | null, images?: import('./TooltipImage').TooltipImage[] | null, type?: string, maxWidth?: number]"
+  },
+  "core.hud.components.ui.WrapText": {
+    "instance": {
+      "set_text": "(text: string | null) => string | null",
+      "set_color": "(color: number) => number",
+      "lineTop": "(line: number) => number",
+      "lastWrapWidth": "number",
+      "growBackground": "(width: number, height: number) => void",
+      "field": "Game.starling.text.TextField",
+      "layoutText": "() => void",
+      "measure": "(width: number) => { width: number; height: number }",
+      "get_text": "() => string",
+      "get_width": "() => number",
+      "maxWidth": "number",
+      "set_maxWidth": "(width: number) => number",
+      "set_width": "(width: number) => number",
+      "hasWidth": "boolean",
+      "viewWidth": "number",
+      "measuredWidth": "number",
+      "measuredHeight": "number"
+    }
+  },
+  "core.hud.components.Style": {
+    "statics": {
+      "COLOR_HIGHLIGHT": "number"
+    }
+  },
+  "openfl.geom.Rectangle": {
+    "instance": {
+      "width": "number",
+      "height": "number",
+      "setTo": "(x: number, y: number, width: number, height: number) => void"
+    },
+    "arguments": "[x?: number, y?: number, width?: number, height?: number]"
+  },
+  "core.states.aistates.Missile": {
+    "instance": {
+      "engine": "Game.core.GameObject",
+      "enter": "() => void",
+      "execute": "() => void",
+      "p": "Game.core.projectile.Projectile"
+    }
+  },
+  "core.states.aistates.Boomerang": {
+    "instance": {
+      "engine": "Game.core.GameObject",
+      "enter": "() => void",
+      "execute": "() => void"
+    }
+  },
+  "core.states.aistates.ProjectileBullet": {
+    "instance": {
+      "p": "Game.core.projectile.Projectile",
+      "m": "Game.core.scene.Game",
+      "isEnemy": "boolean",
+      "execute": "() => void"
+    }
+  },
+  "core.projectile.Projectile": {
+    "instance": {
+      "alive": "boolean",
+      "reset": "() => void",
+      "course": "Game.movement.Heading",
+      "g": "Game.core.scene.Game",
+      "convergenceCounter": "number",
+      "convergenceTime": "number",
+      "error": "Game.openfl.geom.Point | null",
+      "isEnemy": "boolean",
+      "ai": "string | null",
+      "wave": "boolean",
+      "weapon": "Game.core.weapon.Weapon | null",
+      "update": "() => void",
+      "ttl": "number",
+      "speedMax": "number",
+      "oldPos": "Game.openfl.geom.Point",
+      "unit": "Game.core.unit.Unit | null",
+      "collisionRadius": "number",
+      "errorRot": "number",
+      "direction": "number",
+      "boomerangReturning": "boolean",
+      "rotationSpeedMax": "number",
+      "aiStuck": "boolean",
+      "aiStuckDuration": "number",
+      "target": "Game.core.unit.Unit | null",
+      "targetProjectile": "Game.core.projectile.Projectile | null",
+      "fastforward": "() => void",
+      "updateHeading": "(heading: Game.movement.Heading) => void",
+      "destroy": "(force?: boolean) => void",
+      "addToCanvas": "() => void",
+      "removeFromCanvas": "() => void",
+      "acceleration": "number",
+      "isVisible": "boolean",
+      "useShipSystem": "boolean",
+      "isBomb": "boolean",
+      "numberOfHits": "number",
+      "explode": "(force?: boolean, target?: Game.core.GameObject | null) => void",
+      "ribbonTrail": "Game.extensions.RibbonTrail | null",
+      "followingRibbonSegment": "Game.extensions.RibbonSegment",
+      "followingRibbonSegmentLine": "Game.extensions.RibbonSegment[]",
+      "useRibbonOffset": "boolean",
+      "ribbonThickness": "number",
+      "stateMachine": "Game.core.states.StateMachine"
+    }
+  },
+  "movement.Heading": {
+    "instance": {
+      "pos": "Game.openfl.geom.Point",
+      "speed": "Game.openfl.geom.Point",
+      "time": "number",
+      "rotation": "number",
+      "parseMessage": "(message: Game.playerio.Message, index: number) => number",
+      "accelerate": "boolean",
+      "deaccelerate": "boolean",
+      "rotateLeft": "boolean",
+      "rotateRight": "boolean",
+      "clone": "() => Game.movement.Heading",
+      "copy": "(heading: import('./HeadingState').HeadingState) => void",
+      "almostEqual": "(heading: Pick<import('./HeadingState').HeadingState, 'pos' | 'speed' | 'rotation'>) => boolean",
+      "runCommand": "(command: { type: number; active: boolean }) => void"
+    },
+    "arguments": "[]"
+  },
+  "core.states.aistates.MissileStuck": {
+    "instance": {
+      "p": "Game.core.projectile.Projectile",
+      "stuckUnit": "Game.core.unit.Unit | null",
+      "m": "Game.core.scene.Game"
+    }
+  },
+  "core.states.aistates.ProjectileStuck": {
+    "instance": {
+      "p": "Game.core.projectile.Projectile",
+      "stuckUnit": "Game.core.unit.Unit | null"
+    }
+  },
+  "core.weapon.Weapon": {
+    "instance": {
+      "key": "string",
+      "playFireSound": "() => void",
+      "acceleration": "number",
+      "speed": "number",
+      "friction": "number",
+      "useShipSystem": "boolean",
+      "reloadTime": "number",
+      "alive": "boolean",
+      "destroy": "() => void",
+      "set_fire": "(value: boolean) => boolean",
+      "g": "Game.core.scene.Game",
+      "unit": "Game.core.unit.Unit | null",
+      "dmg": "Game.core.weapon.Damage",
+      "target": "Game.core.unit.Unit | null",
+      "fireNextTime": "number",
+      "lastFire": "number",
+      "positionYVariance": "number",
+      "addTechStats": "(definition: import('./WeaponTechDefinition').WeaponTechDefinition, level: number) => void",
+      "getDescription": "(compact: boolean) => string",
+      "level": "number",
+      "specialCondition": "string | null",
+      "specialBonusPercentage": "number",
+      "range": "number",
+      "angleVariance": "number",
+      "positionOffsetX": "number",
+      "positionOffsetY": "number",
+      "active": "boolean",
+      "hotkey": "number",
+      "get_fire": "() => boolean"
+    }
+  },
+  "core.projectile.ProjectileManager": {
+    "instance": {
+      "getProjectile": "() => Game.core.projectile.Projectile",
+      "g": "Game.core.scene.Game",
+      "projectilesById": "{ h: Record<string, Game.core.projectile.Projectile | undefined> }",
+      "createSetProjectile": "(projectile: Game.core.projectile.Projectile | null, id: number, unit: Game.core.unit.Unit, heading: Game.movement.Heading, index: number, offsetX?: number, offsetY?: number, speed?: number) => void",
+      "activateProjectile": "(projectile: Game.core.projectile.Projectile) => void",
+      "updateCourse": "(message: Game.playerio.Message) => void",
+      "addEnemyProjectile": "(message: Game.playerio.Message) => void",
+      "dispose": "() => void",
+      "projectiles": "Game.core.projectile.Projectile[]",
+      "killProjectile": "(message: Game.playerio.Message) => void",
+      "update": "() => void",
+      "meshBatch": "Game.starling.display.MeshBatch",
+      "addPlayerProjectile": "(message: Game.playerio.Message) => void",
+      "skipWhileStalled": "(weapon: Game.core.weapon.ProjectileGun) => boolean",
+      "handleBouncing": "(message: Game.playerio.Message, offset: number) => void"
+    }
+  },
+  "core.ship.ShipManager": {
+    "instance": {
+      "players": "Game.core.ship.PlayerShip[]",
+      "enemiesById": "{ h: Record<number, Game.core.ship.EnemyShip> }",
+      "update": "() => void",
+      "shipSync": "Game.core.ship.ShipSync",
+      "enemies": "Game.core.ship.EnemyShip[]",
+      "killed": "(message: Game.playerio.Message, start: number) => void",
+      "getShipFromId": "(id: number) => Game.core.ship.Ship | null",
+      "ships": "Game.core.ship.Ship[]",
+      "g": "Game.core.scene.Game",
+      "enemyFire": "(message: Game.playerio.Message, start?: number) => void",
+      "damaged": "(message: Game.playerio.Message, start: number) => void",
+      "onEnemyUpdate": "(message: Game.playerio.Message) => void",
+      "readEnemyEntry": "(message: Game.playerio.Message, start: number) => number",
+      "syncEnemyTarget": "(message: Game.playerio.Message, start: number) => void",
+      "spawnEnemy": "(message: Game.playerio.Message, start?: number, end?: number) => void",
+      "createSetEnemy": "(enemy: Game.core.ship.EnemyShip, id: number, heading: Game.movement.Heading, count: number, time: number, spawner: Game.core.spawner.Spawner | null, orbitAngle: number, orbitRadius: number, ellipseAlpha: number, ellipseFactor: number, angleVelocity: number, hardenedShield?: boolean) => void"
+    }
+  },
+  "core.unit.UnitManager": {
+    "instance": {
+      "units": "Game.core.unit.Unit[]",
+      "getTarget": "(id: number) => Game.core.unit.Unit | null",
+      "add": "(unit: Game.core.unit.Unit, canvas: Game.starling.display.Sprite, addToRadar?: boolean) => void",
+      "remove": "(unit: Game.core.unit.Unit) => void"
+    }
+  },
+  "generics.Util": {
+    "statics": {
+      "clampRadians": "(angle: number) => number"
+    }
+  },
+  "core.particle.Emitter": {
+    "instance": {
+      "collectiveMeshBatch": "(Game.starling.display.MeshBatch & { remove(emitter: Game.core.particle.Emitter): void }) | null",
+      "removeFromCollectiveMeshBatch": "() => void",
+      "dispose": "() => void",
+      "oldImageKey": "string | null",
+      "delay": "number",
+      "get_startSize": "() => number",
+      "get_finishSize": "() => number",
+      "set_startSize": "(value: number) => number",
+      "set_finishSize": "(value: number) => number",
+      "g": "Game.core.scene.Game",
+      "key": "string | null",
+      "followTarget": "boolean",
+      "target": "Game.core.GameObject | null",
+      "posX": "number",
+      "posY": "number",
+      "play": "() => void",
+      "name": "string | null",
+      "timeElapsed": "number",
+      "forceUpdate": "boolean",
+      "killEmitter": "() => void",
+      "sourceVarianceX": "number",
+      "sourceVarianceY": "number",
+      "speed": "number",
+      "ttl": "number",
+      "ttlVariance": "number",
+      "MAX_CALC_DELAY": "number",
+      "distanceToCameraX": "number",
+      "distanceToCameraY": "number",
+      "distanceToCamera": "number",
+      "nextDistanceCalculation": "number",
+      "get_radius": "() => number",
+      "isOnScreen": "boolean",
+      "canvasTarget": "Game.starling.display.Sprite | null",
+      "updateOnScreen": "() => void",
+      "particles": "Game.core.particle.Particle[]",
+      "inactiveParticles": "Game.core.particle.Particle[]",
+      "get_constantEmitter": "() => boolean",
+      "get_maxParticles": "() => number",
+      "emittAccum": "number",
+      "get_ppms": "() => number",
+      "_txt": "Game.starling.textures.Texture | null",
+      "add": "(index?: number, count?: number) => void",
+      "addRainbowColumn": "() => void",
+      "remove": "(particle: Game.core.particle.Particle, index: number) => void",
+      "setParticlesInactive": "() => void",
+      "setBatchParent": "() => void",
+      "_duration": "number",
+      "_startColor": "number",
+      "_finishColor": "number",
+      "angle": "number",
+      "xOffset": "number",
+      "yOffset": "number",
+      "gravityX": "number",
+      "gravityY": "number",
+      "alive": "boolean",
+      "isEmitting": "boolean",
+      "global": "boolean",
+      "rainbow": "boolean",
+      "steadyStream": "boolean",
+      "uniformDistribution": "boolean",
+      "centralGravity": "boolean",
+      "followEmitter": "boolean",
+      "useFriction": "boolean"
+    },
+    "statics": {
+      "setHighGraphics": "() => void"
+    }
+  },
+  "core.particle.EmitterManager": {
+    "instance": {
+      "emitters": "Game.core.particle.Emitter[] | null",
+      "inactiveEmitters": "Game.core.particle.Emitter[] | null",
+      "clean": "(target: Game.core.GameObject) => void",
+      "dispose": "() => void",
+      "update": "() => void",
+      "getEmitter": "() => Game.core.particle.Emitter | null",
+      "removeEmitter": "(emitter: Game.core.particle.Emitter, index: number) => void"
+    }
+  },
+  "core.particle.CollectiveMeshBatch": {
+    "instance": {
+      "emitters": "Game.core.particle.Emitter[]",
+      "clear": "() => void",
+      "markUpdated": "() => void"
+    },
+    "statics": {
+      "effectsBatch": "Game.core.particle.CollectiveMeshBatch | null",
+      "normalBatch": "Game.core.particle.CollectiveMeshBatch | null",
+      "meshBatches": "Game.core.particle.CollectiveMeshBatch[]",
+      "disposeAll": "() => void",
+      "AllMeshesAreUpdated": "() => void"
+    }
+  },
+  "core.engine.Engine": {
+    "instance": {
+      "alive": "boolean",
+      "ship": "Game.core.ship.Ship | null",
+      "get_rotationSpeed": "() => number",
+      "accelerate": "() => void",
+      "idle": "() => void",
+      "acceleration": "number"
+    }
+  },
+  "core.solarSystem.Body": {
+    "instance": {
+      "addToCanvasForReal": "() => void",
+      "g": "Game.core.scene.Game",
+      "type": "string",
+      "safeZoneRadius": "number",
+      "hostileZoneRadius": "number",
+      "updateIsNear": "() => void",
+      "updateBody": "(seconds: number) => void",
+      "generatedAreas": "Array<{ key: string; size: number }> | null",
+      "generatedShells": "Game.openfl.geom.Point[][] | null",
+      "addSpawners": "(definition: object, key: string) => void",
+      "preDraw": "(definition: object) => void",
+      "createSpawner": "(definition: object, key: string, parent: Game.core.solarSystem.Body, count: number) => void",
+      "dataManager": "Game.data.IDataManager",
+      "missionHint": "Game.starling.text.TextField | null",
+      "canTriggerMission": "boolean",
+      "hintTween": "{ kill(): void } | null",
+      "reset": "() => void"
+    }
+  },
+  "core.particle.EmitterFactory": {
+    "statics": {
+      "create": "(key: string, game: Game.core.scene.Game, x?: number, y?: number, target?: Game.core.GameObject | null, play?: boolean, addToRenderList?: boolean, multipleAllowed?: boolean, canvasTarget?: Game.starling.display.Sprite | null, retainUntilKilled?: boolean) => Game.core.particle.Emitter[] | null",
+      "resolveTexture": "(definition: import('./EffectSequence').EffectEmitter, target?: Game.core.GameObject | null) => Game.starling.textures.Texture | null"
+    }
+  },
+  "data.DataManager": {
+    "instance": {
+      "loadKey": "{ (table: \"SolarSystems\", key: string): { name: string; pvpLvlCap: number; background: string; x: number; y: number; galaxy: string } | null; (table: \"Images\", key: string): { fileName: string; textureName: string } | null; (table: \"Effects\", key: string): import('./EffectSequence').EffectSequence | null; (table: \"Projectiles\", key: string): import('./ProjectileAISettings').ProjectileAISettings | null; (table: string, key: string): unknown; }",
+      "json": "Record<string, import('../data/RangeIndex').DataTable>",
+      "loadRange": "(table: string, field: string, value: string) => import('../data/RangeIndex').DataTable | null",
+      "cacheCommonData": "() => void"
+    }
+  },
+  "core.player.FleetObj": {
+    "instance": {
+      "shipHue": "number",
+      "shipBrightness": "number",
+      "shipSaturation": "number",
+      "shipContrast": "number"
+    }
+  },
+  "core.turret.TurretManager": {
+    "instance": {
+      "getTurretById": "(id: number, silent?: boolean) => Game.core.turret.Turret | null",
+      "turrets": "Game.core.turret.Turret[]",
+      "removeTurret": "(turret: Game.core.turret.Turret) => void",
+      "g": "Game.core.scene.Game",
+      "getTurret": "() => Game.core.turret.Turret",
+      "getTurretsByParentAndSyncId": "(parentId: number, syncId: number) => Game.core.turret.Turret | null",
+      "onTurretUpdate": "(message: Game.playerio.Message) => void"
+    }
+  },
+  "core.turret.Turret": {
+    "instance": {
+      "weapon": "Game.core.weapon.Weapon | null",
+      "destroy": "(explode?: boolean) => void",
+      "aimArc": "number",
+      "startAngle": "number",
+      "offset": "Game.openfl.geom.Point",
+      "update": "() => void",
+      "get_id": "() => number",
+      "target": "Game.core.ship.Ship | null"
+    }
+  },
+  "starling.display.Mesh": {
+    "arguments": "[vertices: Game.starling.rendering.VertexData, indices: Game.starling.rendering.IndexData, style?: Game.starling.styles.MeshStyle | null]",
+    "instance": {
+      "setVertexPosition": "(index: number, x: number, y: number) => void",
+      "set_color": "(color: number) => number",
+      "dispose": "() => void",
+      "setVertexAlpha": "(index: number, alpha: number) => void",
+      "set_texture": "(texture: Game.starling.textures.Texture | null) => Game.starling.textures.Texture | null",
+      "set_textureSmoothing": "(smoothing: string) => string",
+      "set_pixelSnapping": "(enabled: boolean) => boolean",
+      "get_numVertices": "() => number",
+      "setVertexColor": "(vertexIndex: number, color: number) => void"
+    }
+  },
+  "starling.rendering.VertexData": {
+    "arguments": "[format?: string | Game.starling.rendering.VertexDataFormat | null, initialCapacity?: number]",
+    "instance": {
+      "set_numVertices": "(count: number) => number"
+    }
+  },
+  "starling.rendering.IndexData": {
+    "arguments": "[initialCapacity?: number]",
+    "instance": {
+      "addQuad": "(a: number, b: number, c: number, d: number) => void"
+    }
+  },
+  "core.hud.components.Text": {
+    "arguments": "[x?: number, y?: number, wordWrap?: boolean, font?: string]",
+    "instance": {
+      "set_size": "(size: number) => number",
+      "set_color": "(color: number) => number",
+      "set_text": "(text: string) => string",
+      "format": "Game.openfl.text.TextFormat",
+      "set_defaultTextFormat": "(format: Game.openfl.text.TextFormat) => Game.openfl.text.TextFormat",
+      "get_text": "() => string"
+    }
+  },
+  "core.ship.ShipSync": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "playerCourse": "(message: Game.playerio.Message, offset?: number) => void",
+      "playerUsedBoost": "(message: Game.playerio.Message, offset: number) => void",
+      "fastforwardMe": "(ship: Game.core.ship.Ship, heading: Game.movement.Heading) => void",
+      "aiCourse": "(message: Game.playerio.Message) => void",
+      "aiStateChanged": "(message: Game.playerio.Message, start?: number) => void"
+    }
+  },
+  "core.hud.components.chat.ChatInputText": {
+    "instance": {
+      "savedPrivateTarget": "string | null",
+      "input": "Game.core.hud.components.ui.TextEntry",
+      "sendMessage": "() => void",
+      "updateTab": "() => void",
+      "tabs": "import('./ChatTabs').ChatTabs",
+      "chatMode": "string",
+      "parseCommand": "(text: string) => string[]",
+      "previous": "() => void",
+      "next": "() => void",
+      "toggleChatMode": "() => void",
+      "closeChat": "() => void",
+      "isActive": "() => boolean",
+      "sendGlobal": "(text: string) => void",
+      "sendGroup": "(text: string) => void",
+      "sendChatMessageMod": "(text: string) => void",
+      "sendPrivate": "(text: string, recipient: string) => void",
+      "sendLocal": "(text: string, channel?: string) => void",
+      "g": "Game.core.scene.Game",
+      "nextGlobalRdySendTime": "number",
+      "nextRdySendTime": "number"
+    }
+  },
+  "core.weapon.WeaponManager": {
+    "instance": {
+      "update": "() => void",
+      "weapons": "Game.core.weapon.Weapon[]",
+      "removeWeapon": "(index: number) => void",
+      "getWeapon": "(kind: string) => Game.core.weapon.Weapon"
+    }
+  },
+  "core.solarSystem.BodyManager": {
+    "instance": {
+      "update": "() => void",
+      "bodies": "Game.core.solarSystem.Body[]",
+      "getBodyByKey": "(key: string) => Game.core.solarSystem.Body | null",
+      "dispose": "() => void"
+    }
+  },
+  "core.states.gameStates.PodState": {
+    "instance": {
+      "createClickOpenPod": "(pod: Game.core.states.gameStates.Pod) => () => void",
+      "buyPods": "(count: number) => void",
+      "execute": "() => void",
+      "enter": "() => void",
+      "exit": "(callback: () => void) => void",
+      "buy1Button": "Game.starling.display.Button",
+      "buy10Button": "Game.starling.display.Button",
+      "closeButton": "Game.core.hud.components.ButtonExpandableHud",
+      "openPodPending": "boolean",
+      "boughtPods": "number",
+      "pods": "Game.core.states.gameStates.Pod[]",
+      "currentPod": "Game.core.states.gameStates.Pod | null",
+      "podsContainer": "Game.starling.display.Sprite",
+      "lootContainer": "Game.starling.display.Sprite",
+      "tracks1": "Game.starling.display.Image",
+      "tracks2": "Game.starling.display.Image",
+      "TRACK1_Y": "number",
+      "TRACK2_Y": "number",
+      "initPodCount": "(reply: Game.playerio.Message) => void",
+      "nrOfPodsText": "Game.starling.text.TextField",
+      "animateReadyPod": "(pod: Game.core.states.gameStates.Pod, callback?: () => void) => void",
+      "animateInPod": "(pod: Game.core.states.gameStates.Pod, callback?: () => void) => void",
+      "animateOutPod": "(pod: Game.core.states.gameStates.Pod, callback?: () => void) => void",
+      "animateOpenPod": "(pod: Game.core.states.gameStates.Pod, callback?: () => void) => void",
+      "onOpenPod": "(reply: Game.playerio.Message, pod: Game.core.states.gameStates.Pod) => void",
+      "readyOpenPod": "(reply: Game.playerio.Message) => void",
+      "showLoot": "(reply: Game.playerio.Message, pod: Game.core.states.gameStates.Pod) => void"
+    }
+  },
+  "core.hud.components.hangar.SkinItem": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "onBuy": "(skin: { key: string }) => void",
+      "buyContainer": "Game.starling.display.Sprite",
+      "premanufacturedDetails": "Game.starling.display.Sprite",
+      "specialweapon": "Game.starling.display.Sprite",
+      "premanufactured": "Game.starling.display.Sprite",
+      "specialStats": "Game.starling.display.Sprite",
+      "desc": "Game.core.hud.components.Text",
+      "stats": "Game.core.hud.components.hangar.SkinItemBaseStats | null",
+      "dispose": "() => void",
+      "mode": "number",
+      "specialCount": "number",
+      "hasSpecialWeapon": "boolean",
+      "addBuy": "() => void",
+      "addShip": "() => void",
+      "addNameAndDescription": "() => void",
+      "addBaseStats": "() => void",
+      "addSpecialStats": "() => void",
+      "addSpecialWeapon": "() => void",
+      "addPremanufacturedSkills": "() => void",
+      "addPremanufacturedDetails": "() => void"
+    }
+  },
+  "core.hud.components.credits.CreditPackageItem": {
+    "instance": {
+      "rpcFunction": "string",
+      "onClose": "(event: Game.starling.events.Event) => void"
+    }
+  },
+  "core.artifact.Artifact": {
+    "instance": {
+      "id": "string",
+      "name": "string",
+      "level": "number",
+      "get_isUnique": "() => boolean",
+      "bitmap": "string",
+      "levelPotential": "number",
+      "upgraded": "number",
+      "stats": "Game.core.artifact.ArtifactStat[]",
+      "getColor": "() => number",
+      "get_isRestricted": "() => boolean",
+      "get_requiredPlayerLevel": "() => number",
+      "revealed": "boolean",
+      "upgrading": "boolean",
+      "upgradeTime": "number"
+    }
+  },
+  "core.artifact.ArtifactFactory": {
+    "statics": {
+      "createArtifact": "(id: string, game: Game.core.scene.Game, player: Game.core.player.Player, callback: (artifact: Game.core.artifact.Artifact | null) => void) => void"
+    }
+  },
+  "core.hud.components.credits.CreditBaseItem": {
+    "instance": {
+      "g": "Game.core.scene.Game"
+    }
+  },
+  "core.hud.components.credits.BuyFlux": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "sale": "boolean",
+      "saleMultiplier": "number",
+      "onBuyPaypal": "(bundle: { amount: number }) => void",
+      "onBuySteam": "(bundle: { amount: number }) => void"
+    }
+  },
+  "playerio.PayVault": {
+    "instance": {
+      "raw": "import('./PlayerIOPayVault').PlayerIOPayVault",
+      "getBuyCoinsInfo": "(provider: string, info: Record<string, unknown>, success: (info: Record<string, unknown>) => void, failure: (error: Game.playerio.PlayerIOError) => void) => void",
+      "usePaymentInfo": "(provider: string, info: Record<string, unknown>, success: (result: unknown) => void, failure: (error: Game.playerio.PlayerIOError) => void) => void"
+    }
+  },
+  "core.ship.EnemyShip": {
+    "instance": {
+      "AFName": "Game.core.hud.components.TextBitmap | null",
+      "cloakStart": "() => void",
+      "cloakEnd": "(heading: Game.movement.Heading) => void",
+      "miniboss": "boolean",
+      "rareType": "number",
+      "rareEmitters": "Game.core.particle.Emitter[] | null",
+      "aiHardenedShieldEffect": "Game.core.particle.Emitter[] | null",
+      "killOwnEmitters": "(emitters: Game.core.particle.Emitter[] | null) => void",
+      "addToCanvasForReal": "() => void",
+      "removeFromCanvas": "() => void"
+    }
+  },
+  "core.sync.Converger": {
+    "instance": {
+      "ship": "Game.core.ship.Ship",
+      "g": "Game.core.scene.Game",
+      "course": "Game.movement.Heading | null",
+      "target": "Game.movement.Heading | null",
+      "calculateOffset": "() => void",
+      "run": "() => void",
+      "updateHeading": "(heading: Game.movement.Heading) => void",
+      "setCourse": "(heading: Game.movement.Heading, fastforward?: boolean) => void",
+      "setConvergeTarget": "(heading: Game.movement.Heading) => void",
+      "clearConvergeTarget": "() => void",
+      "aiAddError": "(heading: Game.movement.Heading) => void"
+    }
+  },
+  "core.states.StateMachine": {
+    "instance": {
+      "inState": "(...states: (string | object)[]) => boolean",
+      "currentState": "Game.core.states.IState | null",
+      "previousState": "Game.core.states.IState | null",
+      "changeState": "(state: Game.core.states.IState) => void"
+    }
+  },
+  "movement.Command": {
+    "instance": {
+      "type": "number",
+      "time": "number",
+      "active": "boolean"
+    }
+  },
+  "core.deathLine.DeathLineManager": {
+    "instance": {
+      "lines": "Game.core.deathLine.DeathLine[]"
+    }
+  },
+  "core.hud.components.Line": {
+    "instance": {
+      "toX": "number",
+      "toY": "number"
+    }
+  },
+  "data.KeyBinds": {
+    "instance": {
+      "isInputPressed": "(input: number) => boolean",
+      "isInputDown": "(input: number) => boolean",
+      "isInputUp": "(input: number) => boolean",
+      "get_isEscPressed": "() => boolean",
+      "get_isEnterPressed": "() => boolean"
+    }
+  },
+  "movement.CommandManager": {
+    "instance": {
+      "commands": "Game.movement.Command[]",
+      "addCommand": "(type: number, active: boolean) => void",
+      "runCommand": "(heading: Game.movement.Heading, time: number, cursor?: number) => number | undefined",
+      "clearCommands": "(time: number) => void",
+      "sendCommand": "(command: Game.movement.Command) => void",
+      "commandReceived": "(message: Game.playerio.Message) => void",
+      "addBoostCommand": "() => void"
+    }
+  },
+  "core.hud.components.hotkeys.Abilities": {
+    "instance": {
+      "initiateCooldown": "(ability: string) => void",
+      "hotkeys": "Game.core.hud.components.hotkeys.AbilityHotkey[]",
+      "load": "() => void"
+    }
+  },
+  "extensions.RibbonSegment": {
+    "instance": {
+      "x0": "number",
+      "y0": "number",
+      "x1": "number",
+      "y1": "number",
+      "alpha": "number",
+      "ribbonTrail": "Game.extensions.RibbonTrail",
+      "setTo": "(x0: number, y0: number, x1: number, y1: number, alpha?: number) => void",
+      "setTo2": "(x: number, y: number, thickness: number, rotation: number, alpha?: number) => void",
+      "tweenTo": "(target: Game.extensions.RibbonSegment) => void"
+    }
+  },
+  "extensions.RibbonTrail": {
+    "instance": {
+      "mNumRibbonSegments": "number",
+      "mMovingRatio": "number",
+      "mAlphaRatio": "number",
+      "poolIndex": "number",
+      "mIsPlaying": "boolean",
+      "mFollowingEnable": "boolean",
+      "mRepeat": "boolean",
+      "alphaArray": "number[]",
+      "mRibbonSegments": "Game.extensions.RibbonSegment[] | null",
+      "mFollowingRibbonSegmentLine": "Game.extensions.RibbonSegment[] | null",
+      "get_isPlaying": "() => boolean",
+      "set_color": "(color: number) => number",
+      "resetAllTo": "(x0: number, y0: number, x1: number, y1: number, alpha?: number) => void",
+      "advanceTime": "(milliseconds: number) => void"
+    }
+  },
+  "core.pools.RibbonTrailPool": {
+    "instance": {
+      "activeRibbonTrails": "Game.extensions.RibbonTrail[] | null",
+      "inactiveRibbonTrails": "Game.extensions.RibbonTrail[] | null",
+      "getRibbonTrail": "() => Game.extensions.RibbonTrail",
+      "removeRibbonTrail": "(trail: Game.extensions.RibbonTrail) => void",
+      "reclaimOrphans": "() => number",
+      "dispose": "() => void"
+    }
+  },
+  "starling.filters.ColorMatrixFilter": {
+    "arguments": "[]",
+    "instance": {
+      "concatValues": "(m0: number, m1: number, m2: number, m3: number, m4: number, m5: number, m6: number, m7: number, m8: number, m9: number, m10: number, m11: number, m12: number, m13: number, m14: number, m15: number, m16: number, m17: number, m18: number, m19: number) => void"
+    }
+  },
+  "starling.events.EnterFrameEvent": {
+    "instance": {
+      "get_passedTime": "() => number"
+    }
+  },
+  "starling.events.Touch": {
+    "instance": {
+      "get_phase": "() => string",
+      "get_id": "() => number",
+      "get_cancelled": "() => boolean",
+      "getLocation": "(target: Game.starling.display.DisplayObject, result?: Game.openfl.geom.Point | null) => Game.openfl.geom.Point"
+    }
+  },
+  "core.boss.Boss": {
+    "instance": {
+      "level": "number",
+      "hp": "number",
+      "hpMax": "number",
+      "alive": "boolean",
+      "awaitingActivation": "boolean",
+      "g": "Game.core.scene.Game",
+      "course": "Game.movement.Heading",
+      "allComponents": "Game.core.unit.Unit[]",
+      "update": "() => void",
+      "draw": "() => void",
+      "overrideConvergeTarget": "(x: number, y: number) => void",
+      "bossRadius": "number",
+      "isHostile": "boolean",
+      "updateIsNear": "() => void",
+      "addToCanvas": "() => void",
+      "removeFromCanvas": "() => void",
+      "distanceToCamera": "number"
+    }
+  },
+  "core.spawner.Spawner": {
+    "instance": {
+      "spawnerType": "string | null",
+      "offset": "Game.openfl.geom.Point",
+      "angleOffset": "number"
+    }
+  },
+  "openfl.events.IEventDispatcher": {
+    "instance": {
+      "addEventListener": "<E extends Game.openfl.events.Event>(type: string, listener: (event: E) => void, useCapture?: boolean, priority?: number, useWeakReference?: boolean) => void",
+      "removeEventListener": "<E extends Game.openfl.events.Event>(type: string, listener: (event: E) => void, useCapture?: boolean) => void",
+      "dispatchEvent": "(event: Game.openfl.events.Event) => boolean",
+      "hasEventListener": "(type: string) => boolean",
+      "willTrigger": "(type: string) => boolean"
+    }
+  },
+  "openfl.events.EventDispatcher": {
+    "arguments": "[target?: Pick<Game.openfl.events.IEventDispatcher, 'addEventListener' | 'removeEventListener' | 'dispatchEvent' | 'hasEventListener' | 'willTrigger'> | null]",
+    "instance": {
+      "addEventListener": "<E extends Game.openfl.events.Event>(type: string, listener: (event: E) => void, useCapture?: boolean, priority?: number, useWeakReference?: boolean) => void",
+      "removeEventListener": "<E extends Game.openfl.events.Event>(type: string, listener: (event: E) => void, useCapture?: boolean) => void",
+      "dispatchEvent": "(event: Game.openfl.events.Event) => boolean",
+      "hasEventListener": "(type: string) => boolean",
+      "willTrigger": "(type: string) => boolean"
+    }
+  },
+  "openfl.events.Event": {
+    "arguments": "[type: string, bubbles?: boolean, cancelable?: boolean]",
+    "instance": {
+      "type": "string",
+      "bubbles": "boolean",
+      "cancelable": "boolean",
+      "clone": "() => Game.openfl.events.Event"
+    }
+  },
+  "openfl.display.Shape": {
+    "arguments": "[]",
+    "instance": {
+      "get_graphics": "() => Game.openfl.display.Graphics"
+    }
+  },
+  "openfl.geom.Matrix": {
+    "arguments": "[a?: number, b?: number, c?: number, d?: number, tx?: number, ty?: number]",
+    "instance": {
+      "createGradientBox": "(width: number, height: number, rotation?: number, tx?: number, ty?: number) => void",
+      "a": "number",
+      "b": "number",
+      "c": "number",
+      "d": "number",
+      "tx": "number",
+      "ty": "number"
+    }
+  },
+  "openfl.display.Graphics": {
+    "instance": {
+      "beginGradientFill": "(type: number, colors: number[], alphas: number[] | null, ratios: number[] | null, matrix?: Game.openfl.geom.Matrix | null, spreadMethod?: number, interpolationMethod?: number, focalPointRatio?: number) => void",
+      "drawRect": "(x: number, y: number, width: number, height: number) => void",
+      "endFill": "() => void"
+    }
+  },
+  "core.hud.components.chat.ChatSimple": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "tf": "Game.core.hud.components.ui.WrapText",
+      "nextTimeout": "number",
+      "update": "(event?: Game.starling.events.Event | null) => void",
+      "updateTexts": "(event?: Game.starling.events.Event | null) => void"
+    }
+  },
+  "starling.text.BitmapChar": {
+    "instance": {
+      "getKerning": "(charId: number) => number",
+      "get_xOffset": "() => number",
+      "get_yOffset": "() => number",
+      "get_xAdvance": "() => number",
+      "get_width": "() => number",
+      "get_texture": "() => Game.starling.textures.Texture"
+    },
+    "arguments": "[charId: number, texture: Game.starling.textures.Texture, xOffset: number, yOffset: number, xAdvance: number]"
+  },
+  "starling.textures.ConcreteTexture": {
+    "instance": {
+      "uploadBitmapData": "(data: Game.openfl.display.BitmapData, onReady?: ((texture: Game.starling.textures.ConcreteTexture) => void) | null) => void"
+    }
+  },
+  "starling.text.BitmapFont": {
+    "instance": {
+      "getChar": "(charId: number) => Game.starling.text.BitmapChar | null",
+      "get_name": "() => string",
+      "fillMeshBatch": "(batch: Game.starling.display.MeshBatch, width: number, height: number, text: string, format: Game.starling.text.TextFormat, options?: Game.starling.text.TextOptions | null) => void",
+      "get_size": "() => number",
+      "get_lineHeight": "() => number",
+      "get_baseline": "() => number",
+      "get_offsetX": "() => number",
+      "get_offsetY": "() => number",
+      "get_smoothing": "() => string"
+    }
+  },
+  "starling.text.TextOptions": {
+    "instance": {
+      "get_autoSize": "() => string",
+      "get_wordWrap": "() => boolean",
+      "get_autoScale": "() => boolean",
+      "get_isHtmlText": "() => boolean"
+    }
+  },
+  "starling.rendering.Painter": {
+    "instance": {
+      "excludeFromCache": "(object: Game.starling.display.DisplayObject | null) => void"
+    }
+  },
+  "openfl.text.TextField": {
+    "instance": {
+      "get_text": "() => string",
+      "get_htmlText": "() => string",
+      "get_width": "() => number",
+      "get_height": "() => number",
+      "get_wordWrap": "() => boolean",
+      "set_wordWrap": "(value: boolean) => boolean",
+      "set_width": "(value: number) => number",
+      "set_height": "(value: number) => number",
+      "set_defaultTextFormat": "(format: Game.openfl.text.TextFormat) => Game.openfl.text.TextFormat",
+      "set_text": "(value: string) => string",
+      "set_htmlText": "(value: string) => string"
+    }
+  },
+  "core.particle.Particle": {
+    "arguments": "[]",
+    "instance": {
+      "ttl": "number",
+      "totalTtl": "number",
+      "speed": "number",
+      "localPosX": "number",
+      "localPosY": "number",
+      "startSize": "number",
+      "finishSize": "number",
+      "rainbowLength": "number",
+      "startColor": "number",
+      "finishColor": "number",
+      "startAlpha": "number",
+      "finishAlpha": "number",
+      "ticks": "number"
+    }
+  },
+  "generics.Color": {
+    "statics": {
+      "interpolateColor": "(start: number, finish: number, fraction: number) => number"
+    }
+  },
+  "starling.filters.BlurFilter": {
+    "arguments": "[blurX?: number, blurY?: number, resolution?: number]",
+    "instance": {
+      "set_blurX": "(value: number) => number"
+    }
+  },
+  "core.states.gameStates.ClanState": {
+    "statics": {
+      "getMemberRankName": "(clan: import('./ClanIdentity').ClanRecord, playerId: string) => string | null"
+    },
+    "instance": {
+      "scrollContainer": "Game.starling.display.DisplayObjectContainer | null",
+      "drawClanMember": "(member: { player: string | null }, index: number, clan: object) => void"
+    }
+  },
+  "core.hud.components.dialogs.PopupConfirmMessage": {
+    "arguments": "[confirmText?: string, cancelText?: string, style?: string]",
+    "instance": {
+      "confirmButton": "Game.core.hud.components.Button"
+    }
+  },
+  "core.hud.components.Button": {
+    "instance": {
+      "callback": "(() => void) | null"
+    }
+  },
+  "core.weapon.Teleport": {
+    "instance": {
+      "updateCooldown": "() => void",
+      "shoot": "() => void"
+    }
+  },
+  "core.projectile.ProjectileFactory": {
+    "statics": {
+      "create": "(key: string, game: Game.core.scene.Game, owner: Game.core.unit.Unit | null, weapon: Game.core.weapon.Weapon | null, heading?: Game.movement.Heading | null) => Game.core.projectile.Projectile | null"
+    }
+  },
+  "core.hud.components.ui.ScrollBox": {
+    "instance": {
+      "getChildAt": "(index: number) => Game.starling.display.DisplayObject",
+      "get_numChildren": "() => number",
+      "get_width": "() => number",
+      "get_height": "() => number",
+      "get_verticalScrollPosition": "() => number",
+      "get_maxVerticalScrollPosition": "() => number",
+      "scrollToPosition": "(x: number, y: number) => void",
+      "arrange": "() => void",
+      "contentBottom": "() => number",
+      "content": "Game.starling.display.Sprite",
+      "paddingTop": "number",
+      "paddingLeft": "number",
+      "gap": "number"
+    }
+  },
+  "core.hud.components.ui.TabBar": {
+    "instance": {
+      "equalTabs": "boolean",
+      "tabHeight": "number",
+      "tabs": "Game.core.hud.components.ui.ToggleButton[]",
+      "get_width": "() => number",
+      "set_width": "(width: number) => number",
+      "set_tabHeight": "(height: number) => number",
+      "layoutTabs": "() => void"
+    }
+  },
+  "core.hud.components.chat.ChatAdvanced": {
+    "instance": {
+      "scroll": "Game.core.hud.components.ui.ScrollBox",
+      "scrollView": "Game.starling.display.Sprite",
+      "playerChatOptions": "Game.starling.display.DisplayObject | null",
+      "addText": "(message: import('./ChatMessage').ChatMessage) => void"
+    }
+  },
+  "core.ship.ShipFactory": {
+    "statics": {
+      "createPlayerShipColorMatrixFilter": "(paint: { shipHue: number; shipBrightness: number; shipSaturation: number; shipContrast: number }) => Game.starling.filters.ColorMatrixFilter | null",
+      "createEnemy": "(game: Game.core.scene.Game, key: string, rareType?: number) => Game.core.ship.EnemyShip | null",
+      "createPlayer": "(game: Game.core.scene.Game, player: Game.core.player.Player, ship: Game.core.ship.PlayerShip, weapons: Game.core.weapon.Weapon[]) => Game.core.ship.PlayerShip"
+    }
+  },
+  "core.artifact.ArtifactStat": {
+    "instance": {
+      "type": "string",
+      "value": "number",
+      "get_isUnique": "() => boolean"
+    },
+    "statics": {
+      "parseTextFromStatType": "(type: string, value: number, unique?: boolean) => string"
+    }
+  },
+  "core.states.aistates.Instant": {
+    "instance": {
+      "color": "number",
+      "thickness": "number",
+      "alpha": "number",
+      "glowColor": "number",
+      "g": "Game.core.scene.Game",
+      "p": "Game.core.projectile.Projectile",
+      "sm": "Game.core.states.StateMachine",
+      "isEnemy": "boolean",
+      "enter": "() => void",
+      "execute": "() => void",
+      "exit": "() => void",
+      "get_type": "() => string",
+      "set_stateMachine": "(machine: Game.core.states.StateMachine) => Game.core.states.StateMachine",
+      "amplitude": "number",
+      "frequency": "number",
+      "tick": "number",
+      "texture": "string",
+      "lineInner": "Game.core.hud.components.BeamLine | null",
+      "lineOuter": "Game.core.hud.components.BeamLine | null"
+    }
+  },
+  "core.states.aistates.InstantSplitting": {
+    "instance": {
+      "color": "number",
+      "thickness": "number",
+      "alpha": "number",
+      "glowColor": "number",
+      "g": "Game.core.scene.Game",
+      "p": "Game.core.projectile.Projectile",
+      "sm": "Game.core.states.StateMachine",
+      "isEnemy": "boolean",
+      "enter": "() => void",
+      "execute": "() => void",
+      "exit": "() => void",
+      "get_type": "() => string",
+      "set_stateMachine": "(machine: Game.core.states.StateMachine) => Game.core.states.StateMachine",
+      "maxNrOfLines": "number",
+      "branchingFactor": "number",
+      "splitChance": "number",
+      "lines": "Game.core.hud.components.BeamLine[]"
+    }
+  },
+  "core.pools.BeamLinePool": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "activeLines": "Game.core.hud.components.BeamLine[] | null",
+      "inactiveLines": "Game.core.hud.components.BeamLine[] | null",
+      "getLine": "() => Game.core.hud.components.BeamLine",
+      "removeLine": "(line: Game.core.hud.components.BeamLine) => void",
+      "dispose": "() => void"
+    }
+  },
+  "core.hud.components.BeamLine": {
+    "instance": {
+      "period": "number",
+      "nodeFrequence": "number",
+      "thickness": "number",
+      "amplitude": "number",
+      "ampFactor": "number",
+      "glowWidth": "number",
+      "glowColor": "number",
+      "_color": "number",
+      "g": "Game.core.scene.Game",
+      "lineTexture": "string",
+      "init": "(thickness?: number, frequency?: number, amplitude?: number, color?: number, alpha?: number, glowWidth?: number, glowColor?: number, texture?: string) => void",
+      "lineTo": "(x: number, y: number, width?: number) => void",
+      "clear": "() => void",
+      "get_color": "() => number",
+      "set_color": "(color: number) => number",
+      "set_touchable": "(touchable: boolean) => boolean"
+    }
+  },
+  "core.hud.components.ui.PressButton": {
+    "instance": {
+      "get_isEnabled": "() => boolean",
+      "set_isEnabled": "(enabled: boolean) => boolean",
+      "down": "boolean",
+      "enabled": "boolean",
+      "hover": "boolean",
+      "selectedValue": "boolean",
+      "labelPadding": "number",
+      "textField": "Game.starling.text.TextField",
+      "skinLayer": "Game.starling.display.Sprite",
+      "relayout": "() => void",
+      "showSkin": "() => void",
+      "get_width": "() => number",
+      "get_height": "() => number",
+      "set_width": "(width: number) => number",
+      "set_height": "(height: number) => number"
+    }
+  },
+  "core.hud.components.ui.ToggleButton": {
+    "instance": {
+      "labelWidth": "() => number",
+      "showSkin": "() => void"
+    }
+  },
+  "core.player.CrewMember": {
+    "instance": {
+      "artifact": "string | null",
+      "artifactEnd": "number"
+    }
+  },
+  "core.artifact.ArtifactBox": {
+    "instance": {
+      "a": "Game.core.artifact.Artifact | null",
+      "p": "Game.core.player.Player",
+      "g": "Game.core.scene.Game",
+      "toolTip": "Game.core.hud.components.ToolTip | null",
+      "setArtifact": "() => void",
+      "frame": "Game.starling.display.Image",
+      "update": "() => void",
+      "locked": "boolean"
+    }
+  },
+  "core.artifact.ArtifactCargoBox": {
+    "instance": {
+      "a": "Game.core.artifact.Artifact | null",
+      "p": "Game.core.player.Player",
+      "g": "Game.core.scene.Game",
+      "toolTip": "Game.core.hud.components.ToolTip | null",
+      "addToolTip": "() => void",
+      "frame": "Game.starling.display.Image",
+      "update": "() => void",
+      "setNotSelected": "() => void",
+      "setSelectedForRecycle": "() => void",
+      "toggleRecycle": "() => void",
+      "setEmpty": "() => void",
+      "onClick": "(event?: Game.starling.events.TouchEvent | null) => void",
+      "recycleMode": "boolean",
+      "isUsedInSetup": "() => boolean"
+    }
+  },
+  "core.artifact.ArtifactOverview": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "p": "Game.core.player.Player",
+      "activeSlots": "Game.core.artifact.ArtifactBox[]",
+      "cargoBoxes": "Game.core.artifact.ArtifactCargoBox[]",
+      "cargoContainer": "Game.core.hud.components.ui.ScrollBox",
+      "chooseSortingButton": "Game.core.hud.components.Button",
+      "onSort": "(order: string) => void",
+      "drawArtifactsInCargo": "() => void",
+      "reloadStats": "(event?: Game.starling.events.Event | null) => void",
+      "chooseSorting": "(event?: Game.starling.events.Event | null) => void",
+      "markedForRecycle": "Game.core.artifact.Artifact[]",
+      "toggleRecycleButton": "Game.core.hud.components.Button",
+      "cancelRecycleButton": "Game.core.hud.components.Button",
+      "selectAllRecycleButton": "Game.core.hud.components.Button",
+      "recycleButton": "Game.core.hud.components.Button",
+      "toggleRecycle": "(event?: Game.starling.events.TouchEvent | null) => void",
+      "selectAllForRecycle": "(event?: Game.starling.events.TouchEvent | null) => void",
+      "onRecycle": "(event?: Game.starling.events.TouchEvent | null) => void",
+      "onRecycleSelect": "(event: Game.starling.events.Event) => void",
+      "onRecycleMessage": "(message: Game.playerio.Message) => void",
+      "drawComponents": "() => void",
+      "recycleText": "Game.starling.text.TextField",
+      "recycleTextInfo": "Game.starling.text.TextField",
+      "autoRecycleText": "Game.starling.text.TextField",
+      "autoRecycleTextInfo": "Game.starling.text.TextField",
+      "autoRecycleButton": "Game.core.hud.components.Button",
+      "buySupporter": "Game.core.hud.components.Button",
+      "autoRecycleInput": "Game.core.hud.components.InputText",
+      "load": "() => void"
+    }
+  },
+  "core.states.player.Killed": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "player": "Game.core.player.Player",
+      "execute": "() => void",
+      "respawnText": "Game.starling.text.TextField",
+      "box": "Game.core.hud.components.Box",
+      "deathInfo": "Game.starling.text.TextField",
+      "uberText": "Game.starling.text.TextField"
+    }
+  },
+  "core.hud.components.UberStats": {
+    "instance": {
+      "getMyLives": "() => number"
+    }
+  },
+  "openfl.display.Stage": {
+    "instance": {
+      "stageWidth": "number",
+      "stageHeight": "number",
+      "get_frameRate": "() => number",
+      "set_frameRate": "(rate: number) => number",
+      "window": "Game.lime.ui.Window | null"
+    }
+  },
+  "lime.ui.Window": {
+    "instance": {
+      "application": "Game.lime.app.Application | null"
+    }
+  },
+  "lime.app.Application": {
+    "instance": {
+      "__backend": "Game.lime._internal.backend.html5.HTML5Application"
+    }
+  },
+  "lime._internal.backend.html5.HTML5Application": {
+    "instance": {
+      "framePeriod": "number"
+    }
+  },
+  "core.states.gameStates.LandedLore": {
+    "instance": {
+      "runLore": "(page: number, pages: string[][]) => void"
+    }
+  },
+  "core.states.gameStates.missions.MissionsList": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "trySetMissionsViewed": "() => void"
+    }
+  },
+  "core.states.gameStates.missions.MissionView": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "missionType": "import('./MissionDefinition').MissionDefinition",
+      "mission": "Game.core.player.Mission",
+      "addDescription": "() => void",
+      "addReward": "() => number"
+    },
+    "statics": {
+      "fixText": "(game: Game.core.scene.Game, definition: import('./MissionDefinition').MissionDefinition, text: string) => string"
+    }
+  },
+  "core.player.Mission": {
+    "instance": {
+      "finished": "boolean"
+    }
+  },
+  "openfl.media.Sound": {
+    "instance": {
+      "load": "(request: Game.openfl.net.URLRequest, context?: Game.openfl.media.SoundLoaderContext | null) => void",
+      "play": "(startTime?: number, loops?: number, transform?: Game.openfl.media.SoundTransform | null) => Game.openfl.media.SoundChannel | null",
+      "close": "() => void"
+    }
+  },
+  "openfl.media.SoundChannel": {
+    "instance": {
+      "stop": "() => void",
+      "get_position": "() => number",
+      "set_position": "(value: number) => number",
+      "get_soundTransform": "() => Game.openfl.media.SoundTransform",
+      "set_soundTransform": "(value: Game.openfl.media.SoundTransform | null) => Game.openfl.media.SoundTransform | null"
+    }
+  },
+  "openfl.media.SoundTransform": {
+    "instance": {
+      "volume": "number",
+      "pan": "number",
+      "leftToLeft": "number",
+      "leftToRight": "number",
+      "rightToLeft": "number",
+      "rightToRight": "number",
+      "clone": "() => Game.openfl.media.SoundTransform"
+    }
+  },
+  "core.drops.Drop": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "speed": "Game.openfl.geom.Point",
+      "draw": "() => void",
+      "expireTime": "number",
+      "fadeTween": "Game.com.greensock.TweenMax | null",
+      "randAngleSpeed": "number",
+      "tractorBeamUpdate": "() => void",
+      "updateIsNear": "() => void",
+      "expire": "() => void",
+      "update": "() => void",
+      "reset": "() => void",
+      "containsUniqueArtifact": "boolean",
+      "effect": "Game.core.particle.Emitter[] | null",
+      "addToCanvasForReal": "() => void"
+    }
+  },
+  "core.clan.ClanClient": {
+    "statics": {
+      "brief": "(game: Game.core.scene.Game, clanId: string, playerId: string, callback: (clan: import('./ClanIdentity').ClanBrief) => void) => void"
+    }
+  },
+  "core.boss.BossComponent": {
+    "instance": {
+      "currentAngleOffset": "number",
+      "imageAngle": "number",
+      "offset": "Game.openfl.geom.Point",
+      "effectTarget": "Game.core.GameObject",
+      "effectX": "number",
+      "effectY": "number",
+      "update": "() => void",
+      "effect": "Game.core.particle.Emitter[]"
+    }
+  },
+  "core.hud.components.radar.Radar": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "blips": "Game.core.hud.components.radar.Blip[] | null",
+      "load": "() => void",
+      "dispose": "() => void",
+      "update": "() => void",
+      "createBlip": "(owner: Game.core.GameObject, player?: Game.core.ship.PlayerShip | null) => void"
+    }
+  },
+  "core.hud.components.radar.Blip": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "go": "Game.core.GameObject",
+      "updateVisibility": "() => boolean"
+    }
+  },
+  "core.hud.components.pvp.PvpManager": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "requestTime": "number",
+      "roomStartTime": "number",
+      "scoreList": "Game.core.hud.components.pvp.PvpScoreHolder[]",
+      "update": "() => void",
+      "m_pvpInitPlayers": "(message: Game.playerio.Message) => void"
+    }
+  },
+  "core.hud.components.pvp.DominationManager": {
+    "instance": {
+      "update": "() => void"
+    }
+  },
+  "core.clan.PlayerClanLogo": {
+    "arguments": "[game: Game.core.scene.Game, player: Game.core.player.Player, callback?: (success?: boolean) => void]",
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "player": "Game.core.player.Player",
+      "callback": "((success?: boolean) => void) | null",
+      "init": "(event?: Game.starling.events.Event) => void",
+      "dispose": "() => void"
+    }
+  },
+  "core.hud.components.techTree.TechTree": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "me": "Game.core.player.Player",
+      "canUpgrade": "boolean",
+      "techSelectedForUpgrade": "Game.core.hud.components.techTree.TechLevelIcon | null",
+      "techBars": "Game.core.hud.components.techTree.TechBar[] | null",
+      "_nrOfUpgrades": "number[]",
+      "myCargo": "Game.core.hud.components.cargo.Cargo",
+      "upgradeInfo": "Game.starling.display.Sprite",
+      "isUpgradingEliteTech": "boolean",
+      "buyWithResourcesButton": "Game.core.hud.components.Button",
+      "buyWithFluxButton": "Game.core.hud.components.Button",
+      "resetButton": "Game.core.hud.components.Button",
+      "switchEliteTechButton": "Game.core.hud.components.Button",
+      "load": "() => void",
+      "dispose": "() => void",
+      "exit": "() => void",
+      "disableTouch": "() => void",
+      "enableTouch": "() => void",
+      "canAfford": "(icon: Game.core.hud.components.techTree.TechLevelIcon) => boolean",
+      "handleClickTechIcon": "(icon: Game.core.hud.components.techTree.TechLevelIcon) => void",
+      "updateTechUpgradeInfo": "(icon: Game.core.hud.components.techTree.TechLevelIcon) => void"
+    },
+    "statics": {
+      "hasRequiredLevel": "(upgrade: number, playerLevel: number) => boolean"
+    }
+  },
+  "core.hud.components.techTree.TechLevelIcon": {
+    "instance": {
+      "level": "number",
+      "table": "string",
+      "tech": "string",
+      "tb": "Game.core.hud.components.techTree.TechBar",
+      "upgrade": "() => void",
+      "updateState": "(state: string) => void",
+      "dispose": "() => void",
+      "number": "Game.starling.text.TextField | null"
+    }
+  },
+  "core.hud.components.techTree.TechBar": {
+    "instance": {
+      "getUpgradeByLevel": "(level: number) => Game.core.hud.components.techTree.TechLevelIcon | null",
+      "techIcons": "Game.core.hud.components.techTree.TechLevelIcon[] | null",
+      "eliteTechIcon": "Game.core.hud.components.techTree.EliteTechIcon | null",
+      "eti": "Game.core.hud.components.techTree.EliteTechIcon | null",
+      "dispose": "() => void"
+    }
+  },
+  "core.hud.components.cargo.Cargo": {
+    "instance": {
+      "reloadCargoFromServer": "(callback: () => void) => void",
+      "draw": "(animate?: boolean) => void",
+      "g": "Game.core.scene.Game",
+      "spaceJunkCount": "number",
+      "compressorCapacities": "number[]"
+    }
+  },
+  "core.hud.components.dialogs.CreditBuyBox": {
+    "arguments": "[game: Game.core.scene.Game, cost: number, caption: string]",
+    "instance": {
+      "close": "() => void"
+    }
+  },
+  "core.credits.CreditManager": {
+    "statics": {
+      "getCostPods": "() => number"
+    },
+    "instance": {
+      "refresh": "(callback?: () => void) => void",
+      "g": "Game.core.scene.Game"
+    }
+  },
+  "starling.events.EventDispatcher": {
+    "instance": {
+      "dispatchEvent": "(event: Game.starling.events.Event) => void"
+    }
+  },
+  "core.spawner.SpawnManager": {
+    "instance": {
+      "spawners": "Game.core.spawner.Spawner[]",
+      "getSpawnerByKey": "(key: string) => Game.core.spawner.Spawner | null",
+      "getSpawnerById": "(id: number) => Game.core.spawner.Spawner | null",
+      "removeSpawner": "(spawner: Game.core.spawner.Spawner) => void",
+      "syncSpawners": "(message: Game.playerio.Message, start: number, end: number) => void",
+      "dispose": "() => void"
+    }
+  },
+  "core.drops.DropManager": {
+    "instance": {
+      "drops": "Game.core.drops.Drop[]"
+    }
+  },
+  "core.boss.BossManager": {
+    "instance": {
+      "bosses": "Game.core.boss.Boss[]",
+      "killBoss": "(boss: Game.core.boss.Boss) => void"
+    }
+  },
+  "core.sync.MessagePackHandler": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "addMessageHandlers": "() => void",
+      "handleMessagePack": "(message: Game.playerio.Message) => void",
+      "increaseMessageCounter": "(type: string) => void"
+    }
+  },
+  "core.states.aistates.AIResurect": {
+    "instance": {
+      "s": "Game.core.ship.EnemyShip",
+      "enter": "() => void",
+      "exit": "() => void"
+    }
+  },
+  "core.hud.components.HealthAndShield": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "playerHPBar": "Game.starling.display.Image",
+      "playerShieldBar": "Game.starling.display.Image",
+      "playerHPText": "Game.starling.text.TextField",
+      "playerShieldText": "Game.starling.text.TextField",
+      "update": "() => void"
+    }
+  },
+  "core.hud.components.shipMenu.WeaponSelector": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "icons": "Game.core.hud.components.shipMenu.MenuSelectIcon[] | null",
+      "load": "() => void",
+      "refresh": "() => void",
+      "dispose": "() => void",
+      "addWeaponSelectIcon": "(index: number, texture: Game.starling.textures.Texture | null, type: string, locked?: boolean, inUse?: boolean, enabled?: boolean, caption?: string | null, tooltip?: string | null) => void"
+    }
+  },
+  "core.hud.components.hangar.SkinItemBaseStats": {
+    "instance": {
+      "addStat": "(field: string, label: string, y: number) => void",
+      "tweenDelay": "number"
+    }
+  },
+  "core.hud.components.hotkeys.AbilityHotkey": {
+    "instance": {
+      "_cooldownTime": "number",
+      "set_cooldownTime": "(duration: number) => number",
+      "obj": "{ name: string } | null"
+    }
+  },
+  "core.hud.components.shipMenu.MenuSelectIcon": {
+    "instance": {
+      "_locked": "boolean",
+      "_inUse": "boolean",
+      "bgrBmp": "Game.starling.display.Image",
+      "set_locked": "(locked: boolean) => boolean",
+      "set_inUse": "(inUse: boolean) => boolean"
+    }
+  },
+  "core.states.aistates.Bouncing": {
+    "instance": {
+      "execute": "() => void",
+      "m": "Game.core.scene.Game",
+      "p": "Game.core.projectile.Projectile",
+      "isEnemy": "boolean"
+    }
+  },
+  "core.weapon.Damage": {
+    "instance": {
+      "dmg": "() => number",
+      "type": "number",
+      "damage": "number[]",
+      "damageText": "() => string",
+      "debuffdamageText": "(multiplier: number, duration: number, timing: string) => string"
+    }
+  },
+  "core.weapon.Beam": {
+    "instance": {
+      "shoot": "() => void",
+      "targetBody": "Game.core.solarSystem.Body | null",
+      "initEffects": "() => void",
+      "destroy": "() => void",
+      "startEffect": "Game.core.particle.Emitter[]",
+      "startEffect2": "Game.core.particle.Emitter[]",
+      "endEffect": "Game.core.particle.Emitter[]",
+      "lines": "Game.core.hud.components.BeamLine[]",
+      "lineBatch": "Game.starling.display.MeshBatch | null",
+      "drawBeam": "boolean",
+      "oldDrawBeam": "boolean",
+      "effectsInitialized": "boolean",
+      "set_fire": "(value: boolean) => boolean",
+      "secondaryTargets": "Game.core.unit.Unit[]",
+      "beams": "number",
+      "twin": "boolean",
+      "beamAlpha": "number",
+      "startBeamAlpha": "number",
+      "drawBeamEffect": "(index: number, start: import('../weapon/PhaseBladeMounts').RenderPoint, end: import('../weapon/PhaseBladeMounts').RenderPoint, strands: number) => number",
+      "twinOffset": "number",
+      "startPos": "Game.openfl.geom.Point",
+      "startPos2": "Game.openfl.geom.Point",
+      "endPos": "Game.openfl.geom.Point",
+      "lastPos": "Game.openfl.geom.Point"
+    }
+  },
+  "core.hud.components.dialogs.DailyRewardMessage": {
+    "instance": {
+      "boxXPos": "number",
+      "combo": "number",
+      "dayTextField": "Game.core.hud.components.Text | null"
+    }
+  },
+  "core.hud.components.dialogs.CreditGainBox": {
+    "instance": {
+      "g": "Game.core.scene.Game"
+    }
+  },
+  "core.hud.components.dialogs.DailyRewardChild": {
+    "instance": {
+      "textField": "Game.core.hud.components.Text",
+      "textField2": "Game.core.hud.components.Text | null",
+      "dayTextField": "Game.core.hud.components.Text",
+      "image": "Game.starling.display.Image | null"
+    }
+  },
+  "core.states.DisplayState": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "sm": "Game.core.states.DisplayStateMachine",
+      "parent": "Game.starling.display.DisplayObjectContainer | null",
+      "container": "Game.starling.display.Sprite | null",
+      "enter": "() => void",
+      "exit": "() => void",
+      "addChild": "(child: Game.starling.display.DisplayObject) => void",
+      "removeChild": "(child: Game.starling.display.DisplayObject, dispose?: boolean) => void"
+    }
+  },
+  "core.states.DisplayStateMachine": {
+    "instance": {
+      "parent": "Game.starling.display.DisplayObjectContainer",
+      "inState": "(state: Pick<HaxeClass<Game.core.states.DisplayState>, 'prototype' | '__name__'>) => boolean",
+      "revertState": "() => void"
+    }
+  },
+  "core.states.menuStates.ArtifactState2": {
+    "instance": {
+      "enter": "() => void",
+      "exit": "() => void"
+    }
+  },
+  "core.hud.MenuHud": {
+    "instance": {
+      "bgr": "Game.starling.display.Image | null",
+      "continueGameButton": "Game.core.hud.components.ButtonExpandableHud | null",
+      "close": "() => void"
+    }
+  },
+  "sound.SoundObject": {
+    "instance": {
+      "key": "string",
+      "multipleAllowed": "boolean",
+      "set_originalVolume": "(volume: number) => number",
+      "soundChannels": "Game.openfl.media.SoundChannel[]",
+      "sc": "Game.openfl.media.SoundChannel | null",
+      "loop": "boolean",
+      "position": "number",
+      "isPlaying": "boolean",
+      "stop": "() => void",
+      "killSoundChannel": "(event: Game.openfl.events.Event) => void",
+      "restartSoundChannel": "(event: Game.openfl.events.Event) => void",
+      "playObject": "(volume: number, loop?: boolean) => Game.openfl.media.SoundChannel | null",
+      "resume": "(volume: number, loop?: boolean) => Game.openfl.media.SoundChannel | null",
+      "oldTime": "number",
+      "_volume": "number",
+      "set_volume": "(volume: number) => number",
+      "fadePlay": "(position: number, complete?: (() => void) | null) => void",
+      "fadeStop": "(complete?: () => void) => void",
+      "get_originalVolume": "() => number",
+      "pause": "() => void"
+    },
+    "arguments": "[url: string]"
+  },
+  "core.weapon.ProjectileGun": {
+    "instance": {
+      "shoot": "() => void",
+      "shootSyncedProjectile": "(id: number, target: Game.core.unit.Unit | null, heading: Game.movement.Heading, index: number, time: number, offsetX: number, offsetY: number, speed: number) => void"
+    }
+  },
+  "core.missions.DailyManager": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "initDailyMissionsFromMessage": "(message: Game.playerio.Message, offset: number) => number"
+    }
+  },
+  "core.states.gameStates.missions.Daily": {
+    "instance": {
+      "name": "string",
+      "description": "string"
+    }
+  },
+  "core.states.gameStates.missions.DailyReward": {
+    "instance": {
+      "draw": "() => void"
+    }
+  },
+  "core.states.gameStates.missions.DailyView": {
+    "instance": {
+      "addHeader": "() => void",
+      "addDescription": "() => void",
+      "addProgress": "() => void"
+    }
+  },
+  "core.states.gameStates.LandedExplore": {
+    "instance": {
+      "execute": "() => void",
+      "sceneSM": "Game.core.states.DisplayStateMachine"
+    }
+  },
+  "core.states.aistates.AITeleport": {
+    "instance": {
+      "s": "Game.core.ship.EnemyShip",
+      "g": "Game.core.scene.Game",
+      "targetX": "number",
+      "targetY": "number",
+      "enter": "() => void"
+    }
+  },
+  "core.states.ship.WarpJump": {
+    "instance": {
+      "ship": "Game.core.ship.PlayerShip",
+      "warpJumpEffect": "Game.core.particle.Emitter[] | null",
+      "enter": "() => void",
+      "exit": "() => void"
+    }
+  },
+  "core.states.aistates.AIStateFactory": {
+    "statics": {
+      "createProjectileAI": "(settings: import('./ProjectileAISettings').ProjectileAISettings, game: Game.core.scene.Game, projectile: Game.core.projectile.Projectile) => Game.core.states.IState | null"
+    }
+  },
+  "core.states.exploreStates.ReportState": {
+    "instance": {
+      "createArtifactFunction": "(count: number, index: number, id: string) => (artifact: Game.core.artifact.Artifact | null) => void",
+      "rewardTweens": "Game.com.greensock.TweenMax[]",
+      "rewardStepContainer": "Game.starling.display.Sprite"
+    }
+  },
+  "core.hud.components.explore.ExploreMap": {
+    "instance": {
+      "done": "boolean",
+      "r": "Game.generics.Random",
+      "seed": "number",
+      "areas": "Array<{ key: string; size: number }>",
+      "shell": "Game.openfl.geom.Point[][]",
+      "generateMap": "() => void",
+      "drawMap": "() => void",
+      "tryGenerateMap": "() => boolean",
+      "m": "number[][]",
+      "createShell": "(area: number, previous?: Game.openfl.geom.Point[] | null) => Game.openfl.geom.Point[] | null",
+      "getDirection": "(points: Game.openfl.geom.Point[]) => number",
+      "getStartPoint": "(points: Game.openfl.geom.Point[], area: number, x?: number, y?: number) => void",
+      "getNextPoint": "(x: number, y: number, area: number, direction: number) => Game.openfl.geom.Point | null",
+      "isDone": "(points: Game.openfl.geom.Point[]) => boolean",
+      "removeNarrows": "(points: Game.openfl.geom.Point[]) => void",
+      "postProccessEdge": "(points: Game.openfl.geom.Point[]) => void"
+    }
+  },
+  "core.states.exploreStates.ExploreState": {
+    "instance": {
+      "createMap": "() => void",
+      "b": "Game.core.solarSystem.Body",
+      "bodyAreas": "Array<{ key: string; size: number }>",
+      "areas": "Game.core.hud.components.explore.ExploreArea[]",
+      "areaBox": "Game.starling.display.Sprite",
+      "exploreMap": "Game.core.hud.components.explore.ExploreMap | null",
+      "addExploreAreas": "(map: Game.core.hud.components.explore.ExploreMap) => void",
+      "addImg": "(box: Game.core.hud.components.Box) => void"
+    }
+  },
+  "core.hud.components.CrewDisplayBox": {
+    "instance": {
+      "addLocation": "(box: Game.core.hud.components.GradientBox, selectable: boolean) => void"
+    }
+  },
+  "core.hud.components.explore.ExploreArea": {
+    "instance": {
+      "handleFinished": "() => void"
+    }
+  },
+  "core.states.gameStates.LandedPaintShop": {
+    "instance": {
+      "sliderShipHue": "Game.core.hud.components.ui.Slider",
+      "sliderShipBrightness": "Game.core.hud.components.ui.Slider",
+      "sliderShipSaturation": "Game.core.hud.components.ui.Slider",
+      "sliderShipContrast": "Game.core.hud.components.ui.Slider",
+      "sliderEngineHue": "Game.core.hud.components.ui.Slider",
+      "preview": "Game.core.GameObject",
+      "emitters": "Game.core.particle.Emitter[]",
+      "enter": "() => void"
+    }
+  },
+  "core.hud.components.ui.Slider": {
+    "instance": {
+      "minimum": "number",
+      "maximum": "number",
+      "get_value": "() => number",
+      "set_value": "(value: number) => number"
+    }
+  },
+  "core.hud.components.hotkeys.WeaponHotkeys": {
+    "instance": {
+      "selectedHotkey": "Game.core.hud.components.hotkeys.WeaponHotkey | null"
+    }
+  },
+  "core.hud.components.hotkeys.WeaponHotkey": {
+    "instance": {
+      "key": "number"
+    }
+  },
+  "core.boss.BossFactory": {
+    "statics": {
+      "createBossComponent": "(definition: object, boss: Game.core.boss.Boss, game: Game.core.scene.Game) => void"
+    }
+  },
+  "core.hud.components.playerList.PlayerListItem": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "player": "Game.core.player.Player",
+      "update": "() => void",
+      "dispose": "() => void"
+    }
+  },
+  "core.hud.components.playerList.PlayerList": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "drawOnlineFriends": "() => void",
+      "drawSystemPlayerList": "(event?: Game.starling.events.Event | null) => void",
+      "renewListContainer": "() => void",
+      "dispose": "() => void",
+      "listContainer": "Game.core.hud.components.ui.ScrollBox | null",
+      "onlineFriends": "Game.starling.display.Sprite | null",
+      "friendBoxes": "Game.core.hud.components.friends.FriendDisplayBox[]",
+      "groupListItems": "Game.core.hud.components.playerList.GroupListItem[] | null",
+      "isViewingOnlineFriends": "boolean"
+    }
+  },
+  "core.hud.components.PowerBar": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "heatNumber": "Game.starling.text.TextField | null",
+      "update": "() => void"
+    }
+  },
+  "core.weapon.Heat": {
+    "instance": {
+      "setHeat": "(heat: number) => void"
+    }
+  },
+  "core.hud.components.shipMenu.ArtifactSelector": {
+    "instance": {
+      "createArtifactIcon": "(index: number, texture: Game.starling.textures.Texture | null, type: string, locked?: boolean, inUse?: boolean, enabled?: boolean, tooltip?: string | null) => void"
+    }
+  },
+  "core.hud.components.dialogs.PopupBuyMessage": {
+    "instance": {
+      "addBuyForFluxButton": "(cost: number, slot: number, message: string, confirmation: string) => void"
+    }
+  },
+  "core.hud.components.map.MapPlayer": {
+    "instance": {
+      "player": "Game.core.player.Player | null",
+      "layer": "Game.starling.display.Sprite",
+      "text": "Game.starling.text.TextField",
+      "supporterImage": "Game.starling.display.Image | null",
+      "update": "() => void",
+      "dispose": "() => void"
+    }
+  },
+  "core.hud.components.map.MapDeathLine": {
+    "instance": {
+      "line": "Game.core.hud.components.Line",
+      "dispose": "() => void"
+    }
+  },
+  "core.hud.components.ButtonQueue": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "join": "(event: Game.starling.events.TouchEvent) => void",
+      "leave": "(event: Game.starling.events.TouchEvent) => void",
+      "accept": "(event: Game.starling.events.TouchEvent) => void"
+    }
+  },
+  "core.hud.components.ButtonPvPQuickMatch": {
+    "instance": {
+      "g": "Game.core.scene.Game",
+      "join": "(event: Game.starling.events.TouchEvent) => void",
+      "leave": "(event: Game.starling.events.TouchEvent) => void",
+      "accept": "(event: Game.starling.events.TouchEvent) => void"
+    }
+  },
+  "core.hud.components.techTree.EliteTechIcon": {
+    "instance": {
+      "dispose": "() => void",
+      "number": "Game.starling.text.TextField | null",
+      "icon": "Game.starling.display.Image | null",
+      "updateState": "(state: string) => void"
+    }
+  },
+  "core.hud.components.techTree.EliteTechPopupMenu": {
+    "instance": {
+      "load": "() => void",
+      "eliteTechs": "Game.core.hud.components.techTree.EliteTechBar[]"
+    }
+  },
+  "core.hud.components.ShopItemBar": {
+    "instance": {
+      "addDescription": "(item: { name: string }) => void",
+      "nameText": "Game.core.hud.components.TextBitmap",
+      "weaponIcon": "Game.starling.display.Image",
+      "alreadyAquiredText": "Game.core.hud.components.TextBitmap",
+      "orText": "Game.core.hud.components.TextBitmap",
+      "infoContainer": "Game.starling.display.Sprite",
+      "buyWithFluxButton": "Game.core.hud.components.Button"
+    }
+  },
+  "core.login.ServiceRoomPreview": {
+    "instance": {
+      "playerLevel": "number",
+      "onlineFriends": "Game.core.friend.Friend[] | null",
+      "enabled": "boolean",
+      "serviceRoomSelector": "Game.core.login.ServiceRoomSelector",
+      "onOnlineFriends": "(message: Game.playerio.Message) => void",
+      "highlight": "() => void",
+      "disable": "() => void",
+      "join": "() => void",
+      "joined": "(connection: Game.playerio.Connection) => void",
+      "onPreview": "(message: Game.playerio.Message) => void",
+      "connection": "Game.playerio.Connection | null",
+      "friends": "Game.core.hud.components.Text"
+    }
+  }
+}

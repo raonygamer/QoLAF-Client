@@ -10,7 +10,7 @@ export class PurchaseNotice {
     return !playerName || !PodRewardNotice.validLabel(label)
       ? ''
       : PodRewardNotice.wrap(
-          `${PodRewardNotice.escape(playerName)} just bought ${PodRewardNotice.escape(label)}!`,
+          `${PodRewardNotice.escape(playerName, 700)} just bought ${PodRewardNotice.escape(label, 1000)}!`,
         );
   }
   static isPaidCoinReceipt(

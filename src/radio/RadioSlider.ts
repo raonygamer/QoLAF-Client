@@ -1,4 +1,4 @@
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { settingsControls } from '../settings/NativeControls';
 
 /** Feathers interaction boundaries: seek once on release, preserving the captured track revision. */

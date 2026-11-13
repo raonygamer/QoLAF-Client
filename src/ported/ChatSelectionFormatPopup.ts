@@ -1,5 +1,6 @@
 // Source port of core/hud/components/chat/ChatSelectionFormatPopup.as.
-import { bound, type Resolve } from '../runtime/As3';
+import type { NativeFocusBridge } from '../ui/BitmapInputAdapter';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createChatSelectionFormatPopup(resolve: Resolve): any {
   const ChatSelectionValueSlider: any = resolve(
     'core.hud.components.chat.ChatSelectionValueSlider',
@@ -13,7 +14,6 @@ export function createChatSelectionFormatPopup(resolve: Resolve): any {
     'core.hud.components.chat.rich.RichBitmapChatTextInput',
   );
   type RichBitmapChatTextInput = any;
-  type RichBitmapFontTextEditor = any;
   const RichBitmapMarkup: any = resolve('core.hud.components.chat.rich.RichBitmapMarkup');
   type RichBitmapMarkup = any;
   const RichBitmapMarkupParser: any = resolve(
@@ -24,10 +24,6 @@ export function createChatSelectionFormatPopup(resolve: Resolve): any {
   type VerdanaBitmapFontRegistry = any;
   const BitmapFontTextFormat: any = resolve('feathers.text.BitmapFontTextFormat');
   type BitmapFontTextFormat = any;
-  const EventDispatcher: any = resolve('openfl.events.EventDispatcher');
-  type EventDispatcher = any;
-  const KeyboardEvent: any = resolve('openfl.events.KeyboardEvent');
-  type KeyboardEvent = any;
   const Point: any = resolve('openfl.geom.Point');
   type Point = any;
   const Keyboard: any = resolve('openfl.ui.Keyboard');
@@ -133,7 +129,7 @@ export function createChatSelectionFormatPopup(resolve: Resolve): any {
     private backLabel: TextField = null;
     private hexLabel: TextField = null;
     private hexInput: RichBitmapChatTextInput = null;
-    private hexNativeFocus: EventDispatcher = null;
+    private hexNativeFocus: NativeFocusBridge | null = null;
     private previewViewport: Sprite = null;
     private previewBackground: Quad = null;
     private previewRenderer: RichBitmapFontTextRenderer = null;
@@ -924,7 +920,7 @@ export function createChatSelectionFormatPopup(resolve: Resolve): any {
     }
 
     @bound
-    private onHexNativeKeyDown(event: KeyboardEvent): void {
+    private onHexNativeKeyDown(event: globalThis.KeyboardEvent): void {
       if (
         event.keyCode != Keyboard.ENTER &&
         event.keyCode != Keyboard.NUMPAD_ENTER &&
@@ -964,19 +960,18 @@ export function createChatSelectionFormatPopup(resolve: Resolve): any {
         12,
         ChatSelectionFormatPopup.TEXT_COLOR,
       );
-      let hexEditor: RichBitmapFontTextEditor = this.hexInput.richEditor;
-      let nativeFocus: EventDispatcher =
-        hexEditor == null ? null : <EventDispatcher>hexEditor.nativeFocus;
+      const hexEditor: { nativeFocus: NativeFocusBridge } | null = this.hexInput.richEditor;
+      const nativeFocus = hexEditor?.nativeFocus ?? null;
       if (this.hexNativeFocus === nativeFocus) {
         return;
       }
       if (this.hexNativeFocus != null) {
-        this.hexNativeFocus.removeEventListener(KeyboardEvent.KEY_DOWN, this.onHexNativeKeyDown);
+        this.hexNativeFocus.removeEventListener('keyDown', this.onHexNativeKeyDown);
       }
       this.hexNativeFocus = nativeFocus;
       if (this.hexNativeFocus != null) {
         this.hexNativeFocus.addEventListener(
-          KeyboardEvent.KEY_DOWN,
+          'keyDown',
           this.onHexNativeKeyDown,
           false,
           30000,
@@ -1233,7 +1228,7 @@ export function createChatSelectionFormatPopup(resolve: Resolve): any {
       this.hexInput.removeEventListener(Event.CHANGE, this.onHexInputChange);
       this.hexInput.removeEventListener('focusOut', this.onHexInputFocusOut);
       if (this.hexNativeFocus != null) {
-        this.hexNativeFocus.removeEventListener(KeyboardEvent.KEY_DOWN, this.onHexNativeKeyDown);
+        this.hexNativeFocus.removeEventListener('keyDown', this.onHexNativeKeyDown);
         this.hexNativeFocus = null;
       }
       this.redSlider.removeEventListener(Event.CHANGE, this.onColorSliderChange);

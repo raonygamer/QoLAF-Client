@@ -1,3 +1,6 @@
+import type { GameScene, Projectile } from '../game/Bindings';
+import { installProjectileTargetHistory } from './ProjectileTargetHistory';
+import type { RenderedGameObject } from '../game/RenderedGameObject';
 import { installProjectileContacts } from './ProjectileContacts';
 import { read, type API, type Raw } from '../api/Types';
 import type { Settings } from '../settings/Settings';
@@ -6,9 +9,10 @@ import { segmentCircle } from './LocalHitGeometry';
 
 type ProjectileState = {
   hit: boolean;
+  mineBlastHitRegistered: boolean;
   rayChecked: boolean;
   target: Raw | null;
-  lifecycle: unknown;
+  lifecycle: number;
 };
 
 /** Local observations only. Native damage values and native simulation stay authoritative. */
@@ -16,7 +20,7 @@ export class DamageObserver {
   readonly estimate = new RollingDamageEstimate();
   readonly contactFamilies = new Set<string>();
   private readonly lastContacts = new WeakMap<Raw, { unit: Raw; time: number }>();
-  private readonly unitGenerations = new WeakMap<Raw, number>();
+  private readonly unitGenerations = new WeakMap<object, number>();
   private readonly projectiles = new WeakMap<Raw, ProjectileState>();
   constructor(
     private readonly game: Raw,
@@ -32,7 +36,6 @@ export class DamageObserver {
       weapon &&
       ship &&
       weapon.unit &&
-      !this.game.isLeaving &&
       (weapon.unit === ship || weapon.unit.owner === ship) &&
       weapon.dmg &&
       weapon.dmg.type !== this.healType
@@ -40,7 +43,13 @@ export class DamageObserver {
   }
 
   canEstimate(weapon: Raw): boolean {
-    if (!this.config.show_radar_dps || !this.isPersonalWeapon(weapon)) return false;
+    if (
+      !this.isPersonalWeapon(weapon) ||
+      read(this.game, 'isLeaving', false) ||
+      !this.config.show_radar_dps ||
+      !this.game.hud
+    )
+      return false;
     const amount = weapon.dmg.dmg();
     return Number.isFinite(amount) && amount > 0;
   }
@@ -84,8 +93,11 @@ export class DamageObserver {
     this.unitGenerations.set(unit, (this.unitGenerations.get(unit) ?? 0) + 1);
   }
 
-  private lifecycle(unit: Raw | null): unknown {
-    return unit ? (this.unitGenerations.get(unit) ?? unit.lifecycleId ?? 0) : 0;
+  private lifecycle(unit: Pick<RenderedGameObject, 'get_lifecycleId'> | null): number {
+    if (!unit) return 0;
+    // Prefer the shared native accessor. Switching to a local counter after a
+    // reset can collide with a lifecycle captured before observation began.
+    return unit.get_lifecycleId?.() ?? this.unitGenerations.get(unit) ?? 0;
   }
 
   stuck(projectile: Raw, target: Raw): void {
@@ -110,6 +122,7 @@ export class DamageObserver {
     if (!state) {
       state = {
         hit: false,
+        mineBlastHitRegistered: false,
         rayChecked: false,
         target: projectile.target ?? null,
         lifecycle: this.lifecycle(projectile.target),
@@ -144,6 +157,13 @@ export class DamageObserver {
       (projectile.ai === 'homingMissile' && !projectile.target)
     )
       this.partial(projectile.weapon);
+  }
+
+  captureTarget(projectile: Projectile): void {
+    const state = this.state(projectile);
+    const target: RenderedGameObject | null = projectile.target;
+    state.target = target;
+    state.lifecycle = this.lifecycle(target);
   }
 
   activate(projectile: Raw): void {
@@ -243,18 +263,23 @@ export class DamageObserver {
       projectile.g !== this.game ||
       projectile.isHeal ||
       projectile.ai !== 'mine' ||
+      !this.game.unitManager?.units ||
       !this.isPersonalWeapon(projectile.weapon)
     )
       return;
     const state = this.state(projectile);
-    if (state.hit) return;
-    state.hit = true;
+    if (state.mineBlastHitRegistered) return;
+    // The original keeps this separate from claimEstimatedHit(): a prior
+    // projectile observation must not consume the mine's explosion contact.
+    state.mineBlastHitRegistered = true;
     const pos = read(projectile, 'pos');
+    if (!pos) return;
     let closest: Raw | null = null,
       nearest = Infinity;
     for (const target of this.game.unitManager.units) {
-      if (!this.valid(projectile, target)) continue;
+      if (!target) continue;
       const center = read(target, 'pos');
+      if (!center || !target.canBeDamage(projectile.unit, projectile)) continue;
       const radius =
         Math.max(0, projectile.dmgRadius) +
         (Number.isNaN(target.collisionRadius) ? 0 : Math.max(0, target.collisionRadius));
@@ -270,7 +295,7 @@ export class DamageObserver {
 
 export function installDamageObserver(
   api: API,
-  game: Raw,
+  game: GameScene,
   config: Settings,
   onContact?: (target: Raw) => void,
 ): DamageObserver {
@@ -281,6 +306,7 @@ export function installDamageObserver(
     undefined,
     onContact,
   );
+  installProjectileTargetHistory(api, game, (projectile) => observer.captureTarget(projectile));
   const weapon = api.cls('core.weapon.Weapon')?.prototype;
   if (typeof weapon?.reset === 'function')
     api.before(weapon, 'reset', function () {

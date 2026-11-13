@@ -1,3 +1,5 @@
+import type { ChatCommandDescriptor } from '../chat/ChatCommandDescriptor';
+import type { ChatCommandCallback } from '../chat/ChatCommandInvocation';
 import { AutomationEvent } from './AutomationEvent';
 
 /** The command registry owns parsing/help/completion; the bus owns its registrations. */
@@ -5,8 +7,8 @@ export interface AutomationCommands {
   registerOwnedCommand(
     owner: EventBus,
     name: string,
-    descriptor: object,
-    callback: Function,
+    descriptor: ChatCommandDescriptor,
+    callback: ChatCommandCallback,
   ): string;
   unregisterOwnedCommand(owner: EventBus, name: string): boolean;
   unregisterOwner(owner: EventBus): void;
@@ -29,7 +31,11 @@ export class EventBus {
     this.requireLive();
     this.renderStopped = value;
   }
-  registerCommand(name: string, descriptor: object, callback: Function): string {
+  registerCommand(
+    name: string,
+    descriptor: ChatCommandDescriptor,
+    callback: ChatCommandCallback,
+  ): string {
     this.requireLive();
     return this.commands.registerOwnedCommand(this, this.ownedName(name), descriptor, callback);
   }

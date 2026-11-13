@@ -1,14 +1,15 @@
-import { read, type API } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import { EnemyShip } from '../game/Bindings';
 
 /** EnemyShip.as positions AF/pet names after the interpolated ship draw. */
 export function installWorldLabels(api: API): void {
-  const enemy = api.cls('core.ship.EnemyShip')?.prototype;
-  if (typeof enemy?.draw !== 'function') return;
-  api.after(enemy, 'draw', function () {
+  const reflection = new GameReflection(api);
+  reflection.after(EnemyShip.prototype, 'draw', function () {
     const label = this.AFName;
     const clip = this._mc;
     if (!label || !clip || !this.isAddedToCanvas) return;
-    label.set_x(read(clip, 'x'));
-    label.set_y(read(clip, 'y') - 30);
+    label.set_x(clip.get_x());
+    label.set_y(clip.get_y() - 30);
   });
 }

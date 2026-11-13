@@ -1,77 +1,85 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createSettingsKeybind } from '../src/ported/SettingsKeybind';
-import { aliasProperties } from '../src/runtime/As3';
-import { Display, Stage } from './fixtures/NativeGame';
+import type { API } from '../src/api/Types';
+import { createSettingsBindings } from '../src/ported/SettingsBindings';
+import { aliasProperties } from '../src/runtime/HaxeInterop';
+import { Display } from './fixtures/NativeGame';
 
-test('source keybinding rows cancel, bind mouse buttons, and detach capture listeners after removal', (t) => {
-  const cleanup: (() => void)[] = [];
-  aliasProperties({ defer: (fn: () => void) => cleanup.push(fn) } as any, Display);
-  t.after(() => cleanup.reverse().forEach((fn) => fn()));
-  class Label extends Display {
-    text = '';
-  }
-  class Button extends Label {
+test('binding page preserves source row order and releases its stage update listener', (t) => {
+  const cleanups: Array<() => void> = [];
+  aliasProperties(
+    { defer: (cleanup: () => void) => cleanups.push(cleanup) } as unknown as API,
+    Display,
+  );
+  t.after(() => cleanups.reverse().forEach((cleanup) => cleanup()));
+  const stage = new Display();
+  const keybinds = {};
+  const rows: Row[] = [];
+  class Row extends Display {
+    updates = 0;
     constructor(
-      public callback: Function,
-      text: string,
+      readonly keys: object,
+      readonly id: number,
+      x: number,
+      y: number,
     ) {
       super();
-      this.text = text;
+      this.set_x(x);
+      this.set_y(y);
+      rows.push(this);
+    }
+    update() {
+      this.updates++;
     }
   }
-  const definitions: Record<string, any> = {
-    'core.hud.components.Box': Display,
+  class Label extends Display {
+    htmlText = '';
+    size = 0;
+  }
+  const definitions: Record<string, unknown> = {
+    'core.hud.components.SettingsKeybind': Row,
     'core.hud.components.Text': Label,
-    'core.hud.components.Button': Button,
-    'data.KeyBinds': {},
+    'core.scene.SceneBase': { settings: { keybinds } },
+    'feathers.controls.ScrollContainer': Display,
     'generics.Localize': { t: (text: string) => text },
     'starling.display.Sprite': Display,
-    'starling.display.Stage': Stage,
-    'starling.events.Event': {},
-    'starling.events.KeyboardEvent': {},
-    'starling.events.TouchEvent': {},
   };
-  const Row = createSettingsKeybind((name) => {
-    assert.ok(definitions[name], name);
-    return definitions[name];
-  });
-  const changes: number[][] = [];
-  const bindings = {
-    getName: () => 'Accelerate',
-    getKeyName: () => 'W',
-    setBindKey: (...args: number[]) => changes.push(args),
-  };
-  const stage = new Stage();
-  const row = new Row(bindings, 11, 20, 40);
-  stage.addChild(row);
-  const touch = { interactsWith: (button: any) => button === row.buttonOne };
-  row.buttonOne.callback(touch);
-  assert.equal(row.buttonOne.text, 'Push a Button');
-  for (const type of ['keyDown', 'touch', 'rightClick'])
-    assert.equal(stage.listeners(type).length, 1);
-  stage.dispatch({
-    type: 'keyDown',
-    keyCode: 27,
-    setCurrentTarget() {},
-    stopImmediatePropagation() {},
-  });
-  assert.equal(row.buttonOne.text, 'W');
-  assert.deepEqual(changes, []);
-  row.buttonOne.callback(touch);
-  row.buttonOne.callback(touch);
-  assert.deepEqual(changes, [[-2, 11, 1]]);
-  row.buttonOne.callback(touch);
-  stage.dispatch({ type: 'rightClick', setCurrentTarget() {} });
-  assert.deepEqual(changes, [
-    [-2, 11, 1],
-    [-3, 11, 1],
-  ]);
-  row.buttonOne.callback(touch);
-  row.removeFromParent(true);
-  assert.equal(row.get_stage(), null);
-  for (const type of ['keyDown', 'touch', 'rightClick'])
-    assert.equal(stage.listeners(type).length, 0);
-  row.dispose();
-  assert.equal(changes.length, 2);
+  const Page = createSettingsBindings((name) => definitions[name]);
+  const page = new Page({ stage });
+  assert.deepEqual(
+    rows.map((row) => row.id),
+    [
+      11, 26, 12, 13, 14, 27, 28, 16, 15, 18, 17, 19, 20, 21, 22, 23, 24, 10, 9, 2, 1, 3, 7, 25, 6,
+      4, 5, 8, 0,
+    ],
+  );
+  const scroll = page.getChildAt(0) as Display;
+  assert.deepEqual(
+    [scroll.get_x(), scroll.get_y(), scroll.get_width(), scroll.get_height()],
+    [8, 50, 730, 500],
+  );
+  assert.deepEqual(
+    scroll.children
+      .filter((child): child is Label => child instanceof Label)
+      .map((label) => label.htmlText),
+    ['Movements:', 'Abilities:', 'Weapons', 'Misc:'],
+  );
+  assert.ok(rows.every((row) => row.keys === keybinds && row.get_x() === 20));
+  assert.equal(rows[0].get_y(), 40);
+  assert.equal(rows[1].get_y(), 102);
+  assert.equal(stage.listeners('updateButtons').length, 1);
+  stage.dispatchEventWith('updateButtons');
+  assert.ok(rows.every((row) => row.updates === 1));
+  page.dispose();
+  assert.equal(stage.listeners('updateButtons').length, 0);
+  stage.dispatchEventWith('updateButtons');
+  assert.ok(rows.every((row) => row.updates === 1));
+  const second = new Page({ stage });
+  assert.equal(
+    stage.listeners('updateButtons').length,
+    1,
+    'reopening does not accumulate listeners',
+  );
+  second.dispose();
+  assert.equal(stage.listeners('updateButtons').length, 0);
 });

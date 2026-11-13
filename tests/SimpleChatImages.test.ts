@@ -1,3 +1,5 @@
+import type { Texture } from '../src/game/Bindings';
+import type { WrapText } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { SimpleChatImages } from '../src/chat/SimpleChatImages';
@@ -25,7 +27,13 @@ test('Simple image spacers use font metrics, preserve suffixes, reflow and relea
     },
   }));
   let invalidations = 0;
-  const images = new SimpleChatImages(resolve, cache, field, renderer, () => invalidations++);
+  const images = new SimpleChatImages(
+    resolve,
+    cache,
+    field as unknown as WrapText,
+    renderer,
+    () => invalidations++,
+  );
   t.after(() => {
     images.dispose();
     field.dispose();
@@ -53,7 +61,7 @@ test('Simple image spacers use font metrics, preserve suffixes, reflow and relea
   assert.ok(text.endsWith(ordinary.text + '\n'));
   const thumbnail = field.getChildAt(1) as any;
   assert.equal(thumbnail.previewHeight, 16);
-  const asset = new ChatImageAsset([{ dispose() {} }], [100], 440, 280);
+  const asset = new ChatImageAsset([{ dispose() {} }] as unknown as Texture[], [100], 440, 280);
   pending[0](asset);
   assert.equal(invalidations, 1);
   text = project([row, ordinary]);

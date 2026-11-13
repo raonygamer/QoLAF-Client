@@ -1,5 +1,5 @@
-import { ClientIpcService, type IpcServerMessage } from '../ipc/ClientIpcService';
-import { ClientIpcCodec, type IpcMessage } from '../ipc/ClientIpcCodec';
+import { ClientIPCService, type IPCServerMessage } from '../ipc/ClientIPCService';
+import { ClientIPCCodec, type IPCMessage } from '../ipc/ClientIPCCodec';
 import { RichChatMarkupValidator } from './rich/RichChatMarkupValidator';
 import { PodRewardNotice } from './PodRewardNotice';
 import { RareArtifactNotice, type RewardArtifact } from './RareArtifactNotice';
@@ -27,7 +27,7 @@ interface SendJob {
   done: boolean;
 }
 interface RewardJob {
-  message: IpcMessage;
+  message: IPCMessage;
   expiresAt: number;
   queued: boolean;
   retryAt: number;
@@ -49,7 +49,7 @@ export class ClientQolafChat {
   private readonly seenRewards = new Set<string>();
 
   private constructor(
-    private readonly ipc: ClientIpcService,
+    private readonly ipc: ClientIPCService,
     private readonly ownerId: string,
     private ownerName: string,
     private readonly environment: QolafChatEnvironment,
@@ -71,18 +71,18 @@ export class ClientQolafChat {
   }
 
   static ensure(
-    ipc: ClientIpcService | null,
+    ipc: ClientIPCService | null,
     playerId: string,
     name: string,
     environment: QolafChatEnvironment,
   ): ClientQolafChat | null {
-    if (!ipc || ipc !== ClientIpcService.instance) return null;
+    if (!ipc || ipc !== ClientIPCService.instance) return null;
     const owner = ipc.ownLoginInfo();
     if (
       !owner ||
       owner.id !== playerId ||
       !this.validIdentity(playerId) ||
-      !ClientIpcCodec.validId(owner.loginId)
+      !ClientIPCCodec.validId(owner.loginId)
     )
       return null;
     if (
@@ -169,7 +169,7 @@ export class ClientQolafChat {
   }
 
   announcePodReward(
-    reply: IpcServerMessage | null,
+    reply: IPCServerMessage | null,
     operation: Record<string, unknown> | null,
   ): void {
     if (
@@ -213,7 +213,7 @@ export class ClientQolafChat {
     this.queueReward({ type: PurchaseNotice.type, fields: [token, label] }, 'purchase', label);
   }
   announcePurchasedSkins(
-    reply: IpcServerMessage | null,
+    reply: IPCServerMessage | null,
     operation: Record<string, unknown> | null,
   ): void {
     if (
@@ -237,7 +237,7 @@ export class ClientQolafChat {
   }
 
   private queueReward(
-    message: IpcMessage,
+    message: IPCMessage,
     kind: NonNullable<QolafChatRow['kind']>,
     body: string,
     level?: number,
@@ -299,7 +299,7 @@ export class ClientQolafChat {
     if (!accepted) job.queued = false;
   }
 
-  private readonly onMessage = (message: IpcMessage, senderId: string, senderName: string) => {
+  private readonly onMessage = (message: IPCMessage, senderId: string, senderName: string) => {
     if (
       !this.current() ||
       message.type !== ClientQolafChat.type ||
@@ -312,14 +312,14 @@ export class ClientQolafChat {
       return;
     this.enqueueRow({ body: message.fields[0], senderId, senderName, ownerId: this.ownerId });
   };
-  private readonly onPodReward = (message: IpcMessage, id: string, name: string) =>
+  private readonly onPodReward = (message: IPCMessage, id: string, name: string) =>
     this.receiveReward(message, id, name, 'podReward', PodRewardNotice.type);
-  private readonly onArtifactReward = (message: IpcMessage, id: string, name: string) =>
+  private readonly onArtifactReward = (message: IPCMessage, id: string, name: string) =>
     this.receiveReward(message, id, name, 'artifactReward', RareArtifactNotice.type);
-  private readonly onPurchase = (message: IpcMessage, id: string, name: string) =>
+  private readonly onPurchase = (message: IPCMessage, id: string, name: string) =>
     this.receiveReward(message, id, name, 'purchase', PurchaseNotice.type);
   private receiveReward(
-    message: IpcMessage,
+    message: IPCMessage,
     senderId: string,
     senderName: string,
     kind: NonNullable<QolafChatRow['kind']>,
@@ -331,7 +331,7 @@ export class ClientQolafChat {
       message.type !== type ||
       message.fields.length !== (kind === 'artifactReward' ? 3 : 2) ||
       typeof token !== 'string' ||
-      !ClientIpcCodec.validId(token) ||
+      !ClientIPCCodec.validId(token) ||
       !PodRewardNotice.validLabel(body) ||
       !ClientQolafChat.validIdentity(senderId) ||
       !ClientQolafChat.validName(senderName) ||
@@ -414,7 +414,7 @@ export class ClientQolafChat {
     return (
       !this.disposed &&
       ClientQolafChat.singleton === this &&
-      this.ipc === ClientIpcService.instance &&
+      this.ipc === ClientIPCService.instance &&
       this.ipc.loginId === this.loginId
     );
   }

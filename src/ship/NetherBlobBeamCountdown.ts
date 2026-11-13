@@ -1,4 +1,17 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import {
+  DataLocator,
+  EnemyShip,
+  ProjectileFactory,
+  ProjectileManager,
+  SceneBase,
+  StarlingTextField,
+  TextFormat,
+  type GameScene,
+  type Weapon,
+} from '../game/Bindings';
+import { RussoBitmapFontRegistry } from '../ui/RussoBitmapFontRegistry';
 
 /** Original observed-shot estimate; never predicts or changes an enemy attack. */
 export class NetherBlobBeamCountdown {
@@ -6,11 +19,9 @@ export class NetherBlobBeamCountdown {
   private lastShotTime = NaN;
   private readyTime = NaN;
   private displayedTenths = -1;
-  private label?: Raw;
+  private label?: StarlingTextField;
 
-  constructor(private readonly api: API) {}
-
-  observeShot(weapon: Raw, shotTime: number): void {
+  observeShot(weapon: Pick<Weapon, 'key' | 'reloadTime'> | null, shotTime: number): void {
     if (
       weapon?.key !== NetherBlobBeamCountdown.weaponKey ||
       !Number.isFinite(shotTime) ||
@@ -21,49 +32,56 @@ export class NetherBlobBeamCountdown {
     this.lastShotTime = shotTime;
     let reloadTime = weapon.reloadTime;
     if (!Number.isFinite(reloadTime) || reloadTime <= 0) {
-      const data = this.api.cls('data.DataLocator')?.getService();
-      reloadTime = Number(data?.loadKey('Weapons', weapon.key)?.reloadTime);
+      const definition = DataLocator.getService()?.loadKey('Weapons', weapon.key);
+      reloadTime = Number(
+        definition && typeof definition === 'object' && 'reloadTime' in definition
+          ? definition.reloadTime
+          : NaN,
+      );
     }
     this.readyTime = Number.isFinite(reloadTime) && reloadTime > 0 ? shotTime + reloadTime : NaN;
     this.displayedTenths = -1;
   }
 
-  draw(game: Raw, ship: Raw): void {
-    const clip = read(ship, 'movieClip');
+  draw(game: GameScene, ship: EnemyShip): void {
+    const clip = ship.get_movieClip();
     if (
       Number.isNaN(this.readyTime) ||
       !ship.alive ||
-      !read(ship, 'isAddedToCanvas') ||
+      !ship.isAddedToCanvas ||
       !clip ||
-      !read(clip, 'visible') ||
-      read(clip, 'alpha') <= 0 ||
-      !this.api.cls('core.scene.SceneBase')?.clientSettings?.showNetherBlobBeamCountdown
+      !clip.get_visible() ||
+      clip.get_alpha() <= 0 ||
+      !SceneBase.clientSettings?.showNetherBlobBeamCountdown
     ) {
       this.hide();
       return;
     }
     if (!this.label) {
-      const TextField = this.api.cls('starling.text.TextField') as any;
-      const TextFormat = this.api.cls('starling.text.TextFormat') as any;
-      this.label = new TextField(180, 24, '', new TextFormat('DAIDRR_COMBAT', 14, 0xffcc66));
-      this.label!.set_pivotX(90);
-      this.label!.set_batchable(true);
-      this.label!.set_touchable(false);
+      this.label = new StarlingTextField(
+        180,
+        24,
+        '',
+        new TextFormat(RussoBitmapFontRegistry.COMBAT_FONT_NAME, 14, 0xffcc66),
+      );
+      this.label.set_pivotX(90);
+      this.label.set_batchable(true);
+      this.label.set_touchable(false);
     }
     // Same fractional fixed-step clock used by the port's native ship renderer.
     const alpha = Math.max(0, Math.min(1, (game.gameStateMachine?.accumulator ?? 0) / 33));
     const now = game.time + 33 * alpha;
     const tenths = Math.max(0, Math.ceil((this.readyTime - now) / 100));
-    const label = this.label!;
+    const label = this.label;
     if (tenths !== this.displayedTenths) {
       this.displayedTenths = tenths;
       label.set_text(tenths > 0 ? `Beam ~${(tenths / 10).toFixed(1)}s` : 'Beam ready (est.)');
     }
-    label.set_x(read(clip, 'x'));
-    label.set_y(read(clip, 'y') - ship.radius - 30);
-    label.set_alpha(read(clip, 'alpha'));
+    label.set_x(clip.get_x());
+    label.set_y(clip.get_y() - ship.get_radius() - 30);
+    label.set_alpha(clip.get_alpha());
     label.set_visible(true);
-    if (!read(label, 'parent')) game.canvasTexts.addChild(label);
+    if (!label.get_parent()) game.canvasTexts.addChild(label);
   }
 
   hide(): void {
@@ -78,15 +96,16 @@ export class NetherBlobBeamCountdown {
   }
 }
 
-const observations = new WeakMap<Raw, Map<Raw, NetherBlobBeamCountdown>>();
-const readyGames = new WeakSet<Raw>();
+const observations = new WeakMap<GameScene, Map<EnemyShip, NetherBlobBeamCountdown>>();
+const readyGames = new WeakSet<GameScene>();
 
 /** Capture enemy packets before Haxe caches handlers or mutates shot headings. */
 export function installNetherBlobBeamHooks(api: API): void {
-  let packetGame: Raw | undefined;
-  const manager = api.cls('core.projectile.ProjectileManager')?.prototype;
+  let packetGame: GameScene | undefined;
+  const reflection = new GameReflection(api);
+  const manager = ProjectileManager.prototype;
   if (typeof manager?.addEnemyProjectile === 'function')
-    api.around(manager, 'addEnemyProjectile', function (next, ...args) {
+    reflection.around(manager, 'addEnemyProjectile', function (next, ...args) {
       const previous = packetGame;
       packetGame = this.g;
       try {
@@ -95,13 +114,13 @@ export function installNetherBlobBeamHooks(api: API): void {
         packetGame = previous;
       }
     });
-  const factory = api.cls('core.projectile.ProjectileFactory');
-  const enemy = api.cls('core.ship.EnemyShip')?.prototype;
+  const factory = ProjectileFactory;
+  const enemy = EnemyShip.prototype;
   if (typeof factory?.create === 'function')
-    api.before(factory, 'create', function (_type, game, owner, weapon, heading) {
+    reflection.before(factory, 'create', function (_type, game, owner, weapon, heading) {
       if (
         game !== packetGame ||
-        !enemy?.isPrototypeOf(owner) ||
+        !(owner instanceof EnemyShip) ||
         !owner.alive ||
         owner.owner != null ||
         !owner.hasFaction('Nether') ||
@@ -112,20 +131,20 @@ export function installNetherBlobBeamHooks(api: API): void {
       let ships = observations.get(game);
       if (!ships) observations.set(game, (ships = new Map()));
       let countdown = ships.get(owner);
-      if (!countdown) ships.set(owner, (countdown = new NetherBlobBeamCountdown(api)));
+      if (!countdown) ships.set(owner, (countdown = new NetherBlobBeamCountdown()));
       countdown.observeShot(weapon, heading.time);
     });
   if (typeof enemy?.draw === 'function')
-    api.after(enemy, 'draw', function () {
+    reflection.after(enemy, 'draw', function () {
       if (readyGames.has(this.g)) observations.get(this.g)?.get(this)?.draw(this.g, this);
     });
   if (typeof enemy?.removeFromCanvas === 'function')
-    api.before(enemy, 'removeFromCanvas', function () {
+    reflection.before(enemy, 'removeFromCanvas', function () {
       observations.get(this.g)?.get(this)?.hide();
     });
-  for (const method of ['reset', 'destroy'])
+  for (const method of ['reset', 'destroy'] as const)
     if (typeof enemy?.[method] === 'function')
-      api.before(enemy, method, function () {
+      reflection.before(enemy, method, function () {
         const ships = observations.get(this.g);
         ships?.get(this)?.dispose();
         ships?.delete(this);
@@ -133,7 +152,7 @@ export function installNetherBlobBeamHooks(api: API): void {
 }
 
 /** Delay text allocation until the session's combat bitmap font is available. */
-export function installNetherBlobBeamCountdown(api: API, game: Raw): void {
+export function installNetherBlobBeamCountdown(api: API, game: GameScene): void {
   readyGames.add(game);
   api.defer(() => {
     readyGames.delete(game);

@@ -1,3 +1,4 @@
+import type { AutomationGame } from '../src/game/AutomationGame';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatCommandRegistry } from '../src/chat/ChatCommandRegistry';
@@ -29,6 +30,34 @@ test('oldest surviving bare-name registration wins while native commands remain 
   assert.equal(registry.dispatch('go').matched, false);
   assert.equal(registry.dispatch('b:go').handled, true);
   assert.equal(registry.ownsBareName('b:go'), false);
+});
+
+test('malformed command input preserves original error text and cannot invoke a handler', () => {
+  const registry = new ChatCommandRegistry();
+  let calls = 0;
+  registry.registerCommand('example:go', { description: 'Go', mandatory: ['target'] }, () => {
+    calls++;
+  });
+  for (const [raw, error] of [
+    ['target\\', 'Command arguments end with an incomplete escape.'],
+    ['"target', 'Command arguments contain an unterminated quote.'],
+    ["'target", 'Command arguments contain an unterminated quote.'],
+    ['"target\\', 'Command arguments end with an incomplete escape.'],
+  ]) {
+    const result = registry.dispatch('go', raw);
+    assert.equal(result.status, 'parse_error');
+    assert.equal(result.fullName, 'example:go');
+    assert.equal(result.message, `${error} Usage: /example:go <target>`);
+    assert.equal(result.matched, true);
+    assert.equal(result.handled, false);
+  }
+  assert.equal(calls, 0);
+  assert.equal(
+    registry.dispatch('go', '""').handled,
+    true,
+    'an explicitly empty argument is supplied',
+  );
+  assert.equal(calls, 1);
 });
 
 test('argument descriptors retain source validation, quoted values, defaults, extras and usage errors', () => {
@@ -150,7 +179,8 @@ test('automation commands are bound to the current game/bus and expected stops r
     () => {},
     () => {},
   );
-  const game = { automationManager: manager };
+  // This dispatch fixture supplies only the manager; handlers never access game services.
+  const game = { automationManager: manager } as unknown as AutomationGame;
   await manager.importCode('', '', 'Example.js');
   // A known command is consumed before exposing parsing errors or calling its handler.
   assert.equal(registry.dispatch('go', '"unfinished', game).status, 'handled');
@@ -169,7 +199,7 @@ test('automation commands are bound to the current game/bus and expected stops r
   assert.equal(stops, 1);
   const oldBus = buses[0];
   manager.suspendForRoomTransition(game);
-  const nextGame = { automationManager: manager };
+  const nextGame = { automationManager: manager } as unknown as AutomationGame;
   manager.attachGame(nextGame);
   assert.equal(manager.canDispatchOwnedCommand(oldBus, nextGame), false);
   assert.equal(manager.canDispatchOwnedCommand(buses[1], game), false);

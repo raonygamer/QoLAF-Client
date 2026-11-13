@@ -1,9 +1,8 @@
 // Source port of core/hud/components/EchoPulseColor.as.
-import type { Resolve } from '../runtime/As3';
-import { read } from '../api/Types';
-export function createEchoPulseColor(resolve: Resolve): any {
-  const Game: any = resolve('core.scene.Game');
-  type Game = any;
+import type { Resolve } from '../runtime/HaxeInterop';
+import type { GameScene } from '../game/Bindings';
+export function createEchoPulseColor(resolve: Resolve) {
+  const Game: typeof GameScene = resolve('core.scene.Game');
 
   /** Shared server-clock violet/electric-blue pulse for marked echo labels. */
 
@@ -16,13 +15,8 @@ export function createEchoPulseColor(resolve: Resolve): any {
     public static get currentColor(): number {
       // Only borrow the current room for this read. Game.time is a sync
       // readiness guard, not the fixed-step clock used to animate the label.
-      let game: Game = Game.instance;
-      if (
-        game == null ||
-        read(game, 'isLeaving', false) ||
-        !isFinite(game.time) ||
-        game.time <= 0
-      ) {
+      const game = Game.instance;
+      if (game == null || game.get_isLeaving() || !isFinite(game.time) || game.time <= 0) {
         return EchoPulseColor.MARKER_COLOR;
       }
 

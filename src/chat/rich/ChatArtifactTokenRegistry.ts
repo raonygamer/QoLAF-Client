@@ -1,5 +1,5 @@
 // Source port of core/hud/components/chat/ChatArtifactTokenRegistry.as.
-import { bound } from '../../runtime/As3';
+import { bound } from '../../runtime/HaxeInterop';
 import { ChatArtifactToken } from './ChatArtifactToken';
 
 /** Session-local labels; network/database ownership stays outside text layout. */

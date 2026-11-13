@@ -1,28 +1,32 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import {
+  StarlingTextField as TextField,
+  DisplayObjectContainer as Container,
+  Starling,
+} from '../game/Bindings';
 
 /** Keep HTML geometry changes outside Starling's cached display-list traversal. */
 export function installBitmapCompositionQueue(api: API): void {
-  const TextField = api.cls('starling.text.TextField')!;
-  const Container = api.cls('starling.display.DisplayObjectContainer')!;
-  const Starling = api.cls('starling.core.Starling')!;
-  const pending = new Set<Raw>();
+  const reflection = new GameReflection(api);
+  const pending = new Set<TextField>();
   let painting = false;
-  const compose = (field: Raw) => {
-    if (field._recomposing || !read(field, 'isHtmlText', false)) return;
+  const compose = (field: TextField) => {
+    if (field._recomposing || !field.get_isHtmlText()) return;
     if (!field._requiresRecomposition) return;
     if (painting || !field._meshBatch) pending.add(field);
     else field.recompose();
   };
-  api.after(TextField.prototype, 'setRequiresRecomposition', function () {
+  reflection.after(TextField.prototype, 'setRequiresRecomposition', function () {
     compose(this);
   });
-  api.before(Container.prototype, 'addChildAt', function (child) {
-    if (child instanceof (TextField as any)) compose(child);
+  reflection.before(Container.prototype, 'addChildAt', function (child) {
+    if (child instanceof TextField) compose(child);
   });
-  api.before(TextField.prototype, 'dispose', function () {
+  reflection.before(TextField.prototype, 'dispose', function () {
     pending.delete(this);
   });
-  api.around(Starling.prototype, 'render', function (next, ...args) {
+  reflection.around(Starling.prototype, 'render', function (next, ...args) {
     const current = [...pending];
     pending.clear();
     for (const field of current) compose(field);
@@ -33,7 +37,7 @@ export function installBitmapCompositionQueue(api: API): void {
       painting = false;
     }
   });
-  api.around(TextField.prototype, 'render', function (next, painter) {
+  reflection.around(TextField.prototype, 'render', function (next, painter) {
     if (pending.has(this)) {
       // A field changed during traversal. Draw it after next frame's
       // composition instead of caching a range whose geometry is changing.

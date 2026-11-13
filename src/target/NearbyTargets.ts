@@ -1,10 +1,10 @@
-import type { Raw } from '../api/Types';
+import type { Unit } from '../game/Bindings';
 import type { Settings } from '../settings/Settings';
 import type { TargetPresentation } from './TargetPresentation';
 import type { TargetSystem } from './TargetSystem';
 
 interface NearbyTarget {
-  unit: Raw;
+  unit: Unit;
   lifecycle: number;
 }
 
@@ -18,8 +18,12 @@ export class NearbyTargets {
     private config: Settings,
   ) {}
 
-  refresh(units: Raw[], count: number): void {
-    const seen = new Set<Raw>();
+  clear(): void {
+    this.entries.length = 0;
+  }
+
+  refresh(units: Unit[], count: number): void {
+    const seen = new Set<object>();
     this.entries = units
       .filter((unit) => {
         if (!this.eligible(unit)) return false;
@@ -33,12 +37,12 @@ export class NearbyTargets {
       .map((unit) => ({ unit, lifecycle: this.target.lifecycle(unit) }));
   }
 
-  at(index: number): Raw | null {
+  at(index: number): Unit | null {
     const entry = this.entries[index];
     return entry && this.current(entry) ? entry.unit : null;
   }
 
-  select(unit: Raw): boolean {
+  select(unit: Unit): boolean {
     const entry = this.entries.find((candidate) => candidate.unit === unit);
     if (!entry || !this.current(entry) || !this.target.select(unit, true)) return false;
     this.target.locked = true;
@@ -49,7 +53,7 @@ export class NearbyTargets {
     return this.target.lifecycle(entry.unit) === entry.lifecycle && this.eligible(entry.unit);
   }
 
-  private eligible(unit: Raw): boolean {
+  private eligible(unit: Unit): boolean {
     const active = this.target.current;
     return !!(
       unit &&

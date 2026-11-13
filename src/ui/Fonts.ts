@@ -1,14 +1,11 @@
-import type { API, Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { BitmapData, BitmapFont, Texture, StarlingTextField as TextField } from '../game/Bindings';
 import { fontAssets } from './FontAssets';
 
 /** Texture roots retain the original bitmap for Starling context restoration. */
 export function loadFonts(api: API): Promise<void> {
-  const BitmapData = api.cls('openfl.display.BitmapData')!;
-  const Texture = api.cls('starling.textures.Texture')!;
-  const BitmapFont: any = api.cls('starling.text.BitmapFont');
-  const TextField = api.cls('starling.text.TextField')!;
   let alive = true;
-  const aliases: { name: string; previous: Raw | null; font: Raw }[] = [];
+  const aliases: { name: string; previous: BitmapFont | null; font: BitmapFont }[] = [];
   api.defer(() => {
     alive = false;
     for (const { name, previous, font } of aliases.reverse()) {
@@ -21,7 +18,7 @@ export function loadFonts(api: API): Promise<void> {
     fontAssets.map(
       (asset) =>
         new Promise<void>((resolve, reject) => {
-          const registerAliases = (font: Raw) => {
+          const registerAliases = (font: BitmapFont) => {
             if (alive)
               for (const name of asset.aliases) {
                 aliases.push({ name, previous: TextField.getBitmapFont(name), font });
@@ -39,7 +36,7 @@ export function loadFonts(api: API): Promise<void> {
             'image/png',
           );
           future.onError(reject);
-          future.onComplete((bitmap: Raw) => {
+          future.onComplete((bitmap: BitmapData) => {
             if (!alive) {
               bitmap.dispose();
               resolve();

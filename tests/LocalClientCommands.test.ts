@@ -1,3 +1,6 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import { onChatViewInvalidation } from '../src/chat/ChatViewInvalidation';
+import { ClientIPCService } from '../src/ipc/ClientIPCService';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatCommandRegistry } from '../src/chat/ChatCommandRegistry';
@@ -89,7 +92,18 @@ function fixture() {
     'core.scene.SceneBase': scene,
     'af.ChatCommandRegistry': registry,
   };
+  class NativeClock {
+    requestServerTime() {}
+    dispose() {}
+  }
+  classes['clock.Clock'] = NativeClock;
+  bindGameClasses({ cls: (name: string) => classes[name] ?? NativeClock } as any);
   installLocalClientCommands({
+    on: () => () => {},
+    before: (target: Raw, key: string, fn: Function) =>
+      cleanups.push(hooks.add(target, key, 'before', fn)),
+    defer: (cleanup: () => void) => cleanups.push(cleanup),
+    interval: () => () => {},
     cls: (name: string) => classes[name],
     around: (target: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'around', fn)),
@@ -137,7 +151,7 @@ test('local commands preserve native dispatch, validate timers, and report port 
   assert.deepEqual(f.messages.at(-1), ['Timer settings are not available yet.', 'error']);
   f.send('/echo');
   assert.equal(f.messages.at(-1)?.[0], 'death');
-  assert.match(String(f.messages.at(-1)?.[1]), /QoLAF v1\.1\.23 \(Public\)/);
+  assert.match(String(f.messages.at(-1)?.[1]), /QoLAF \(Server \d+ \/ v1\.2\.0 TS \(Public\)\)/);
   assert.equal(f.chat.input.text, '');
   assert.equal(f.tabsUpdated(), 5);
   assert.equal(f.chat.nativeCalls, 2);
@@ -148,7 +162,17 @@ test('local commands preserve native dispatch, validate timers, and report port 
 test('clear removes both views and shared queue in place without touching sent history', () => {
   const f = fixture(),
     queue = f.log.textQueue;
+  const cleared: string[] = [];
+  const closeSimple = onChatViewInvalidation(f.game.messageLog.simple, () =>
+    cleared.push('simple'),
+  );
+  const closeAdvanced = onChatViewInvalidation(f.game.messageLog.advanced, () =>
+    cleared.push('advanced'),
+  );
   f.send('/clearchat');
+  assert.deepEqual(cleared, ['simple', 'advanced']);
+  closeSimple();
+  closeAdvanced();
   assert.equal(f.log.textQueue, queue);
   assert.equal(queue.length, 0);
   assert.equal(f.game.messageLog.nextTimeout, 0);
@@ -194,4 +218,105 @@ test('help follows live command ownership, escapes metadata, and reserves local 
   f.registry.unregisterOwner(owner);
   assert.deepEqual(customCommandHelp(f.registry.getHelpEntries()), []);
   f.cleanup();
+});
+
+test('QIPC debug command reports unavailable service and toggles the current service locally', () => {
+  ClientIPCService.shutdown();
+  const f = fixture();
+  try {
+    f.send('/qipc3dbg');
+    assert.deepEqual(f.messages.at(-1), [
+      'QIPC3 debug unavailable: IPC is not initialized.',
+      'error',
+    ]);
+    const ipc = ClientIPCService.ensure(
+      { connectUserId: 'debug-owner', createJoinRoom() {} },
+      '1.1.23 (Public)',
+      {
+        now: () => 0,
+        random: () => 0.5,
+        interval: () => () => {},
+        defer: (callback) => callback(),
+        debug() {},
+      },
+    );
+    assert.ok(ipc);
+    f.send('/qipc3dbg');
+    assert.deepEqual(f.messages.at(-1), ['QIPC3 debug enabled.', 'debug']);
+    f.send('/qipc3dbg');
+    assert.deepEqual(f.messages.at(-1), ['QIPC3 debug disabled.', 'debug']);
+    assert.equal(f.chat.nativeCalls, 0, 'debug commands never reach the native chat transport');
+    assert.equal(f.chat.input.text, '');
+    assert.equal(f.tabsUpdated(), 3);
+  } finally {
+    ClientIPCService.shutdown();
+    f.cleanup();
+  }
+});
+
+test('each client help description is emitted as text with the default message type', () => {
+  const f = fixture();
+  try {
+    f.chat.listCommands();
+    assert.ok(f.messages.every((args) => args.length === 1));
+    const text = f.messages.map((args) => args[0]);
+    assert.ok(text.some((line) => typeof line === 'string' && line.startsWith("''/torptiming ")));
+    assert.ok(
+      text.includes(
+        "''/ref, /refresh, /upstream'' refreshes the current Game room while keeping the same Service connection and loaded plugins",
+      ),
+    );
+    assert.ok(text.some((line) => typeof line === 'string' && line.includes('parallel samples')));
+    assert.ok(!text.some((line) => typeof line === 'string' && line.includes('/switchservice')));
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('room refresh aliases keep command hooks; only restart reloads the launcher', () => {
+  const f = fixture();
+  const previousWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+  let rooms = 0;
+  let launcherReloads = 0;
+  Object.assign(f.game, {
+    reload() {
+      assert.equal(f.chat.input.text, '', 'clear before native chat can be disposed');
+      rooms++;
+    },
+  });
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      top: {
+        location: {
+          reload() {
+            assert.equal(f.chat.input.text, '');
+            launcherReloads++;
+          },
+        },
+      },
+      location: {
+        reload() {
+          assert.fail('must reload launcher, not only game frame');
+        },
+      },
+    },
+  });
+  try {
+    for (const command of ['/ref', '/refresh', '/upstream', '/ref']) {
+      f.send(command);
+      assert.equal(launcherReloads, 0);
+    }
+    assert.equal(rooms, 4);
+    assert.equal(f.chat.nativeCalls, 0);
+    f.send('/timers');
+    assert.equal(f.scene.clientSettings.showSecondaryBossTimers, true);
+    f.send('/restart');
+    assert.equal(launcherReloads, 1);
+    assert.equal(rooms, 4);
+  } finally {
+    f.cleanup();
+    if (previousWindow) Object.defineProperty(globalThis, 'window', previousWindow);
+    else Reflect.deleteProperty(globalThis, 'window');
+  }
 });

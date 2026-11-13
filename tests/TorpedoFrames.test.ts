@@ -1,3 +1,4 @@
+import type { Projectile, GameScene } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { projectileOffsetSeconds, TorpedoFrames } from '../src/rendering/TorpedoFrames';
@@ -46,6 +47,9 @@ function fixture() {
     course: { time: 1033, pos: { x: 100, y: 200 }, speed: { x: 300, y: -100 } },
     ttl: 5000,
     rotation: 0,
+    get_rotation() {
+      return this.rotation;
+    },
     _mc: {
       set_x(value: number) {
         this.x = value;
@@ -59,7 +63,7 @@ function fixture() {
     } as Raw,
   };
   const frames = new TorpedoFrames();
-  frames.capture(projectile, true);
+  frames.capture(projectile as unknown as Projectile, true);
   return {
     game,
     projectile,
@@ -78,10 +82,12 @@ test('torpedo display samples one clock per frame and moves smoothly without adv
     let count = 0;
     for (let elapsed = 0; elapsed < 100; elapsed += 1000 / fps) {
       setTime(1000 + elapsed);
-      frames.beginFrame(game);
+      frames.beginFrame(game as unknown as GameScene);
       count++;
       for (let repeat = 0; repeat < 2; repeat++) {
-        drawProjectileFrame(projectile, 0, undefined, (p, fallback) => frames.seconds(p, fallback));
+        drawProjectileFrame(projectile as unknown as Projectile, 0, undefined, (p, fallback) =>
+          frames.seconds(p, fallback),
+        );
         assert.ok(Math.abs(projectile._mc.x - (100 + 0.3 * (elapsed - 33))) < 1e-8);
         assert.ok(Math.abs(projectile._mc.y - (200 - 0.1 * (elapsed - 33))) < 1e-8);
       }
@@ -95,8 +101,12 @@ test('torpedo display samples one clock per frame and moves smoothly without adv
 
 test('torpedo prediction is scoped to the captured setting and exact projectile kind', () => {
   const { frames, projectile, game, setTime } = fixture();
-  assert.equal(frames.seconds(projectile, 0.01), -0.033, 'draw before first frame reads the clock');
-  frames.beginFrame(game);
+  assert.equal(
+    frames.seconds(projectile as unknown as Projectile, 0.01),
+    -0.033,
+    'draw before first frame reads the clock',
+  );
+  frames.beginFrame(game as unknown as GameScene);
   for (const [key, value] of [
     ['isEnemy', false],
     ['ai', 'missile'],
@@ -105,19 +115,23 @@ test('torpedo prediction is scoped to the captured setting and exact projectile 
   ] as const) {
     const previous = projectile[key];
     projectile[key] = value;
-    assert.equal(frames.seconds(projectile, 0.01), 0.01);
+    assert.equal(frames.seconds(projectile as unknown as Projectile, 0.01), 0.01);
     projectile[key] = previous;
   }
   setTime(5000);
-  frames.beginFrame(game);
+  frames.beginFrame(game as unknown as GameScene);
   assert.equal(
-    frames.seconds(projectile, 0.01),
+    frames.seconds(projectile as unknown as Projectile, 0.01),
     0,
     'stale course must not extrapolate beyond the horizon',
   );
-  frames.capture(projectile, false);
-  assert.equal(frames.seconds(projectile, 0.01), 0.01);
-  frames.capture(projectile, true);
-  frames.reset(projectile);
-  assert.equal(frames.seconds(projectile, 0.01), 0.01, 'pool reset removes old eligibility');
+  frames.capture(projectile as unknown as Projectile, false);
+  assert.equal(frames.seconds(projectile as unknown as Projectile, 0.01), 0.01);
+  frames.capture(projectile as unknown as Projectile, true);
+  frames.reset(projectile as unknown as Projectile);
+  assert.equal(
+    frames.seconds(projectile as unknown as Projectile, 0.01),
+    0.01,
+    'pool reset removes old eligibility',
+  );
 });

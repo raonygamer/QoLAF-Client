@@ -1,3 +1,5 @@
+import { bindGameClasses, type GameScene } from '../src/game/Bindings';
+import { onChatViewInvalidation } from '../src/chat/ChatViewInvalidation';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installNativeSimpleChat } from '../src/chat/NativeSimpleChat';
@@ -42,12 +44,14 @@ function fixture() {
   const game = { messageLog: log, time: 1000 };
   const api: any = {
     cls: () => messages,
+    defer: (cleanup: () => void) => cleanups.push(cleanup),
     around: (object: Raw, name: string, fn: Function) =>
       cleanups.push(hooks.add(object, name, 'around', fn)),
     after: (object: Raw, name: string, fn: Function) =>
       cleanups.push(hooks.add(object, name, 'after', fn)),
   };
-  installNativeSimpleChat(api, game);
+  bindGameClasses(api);
+  installNativeSimpleChat(api, game as unknown as GameScene);
   const enqueue = (text: string, timeout = 2000, type = 'local') => {
     messages.textQueue.push({ text, timeout, type });
     log.updateTexts();
@@ -105,4 +109,26 @@ test('expiry uses earliest visible timeout and advanced view retains its native 
   f.cleanup();
   f.log.updateTexts();
   assert.equal(f.log.advancedUpdates, 2);
+});
+
+test('simple chat invalidates hover cards before rebuilds and expiry without waiting for a hover frame', () => {
+  const f = fixture();
+  const beforeRebuild: string[] = [];
+  const unsubscribe = onChatViewInvalidation(f.simple, () => beforeRebuild.push(f.tf.text));
+  try {
+    f.enqueue('temporary', 1200);
+    f.game.time = 1100;
+    f.simple.update();
+    assert.deepEqual(beforeRebuild, ['']);
+    f.game.time = 1200;
+    f.simple.update();
+    assert.deepEqual(beforeRebuild, ['', 'temporary\n']);
+    assert.equal(f.tf.text, '');
+    unsubscribe();
+    f.simple.updateTexts();
+    assert.equal(beforeRebuild.length, 2);
+  } finally {
+    unsubscribe();
+    f.cleanup();
+  }
 });

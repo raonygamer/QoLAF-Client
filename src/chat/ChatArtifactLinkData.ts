@@ -1,4 +1,4 @@
-import type { Raw } from '../api/Types';
+import type { Artifact } from '../game/Bindings';
 
 /** Verified artifact data, with a plain-text label for rich bitmap token projection. */
 export class ChatArtifactLinkData {
@@ -10,7 +10,7 @@ export class ChatArtifactLinkData {
     readonly playerId: string,
     readonly artifactId: string,
     readonly playerName: string,
-    readonly artifact: Raw,
+    readonly artifact: Artifact,
     playerLevel = 0,
     localize: (text: string) => string = (text) => text,
   ) {

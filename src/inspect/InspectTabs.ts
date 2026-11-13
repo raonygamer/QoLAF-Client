@@ -1,4 +1,4 @@
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 
 /** Feathers settings-tabs contract over the native Haxe TabBar. */
 export function createInspectTabs(resolve: Resolve): any {

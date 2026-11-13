@@ -1,5 +1,5 @@
 // Source port of core/hud/components/chat/rich/RichBitmapMarkupSerializer.as.
-import { bound } from '../../runtime/As3';
+import { bound } from '../../runtime/HaxeInterop';
 import { RichBitmapMarkup } from './RichBitmapMarkup';
 import { RichBitmapInlineAtom } from './RichBitmapInlineAtom';
 

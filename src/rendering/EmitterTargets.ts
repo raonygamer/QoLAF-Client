@@ -1,29 +1,41 @@
-import { read, type Raw } from '../api/Types';
+import type { Engine, EnemyShip } from '../game/Bindings';
+import { staleProjectileThrust } from './ProjectileThrustAnchor';
+
+/** Identity-only view shared by native emitters and delayed factory requests. */
+export interface EmitterTargetContext {
+  target?: object | null;
+  followTarget?: boolean;
+  g?: {
+    shipManager: {
+      enemiesById: { h: Readonly<Record<number, object | undefined>> };
+    };
+  };
+}
 
 interface Attachment {
-  target: Raw;
+  target: object;
   generation: number;
 }
 
 /** Emitter.hasStaleTarget, with reset generations for the Haxe object pools. */
 export class EmitterTargets {
-  private generations = new WeakMap<Raw, number>();
-  private attachments = new WeakMap<Raw, Attachment>();
+  private generations = new WeakMap<object, number>();
+  private attachments = new WeakMap<object, Attachment>();
 
   constructor(
-    private Engine?: any,
-    private EnemyShip?: any,
+    private engineClass?: typeof Engine,
+    private enemyShipClass?: typeof EnemyShip,
   ) {}
 
-  resetTarget(target: Raw): void {
+  resetTarget(target: object): void {
     this.generations.set(target, (this.generations.get(target) ?? 0) + 1);
   }
 
-  release(emitter: Raw): void {
+  release(emitter: object): void {
     this.attachments.delete(emitter);
   }
 
-  capture(emitter: Raw): void {
+  capture(emitter: EmitterTargetContext): void {
     const target = emitter.target;
     if (!target) {
       this.release(emitter);
@@ -35,23 +47,26 @@ export class EmitterTargets {
     });
   }
 
-  stale(emitter: Raw): boolean {
+  stale(emitter: EmitterTargetContext): boolean {
     const target = emitter.target;
-    if (!emitter.followTarget || !target) return false;
+    // EmitterManager checks ownership independently of position-following.
+    // Only clearing target detaches an effect from a pooled object's life.
+    if (!target) return false;
+    if (staleProjectileThrust(target)) return true;
     let attachment = this.attachments.get(emitter);
     if (!attachment || attachment.target !== target) {
-      // Factory-created effects are captured immediately, before any reset.
-      // Also support callers that assign a different target directly.
-      this.capture(emitter);
-      attachment = this.attachments.get(emitter)!;
+      // Factory effects are captured immediately; direct target reassignment
+      // starts tracking that new object's current pooled life.
+      attachment = { target, generation: this.generations.get(target) ?? 0 };
+      this.attachments.set(emitter, attachment);
     }
     if (attachment.generation !== (this.generations.get(target) ?? 0)) return true;
-    if (this.Engine && target instanceof this.Engine) {
+    if (this.engineClass && target instanceof this.engineClass) {
       return !target.ship || target.ship.engine !== target || !target.ship.alive;
     }
-    if (this.EnemyShip && target instanceof this.EnemyShip) {
-      const id = read(target, 'id');
-      return !(id > 0) || emitter.g.shipManager.enemiesById.h[id] !== target;
+    if (this.enemyShipClass && target instanceof this.enemyShipClass) {
+      const id = target.get_id();
+      return !(id > 0) || emitter.g?.shipManager.enemiesById.h[id] !== target;
     }
     return false;
   }

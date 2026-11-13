@@ -144,3 +144,58 @@ test('Radio listener/leader controls preserve source queue and request routing',
     ['modes', true, 'off', false],
   ]);
 });
+
+test('Radio layout and Escape use native Haxe getters without another screen installing aliases', () => {
+  const Popup = createRadioPopup(() => Display, Display, {} as any);
+  const view: any = Object.create(Popup.prototype);
+  let width = 1920,
+    height = 1080,
+    closed = 0,
+    stopped = 0;
+  Object.defineProperty(view, 'stage', {
+    value: { get_stageWidth: () => width, get_stageHeight: () => height },
+  });
+  Object.defineProperty(view, 'close', { value: () => closed++ });
+  view.disposed = false;
+  view.box = {};
+  view.bgr = {};
+  view.closeButton = { width: 84 };
+  view.redraw();
+  assert.deepEqual(view.box, { scaleY: 1, scaleX: 1, width: 900, height: 780, x: 510, y: 150 });
+  assert.deepEqual(view.bgr, { width: 1920, height: 1080 });
+  width = 474;
+  height = 414;
+  view.redraw();
+  assert.equal(view.box.scaleX, 0.5);
+  assert.equal(view.box.scaleY, 0.5);
+  assert.equal(view.box.x, 12);
+  assert.equal(view.box.y, 12);
+  view.keyDown({ get_keyCode: () => 27, stopImmediatePropagation: () => stopped++ });
+  assert.equal(closed, 1);
+  assert.equal(stopped, 1);
+  view.keyDown({ get_keyCode: () => 13, stopImmediatePropagation: () => stopped++ });
+  assert.equal(closed, 1);
+});
+
+test('Radio volume calls native settings setter before Settings has installed property aliases', () => {
+  const changes: number[] = [];
+  const settings = { set_musicVolume: (value: number) => changes.push(value) };
+  const Popup = createRadioPopup(
+    (name) => (name.endsWith('.SceneBase') ? { get_settings: () => settings } : Display),
+    Display,
+    {} as any,
+  );
+  const view: any = Object.create(Popup.prototype);
+  view.disposed = false;
+  view.syncing = false;
+  view.volume = { value: 0.37 };
+  view.changeVolume({});
+  assert.deepEqual(changes, [0.37]);
+  assert.equal(Object.hasOwn(settings, 'musicVolume'), false);
+  view.syncing = true;
+  view.changeVolume({});
+  view.syncing = false;
+  view.disposed = true;
+  view.changeVolume({});
+  assert.deepEqual(changes, [0.37]);
+});

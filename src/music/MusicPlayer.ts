@@ -1,4 +1,5 @@
-import type { Resolve } from '../runtime/As3';
+import type { SoundChannel, SoundManager } from '../game/Bindings';
+import type { Resolve } from '../runtime/HaxeInterop';
 import { createMusicTrackCatalog } from './MusicTrackCatalog';
 export function createMusicPlayer(resolve: Resolve) {
   const DataLocator = resolve('data.DataLocator');
@@ -419,12 +420,12 @@ export function createMusicPlayer(resolve: Resolve) {
     /** Called only at existing automatic music entry points, not on audio completion. */
 
     public static allowPlay(
-      current: any,
+      current: SoundManager,
       key: string,
       loop: boolean,
       resume: boolean,
-      onLoad: Function,
-      onComplete: Function,
+      onLoad: ((channel: SoundChannel | null) => void) | undefined,
+      onComplete: (() => void) | undefined,
       fade: boolean,
     ): boolean {
       if (MusicPlayer.dispatchService === current) return true;

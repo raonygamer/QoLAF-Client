@@ -18,7 +18,7 @@ test('source guide retains its tabs and long colored pages within bitmap limits'
       'QoL / settings',
     ],
   );
-  assert.match(pages[0].content, /1\.1\.23 \(Public\)/);
+  assert.match(pages[0].content, /1\.2\.0 TS \(Public\)/);
   assert.match(pages[0].content, /server 1409/);
   assert.match(pages[0].content, /Port in development/);
   for (const page of pages) {
@@ -57,4 +57,62 @@ test('custom command guide preserves aliases and escapes plugin-supplied metadat
   assert.match(commands, /required file - A &lt;path&gt;/);
   assert.match(commands, /default &lt;auto&gt;/);
   assert.match(commands, /extra arguments allowed/);
+});
+
+test('displayed automation example imports and runs through the browser module lifecycle', async () => {
+  const { AutomationManager } = await import('../src/automation/AutomationManager');
+  const page = new ClientHelpContent('1409', true)
+    .createPages()
+    .find((page) => page.label === 'Automations')!;
+  const text = RichBitmapMarkupParser.parse(page.content, 12, 0xffffff).text.replace(
+    /\u00a0/g,
+    ' ',
+  );
+  const start = text.indexOf('export default class AutomationScript');
+  assert.ok(start >= 0);
+  const end = text.indexOf('\n}', start) + 2;
+  const code = text.slice(start, end);
+  const errors: unknown[] = [];
+  const manager = new AutomationManager(
+    { path: 'help-example', read: () => [], write() {} },
+    {
+      fetch: async () => code,
+      compile: async (source) =>
+        (await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64')))
+          .default,
+    },
+    {
+      registerOwnedCommand: (_owner, name) => name,
+      unregisterOwnedCommand: () => true,
+      unregisterOwner() {},
+      unregisterNamespace() {},
+    },
+    123,
+    (...args) => errors.push(args),
+    () => {},
+  );
+  try {
+    manager.attachGame({});
+    const module = await manager.importCode(code, 'help', 'Example.js');
+    assert.equal(module.initialized, true);
+    assert.equal(manager.start('example'), true);
+    manager.update(33);
+    manager.render(8);
+    manager.stop('example');
+    assert.equal(module.running, false);
+    assert.equal(module.lastError, '');
+  } finally {
+    manager.dispose();
+  }
+  assert.deepEqual(errors, []);
+});
+
+test('current command examples follow the supplied server version', () => {
+  const text = new ClientHelpContent('1413', true)
+    .createPages()
+    .map((page) => page.content)
+    .join('\n');
+  assert.match(text, /Service-1413_0/);
+  assert.match(text, /Service-1413_&lt;int&gt;/);
+  assert.doesNotMatch(text, /Service-1409/);
 });

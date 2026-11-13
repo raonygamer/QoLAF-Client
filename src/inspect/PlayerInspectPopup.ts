@@ -1,7 +1,7 @@
 // Source port of core/hud/components/dialogs/PlayerInspectPopup.as.
 import { artifactFitness } from '../artifacts/Fitness';
 import { read } from '../api/Types';
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createPlayerInspectPopup(resolve: Resolve): any {
   const PopupMessage: any = resolve('core.hud.components.dialogs.PopupMessage');
   type PopupMessage = any;

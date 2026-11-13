@@ -1,6 +1,7 @@
+import { writeClipboardText, readClipboardText } from '../ui/Clipboard';
 import { installNativeChatShortcuts } from './NativeChatShortcuts';
 import { read, type API, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 import type { DeviceSettings } from '../settings/DeviceSettings';
 import type { NativeBitmapInput } from './rich/NativeBitmapInput';
 import { createChatFormattingClasses } from './ChatFormattingClasses';
@@ -34,7 +35,7 @@ export function installNativeChatFormatting(
   const emoji = new EmojiPicker();
   const images =
     sharedImages ??
-    new ChatImageCache(() => new ChatRemoteImageLoader(createBrowserImagePlatform(resolve)));
+    new ChatImageCache(() => new ChatRemoteImageLoader(createBrowserImagePlatform()));
   if (!sharedImages) api.defer(() => images.dispose());
   const prefetch = (link: ChatDiscordImageLink) => images.prefetch(link);
   const shortcuts = new ChatImageShortcutStore(api.storage, prefetch);
@@ -153,17 +154,16 @@ export function installNativeChatFormatting(
   };
   const copy = () => {
     restore();
-    void navigator.clipboard
-      .writeText(editor.model.selectedCopyText)
-      .catch((error) => api.log('Chat copy failed', error));
+    void writeClipboardText(editor.model.selectedCopyText).catch((error) =>
+      api.log('Chat copy failed', error),
+    );
   };
   const paste = () => {
     restore();
     const textBefore = editor.model.text;
     const pasteAnchor = anchor,
       pasteActive = active;
-    void navigator.clipboard
-      .readText()
+    void readClipboardText()
       .then((text) => {
         if (
           disposed ||
@@ -247,6 +247,13 @@ export function installNativeChatFormatting(
   });
   layout();
   return {
+    close(): void {
+      if (disposed) return;
+      popup.close();
+      emoji.close();
+      imagePicker.close();
+      restorePosition();
+    },
     get isOpen(): boolean {
       return popup.isOpen || emoji.isOpen || imagePicker.isOpen;
     },

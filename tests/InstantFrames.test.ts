@@ -1,8 +1,10 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { Display } from './fixtures/NativeGame';
 import { Mesh, Vertices, Indices } from './fixtures/AuraMesh';
 import { installProjectileFrames } from '../src/rendering/ProjectileFrames';
+import { drawInstantFrame } from '../src/rendering/InstantFrames';
 // @ts-expect-error extracted native Haxe methods
 import { InstantPrototype, InstantSplittingPrototype } from './fixtures/NativeInstant.js';
 // @ts-expect-error actual host dispatcher
@@ -26,6 +28,9 @@ function fixture(splitting: boolean, weaponKey = '', tentacle = false) {
     },
     set_y(v: number) {
       this.y = v;
+    },
+    get_rotation() {
+      return this.rotation;
     },
     set_rotation(v: number) {
       this.rotation = v;
@@ -56,6 +61,12 @@ function fixture(splitting: boolean, weaponKey = '', tentacle = false) {
         end: [0, 0],
         init() {},
         clear() {},
+        get_parent() {
+          return this.parent;
+        },
+        get_alpha() {
+          return this.alpha;
+        },
         set_x(v: number) {
           this.x = v;
         },
@@ -94,6 +105,7 @@ function fixture(splitting: boolean, weaponKey = '', tentacle = false) {
     get_rotation() {
       return this.rotation;
     }
+    fastforward() {}
     update() {}
     reset() {}
     draw() {}
@@ -103,7 +115,15 @@ function fixture(splitting: boolean, weaponKey = '', tentacle = false) {
   const classes: any = {
     'starling.display.Sprite': Display,
     'core.ship.EnemyShip': Enemy,
-    'core.projectile.ProjectileManager': { prototype: { activateProjectile() {}, dispose() {} } },
+    'core.projectile.ProjectileManager': {
+      prototype: {
+        activateProjectile() {},
+        dispose() {},
+        getProjectile() {},
+        createSetProjectile() {},
+        updateCourse() {},
+      },
+    },
     'starling.display.Mesh': Mesh,
     'starling.rendering.VertexData': Vertices,
     'starling.rendering.IndexData': Indices,
@@ -119,6 +139,19 @@ function fixture(splitting: boolean, weaponKey = '', tentacle = false) {
   for (const type of ['before', 'after', 'around'])
     api[type] = (object: any, name: string, fn: Function) =>
       cleanup.push(hooks.add(object, name, type, fn));
+  class BindingFixture {
+    static createProjectileAI() {
+      return null;
+    }
+    resetAllTo() {}
+    getRibbonTrail() {}
+    removeRibbonTrail() {}
+    reclaimOrphans() {}
+    enter() {}
+    exit() {}
+    execute() {}
+  }
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? BindingFixture });
   installProjectileFrames(api);
   const p = new Projectile();
   const state: any = Object.assign(Object.create(State.prototype), {
@@ -145,6 +178,32 @@ function fixture(splitting: boolean, weaponKey = '', tentacle = false) {
 }
 
 for (const splitting of [false, true]) {
+  test(`${splitting ? 'splitting' : 'instant'} uses rendered rotation and releases reparented lines`, () => {
+    const { p, state, released, dispose } = fixture(splitting);
+    try {
+      state.enter();
+      p.rotation = 0;
+      p._mc.set_rotation(Math.PI / 2);
+      drawInstantFrame(state, splitting);
+      const line = splitting ? state.lines[0] : state.lineOuter;
+      assert.ok(Math.abs(line.end[0] - 25) < 1e-10);
+      assert.equal(line.end[1], splitting ? 250 : 150);
+      let removed = 0;
+      line.parent = {
+        removeChild(child: typeof line) {
+          assert.equal(child, line);
+          child.parent = null;
+          removed++;
+        },
+      };
+      state.exit();
+      state.exit();
+      assert.equal(removed, 1);
+      assert.equal(released.filter((entry) => entry === line).length, 1);
+    } finally {
+      dispose();
+    }
+  });
   test(`${splitting ? 'splitting' : 'instant'} room exit returns active lines before teardown`, () => {
     const { state, released, exitGame, dispose } = fixture(splitting);
     state.enter();
@@ -261,4 +320,44 @@ test('Nether tentacles suppress duplicate native rays while retaining Haxe TTL a
   state.exit();
   p.reset();
   dispose();
+});
+
+test('all instant lifetimes wait for valid ranges without corrupting TTL', () => {
+  for (const tentacle of [false, true])
+    for (const [range, weaponRange] of [
+      [NaN, 100],
+      [Infinity, 100],
+      [-1, 100],
+      [0, 100],
+      [100, 0],
+      [100, NaN],
+      [100, Infinity],
+      [100, -1],
+    ]) {
+      const { p, state, dispose } = fixture(
+        false,
+        tentacle ? '0O4EOmZ-_USlz3RhlUCQ4Q' : 'other',
+        tentacle,
+      );
+      try {
+        state.enter();
+        p.range = range;
+        p.weapon.range = weaponRange;
+        state.execute();
+        assert.equal(p.ttl, 100);
+        assert.equal(p.ttlMax, 100);
+        assert.equal(state.tick, 0, 'invalid geometry must not consume the initialization');
+        assert.equal(p.course.time, 33);
+        p.range = 75;
+        p.weapon.range = 100;
+        state.execute();
+        assert.equal(p.ttl, 81, 'valid geometry retains native integer arithmetic');
+        assert.equal(p.ttlMax, 81);
+        assert.equal(state.tick, 1);
+        state.execute();
+        assert.equal(p.ttl, 81, 'lifetime is scaled once');
+      } finally {
+        dispose();
+      }
+    }
 });

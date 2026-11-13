@@ -1,9 +1,9 @@
 import { read, type API, type Raw } from '../api/Types';
+import { takeSteeringTurn } from '../movement/SteeringClock';
 
 interface AutomationAim {
   owner: string;
   angle: number;
-  lastCourseTime: number;
 }
 
 /** Original PlayState automation ownership, using native commands and ship state. */
@@ -40,13 +40,7 @@ export function installAutomationControls(api: API): void {
       return;
     }
     // Source throttle follows serialized course time, including clock rollback.
-    if (
-      Number.isFinite(aim.lastCourseTime) &&
-      course.time >= aim.lastCourseTime &&
-      course.time - aim.lastCourseTime < tickLength()
-    )
-      return;
-    aim.lastCourseTime = course.time;
+    if (!takeSteeringTurn(state, course.time)) return;
     const threshold = ((read(ship.engine, 'rotationSpeed') * tickLength()) / 1000) * 0.6;
     const difference = api.cls('generics.Util')!.angleDifference(read(ship, 'rotation'), aim.angle);
     if (difference < threshold && difference > -threshold) stopTurn(state, course);
@@ -72,11 +66,9 @@ export function installAutomationControls(api: API): void {
     addProperty(prototype, name, { writable: true, value });
   method('setAutomationAimAngle', function (this: Raw, id: string, angle: number): boolean {
     if (!this.g?.automationManager?.ownsControls(id) || !Number.isFinite(angle)) return false;
-    const previous = currentAim(this);
     aimByState.set(this, {
       owner: id,
       angle: api.cls('generics.Util')!.clampRadians(angle),
-      lastCourseTime: previous?.lastCourseTime ?? NaN,
     });
     return true;
   });

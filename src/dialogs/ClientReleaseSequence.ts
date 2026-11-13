@@ -1,4 +1,6 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { PopupMessage, type GameScene } from '../game/Bindings';
+import type {} from '../game/GameRecovery';
 
 /** Source release-before-welcome ordering, using the port's own release identity. */
 export class ClientReleaseSequence {
@@ -28,7 +30,7 @@ export class ClientReleaseSequence {
     }
   }
 
-  install(api: API, game: Raw, version: string, open: () => boolean): () => boolean {
+  install(api: API, game: GameScene, version: string, open: () => boolean): () => boolean {
     let pending = !this.hasSeen(api, version);
     let stop = () => {};
     const markOpened = () => {
@@ -43,13 +45,12 @@ export class ClientReleaseSequence {
     };
     if (pending) {
       stop = api.interval(() => {
-        if (!pending || api.game !== game || game.isLeaving) return;
-        if (!game.me || game.isRecoveringGameConnection || game.blockHotkeys) return;
-        const Modal = api.cls('core.hud.components.dialogs.PopupMessage') as any;
+        if (!pending || api.game !== game || game.get_isLeaving()) return;
+        if (!game.get_me() || game.get_isRecoveringGameConnection?.() || game.blockHotkeys) return;
         const overlay = game.overlay;
-        for (let index = 0; index < read(overlay, 'numChildren', 0); index++) {
+        for (let index = 0; index < overlay.get_numChildren(); index++) {
           const child = overlay.getChildAt(index);
-          if (Modal && child instanceof Modal && read(child, 'visible', true)) return;
+          if (child instanceof PopupMessage && child.get_visible()) return;
         }
         show();
       }, 250);

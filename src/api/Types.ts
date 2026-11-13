@@ -1,15 +1,54 @@
-// Only the upstream Haxe boundary is dynamic. Objects are the live game objects.
+import type { Game } from '../game/Game';
+import type { MethodKey, MethodOf } from './HookTypes';
+
+// Legacy callers remain to migrate to the declared game bindings.
 export type Raw = Record<string, any>;
 export type Cleanup = () => void;
+export interface FrameEvent {
+  game: Game.core.scene.Game;
+  event: Game.starling.events.EnterFrameEvent;
+}
+
+export interface DiagnosticEntry {
+  time: number;
+  level: string;
+  message: string;
+  repeats: number;
+}
+
 export interface API {
+  diagnostics?: { snapshot(): readonly DiagnosticEntry[] };
   version: number;
   game: Raw | null;
   raw: { classes: Raw | null; game: Raw | null };
   cls(name: string): Raw | undefined;
+  on(name: 'frame', fn: (value: FrameEvent) => void): Cleanup;
   on(name: string, fn: (value: any) => void): Cleanup;
-  onGame(fn: (game: Raw, api: API) => void | Cleanup): void;
+  onGame(fn: (game: Game.core.scene.Game, api: API) => void | Cleanup): void;
+
+  before<T extends object, K extends MethodKey<T>>(
+    target: T,
+    key: K,
+    fn: (this: T, ...args: Parameters<MethodOf<T, K>>) => void,
+  ): Cleanup;
   before(target: Raw, key: string, fn: (this: Raw, ...args: any[]) => any): Cleanup;
+
+  after<T extends object, K extends MethodKey<T>>(
+    target: T,
+    key: K,
+    fn: (this: T, result: ReturnType<MethodOf<T, K>>, ...args: Parameters<MethodOf<T, K>>) => void,
+  ): Cleanup;
   after(target: Raw, key: string, fn: (this: Raw, ...args: any[]) => any): Cleanup;
+
+  around<T extends object, K extends MethodKey<T>>(
+    target: T,
+    key: K,
+    fn: (
+      this: T,
+      next: MethodOf<T, K>,
+      ...args: Parameters<MethodOf<T, K>>
+    ) => ReturnType<MethodOf<T, K>>,
+  ): Cleanup;
   around(
     target: Raw,
     key: string,

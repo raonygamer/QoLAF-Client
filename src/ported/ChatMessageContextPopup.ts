@@ -1,6 +1,6 @@
 // Source port of core/hud/components/chat/ChatMessageContextPopup.as.
 import type { ChatMessageContextData } from '../chat/ChatMessageContextData';
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createChatMessageContextPopup(resolve: Resolve): any {
   const VerdanaBitmapFontRegistry: any = resolve('core.text.VerdanaBitmapFontRegistry');
   type VerdanaBitmapFontRegistry = any;

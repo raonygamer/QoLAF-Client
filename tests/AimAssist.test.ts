@@ -36,6 +36,18 @@ function setup() {
   return { assist, input, overrides, update };
 }
 
+test('automation suspension advances sample time without replacing the last player input', () => {
+  const f = setup();
+  f.update();
+  f.assist.suspend(10000, 'automation owns aim control');
+  assert.equal(f.assist.mouseAngle, -0.1);
+  assert.equal(f.assist.active, false);
+  f.update({ now: 10016, angle: -0.01 });
+  assert.ok(Math.abs(f.assist.mouseSpeed - 5.625) < 1e-12);
+  assert.equal(f.assist.active, false, 'handoff cannot dilute fast movement across automation time');
+  assert.match(f.assist.reason, /acquisition limit/);
+});
+
 test('source assist acquires from player intent, transitions to stationary tracking and honors manual override', () => {
   const f = setup();
   f.update();

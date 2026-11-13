@@ -1,3 +1,4 @@
+import type { Texture } from '../src/game/Bindings';
 import { installNativeChatImageViewer } from '../src/chat/NativeChatImageViewer';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -69,7 +70,13 @@ function fixture() {
     },
   };
 }
-const asset = () => new ChatImageAsset([{ dispose() {} }, { dispose() {} }], [100, 20], 1000, 500);
+const asset = () =>
+  new ChatImageAsset(
+    [{ dispose() {} }, { dispose() {} }] as unknown as Texture[],
+    [100, 20],
+    1000,
+    500,
+  );
 
 test('source viewer deduplicates, constrains, animates and releases native resources', (t) => {
   const f = fixture();

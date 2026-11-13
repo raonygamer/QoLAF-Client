@@ -1,22 +1,32 @@
-import { read, type API, type Raw } from '../api/Types';
+import {
+  ArtifactStat,
+  Localize,
+  Util,
+  type Artifact,
+  type Player,
+  type GameScene,
+} from '../game/Bindings';
+
+export interface ArtifactTooltipContext {
+  a: Artifact;
+  p: Player;
+  g: Pick<GameScene, 'time'>;
+}
 import { artifactAdequacyValue } from './ArtifactOrder';
 import { artifactFitness } from './Fitness';
 
 /** Original cargo/active artifact tooltip ordering and localization. */
-export function artifactTooltip(api: API, box: Raw, cargo: boolean): string {
+export function artifactTooltip(box: ArtifactTooltipContext, cargo: boolean): string {
   const artifact = box.a;
-  const localize = api.cls('generics.Localize')!;
-  const util = api.cls('generics.Util')!;
-  const statText = api.cls('core.artifact.ArtifactStat')!;
-  const t = (text: string) => localize.t(text);
+  const t = (text: string) => Localize.t(text);
   for (const crew of box.p.crewMembers ?? [])
     if (crew.artifact === artifact.id) artifact.upgradeTime = crew.artifactEnd;
   let text = t(artifact.name) + '<br>';
-  if (cargo && read(artifact, 'isRestricted'))
+  if (cargo && artifact.get_isRestricted())
     text +=
       t("<font color='#ff0000'>Requires level [level]</font>").replace(
         '[level]',
-        String(read(artifact, 'requiredPlayerLevel')),
+        String(artifact.get_requiredPlayerLevel()),
       ) + '<br>';
   text +=
     t('Level [potential], strength [level]')
@@ -29,8 +39,8 @@ export function artifactTooltip(api: API, box: Raw, cargo: boolean): string {
     text += t('[nr] upgrades').replace('[nr]', String(artifact.upgraded)) + '<br>';
   if (artifact.upgrading)
     text +=
-      t('Upgrading') + ': ' + util.getFormattedTime(artifact.upgradeTime - box.g.time) + '<br>';
+      t('Upgrading') + ': ' + Util.getFormattedTime(artifact.upgradeTime - box.g.time) + '<br>';
   for (const stat of artifact.stats)
-    text += statText.parseTextFromStatType(stat.type, stat.value, read(stat, 'isUnique')) + '<br>';
+    text += ArtifactStat.parseTextFromStatType(stat.type, stat.value, stat.get_isUnique()) + '<br>';
   return text;
 }

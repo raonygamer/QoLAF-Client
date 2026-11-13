@@ -1,3 +1,4 @@
+import type { GameScene } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ClanLabel } from '../src/ui/ClanLabel';
@@ -14,6 +15,7 @@ class Text extends Display {
     set_color: (color: number) => {
       this.format.color = color;
     },
+    get_color: () => this.format.color,
     set_horizontalAlign() {},
   };
   constructor(_x: number, _y: number, _text: string, size: number) {
@@ -47,27 +49,38 @@ test('clan identity rejects stale callbacks, retries, follows visibility and nat
     cls: (name: string) =>
       ({
         'core.hud.components.TextBitmap': Text,
-        'data.DataLocator': {
-          getService: () => ({
-            loadKeyFromBigDB: (_table: string, id: string, callback: Function) => {
-              requests.push(id);
-              callbacks.push(callback);
-            },
-          }),
-        },
-        'core.states.gameStates.ClanState': { getMemberRankName: () => 'Officer' },
+        'core.scene.SceneBase': { settings },
+        'core.clan.ClanClient': { brief(_game: GameScene, id: string, _player: string, callback: Function) { requests.push(id); callbacks.push(callback); } },
       })[name],
-    api: { cls: () => ({ settings }) },
+    api: { cls: () => ({ settings }), log: (...args: unknown[]) => assert.fail(String(args)) },
     dispose: (node: Display) => node.removeFromParent(true),
   };
   const parent = new Display();
   const nameText = new Text(0, 0, '', 13);
   nameText.set_y(100);
   parent.addChild(nameText);
+  const me = { id: 'local', clanId: 'one' };
   const player = { id: 'p1', clanId: 'one' };
   const ship: any = { player, lifecycleId: 1, nameText, _mc: new Display() };
+  ship.get_lifecycleId = () => ship.lifecycleId;
   ship._mc.set_x(200);
-  const label = new ClanLabel(ui, { me: {} }, ship, () => now);
+  const label = new ClanLabel(
+    ui,
+    {
+      get_me: () => me,
+      get_isLeaving: () => false,
+      client: {
+        bigDB: {
+          load(_table: string, id: string, callback: Function) {
+            requests.push(id);
+            callbacks.push(callback);
+          },
+        },
+      },
+    } as unknown as GameScene,
+    ship,
+    () => now,
+  );
   label.update();
   label.update();
   assert.deepEqual(requests, ['one']);
@@ -77,16 +90,30 @@ test('clan identity rejects stale callbacks, retries, follows visibility and nat
   callbacks[0]({ name: 'Stale', color: 1 });
   label.update();
   assert.equal(label.node.get_visible(), false, 'old attempt cannot override a retry');
-  callbacks[1]({ name: 'Current', color: 123 });
+  callbacks[1]({ name: 'Current', color: 123, rankName: 'Officer' });
   label.update();
-  assert.equal(label.node.get_visible(), true, 'missing logo does not hide text');
-  const [clan, role] = label.node.children as Text[];
+  assert.equal(label.node.get_visible(), true, 'same-clan remote players remain visible even without a logo');
+  const [clan, role] = [label.node.getChildAt(0), label.node.getChildAt(1)] as unknown as Text[];
   assert.equal(clan.text, 'Current');
   assert.equal(role.text, 'Officer');
   assert.equal(clan.format.font, 'DAIDRR_COMBAT');
   assert.equal(clan.format.color, 123);
   assert.equal(label.node.get_y(), 100 - (17 + 15 - 5));
   assert.equal(label.node.get_x(), 200 - 53 / 2);
+  Object.assign(player, { clanRankName: 'Leader', clanLogoColor: 321 });
+  label.update();
+  assert.equal(role.text, 'Leader', 'cached clan identity updates the rendered rank');
+  assert.equal(clan.format.color, 321);
+  assert.equal(requests.length, 2, 'cached identity does not trigger another lookup');
+  const reused = new ClanLabel(
+    ui,
+    { get_me: () => me, get_isLeaving: () => false } as unknown as GameScene,
+    ship,
+    () => now,
+  );
+  reused.update();
+  assert.equal(reused.node.get_visible(), true, 'a new ship label reuses player-owned identity');
+  reused.dispose();
   settings.showPlayerClanIdentification = false;
   label.update();
   assert.equal(label.node.get_visible(), false);
@@ -101,7 +128,16 @@ test('clan identity rejects stale callbacks, retries, follows visibility and nat
   callbacks[1]({ name: 'Old clan', color: 1 });
   label.update();
   assert.equal(label.node.get_visible(), false);
+  ship.lifecycleId++;
+  callbacks[2]({ name: 'Old ship lifetime', color: 1 });
+  assert.equal(
+    label.node.get_visible(),
+    false,
+    'native lifecycle accessor rejects stale responses',
+  );
+  label.update();
+  assert.deepEqual(requests, ['one', 'one', 'two', 'two']);
   label.dispose();
-  callbacks[2]({ name: 'Too late', color: 1 });
-  assert.equal(label.node.disposed, true);
+  callbacks[3]({ name: 'Too late', color: 1 });
+  assert.equal((label.node as unknown as Display).disposed, true);
 });

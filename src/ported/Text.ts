@@ -1,34 +1,27 @@
+import type { Game } from '../game/Game';
+import type { Texture } from '../game/Bindings';
+import {
+  NativeTextFormat as TextFormat,
+  Point,
+  Event,
+  GlowFilter,
+  DisplayObjectContainer,
+} from '../game/Bindings';
+import { bitmapTextAlign } from '../ui/TextAlignment';
+import type { createRichBitmapFontTextRenderer } from './RichBitmapFontTextRenderer';
+import { RichBitmapMarkup } from '../chat/rich/RichBitmapMarkup';
+import { RichBitmapMarkupParser } from '../chat/rich/RichBitmapMarkupParser';
+import { BitmapFontTextFormat } from '../ui/BitmapFontTextFormat';
+import { RussoBitmapFontRegistry } from '../ui/RussoBitmapFontRegistry';
+import { VerdanaBitmapFontRegistry } from '../ui/VerdanaBitmapFontRegistry';
+type Renderer = InstanceType<ReturnType<typeof createRichBitmapFontTextRenderer>>;
 // Source port of core/hud/components/Text.as.
-import { bound, bridgeNativeProperties, type Resolve } from '../runtime/As3';
-export function createText(resolve: Resolve): any {
-  const RichBitmapFontTextRenderer: any = resolve(
+import { bound, bridgeNativeProperties, type Resolve } from '../runtime/HaxeInterop';
+export function createText(resolve: Resolve) {
+  const RichBitmapFontTextRenderer = resolve(
     'core.hud.components.chat.rich.RichBitmapFontTextRenderer',
-  );
-  type RichBitmapFontTextRenderer = any;
-  const RichBitmapMarkup: any = resolve('core.hud.components.chat.rich.RichBitmapMarkup');
-  type RichBitmapMarkup = any;
-  const RichBitmapMarkupParser: any = resolve(
-    'core.hud.components.chat.rich.RichBitmapMarkupParser',
-  );
-  type RichBitmapMarkupParser = any;
-  const RussoBitmapFontRegistry: any = resolve('core.text.RussoBitmapFontRegistry');
-  type RussoBitmapFontRegistry = any;
-  const VerdanaBitmapFontRegistry: any = resolve('core.text.VerdanaBitmapFontRegistry');
-  type VerdanaBitmapFontRegistry = any;
-  const BitmapFontTextFormat: any = resolve('feathers.text.BitmapFontTextFormat');
-  type BitmapFontTextFormat = any;
-  const Point: any = resolve('openfl.geom.Point');
-  type Point = any;
-  const TextFormat: any = resolve('openfl.text.TextFormat');
-  type TextFormat = any;
-  const DisplayObjectContainer: any = resolve('starling.display.DisplayObjectContainer');
-  type DisplayObjectContainer = any;
-  const Event: any = resolve('starling.events.Event');
-  type Event = any;
-  const GlowFilter: any = resolve('starling.filters.GlowFilter');
-  type GlowFilter = any;
-  const TextureSmoothing: any = resolve('starling.textures.TextureSmoothing');
-  type TextureSmoothing = any;
+  ) as ReturnType<typeof createRichBitmapFontTextRenderer>;
+  resolve('starling.display.DisplayObjectContainer');
 
   /**
    * Legacy text API backed by one reusable bitmap-glyph batch.
@@ -54,10 +47,10 @@ export function createText(resolve: Resolve): any {
     private static AUTO_WIDTH_PADDING: number = 5;
 
     // CreditLabel relies on this protected display object for icon placement.
-    protected finalLayer: RichBitmapFontTextRenderer = null;
+    protected finalLayer: Renderer | null = null;
     protected _hAlign: number = Text.H_ALIGN_LEFT;
 
-    private format: TextFormat = null;
+    private format: TextFormat | null = null;
     private _vAlign: number = Text.V_ALIGN_TOP;
     private _wordWrap: boolean = false;
     private _fieldWidth: number = Text.DEFAULT_WIDTH;
@@ -67,22 +60,24 @@ export function createText(resolve: Resolve): any {
     private _plainText: string = '';
     private renderedText: string = '';
     private oldText: string = '';
-    private isHtml: boolean = false;
+    private isHTML: boolean = false;
     private autoWidthOnNextDraw: boolean = false;
     private autoHeightOnNextDraw: boolean = false;
     private _sharpness: number = 0;
-    private glowFilter: GlowFilter = null;
+    private glowFilter: GlowFilter | null = null;
     private markup: RichBitmapMarkup = new RichBitmapMarkup();
     private metrics: Point = new Point();
     private _disposed: boolean = false;
 
     /** Initialize the original renderer on an existing Haxe Text instance. */
-    public static initializeNative(instance: any): void {
+    public static initializeNative(
+      instance: Text & { tf: Game.openfl.text.TextField; texture: Texture | null },
+    ): void {
       const field = instance.tf;
       const format = instance.format;
       const content = field.get_text() ?? '';
       const html = field.get_htmlText() ?? '';
-      const isHtml = instance.oldText !== content;
+      const isHTML = instance.oldText !== content;
       const width = field.get_width();
       const height = field.get_height();
       const wrap = field.get_wordWrap();
@@ -97,7 +92,7 @@ export function createText(resolve: Resolve): any {
       instance._plainText = '';
       instance.renderedText = '';
       instance.oldText = '';
-      instance.isHtml = false;
+      instance.isHTML = false;
       instance.autoWidthOnNextDraw = false;
       instance.autoHeightOnNextDraw = false;
       instance._sharpness = 0;
@@ -107,18 +102,39 @@ export function createText(resolve: Resolve): any {
       instance._disposed = false;
       instance.format = format;
       instance.finalLayer = new RichBitmapFontTextRenderer();
-      instance.finalLayer.touchable = false;
+      instance.finalLayer.set_touchable(false);
       instance.finalLayer.wordWrap = wrap;
       instance.finalLayer.truncateToFit = false;
       instance.finalLayer.useSeparateBatch = false;
-      instance.finalLayer.textureSmoothing = TextureSmoothing.BILINEAR;
+      instance.finalLayer.textureSmoothing = 'bilinear';
       instance.finalLayer.pixelSnapping = false;
       instance.addChild(instance.finalLayer);
       instance.applyFormat();
       if (content.length || html.length) {
-        if (isHtml) instance.htmlText = html;
+        if (isHTML) instance.htmlText = html;
         else instance.text = content;
       }
+    }
+
+    /** Restore a still-live native label after its original methods have been reinstalled. */
+    public static restoreNative(
+      instance: Text & { tf: Game.openfl.text.TextField; texture: Texture | null },
+    ): void {
+      const html = instance._htmlText;
+      const plain = instance._plainText;
+      const isHTML = instance.isHTML;
+      if (instance.finalLayer) instance.removeChild(instance.finalLayer, true);
+      instance.finalLayer = null;
+      instance.markup.clear();
+      instance.tf.set_wordWrap(instance._wordWrap);
+      instance.tf.set_width(instance._fieldWidth);
+      instance.tf.set_height(instance._fieldHeight);
+      if (!instance.format) throw Error('Cannot restore a native label without its text format');
+      instance.tf.set_defaultTextFormat(instance.format);
+      if (isHTML) instance.tf.set_htmlText(html);
+      else instance.tf.set_text(plain);
+      instance.oldText = isHTML ? html : plain;
+      instance.draw();
     }
 
     constructor(
@@ -138,16 +154,16 @@ export function createText(resolve: Resolve): any {
 
       this._wordWrap = param3;
       this.finalLayer = new RichBitmapFontTextRenderer();
-      this.finalLayer.touchable = false;
+      this.finalLayer.set_touchable(false);
       this.finalLayer.wordWrap = this._wordWrap;
       this.finalLayer.truncateToFit = false;
       this.finalLayer.useSeparateBatch = false;
-      this.finalLayer.textureSmoothing = TextureSmoothing.BILINEAR;
+      this.finalLayer.textureSmoothing = 'bilinear';
       this.finalLayer.pixelSnapping = false;
       this.applyFormat();
       this.addChild(this.finalLayer);
 
-      this.touchable = false;
+      this.set_touchable(false);
       this.x = param1;
       this.y = param2;
       this.addEventListener(Event.REMOVED_FROM_STAGE, this.clean);
@@ -171,19 +187,19 @@ export function createText(resolve: Resolve): any {
     }
 
     @bound
-    private setGlowFilter(param1: GlowFilter): void {
+    private setGlowFilter(param1: GlowFilter | null): void {
       if (this.glowFilter != null) {
-        this.finalLayer.filter = null;
+        this.finalLayer?.set_filter(null);
         this.glowFilter.dispose();
       }
       this.glowFilter = param1;
-      this.finalLayer.filter = this.glowFilter;
+      this.requireRenderer().set_filter(this.glowFilter);
     }
 
     @bound
     public centerPivot(): void {
-      this.pivotX = this.width / 2;
-      this.pivotY = this.height / 2;
+      this.set_pivotX(this.width / 2);
+      this.set_pivotY(this.height / 2);
     }
 
     @bound
@@ -256,27 +272,29 @@ export function createText(resolve: Resolve): any {
     }
 
     public set size(param1: number) {
-      if (Number(this.format.size) == param1) {
+      const format = this.requireFormat();
+      if (Number(format.size) == param1) {
         return;
       }
-      this.format.size = param1;
-      this.defaultTextFormat = this.format;
+      format.size = param1;
+      this.defaultTextFormat = format;
     }
 
     public get size(): number {
-      return Number(this.format.size);
+      return Number(this.requireFormat().size);
     }
 
     public set color(param1: number) {
-      if (Number(this.format.color) == param1) {
+      const format = this.requireFormat();
+      if (Number(format.color) == param1) {
         return;
       }
-      this.format.color = param1;
-      this.defaultTextFormat = this.format;
+      format.color = param1;
+      this.defaultTextFormat = format;
     }
 
     public get color(): number {
-      return Number(this.format.color);
+      return Number(this.requireFormat().color);
     }
 
     /*override*/ public set width(param1: number) {
@@ -293,21 +311,23 @@ export function createText(resolve: Resolve): any {
     }
 
     public set font(param1: string) {
-      if (String(this.format.font) == param1) {
+      const format = this.requireFormat();
+      if (String(format.font) == param1) {
         return;
       }
-      this.format.font = param1;
-      this.defaultTextFormat = this.format;
+      format.font = param1;
+      this.defaultTextFormat = format;
     }
 
     public set bold(param1: boolean) {
-      if (<boolean>this.format.bold == param1) {
+      const format = this.requireFormat();
+      if (Boolean(format.bold) == param1) {
         return;
       }
       // Russo One has a single face. Keep this value for API compatibility;
       // the bitmap renderer intentionally does not synthesize a blurred bold.
-      this.format.bold = param1;
-      this.defaultTextFormat = this.format;
+      format.bold = param1;
+      this.defaultTextFormat = format;
     }
 
     public set wordWrap(param1: boolean) {
@@ -315,7 +335,7 @@ export function createText(resolve: Resolve): any {
         return;
       }
       this._wordWrap = param1;
-      this.finalLayer.wordWrap = param1;
+      this.requireRenderer().wordWrap = param1;
       this.draw();
     }
 
@@ -333,11 +353,11 @@ export function createText(resolve: Resolve): any {
     }
 
     public set htmlText(param1: string) {
-      param1 = param1 == null ? '' : param1;
-      if (this.isHtml && this.oldText == param1) {
+      param1 = param1 == null ? '' : String(param1);
+      if (this.isHTML && this.oldText == param1) {
         return;
       }
-      this.isHtml = true;
+      this.isHTML = true;
       this.oldText = param1;
       this._htmlText = param1;
       RichBitmapMarkupParser.parse(param1, this.size, this.color, this.markup);
@@ -352,11 +372,11 @@ export function createText(resolve: Resolve): any {
     }
 
     public set text(param1: string) {
-      param1 = param1 == null ? '' : param1;
-      if (!this.isHtml && this.oldText == param1) {
+      param1 = param1 == null ? '' : String(param1);
+      if (!this.isHTML && this.oldText == param1) {
         return;
       }
-      this.isHtml = false;
+      this.isHTML = false;
       this.oldText = param1;
       this._plainText = param1;
       this._htmlText = Text.escapePlainText(param1);
@@ -386,13 +406,16 @@ export function createText(resolve: Resolve): any {
     }
 
     /** Accepts flash.text.TextFormat to preserve the legacy public ABI. */
-    public set defaultTextFormat(param1: TextFormat) {
+    public set defaultTextFormat(param1: TextFormat | null) {
       if (param1 == null) {
         return;
       }
       this.format = param1;
       this.applyFormat();
-      this.requestAutoSize();
+      // Native Haxe labels often set size/color before enabling word wrap.
+      // Styling an empty field must retain its layout width for the first text;
+      // an explicit text assignment still owns empty-content auto-sizing.
+      if (this.renderedText.length > 0) this.requestAutoSize();
       this.draw();
     }
 
@@ -402,23 +425,31 @@ export function createText(resolve: Resolve): any {
       this.autoHeightOnNextDraw = true;
     }
 
+    private requireFormat(): TextFormat {
+      if (!this.format) throw Error('Text format is not available after disposal');
+      return this.format;
+    }
+
+    private requireRenderer(): Renderer {
+      if (!this.finalLayer) throw Error('Text renderer is not available after disposal');
+      return this.finalLayer;
+    }
+
     @bound
     private applyFormat(): void {
+      const format = this.requireFormat();
+      const renderer = this.requireRenderer();
       let fontName: string =
-        this.format.font == null
-          ? RussoBitmapFontRegistry.PRIMARY_FONT_NAME
-          : String(this.format.font);
-      let fontSize: number = this.format.size == null ? 10 : Number(this.format.size);
+        format.font == null ? RussoBitmapFontRegistry.PRIMARY_FONT_NAME : String(format.font);
+      let fontSize: number = format.size == null ? 10 : Number(format.size);
       if (fontName.toLowerCase() == 'verdana') {
         fontName = VerdanaBitmapFontRegistry.fontNameForSize(fontSize);
       } else if (fontName == RussoBitmapFontRegistry.PRIMARY_FONT_NAME) {
         fontName = RussoBitmapFontRegistry.fontNameForSize(fontSize);
       }
-      let fontColor: number =
-        this.format.color == null ? 0xffffff : Number(this.format.color) & 0xffffff;
-      let align: string = this.format.align == null ? 'left' : String(this.format.align);
-      let letterSpacing: number =
-        this.format.letterSpacing == null ? 0 : Number(this.format.letterSpacing);
+      let fontColor: number = format.color == null ? 0xffffff : Number(format.color) & 0xffffff;
+      const align = bitmapTextAlign(format.align);
+      let letterSpacing: number = format.letterSpacing == null ? 0 : Number(format.letterSpacing);
       let bitmapFormat: BitmapFontTextFormat = new BitmapFontTextFormat(
         fontName,
         fontSize,
@@ -426,13 +457,12 @@ export function createText(resolve: Resolve): any {
         align,
       );
       bitmapFormat.letterSpacing = letterSpacing;
-      bitmapFormat.leading =
-        this.format.leading == null ? Text.LEADING : Number(this.format.leading);
-      this.finalLayer.textFormat = bitmapFormat;
+      bitmapFormat.leading = format.leading == null ? Text.LEADING : Number(format.leading);
+      renderer.textFormat = bitmapFormat;
       // Keep camera-scaled combat text stable. Verdana bitmap labels use
       // integer placement and nearest sampling so compact glyphs stay clear.
-      this.finalLayer.pixelSnapping = fontName == RussoBitmapFontRegistry.COMBAT_FONT_NAME;
-      this.finalLayer.textureSmoothing = TextureSmoothing.BILINEAR;
+      renderer.pixelSnapping = fontName == RussoBitmapFontRegistry.COMBAT_FONT_NAME;
+      renderer.textureSmoothing = 'bilinear';
     }
 
     @bound
@@ -444,7 +474,7 @@ export function createText(resolve: Resolve): any {
         this.addEventListener(Event.REMOVED_FROM_STAGE, this.clean);
       }
 
-      this.finalLayer.visible = this.renderedText.length > 0;
+      this.finalLayer.set_visible(this.renderedText.length > 0);
       this.finalLayer.wordWrap = this._wordWrap;
       this.finalLayer.height = NaN;
       if (this._wordWrap) {
@@ -468,18 +498,18 @@ export function createText(resolve: Resolve): any {
       this.finalLayer.height = this._fieldHeight;
 
       if (this._hAlign == Text.H_ALIGN_CENTER) {
-        this.finalLayer.x = -this._fieldWidth / 2;
+        this.finalLayer.set_x(-this._fieldWidth / 2);
       } else if (this._hAlign == Text.H_ALIGN_RIGHT) {
-        this.finalLayer.x = -this._fieldWidth;
+        this.finalLayer.set_x(-this._fieldWidth);
       } else {
-        this.finalLayer.x = 0;
+        this.finalLayer.set_x(0);
       }
       if (this._vAlign == Text.V_ALIGN_MIDDLE) {
-        this.finalLayer.y = -this._fieldHeight / 2 + Text.LEADING / 2;
+        this.finalLayer.set_y(-this._fieldHeight / 2 + Text.LEADING / 2);
       } else if (this._vAlign == Text.V_ALIGN_BOTTOM) {
-        this.finalLayer.y = -this._fieldHeight + Text.LEADING / 2;
+        this.finalLayer.set_y(-this._fieldHeight + Text.LEADING / 2);
       } else {
-        this.finalLayer.y = 0;
+        this.finalLayer.set_y(0);
       }
 
       this.autoWidthOnNextDraw = false;
@@ -492,7 +522,7 @@ export function createText(resolve: Resolve): any {
     }
 
     @bound
-    public clean(param1: Event = null): void {
+    public clean(param1: Event | null = null): void {
       this.dispose();
     }
 
@@ -505,7 +535,7 @@ export function createText(resolve: Resolve): any {
       this._disposed = true;
       this.removeEventListeners();
       if (this.glowFilter != null) {
-        this.finalLayer.filter = null;
+        this.finalLayer?.set_filter(null);
         this.glowFilter.dispose();
         this.glowFilter = null;
       }
@@ -514,8 +544,7 @@ export function createText(resolve: Resolve): any {
       this._htmlText = '';
       this._plainText = '';
       this.markup.clear();
-      this.markup = null;
-      this.metrics = null;
+
       super.dispose();
       this.finalLayer = null;
       this.format = null;

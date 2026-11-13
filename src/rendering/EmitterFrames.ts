@@ -1,3 +1,22 @@
+import type { Game } from '../game/Game';
+import { emitterTargetPose } from './EmitterTargetPose';
+import { updateEmitterVisibility } from './EmitterVisibility';
+export { emitterTargetPose } from './EmitterTargetPose';
+export { emitterCullingRadius, updateEmitterVisibility } from './EmitterVisibility';
+import { GameReflection } from '../api/GameReflection';
+import {
+  Engine,
+  EnemyShip,
+  GameObject,
+  Particle,
+  Color as NativeColor,
+  CollectiveMeshBatch,
+  EmitterFactory,
+  Emitter as NativeEmitter,
+} from '../game/Bindings';
+import { beginEmitterFrame, installEmitterLifecycle } from './EmitterLifecycle';
+import { installNativeBeamResources } from '../weapon/NativeBeamResources';
+import { installProjectileThrustAnchors } from './ProjectileThrustAnchor';
 import { AuraLightningFrames, installAuraLightning } from './AuraLightningFrames';
 import { installAuraStyles } from './AuraStyles';
 import { AuraPulses, installAuraPulses } from './AuraPulses';
@@ -5,83 +24,43 @@ import { installRarityAuraLayers } from './RarityAuraLayers';
 import { installEmitterDelays } from './EmitterDelays';
 import { EmitterTargets } from './EmitterTargets';
 import { installEmitterMirroring } from './EmitterMirroring';
-import { read, type API, type Raw } from '../api/Types';
-
-/** Render-only mount lookup; never writes ship/engine course or simulation position. */
-export function emitterTargetPose(target: Raw): { x: number; y: number; rotation: number } {
-  const ship = target.ship;
-  if (ship?.alive && target.alive && ship.engine === target && ship.enginePos) {
-    const pose = emitterTargetPose(ship);
-    const mount = ship.enginePos;
-    const radius = Math.hypot(mount.x, mount.y);
-    const offset = mount.x !== 0 ? Math.atan(mount.y / mount.x) : 0;
-    const rotation = pose.rotation + Math.PI;
-    return {
-      x: pose.x + Math.cos(rotation + offset) * radius,
-      y: pose.y + Math.sin(rotation + offset) * radius,
-      rotation,
-    };
-  }
-  const clip = target.isAddedToCanvas && target.hasRenderPosition !== false ? target._mc : null;
-  const position = read(target, 'pos');
-  return {
-    x: read(clip, 'x', position?.x ?? 0),
-    y: read(clip, 'y', position?.y ?? 0),
-    rotation: read(clip, 'rotation', read(target, 'rotation', 0)),
-  };
-}
-
-/** Emitter.as includes the authored particle footprint and travel in culling. */
-export function emitterCullingRadius(emitter: Raw): number {
-  const spread = Math.max(Math.abs(emitter.sourceVarianceX), Math.abs(emitter.sourceVarianceY));
-  const travel = (Math.abs(emitter.speed) * (emitter.ttl + Math.abs(emitter.ttlVariance))) / 1000;
-  return Math.max(100, read(emitter, 'radius') + spread + travel);
-}
-
-export function updateEmitterVisibility(emitter: Raw): void {
-  emitter.forceUpdate = false;
-  emitter.isOnScreen = emitter.canvasTarget != null;
-  if (!emitter.isOnScreen) {
-    emitter.isOnScreen = emitter.g.camera.isCircleOnScreen(
-      emitter.posX,
-      emitter.posY,
-      emitterCullingRadius(emitter),
-    );
-  }
-  if (emitter.isOnScreen) {
-    emitter.nextDistanceCalculation = 1000;
-    return;
-  }
-  const center = emitter.g.camera.getCameraCenter();
-  emitter.distanceToCameraX = emitter.posX - center.x;
-  emitter.distanceToCameraY = emitter.posY - center.y;
-  emitter.distanceToCamera = Math.hypot(emitter.distanceToCameraX, emitter.distanceToCameraY);
-  emitter.nextDistanceCalculation = emitter.distanceToCamera;
-  if (emitter.nextDistanceCalculation > emitter.MAX_CALC_DELAY) {
-    emitter.nextDistanceCalculation = emitter.MAX_CALC_DELAY + Math.random() * 200;
-  }
-}
+import { type API } from '../api/Types';
 
 /** Original elapsed-time emission/motion rules, adapted to native particle pools. */
+interface FrameEmitter extends NativeEmitter {
+  retainUntilKilled?: boolean;
+  mirrorY?: boolean;
+}
+
 export class EmitterFrames {
-  private pendingDelta = new WeakMap<Raw, number>();
-  private emittedCount = new WeakMap<Raw, number>();
+  private pendingDelta = new WeakMap<Game.core.particle.Particle, number>();
+  private emittedCount = new WeakMap<FrameEmitter, number>();
   constructor(
-    private Particle: any,
-    private Emitter: Raw,
-    private Color: Raw,
+    private Particle: new () => Particle,
+    private Emitter: Pick<
+      typeof NativeEmitter,
+      'POOL_SIZE_MAX' | 'POOL_SIZE_MIN' | 'IS_HIGH_GRAPHICS' | 'setHighGraphics'
+    >,
+    private Color: Pick<typeof NativeColor, 'interpolateColor'>,
     private targets = new EmitterTargets(),
-    private prepareFrame?: (emitter: Raw) => void,
+    private prepareFrame?: (emitter: FrameEmitter) => void,
     private auraPulses?: AuraPulses,
     private lightning?: AuraLightningFrames,
   ) {}
 
-  reset(emitter: Raw): void {
+  restart(emitter: FrameEmitter): void {
+    emitter.emittAccum = 0;
     this.emittedCount.delete(emitter);
+  }
+
+  reset(emitter: FrameEmitter): void {
+    this.restart(emitter);
+    for (const particle of emitter.particles ?? []) this.pendingDelta.delete(particle);
+    for (const particle of emitter.inactiveParticles ?? []) this.pendingDelta.delete(particle);
     this.targets.release(emitter);
   }
 
-  update(emitter: Raw, milliseconds: number): void {
+  update(emitter: FrameEmitter, milliseconds: number): void {
     this.prepareFrame?.(emitter);
     this.lightning?.begin(emitter);
     if (this.targets.stale(emitter)) {
@@ -90,8 +69,9 @@ export class EmitterFrames {
       return;
     }
     const delta = Number.isFinite(milliseconds) ? Math.max(0, Math.min(500, milliseconds)) : 0;
-    const constant = read(emitter, 'constantEmitter');
-    if (!emitter.isEmitting && !emitter.particles.length && constant) return;
+    const constant = emitter.get_constantEmitter();
+    if (!emitter.isEmitting && !emitter.particles.length && (constant || emitter.retainUntilKilled))
+      return;
     emitter.nextDistanceCalculation -= delta;
     if (emitter.nextDistanceCalculation <= 0) {
       this.position(emitter);
@@ -121,7 +101,7 @@ export class EmitterFrames {
     this.time(emitter, delta);
   }
 
-  private position(emitter: Raw): void {
+  private position(emitter: FrameEmitter): void {
     if (!emitter.followTarget || !emitter.target) return;
     const target = emitter.target,
       pose = emitterTargetPose(target);
@@ -130,7 +110,8 @@ export class EmitterFrames {
     if (emitter.yOffset !== 0) {
       const radius = Math.abs(emitter.yOffset),
         offset = Math.atan(emitter.yOffset);
-      if (target.ship?.engine === target) emitter.angle = pose.rotation + Math.PI;
+      if ((target as Partial<Engine>).ship?.engine === target)
+        emitter.angle = pose.rotation + Math.PI;
       emitter.posX = pose.x + Math.cos(emitter.angle + offset) * radius;
       emitter.posY = pose.y + Math.sin(emitter.angle + offset) * radius;
       emitter.angle = pose.rotation + Math.PI;
@@ -141,25 +122,28 @@ export class EmitterFrames {
     }
   }
 
-  private time(emitter: Raw, delta: number): void {
+  private time(emitter: FrameEmitter, delta: number): void {
     if (emitter.isEmitting) emitter.timeElapsed += delta;
     if (
-      !read(emitter, 'constantEmitter') &&
+      !emitter.get_constantEmitter() &&
       emitter.timeElapsed >= emitter._duration + emitter.delay
     ) {
       emitter.isEmitting = false;
-      if (!emitter.particles.length) emitter.alive = false;
+      if (!emitter.particles.length && !emitter.retainUntilKilled) emitter.alive = false;
     }
   }
 
-  private emit(emitter: Raw, delta: number, afterEmission: number): void {
+  private emit(emitter: FrameEmitter, delta: number, afterEmission: number): void {
     // Rainbow is a newer native visual: preserve its column creation and 33ms
     // cadence while animating existing particles every render frame.
+    const limit = Math.min(emitter.get_maxParticles(), this.Emitter.POOL_SIZE_MAX);
     const rate = emitter.rainbow
       ? 1 / 33
-      : !read(emitter, 'constantEmitter') || emitter.steadyStream
-        ? read(emitter, 'ppms')
-        : 1 / 33;
+      : !emitter.get_constantEmitter()
+        ? emitter.get_ppms()
+        : emitter.steadyStream
+          ? limit / emitter.ttl
+          : 1 / 33;
     if (!(rate > 0)) return;
     emitter.emittAccum += rate * delta;
     const count = Math.floor(emitter.emittAccum + 1e-10);
@@ -172,7 +156,6 @@ export class EmitterFrames {
       );
       for (let index = 0; index < missing; index++) pool.push(new this.Particle());
     }
-    const limit = read(emitter, 'maxParticles');
     let emitted = this.emittedCount.get(emitter) ?? 0;
     for (let index = 1; index <= count; index++) {
       const before = emitter.particles.length;
@@ -193,8 +176,10 @@ export class EmitterFrames {
     this.emittedCount.set(emitter, emitted);
   }
 
-  private draw(emitter: Raw, frameDelta: number): void {
-    emitter.collectiveMeshBatch.clear();
+  private draw(emitter: FrameEmitter, frameDelta: number): void {
+    const batch = emitter.collectiveMeshBatch;
+    if (!batch) throw Error('Cannot draw an emitter without its collective mesh batch');
+    batch.clear();
     let vertices = 0;
     for (let index = emitter.particles.length - 1; index >= 0; index--) {
       const particle = emitter.particles[index];
@@ -206,7 +191,7 @@ export class EmitterFrames {
       }
       const seconds = delta / 1000,
         fraction = particle.ttl / particle.totalTtl;
-      const rotation = read(particle, 'rotation'),
+      const rotation = particle.get_rotation(),
         distance = particle.speed * seconds;
       const pull = Math.pow(Math.max(0, fraction), delta / 33);
       let x: number, y: number;
@@ -221,8 +206,8 @@ export class EmitterFrames {
         y = particle.localPosY + emitter.posY;
         particle.set_rotation(emitter.angle);
       } else {
-        x = read(particle, 'x') + Math.cos(rotation) * distance + emitter.gravityX * seconds;
-        y = read(particle, 'y') + Math.sin(rotation) * distance + emitter.gravityY * seconds;
+        x = particle.get_x() + Math.cos(rotation) * distance + emitter.gravityX * seconds;
+        y = particle.get_y() + Math.sin(rotation) * distance + emitter.gravityY * seconds;
         if (emitter.centralGravity) {
           x = (x - emitter.posX) * pull + emitter.posX;
           y = (y - emitter.posY) * pull + emitter.posY;
@@ -232,7 +217,7 @@ export class EmitterFrames {
       particle.set_y(y);
       const size = (particle.startSize - particle.finishSize) * fraction + particle.finishSize;
       particle.set_scaleX(
-        emitter.rainbow ? particle.rainbowLength / read(emitter._txt, 'width') : size,
+        emitter.rainbow ? particle.rainbowLength / emitter._txt!.get_width() : size,
       );
       particle.set_scaleY(emitter.mirrorY ? -size : size);
       if (!emitter.rainbow)
@@ -248,27 +233,36 @@ export class EmitterFrames {
       particle.ttl -= delta;
       if (emitter.isOnScreen) {
         vertices += 4;
-        if (vertices >= 800) {
+        if (vertices >= 2400) {
           this.Emitter.POOL_SIZE_MAX = 10;
           this.Emitter.POOL_SIZE_MIN = 2;
           break;
         }
-        emitter.collectiveMeshBatch.addMesh(particle, null, alpha, null, false);
-        this.lightning?.observe(emitter, particle, alpha);
+        if (batch.canAddMesh(particle)) {
+          batch.addMesh(particle, null, alpha, null, false);
+          this.lightning?.observe(emitter, particle, alpha);
+        }
       }
     }
-    if (this.Emitter.IS_HIGH_GRAPHICS && vertices < 400) this.Emitter.setHighGraphics();
+    if (this.Emitter.IS_HIGH_GRAPHICS && vertices < 1200) this.Emitter.setHighGraphics();
   }
 }
 
 export function installEmitterFrames(api: API): void {
-  const Emitter = api.cls('core.particle.Emitter');
-  const Particle = api.cls('core.particle.Particle');
-  const Color = api.cls('generics.Color');
-  const Collective = api.cls('core.particle.CollectiveMeshBatch');
-  if (!Emitter || !Particle || !Color || !Collective) return;
-  const targets = new EmitterTargets(api.cls('core.engine.Engine'), api.cls('core.ship.EnemyShip'));
+  const Emitter = NativeEmitter;
+  const reflection = new GameReflection(api);
+  if (!Emitter || !Particle || !NativeColor || !CollectiveMeshBatch) return;
+  installEmitterLifecycle(api);
+  // Emitter.diff triples the high-quality pool and matching render thresholds.
+  // Hook every graphics-mode reset so the native 100-particle limit cannot return.
+  reflection.after(Emitter, 'setHighGraphics', () => {
+    Emitter.POOL_SIZE_MAX = 300;
+  });
+  if (Emitter.IS_HIGH_GRAPHICS) Emitter.setHighGraphics();
+  const targets = new EmitterTargets(Engine, EnemyShip);
+  installProjectileThrustAnchors(api, emitterTargetPose);
   installEmitterMirroring(api);
+  installNativeBeamResources(api);
   const prepareAuras = installRarityAuraLayers(api);
   installAuraStyles(api);
   const pulses = installAuraPulses(api);
@@ -276,48 +270,59 @@ export function installEmitterFrames(api: API): void {
   const frames = new EmitterFrames(
     Particle,
     Emitter,
-    Color,
+    NativeColor,
     targets,
     prepareAuras,
     pulses,
     lightning,
   );
   installEmitterDelays(api, targets);
-  // Unit.reset reaches GameObject.reset; Engine.reset does not call its base.
-  for (const name of ['core.GameObject', 'core.engine.Engine']) {
-    const prototype = api.cls(name)?.prototype;
-    if (typeof prototype?.reset === 'function') {
-      api.before(prototype, 'reset', function () {
-        targets.resetTarget(this);
-      });
-    }
-  }
-  const factory = api.cls('core.particle.EmitterFactory');
-  if (typeof factory?.create === 'function') {
-    api.after(factory, 'create', function (emitters: Raw[] | null) {
-      for (const emitter of emitters ?? []) targets.capture(emitter);
-    });
-  }
-  api.around(Emitter.prototype, 'updateOnScreen', function () {
-    updateEmitterVisibility(this);
+  // fastForward and other native callers must use the same elapsed-time path
+  // as display frames. Calls without a delta retain the source's 33 ms default.
+  reflection.around(Emitter.prototype, 'update', function (_next, milliseconds: number = 33) {
+    frames.update(this, milliseconds);
   });
-  api.before(Emitter.prototype, 'dispose', function () {
+  reflection.before(Emitter.prototype, 'play', function () {
+    frames.restart(this);
+  });
+  reflection.before(Emitter.prototype, 'killEmitter', function () {
     frames.reset(this);
   });
-  api.onGame((game, session) => {
+  // Unit.reset reaches GameObject.reset; Engine.reset does not call its base.
+  for (const prototype of [GameObject.prototype, Engine.prototype]) {
+    reflection.before(prototype, 'reset', function () {
+      targets.resetTarget(this);
+    });
+  }
+  reflection.after(EmitterFactory, 'create', function (emitters) {
+    for (const emitter of emitters ?? []) targets.capture(emitter);
+  });
+  new GameReflection(api).around(NativeEmitter.prototype, 'updateOnScreen', function () {
+    updateEmitterVisibility(this);
+  });
+  reflection.before(Emitter.prototype, 'dispose', function () {
+    frames.reset(this);
+    const emitter: FrameEmitter = this;
+    emitter.retainUntilKilled = false;
+  });
+  api.onGame((value, session) => {
+    const game = reflection.cast(value, 'core.scene.Game');
+    const hooks = new GameReflection(session);
     const manager = game.emitterManager;
-    if (!manager) return;
+    const parallax = game.parallaxManager;
+    if (!manager || !parallax) return;
     // The cached Game.update callback reaches parallax once per display frame,
     // after ship drawing. Suppress only this session's old tick-time emitter call.
-    session.around(manager, 'update', function () {});
-    session.before(game.parallaxManager, 'update', function (seconds: number) {
-      if (read(game, 'isLeaving') || !manager.emitters) return;
+    hooks.around(manager, 'update', function () {});
+    hooks.before(parallax, 'update', function (seconds = 1 / 60) {
+      if (game.get_isLeaving() || !manager.emitters) return;
+      beginEmitterFrame();
       for (let index = manager.emitters.length - 1; index >= 0; index--) {
         const emitter = manager.emitters[index];
-        if (emitter.alive) frames.update(emitter, seconds * 1000);
+        if (emitter.alive && !targets.stale(emitter)) frames.update(emitter, seconds * 1000);
         else manager.removeEmitter(emitter, index);
       }
-      Collective.AllMeshesAreUpdated();
+      CollectiveMeshBatch.AllMeshesAreUpdated();
     });
   });
 }

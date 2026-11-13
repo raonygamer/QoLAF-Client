@@ -1,14 +1,41 @@
 // Source port of qolaf/data/ClientSettings.as.
-import { bound, type Resolve } from '../runtime/As3';
-export function createClientSettings(resolve: Resolve): any {
-  const Game: any = resolve('core.scene.Game');
-  type Game = any;
-  const SceneBase: any = resolve('core.scene.SceneBase');
-  type SceneBase = any;
-  const Point: any = resolve('openfl.geom.Point');
-  type Point = any;
-  const SharedObject: any = resolve('openfl.net.SharedObject');
-  type SharedObject = any;
+import { bound, type Resolve } from '../runtime/HaxeInterop';
+import type { Point as NativePoint, SceneBase } from '../game/Bindings';
+import { errorMessage } from '../runtime/ErrorMessage';
+
+type SettingsValues = Record<string, unknown>;
+type NumberRange = readonly [fallback: number, minimum: number, maximum: number];
+interface SettingsStorage {
+  data: { settings?: unknown };
+  flush(): unknown;
+}
+interface SettingsIdentity {
+  instance: { me: { id: string | null } | null } | null;
+}
+interface MusicState {
+  manual: boolean;
+  trackKey: string;
+  selectedTrackKey: string;
+  loop: boolean;
+  state: 'playing' | 'paused' | 'stopped';
+}
+interface ChatTab {
+  mode: string;
+  privateTarget: string;
+}
+function settingsRecord(value: unknown): SettingsValues | null {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? (value as SettingsValues)
+    : null;
+}
+
+export function createClientSettings(resolve: Resolve) {
+  const Game = resolve('core.scene.Game') as SettingsIdentity;
+  const Point = resolve('openfl.geom.Point') as typeof NativePoint;
+  type Point = NativePoint;
+  const SharedObject = resolve('openfl.net.SharedObject') as {
+    getLocal(name: string): SettingsStorage;
+  };
 
   class ClientSettings {
     public static SETTINGS_FILE: string = '\\qolaf\\local_settings.json';
@@ -106,14 +133,15 @@ export function createClientSettings(resolve: Resolve): any {
 
     private static SHARED_OBJECT_NAME: string = 'QoLAFSettings';
     private static DEFAULT_PLAYER_ID: string = 'default';
-    private static AIM_ASSIST_BOOLEAN_DEFAULTS: any =
+    private static AIM_ASSIST_BOOLEAN_DEFAULTS: Record<string, boolean> =
       ClientSettings.createAimAssistBooleanDefaults();
-    private static AIM_ASSIST_NUMBER_RANGES: any = ClientSettings.createAimAssistNumberRanges();
+    private static AIM_ASSIST_NUMBER_RANGES: Record<string, NumberRange> =
+      ClientSettings.createAimAssistNumberRanges();
 
-    private sharedObject!: SharedObject;
-    private settingsObject: any = {};
+    private sharedObject!: SettingsStorage;
+    private settingsObject: SettingsValues = {};
 
-    constructor(sceneBase: SceneBase = null) {
+    constructor(_sceneBase: SceneBase | null = null) {
       this.sharedObject = SharedObject.getLocal(ClientSettings.SHARED_OBJECT_NAME);
       this.load();
     }
@@ -151,7 +179,7 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get settingsCategory(): string {
-      var values: any = this.getPlayerSettings(false);
+      const values = this.getPlayerSettings(false);
       var category: string | null =
         values == null ? null : <string>values[ClientSettings.SETTINGS_CATEGORY];
       return ClientSettings.validSettingsCategory(category) ? category! : 'general';
@@ -183,10 +211,10 @@ export function createClientSettings(resolve: Resolve): any {
 
     /** Explicit account identity prevents late audio callbacks writing another account. */
     @bound
-    public getMusicPlayerState(playerId: string): any {
-      var values: any =
-        ClientSettings.validMusicAccount(playerId) && this.settingsObject.hasOwnProperty(playerId)
-          ? this.settingsObject[playerId]
+    public getMusicPlayerState(playerId: string): MusicState {
+      const values =
+        ClientSettings.validMusicAccount(playerId) && Object.hasOwn(this.settingsObject, playerId)
+          ? settingsRecord(this.settingsObject[playerId])
           : null;
       return ClientSettings.normalizeMusicPlayerState(
         values == null ? null : values[ClientSettings.MUSIC_PLAYER_STATE],
@@ -194,10 +222,10 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     @bound
-    public setMusicPlayerState(playerId: string, value: any): void {
+    public setMusicPlayerState(playerId: string, value: unknown): void {
       if (!ClientSettings.validMusicAccount(playerId)) return;
-      var normalized: any = ClientSettings.normalizeMusicPlayerState(value);
-      var previous: any = this.getMusicPlayerState(playerId);
+      const normalized = ClientSettings.normalizeMusicPlayerState(value);
+      const previous = this.getMusicPlayerState(playerId);
       if (
         previous.manual == normalized.manual &&
         previous.trackKey == normalized.trackKey &&
@@ -206,10 +234,12 @@ export function createClientSettings(resolve: Resolve): any {
         previous.state == normalized.state
       )
         return;
-      if (!this.settingsObject.hasOwnProperty(playerId) || this.settingsObject[playerId] == null) {
+      if (!Object.hasOwn(this.settingsObject, playerId) || this.settingsObject[playerId] == null) {
         this.settingsObject[playerId] = this.buildDefaults();
       }
-      this.settingsObject[playerId][ClientSettings.MUSIC_PLAYER_STATE] = normalized;
+      const values = settingsRecord(this.settingsObject[playerId]) ?? this.buildDefaults();
+      values[ClientSettings.MUSIC_PLAYER_STATE] = normalized;
+      this.settingsObject[playerId] = values;
       this.save();
     }
 
@@ -224,32 +254,32 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     @bound
-    private static normalizeMusicPlayerState(value: any): any {
-      if (value == null || typeof value != 'object') value = {};
+    private static normalizeMusicPlayerState(stored: unknown): MusicState {
+      const value = settingsRecord(stored) ?? {};
       var key: string = ClientSettings.normalizeMusicTrackKey(value.trackKey);
       var selectedKey: string = ClientSettings.normalizeMusicTrackKey(value.selectedTrackKey);
       var manual: boolean =
         value.manual === true && (key != '' || value.trackKey == null || value.trackKey === '');
-      var state: string =
-        value.state == 'playing' || value.state == 'paused' ? value.state : 'stopped';
+      const state: MusicState['state'] =
+        value.state === 'playing' || value.state === 'paused' ? value.state : 'stopped';
       return {
         manual: manual,
         trackKey: key,
         selectedTrackKey: selectedKey == '' ? key : selectedKey,
-        loop: !value.hasOwnProperty('loop') || value.loop === true,
+        loop: !Object.hasOwn(value, 'loop') || value.loop === true,
         state: manual ? state : 'stopped',
       };
     }
 
     @bound
-    private static normalizeMusicTrackKey(value: any): string {
+    private static normalizeMusicTrackKey(value: unknown): string {
       return typeof value == 'string' && value.length <= 160 && !/[^A-Za-z0-9_-]/.test(value)
         ? value
         : '';
     }
 
-    public get advancedChatTab(): any {
-      var playerSettings: any = this.getPlayerSettings(false);
+    public get advancedChatTab(): ChatTab {
+      const playerSettings = this.getPlayerSettings(false);
       return ClientSettings.normalizeChatTab(
         playerSettings == null ? null : playerSettings[ClientSettings.ADVANCED_CHAT_TAB],
       );
@@ -257,11 +287,11 @@ export function createClientSettings(resolve: Resolve): any {
 
     @bound
     public setAdvancedChatTab(mode: string, privateTarget: string = ''): void {
-      var value: any = ClientSettings.normalizeChatTab({
+      const value = ClientSettings.normalizeChatTab({
         mode: mode,
         privateTarget: privateTarget,
       });
-      var previous: any = this.advancedChatTab;
+      const previous = this.advancedChatTab;
       if (previous.mode == value.mode && previous.privateTarget == value.privateTarget) {
         return;
       }
@@ -270,11 +300,18 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     @bound
-    private static normalizeChatTab(value: any): any {
+    private static normalizeChatTab(stored: unknown): ChatTab {
+      const value = settingsRecord(stored);
       var mode: string | null =
-        value != null && value.hasOwnProperty('mode') ? <string>value.mode : null;
+        value != null && Object.hasOwn(value, 'mode') && typeof value.mode === 'string'
+          ? value.mode
+          : null;
       var target: string | null =
-        value != null && value.hasOwnProperty('privateTarget') ? <string>value.privateTarget : null;
+        value != null &&
+        Object.hasOwn(value, 'privateTarget') &&
+        typeof value.privateTarget === 'string'
+          ? value.privateTarget
+          : null;
       switch (mode) {
         case 'local':
         case 'global':
@@ -292,8 +329,8 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get autoTarget(): boolean {
-      var playerSettings: any = this.getPlayerSettings(false);
-      if (playerSettings != null && playerSettings.hasOwnProperty(ClientSettings.AUTO_TARGET)) {
+      const playerSettings = this.getPlayerSettings(false);
+      if (playerSettings != null && Object.hasOwn(playerSettings, ClientSettings.AUTO_TARGET)) {
         return <boolean>playerSettings[ClientSettings.AUTO_TARGET];
       }
       return true;
@@ -309,7 +346,7 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get showSecondaryBossTimers(): boolean {
-      var values: any = this.getPlayerSettings(false);
+      const values = this.getPlayerSettings(false);
       return values != null && <boolean>values[ClientSettings.SHOW_SECONDARY_BOSS_TIMERS];
     }
 
@@ -355,7 +392,7 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get animateTeleportScaling(): boolean {
-      var values: any = this.getPlayerSettings(false);
+      const values = this.getPlayerSettings(false);
       return values != null && <boolean>values[ClientSettings.ANIMATE_TELEPORT_SCALING];
     }
 
@@ -365,7 +402,7 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get disableRemasteredAuras(): boolean {
-      var values: any = this.getPlayerSettings(false);
+      const values = this.getPlayerSettings(false);
       return values != null && <boolean>values[ClientSettings.DISABLE_REMASTERED_AURAS];
     }
 
@@ -385,8 +422,8 @@ export function createClientSettings(resolve: Resolve): any {
 
     @bound
     private defaultOn(key: string): boolean {
-      var values: any = this.getPlayerSettings(false);
-      return values == null || !values.hasOwnProperty(key) || <boolean>values[key];
+      const values = this.getPlayerSettings(false);
+      return values == null || !Object.hasOwn(values, key) || <boolean>values[key];
     }
 
     public get showRadarFPS(): boolean {
@@ -430,7 +467,7 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get radarSpeedInMph(): boolean {
-      var values: any = this.getPlayerSettings(false);
+      const values = this.getPlayerSettings(false);
       return values != null && <boolean>values[ClientSettings.RADAR_SPEED_IN_MPH];
     }
     public set radarSpeedInMph(value: boolean) {
@@ -476,13 +513,13 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get targetInfoPosition(): Point {
-      var playerSettings: any = this.getPlayerSettings(false);
+      const playerSettings = this.getPlayerSettings(false);
       if (
         playerSettings != null &&
-        playerSettings.hasOwnProperty(ClientSettings.TARGET_INFO_POSITION)
+        Object.hasOwn(playerSettings, ClientSettings.TARGET_INFO_POSITION)
       ) {
-        var stored: any = playerSettings[ClientSettings.TARGET_INFO_POSITION];
-        if (stored != null && stored.hasOwnProperty('x') && stored.hasOwnProperty('y')) {
+        const stored = settingsRecord(playerSettings[ClientSettings.TARGET_INFO_POSITION]);
+        if (stored != null && Object.hasOwn(stored, 'x') && Object.hasOwn(stored, 'y')) {
           return new Point(
             ClientSettings.clampNormalized(Number(stored.x), ClientSettings.DEFAULT_TARGET_INFO_X),
             ClientSettings.clampNormalized(Number(stored.y), ClientSettings.DEFAULT_TARGET_INFO_Y),
@@ -504,10 +541,10 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get targetListExpanded(): boolean {
-      var playerSettings: any = this.getPlayerSettings(false);
+      const playerSettings = this.getPlayerSettings(false);
       if (
         playerSettings != null &&
-        playerSettings.hasOwnProperty(ClientSettings.TARGET_LIST_EXPANDED)
+        Object.hasOwn(playerSettings, ClientSettings.TARGET_LIST_EXPANDED)
       ) {
         return <boolean>playerSettings[ClientSettings.TARGET_LIST_EXPANDED];
       }
@@ -520,10 +557,10 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get nearbyEnemyRadarLines(): number {
-      var playerSettings: any = this.getPlayerSettings(false);
+      const playerSettings = this.getPlayerSettings(false);
       if (
         playerSettings != null &&
-        playerSettings.hasOwnProperty(ClientSettings.NEARBY_ENEMY_RADAR_LINES)
+        Object.hasOwn(playerSettings, ClientSettings.NEARBY_ENEMY_RADAR_LINES)
       ) {
         return Number(
           Math.round(
@@ -554,10 +591,10 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get excludeAFFactionFromRadar(): boolean {
-      var playerSettings: any = this.getPlayerSettings(false);
+      const playerSettings = this.getPlayerSettings(false);
       if (
         playerSettings != null &&
-        playerSettings.hasOwnProperty(ClientSettings.EXCLUDE_AF_FACTION_FROM_RADAR)
+        Object.hasOwn(playerSettings, ClientSettings.EXCLUDE_AF_FACTION_FROM_RADAR)
       ) {
         return <boolean>playerSettings[ClientSettings.EXCLUDE_AF_FACTION_FROM_RADAR];
       }
@@ -570,10 +607,10 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get disableNativeBossBar(): boolean {
-      var playerSettings: any = this.getPlayerSettings(false);
+      const playerSettings = this.getPlayerSettings(false);
       if (
         playerSettings != null &&
-        playerSettings.hasOwnProperty(ClientSettings.DISABLE_NATIVE_BOSS_BAR)
+        Object.hasOwn(playerSettings, ClientSettings.DISABLE_NATIVE_BOSS_BAR)
       ) {
         return <boolean>playerSettings[ClientSettings.DISABLE_NATIVE_BOSS_BAR];
       }
@@ -586,10 +623,10 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get disableSelectedTargetIcon(): boolean {
-      var playerSettings: any = this.getPlayerSettings(false);
+      const playerSettings = this.getPlayerSettings(false);
       if (
         playerSettings != null &&
-        playerSettings.hasOwnProperty(ClientSettings.DISABLE_SELECTED_TARGET_ICON)
+        Object.hasOwn(playerSettings, ClientSettings.DISABLE_SELECTED_TARGET_ICON)
       ) {
         return <boolean>playerSettings[ClientSettings.DISABLE_SELECTED_TARGET_ICON];
       }
@@ -602,10 +639,10 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get targetSearchDistance(): number {
-      var playerSettings: any = this.getPlayerSettings(false);
+      const playerSettings = this.getPlayerSettings(false);
       if (
         playerSettings != null &&
-        playerSettings.hasOwnProperty(ClientSettings.TARGET_SEARCH_DISTANCE)
+        Object.hasOwn(playerSettings, ClientSettings.TARGET_SEARCH_DISTANCE)
       ) {
         return ClientSettings.clampNumber(
           Number(playerSettings[ClientSettings.TARGET_SEARCH_DISTANCE]),
@@ -629,8 +666,8 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get multibarMode(): boolean {
-      var playerSettings: any = this.getPlayerSettings(false);
-      if (playerSettings != null && playerSettings.hasOwnProperty(ClientSettings.MULTIBAR_MODE)) {
+      const playerSettings = this.getPlayerSettings(false);
+      if (playerSettings != null && Object.hasOwn(playerSettings, ClientSettings.MULTIBAR_MODE)) {
         return <boolean>playerSettings[ClientSettings.MULTIBAR_MODE];
       }
       return true;
@@ -642,10 +679,10 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get multibarDividend(): number {
-      var playerSettings: any = this.getPlayerSettings(false);
+      const playerSettings = this.getPlayerSettings(false);
       if (
         playerSettings != null &&
-        playerSettings.hasOwnProperty(ClientSettings.MULTIBAR_DIVIDEND)
+        Object.hasOwn(playerSettings, ClientSettings.MULTIBAR_DIVIDEND)
       ) {
         return ClientSettings.clampNumber(
           Number(playerSettings[ClientSettings.MULTIBAR_DIVIDEND]),
@@ -668,10 +705,10 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get expandedArtifactOverview(): boolean {
-      var playerSettings: any = this.getPlayerSettings(false);
+      const playerSettings = this.getPlayerSettings(false);
       if (
         playerSettings != null &&
-        playerSettings.hasOwnProperty(ClientSettings.EXPANDED_ARTIFACT_OVERVIEW)
+        Object.hasOwn(playerSettings, ClientSettings.EXPANDED_ARTIFACT_OVERVIEW)
       ) {
         return <boolean>playerSettings[ClientSettings.EXPANDED_ARTIFACT_OVERVIEW];
       }
@@ -684,8 +721,8 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     public get dontKick(): boolean {
-      var playerSettings: any = this.getPlayerSettings(false);
-      if (playerSettings != null && playerSettings.hasOwnProperty(ClientSettings.DONT_KICK)) {
+      const playerSettings = this.getPlayerSettings(false);
+      if (playerSettings != null && Object.hasOwn(playerSettings, ClientSettings.DONT_KICK)) {
         return <boolean>playerSettings[ClientSettings.DONT_KICK];
       }
       return false;
@@ -734,11 +771,11 @@ export function createClientSettings(resolve: Resolve): any {
 
     @bound
     public getAimAssistBoolean(key: string): boolean {
-      if (!ClientSettings.AIM_ASSIST_BOOLEAN_DEFAULTS.hasOwnProperty(key)) {
+      if (!Object.hasOwn(ClientSettings.AIM_ASSIST_BOOLEAN_DEFAULTS, key)) {
         return false;
       }
-      var playerSettings: any = this.getPlayerSettings(false);
-      if (playerSettings != null && playerSettings.hasOwnProperty(key)) {
+      const playerSettings = this.getPlayerSettings(false);
+      if (playerSettings != null && Object.hasOwn(playerSettings, key)) {
         return <boolean>playerSettings[key];
       }
       return <boolean>ClientSettings.AIM_ASSIST_BOOLEAN_DEFAULTS[key];
@@ -746,7 +783,7 @@ export function createClientSettings(resolve: Resolve): any {
 
     @bound
     public setAimAssistBoolean(key: string, value: boolean): void {
-      if (!ClientSettings.AIM_ASSIST_BOOLEAN_DEFAULTS.hasOwnProperty(key)) {
+      if (!Object.hasOwn(ClientSettings.AIM_ASSIST_BOOLEAN_DEFAULTS, key)) {
         return;
       }
       this.getPlayerSettings(true)[key] = value;
@@ -755,12 +792,12 @@ export function createClientSettings(resolve: Resolve): any {
 
     @bound
     public getAimAssistNumber(key: string): number {
-      var range: any[] = <any[]>ClientSettings.AIM_ASSIST_NUMBER_RANGES[key];
+      const range = ClientSettings.AIM_ASSIST_NUMBER_RANGES[key];
       if (range == null) {
         return 0;
       }
-      var playerSettings: any = this.getPlayerSettings(false);
-      if (playerSettings != null && playerSettings.hasOwnProperty(key)) {
+      const playerSettings = this.getPlayerSettings(false);
+      if (playerSettings != null && Object.hasOwn(playerSettings, key)) {
         return ClientSettings.clampNumber(
           Number(playerSettings[key]),
           Number(range[1]),
@@ -773,7 +810,7 @@ export function createClientSettings(resolve: Resolve): any {
 
     @bound
     public setAimAssistNumber(key: string, value: number): void {
-      var range: any[] = <any[]>ClientSettings.AIM_ASSIST_NUMBER_RANGES[key];
+      const range = ClientSettings.AIM_ASSIST_NUMBER_RANGES[key];
       if (range == null) {
         return;
       }
@@ -788,33 +825,33 @@ export function createClientSettings(resolve: Resolve): any {
 
     @bound
     public static getAimAssistNumberDefault(key: string): number {
-      var range: any[] = <any[]>ClientSettings.AIM_ASSIST_NUMBER_RANGES[key];
+      const range = ClientSettings.AIM_ASSIST_NUMBER_RANGES[key];
       return range == null ? 0 : Number(range[0]);
     }
 
     @bound
     public static getAimAssistNumberMinimum(key: string): number {
-      var range: any[] = <any[]>ClientSettings.AIM_ASSIST_NUMBER_RANGES[key];
+      const range = ClientSettings.AIM_ASSIST_NUMBER_RANGES[key];
       return range == null ? 0 : Number(range[1]);
     }
 
     @bound
     public static getAimAssistNumberMaximum(key: string): number {
-      var range: any[] = <any[]>ClientSettings.AIM_ASSIST_NUMBER_RANGES[key];
+      const range = ClientSettings.AIM_ASSIST_NUMBER_RANGES[key];
       return range == null ? 0 : Number(range[2]);
     }
 
     @bound
     public static getAimAssistBooleanDefault(key: string): boolean {
       return (
-        ClientSettings.AIM_ASSIST_BOOLEAN_DEFAULTS.hasOwnProperty(key) &&
+        Object.hasOwn(ClientSettings.AIM_ASSIST_BOOLEAN_DEFAULTS, key) &&
         <boolean>ClientSettings.AIM_ASSIST_BOOLEAN_DEFAULTS[key]
       );
     }
 
     @bound
     public resetAimAssistSettings(): void {
-      var playerSettings: any = this.getPlayerSettings(true);
+      const playerSettings = this.getPlayerSettings(true);
       var key: string;
       for (key in ClientSettings.AIM_ASSIST_BOOLEAN_DEFAULTS) {
         playerSettings[key] = <boolean>ClientSettings.AIM_ASSIST_BOOLEAN_DEFAULTS[key];
@@ -826,8 +863,8 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     @bound
-    public buildDefaults(): any {
-      var defaults: any = {
+    public buildDefaults(): SettingsValues {
+      const defaults: SettingsValues = {
         auto_target: true,
         target_info_position: {
           x: ClientSettings.DEFAULT_TARGET_INFO_X,
@@ -887,8 +924,8 @@ export function createClientSettings(resolve: Resolve): any {
         this.sharedObject.data.settings = this.settingsObject;
         this.sharedObject.flush();
         return true;
-      } catch (error: any) {
-        console.warn('Failed to serialize local QoLAF settings: ' + error.message);
+      } catch (error) {
+        console.warn('Failed to serialize local QoLAF settings: ' + errorMessage(error));
       }
       return false;
     }
@@ -897,36 +934,37 @@ export function createClientSettings(resolve: Resolve): any {
     private deserialize(): boolean {
       try {
         if (
-          this.sharedObject.data.hasOwnProperty('settings') &&
+          Object.hasOwn(this.sharedObject.data, 'settings') &&
           this.sharedObject.data.settings != null
         ) {
-          this.settingsObject = this.sharedObject.data.settings;
+          this.settingsObject = settingsRecord(this.sharedObject.data.settings) ?? {};
         } else {
           this.settingsObject = {};
         }
         return true;
-      } catch (error: any) {
-        console.warn('Failed to deserialize local QoLAF settings: ' + error.message);
+      } catch (error) {
+        console.warn('Failed to deserialize local QoLAF settings: ' + errorMessage(error));
         this.settingsObject = {};
       }
       return false;
     }
 
-    @bound
-    private getPlayerSettings(create: boolean): any {
-      var playerId: string = ClientSettings.getCurrentPlayerId();
-      if (!this.settingsObject.hasOwnProperty(playerId) || this.settingsObject[playerId] == null) {
-        if (!create) {
-          return null;
-        }
-        this.settingsObject[playerId] = this.buildDefaults();
-      }
-      return this.settingsObject[playerId];
+    private getPlayerSettings(create: true): SettingsValues;
+    private getPlayerSettings(create: false): SettingsValues | null;
+    private getPlayerSettings(create: boolean): SettingsValues | null {
+      const playerId = ClientSettings.getCurrentPlayerId();
+      const values = Object.hasOwn(this.settingsObject, playerId)
+        ? settingsRecord(this.settingsObject[playerId])
+        : null;
+      if (values || !create) return values;
+      const defaults = this.buildDefaults();
+      this.settingsObject[playerId] = defaults;
+      return defaults;
     }
 
     @bound
     private static getCurrentPlayerId(): string {
-      var game: Game = Game.instance;
+      const game = Game.instance;
       if (game != null && game.me != null && game.me.id != null && game.me.id.length > 0) {
         return game.me.id;
       }
@@ -955,8 +993,8 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     @bound
-    private static createAimAssistBooleanDefaults(): any {
-      var defaults: any = {};
+    private static createAimAssistBooleanDefaults(): Record<string, boolean> {
+      const defaults: Record<string, boolean> = {};
       defaults[ClientSettings.AIM_ASSIST_ENABLED] = false;
       defaults[ClientSettings.AIM_ASSIST_PROJECTILE_LEAD] = true;
       defaults[ClientSettings.AIM_ASSIST_STATIONARY_TRACKING] = true;
@@ -968,8 +1006,8 @@ export function createClientSettings(resolve: Resolve): any {
     }
 
     @bound
-    private static createAimAssistNumberRanges(): any {
-      var ranges: any = {};
+    private static createAimAssistNumberRanges(): Record<string, NumberRange> {
+      const ranges: Record<string, NumberRange> = {};
       ranges[ClientSettings.AIM_ASSIST_MIN_DISTANCE] = [150, 0, 1000];
       ranges[ClientSettings.AIM_ASSIST_MIN_RANGE_RATIO] = [0.15, 0, 1];
       ranges[ClientSettings.AIM_ASSIST_MIN_MOUSE_DELTA] = [0.0003, 0, 0.003];

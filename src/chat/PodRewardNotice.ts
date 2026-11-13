@@ -1,4 +1,4 @@
-import type { IpcServerMessage } from '../ipc/ClientIpcService';
+import type { IPCServerMessage } from '../ipc/ClientIPCService';
 
 /** Source reward labels: converted duplicates disclose Flux, not the old item. */
 export class PodRewardNotice {
@@ -12,7 +12,7 @@ export class PodRewardNotice {
       !/[\x00-\x1f\x7f\u2028\u2029]/.test(value)
     );
   }
-  static fromReply(reply: IpcServerMessage | null): string | null {
+  static fromReply(reply: IPCServerMessage | null): string | null {
     if (!reply || reply.fields.length < 7) return null;
     const [success, table, rawName, , converted, count, quality] = reply.fields;
     if (
@@ -44,15 +44,27 @@ export class PodRewardNotice {
   static format(playerName: string, reward: string): string {
     return !playerName || !this.validLabel(reward)
       ? ''
-      : this.wrap(`${this.escape(playerName)} received ${this.escape(reward)} from a pod!`);
+      : this.wrap(
+          `${this.escape(playerName, 700)} received ${this.escape(reward, 1000)} from a pod!`,
+        );
   }
-  static escape(value: string): string {
-    return value
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+  static escape(value: string, maximum = Infinity): string {
+    const entities: Readonly<Record<string, string>> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&apos;',
+      '[': '&#91;',
+      ']': '&#93;',
+    };
+    let result = '';
+    for (const character of value) {
+      const encoded = entities[character] ?? character;
+      if (result.length + encoded.length > maximum) return result + '...';
+      result += encoded;
+    }
+    return result;
   }
   static wrap(text: string, lowRelic = false): string {
     return `<font color='${lowRelic ? '#43efdf' : '#ff4b85'}'>${text}</font>`;

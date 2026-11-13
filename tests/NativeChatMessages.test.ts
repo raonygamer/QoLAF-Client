@@ -1,3 +1,8 @@
+import type { Artifact } from '../src/game/Bindings';
+import { bindGameClasses, Point } from '../src/game/Bindings';
+import type { GameScene } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
+import type { Texture } from '../src/game/Bindings';
 import { ChatFriendPingData } from '../src/chat/ChatFriendPingData';
 import { snapshotFriendPings } from '../src/chat/ChatFriendPingTargets';
 import assert from 'node:assert/strict';
@@ -73,6 +78,16 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
     },
   };
   const preferences = new DeviceSettings({ get: (_key, fallback) => fallback, set() {} });
+  bindGameClasses({
+    cls: (name: string) => {
+      if (name === 'core.hud.components.ui.WrapText') return WrapText;
+      try {
+        return fixture.resolve(name);
+      } catch {
+        return {};
+      }
+    },
+  } as unknown as API);
   const api: any = {
     cls: () => WrapText,
     around: (object: any, key: string, fn: Function) =>
@@ -90,7 +105,7 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
   t.after(() => images.dispose());
   const messages = installNativeChatMessages(
     api,
-    { messageLog: { simple, advanced } },
+    { messageLog: { simple, advanced, getQueue: () => [] } } as unknown as GameScene,
     (name) => (name === 'starling.text.TextField' ? Text : fixture.resolve(name)),
     preferences,
     images,
@@ -108,7 +123,7 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
   assert.equal(renderer.characterBatch.meshes[1].scale, 24 / fixture.font.size);
   simple.tf.set_text("<font color='#ffaa44'>[mod]</font> Pilot");
   const badgeGlyph = renderer.activeGlyphs[1];
-  const badgePoint = { x: badgeGlyph.hitX + 1, y: badgeGlyph.hitY + 1 };
+  const badgePoint = new Point(badgeGlyph.hitX + 1, badgeGlyph.hitY + 1);
   assert.equal(messages!.roleTagAtStagePoint(badgePoint, true), 'mod');
   simple.tf.set_text('[mod] Pilot');
   assert.equal(
@@ -124,7 +139,7 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
   assert.ok(renderer.get_height() > originalHeight);
   preferences.set('legacyChatFontSize', 22);
   assert.equal(renderer.textFormat.size, 22);
-  advanced.addText('new row');
+  advanced.addText({ text: 'new row', type: 'local', playerName: 'Pilot' });
   const row = scroll.getChildAt(0) as any;
   const rowRenderer = row.getChildAt(0);
   assert.notEqual(rowRenderer, row.field);
@@ -142,7 +157,7 @@ test('received chat uses source rich glyphs, wraps at viewport width and release
   assert.equal(pending.length, 1);
   assert.equal(imageRenderer.collapseImageLinks, true);
   assert.equal(thumbnail.previewHeight, 16);
-  const asset = new ChatImageAsset([{ dispose() {} }], [100], 440, 280);
+  const asset = new ChatImageAsset([{ dispose() {} }] as unknown as Texture[], [100], 440, 280);
   pending[0](asset);
   assert.equal(imageRow.measuredHeight, 140);
   assert.equal(thumbnail.previewWidth, 220);
@@ -200,16 +215,37 @@ test('verified artifact resolution reprojects existing chat tokens without repla
         load: (_table: string, _key: string, ok: (record: any) => void) => pending.push(ok),
       },
     },
-    messageLog: { simple: { tf: row }, advanced: { scroll, addText() {} } },
+    messageLog: {
+      simple: { tf: row },
+      advanced: {
+        scroll,
+        addText(message: { text: string }) {
+          const node = new WrapText();
+          node.set_text(message.text);
+          scroll.addChild(node);
+        },
+      },
+      getQueue: () => [],
+    },
   };
   const artifacts = new ChatArtifactLinkResolver(
     game,
-    (record) => ({ ...record, getColor: () => 0x55ccff }),
+    (record) => ({ ...record, getColor: () => 0x55ccff }) as unknown as Artifact,
     (text) => text,
     () => 1,
     new ChatArtifactTokenRegistry(),
   );
   t.after(() => artifacts.dispose());
+  bindGameClasses({
+    cls: (name: string) => {
+      if (name === 'core.hud.components.ui.WrapText') return WrapText;
+      try {
+        return fixture.resolve(name);
+      } catch {
+        return {};
+      }
+    },
+  } as unknown as API);
   const api: any = {
     cls: () => WrapText,
     around: (object: any, key: string, fn: Function) =>
@@ -250,7 +286,7 @@ test('verified artifact resolution reprojects existing chat tokens without repla
   const advancedRenderer: any = advancedRow.getChildAt(0);
   advancedRenderer.globalToLocal = (point: any) => point;
   const artifactGlyph = advancedRenderer.activeGlyphs[9];
-  const point = { x: artifactGlyph.hitX + 1, y: artifactGlyph.hitY + 1 };
+  const point = new Point(artifactGlyph.hitX + 1, artifactGlyph.hitY + 1);
   const hit = messages!.artifactAtStagePoint(point);
   assert.equal(hit?.row, advancedRow);
   assert.equal(hit?.token.playerId, 'pilot');
@@ -265,10 +301,14 @@ test('verified artifact resolution reprojects existing chat tokens without repla
   ]);
   advancedRow.set_text(pingText);
   game.messageLog.advanced.addText({ text: pingText, type: 'local', pings });
-  const pingGlyph = advancedRenderer.activeGlyphs.find(
-    (glyph: any) => glyph.textBegin === advancedRenderer.markup.text.indexOf('@'),
+  const pingRenderer = scroll
+    .getChildAt(scroll.get_numChildren() - 1)
+    .getChildAt(0) as typeof advancedRenderer;
+  pingRenderer.globalToLocal = (point: Point) => point;
+  const pingGlyph = pingRenderer.activeGlyphs.find(
+    (glyph: any) => glyph.textBegin === pingRenderer.markup.text.indexOf('@'),
   );
-  const pingPoint = { x: pingGlyph.hitX + 1, y: pingGlyph.hitY + 1 };
+  const pingPoint = new Point(pingGlyph.hitX + 1, pingGlyph.hitY + 1);
   assert.equal(
     messages!.pingAtStagePoint(pingPoint)?.ping,
     pings[0],

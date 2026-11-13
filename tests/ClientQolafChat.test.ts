@@ -1,7 +1,8 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createHash } from 'node:crypto';
-import { ClientIpcService } from '../src/ipc/ClientIpcService';
+import { ClientIPCService } from '../src/ipc/ClientIPCService';
 import { ClientQolafChat, type QolafChatRow } from '../src/chat/ClientQolafChat';
 import { PodRewardNotice } from '../src/chat/PodRewardNotice';
 import { RareArtifactNotice } from '../src/chat/RareArtifactNotice';
@@ -10,7 +11,7 @@ import { installNativeQolafChat } from '../src/chat/NativeQolafChat';
 
 function fixture(t: { after(fn: () => void): void }) {
   ClientQolafChat.shutdown();
-  ClientIpcService.shutdown();
+  ClientIPCService.shutdown();
   let now = 0;
   const timers = new Set<() => void>();
   const interval = (callback: () => void) => {
@@ -19,7 +20,7 @@ function fixture(t: { after(fn: () => void): void }) {
       timers.delete(callback);
     };
   };
-  const ipc = ClientIpcService.ensure(
+  const ipc = ClientIPCService.ensure(
     { connectUserId: 'owner', createJoinRoom() {} },
     '0.3.0 (Public)',
     {
@@ -45,7 +46,7 @@ function fixture(t: { after(fn: () => void): void }) {
   const chat = ClientQolafChat.ensure(ipc, 'owner', 'Owner', environment)!;
   t.after(() => {
     ClientQolafChat.shutdown();
-    ClientIpcService.shutdown();
+    ClientIPCService.shutdown();
   });
   return {
     ipc,
@@ -118,7 +119,7 @@ test('QoLAF sends echo only after transport success, isolate stale scenes, and r
   f.jobs[1].options.onError('stale scene');
   assert.deepEqual(errors, []);
   f.chat.send('cancelled');
-  ClientIpcService.shutdown();
+  ClientIPCService.shutdown();
   assert.equal(f.jobs[2].options.beforeSend(), null);
   f.jobs[2].options.onSent();
   assert.equal(rows.length, 1);
@@ -203,7 +204,10 @@ test('native QoLAF tab uses the rich log, retains rejected drafts, and detaches 
     },
   };
   const tabs = {
-    dataProvider: [{ label: 'Local', chatMode: 'local' }],
+    dataProvider: [
+      { label: 'Local', chatMode: 'local' },
+      { label: 'Recipient', chatMode: 'privateSaved' },
+    ],
     set_dataProvider(value: any) {
       this.dataProvider = value;
     },
@@ -229,9 +233,13 @@ test('native QoLAF tab uses the rich log, retains rejected drafts, and detaches 
   const rows: any[] = [];
   const game: any = {
     client: { connectUserId: 'owner' },
-    me: { id: 'owner', name: 'Owner' },
+    me: { id: 'owner', get_name: () => 'Owner', hasSupporter: () => false },
+    get_me() {
+      return this.me;
+    },
+    get_isLeaving: () => false,
     chatInput: chat,
-    playerManager: {},
+    playerManager: { get_playersById: () => ({ h: {} }) },
     messageLog: { isMuted: () => false, updateTexts: (row: any) => rows.push(row) },
   };
   const log: any = {
@@ -254,8 +262,22 @@ test('native QoLAF tab uses the rich log, retains rejected drafts, and detaches 
     defer: (fn: Function) => cleanups.push(fn),
     interval() {},
   };
+  bindGameClasses({
+    ...api,
+    cls: (name: string) => {
+      if (name === 'core.hud.components.chat.MessageLog') return log;
+      if (name === 'com.adobe.crypto.MD5')
+        return { hash: (value: string) => createHash('md5').update(value).digest('hex') };
+      if (name === 'data.DataLocator') return { getService: () => ({ loadKey: () => null }) };
+      return class {};
+    },
+  });
   installNativeQolafChat(api, game);
-  assert.equal(tabs.dataProvider.at(-1)!.chatMode, 'qolaf');
+  assert.deepEqual(
+    tabs.dataProvider.map((tab) => tab.chatMode),
+    ['local', 'qolaf', 'privateSaved'],
+  );
+  assert.equal(tabs.dataProvider.at(-1)!.label, 'Recipient');
   assert.deepEqual(log.textQueue, []);
   f.receive('hello', 'peer', '<Peer>');
   assert.equal(rows[0].qolafOwner, 'owner');
@@ -264,13 +286,20 @@ test('native QoLAF tab uses the rich log, retains rejected drafts, and detaches 
   chat.chatMode = 'qolaf';
   input.text = 'message';
   Object.defineProperty(f.ipc, 'connected', { configurable: true, value: false });
-  chat.sendMessage();
+  assert.equal(chat.sendMessage(), false);
   assert.equal(input.text, 'message');
+  assert.equal(
+    rows.at(-1).text,
+    'QoLAF chat is not connected yet. Your message was kept in the input.',
+  );
   Object.defineProperty(f.ipc, 'connected', { configurable: true, value: true });
-  chat.sendMessage();
+  assert.equal(chat.sendMessage(), true);
   assert.equal(input.text, '');
   assert.equal(f.jobs.length, 1);
   for (const cleanup of cleanups.reverse()) cleanup();
-  assert.equal(tabs.dataProvider.length, 1);
-  assert.equal(ClientIpcService.instance, f.ipc);
+  assert.deepEqual(
+    tabs.dataProvider.map((tab) => tab.chatMode),
+    ['local', 'privateSaved'],
+  );
+  assert.equal(ClientIPCService.instance, f.ipc);
 });

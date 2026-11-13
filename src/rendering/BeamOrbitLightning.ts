@@ -1,4 +1,4 @@
-import type { API, Raw } from '../api/Types';
+import { Mesh, VertexData, IndexData, type Weapon } from '../game/Bindings';
 
 const SEGMENTS = 12;
 const MAX_ORBITS = 3;
@@ -10,16 +10,12 @@ const SUPPORTED_WEAPONS = new Set([
   '222ekuHQxE6j9IOXMVXs6g',
 ]);
 
-export function supportsBeamOrbit(projectile: Raw): boolean {
-  return SUPPORTED_WEAPONS.has(projectile?.weapon?.key);
+export function supportsBeamOrbit(projectile: { weapon?: Pick<Weapon, 'key'> | null }): boolean {
+  return SUPPORTED_WEAPONS.has(projectile.weapon?.key ?? '');
 }
 
 /** Original BeamOrbitLightning geometry, using the game's native Starling mesh. */
-export function createBeamOrbitLightning(api: API): any {
-  const Mesh = api.cls('starling.display.Mesh') as any;
-  const VertexData = api.cls('starling.rendering.VertexData') as any;
-  const IndexData = api.cls('starling.rendering.IndexData') as any;
-  if (!Mesh || !VertexData || !IndexData) return null;
+export function createBeamOrbitLightning() {
   return class BeamOrbitLightning extends Mesh {
     private released = false;
     constructor() {

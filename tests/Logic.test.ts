@@ -1,3 +1,9 @@
+import { bindGameClasses, type GameScene, type Unit } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
+class TargetPlayerShip {}
+function bindTargets() {
+  bindGameClasses({ cls: () => TargetPlayerShip } as unknown as API);
+}
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ChatHistory } from '../src/chat/ChatHistory';
@@ -50,6 +56,22 @@ test('telemetry preserves AS3 sampling, smoothing and display scale', () => {
   m.advance(0.1, 0, 0, false);
   assert.ok(Number.isNaN(m.speed));
 });
+test('telemetry motion reset preserves FPS sampling and reacquires speed without stale smoothing', () => {
+  const metrics = new Telemetry();
+  for (let frame = 0; frame < 10; frame++) metrics.advance(0.02, 3, 4, true);
+  metrics.resetMotion();
+  assert.ok(Number.isNaN(metrics.displaySpeed(false)));
+  metrics.advance(0.02, 0, 12, true);
+  assert.equal(metrics.displaySpeed(false), 432);
+  for (let frame = 0; frame < 14; frame++) metrics.advance(0.02, 0, 12, true);
+  assert.ok(Math.abs(metrics.fps - 50) < 1e-8);
+  for (const invalid of [NaN, Infinity, -Infinity]) {
+    metrics.advance(0.02, invalid, 0, true);
+    assert.ok(Number.isNaN(metrics.displaySpeed(false)));
+    metrics.advance(0.02, 0, 7, true);
+    assert.equal(metrics.displaySpeed(false), 252);
+  }
+});
 test('settings accept only supported keys and correct types; clamp range', () => {
   const s = settings({
     auto_target: false,
@@ -65,10 +87,25 @@ test('settings accept only supported keys and correct types; clamp range', () =>
   assert.equal('aim_assist' in s, false);
 });
 function scene() {
-  const ship = { alive: true, get_pos: () => ({ x: 0, y: 0 }) };
-  const game = { get_me: () => ({ ship, get_group: () => ({ id: 'ours' }) }) };
-  const unit = (x: number, extra = {}) => ({ alive: true, get_pos: () => ({ x, y: 0 }), ...extra });
-  return { system: new TargetSystem(game, settings({})), unit, ship };
+  bindTargets();
+  const ship = { alive: true, get_pos: () => ({ x: 0, y: 0 }) } as unknown as Unit;
+  const game = { get_me: () => ({ ship, get_group: () => ({ get_id: () => 'ours' }) }) };
+  const unit = (x: number, extra = {}): Unit =>
+    Object.assign(
+      'player' in extra ? new TargetPlayerShip() : {},
+      {
+        alive: true,
+        get_pos: () => ({ x, y: 0 }),
+        hasFaction: () => false,
+        get_landed: () => false,
+      },
+      extra,
+    ) as unknown as Unit;
+  return {
+    system: new TargetSystem(game as unknown as Pick<GameScene, 'get_me'>, settings({})),
+    unit,
+    ship,
+  };
 }
 test('target cooldown, locking, invalidation and strict range boundary', () => {
   const { system: s, unit, ship } = scene(),
@@ -102,7 +139,7 @@ test('automatic targets exclude AF and prefer players over NPCs but not group me
   s.clear(true);
   s.select(npc);
   s.update(1);
-  assert.equal(s.auto(unit(2, { player: { get_group: () => ({ id: 'ours' }) } })), false);
+  assert.equal(s.auto(unit(2, { player: { get_group: () => ({ get_id: () => 'ours' }) } })), false);
 });
 test('locked target can move outside range but cannot survive death', () => {
   const { system: s, unit } = scene();
@@ -135,14 +172,15 @@ test('artifact scoring preserves conversion thresholds, aliases and unique const
 });
 
 test('target validity uses Haxe landed accessor and rejects locking an invalid selection', () => {
-  const game = { me: { ship: { pos: { x: 0, y: 0 } } } };
-  const system = new TargetSystem(game, settings({}));
-  const player = {
+  bindTargets();
+  const game = { get_me: () => ({ ship: { get_pos: () => ({ x: 0, y: 0 }) } }) };
+  const system = new TargetSystem(game as unknown as Pick<GameScene, 'get_me'>, settings({}));
+  const player = Object.assign(new TargetPlayerShip(), {
     alive: true,
-    pos: { x: 10, y: 0 },
+    get_pos: () => ({ x: 10, y: 0 }),
     player: { isMe: false },
     get_landed: () => true,
-  };
+  }) as unknown as Unit & { get_landed(): boolean };
   assert.equal(system.valid(player), false);
   assert.equal(system.select(player), false);
   system.locked = true;
@@ -155,4 +193,20 @@ test('target validity uses Haxe landed accessor and rejects locking an invalid s
   system.update(0.01);
   assert.equal(system.current, null);
   assert.equal(system.locked, false);
+});
+
+test('automatic target priority requires native PlayerShip identity and accepts no candidate', () => {
+  const { system, unit } = scene();
+  const current = unit(10);
+  const npcWithPlayerData = Object.assign(unit(20), {
+    player: { isMe: false, get_group: () => null },
+  });
+  assert.equal(system.auto(null), false);
+  assert.equal(system.auto(current), true);
+  assert.equal(
+    system.auto(npcWithPlayerData),
+    false,
+    'NPC fields cannot bypass the source cooldown',
+  );
+  assert.equal(system.current, current);
 });

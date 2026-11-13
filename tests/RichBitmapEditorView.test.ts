@@ -17,7 +17,7 @@ test('bitmap editor draws source styles and uses actual atlas advances for curso
   t.after(() => view.dispose());
   view.setBounds(200, 30);
   view.setFocus(true);
-  const [selection, renderer, cursor] = view.node.children;
+  const [selection, renderer, cursor] = fixture.displayNode(view.node).children;
   assert.deepEqual(
     renderer.characterBatch.meshes.map((mesh: any) => mesh.color),
     [0xffffff, 0xff0000, 0xffffff],
@@ -52,7 +52,7 @@ test('caret scrolling, clipped selection and resizing share the source two-pixel
   t.after(() => view.dispose());
   view.setBounds(40, 30);
   view.setFocus(true);
-  const [selection, renderer, cursor] = view.node.children;
+  const [selection, renderer, cursor] = fixture.displayNode(view.node).children;
   assert.equal(cursor.get_x(), 38);
   assert.ok(renderer.get_x() < 0);
   model.select(0, 10);
@@ -80,7 +80,7 @@ test('password view masks whole clusters and disposes its separate clipping mask
     new fixture.BitmapFormat(fixture.font, 16),
   );
   view.setBounds(200, 30);
-  const renderer = view.node.children[1];
+  const renderer = fixture.displayNode(view.node).children[1];
   const mask = view.node.get_mask();
   assert.equal(renderer.text, '***');
   view.dispose();
@@ -103,7 +103,7 @@ test('source prompt stays visible on empty focused input without entering the do
   view.setBounds(300, 33);
   view.setPrompt('Type text here...');
   view.setFocus(true);
-  const prompt = view.node.children[3];
+  const prompt = fixture.displayNode(view.node).children[3];
   assert.equal(prompt.get_visible(), true);
   assert.equal(prompt.get_alpha(), 0.55);
   assert.equal(prompt.text, 'Type text here...');
@@ -143,7 +143,7 @@ test('double and triple clicks select source words and the complete formatted li
   view.selectAt(x, false, 2);
   assert.equal(model.selectedVisibleText, 'two');
   assert.equal(model.selectedColor, 0xff0000);
-  assert.equal(view.node.children[0].get_visible(), true);
+  assert.equal(fixture.displayNode(view.node).children[0].get_visible(), true);
   view.selectAt(x, false, 3);
   assert.equal(model.selectedVisibleText, 'one two three');
   assert.equal(model.text, "one <font color='#ff0000'>two</font> three");

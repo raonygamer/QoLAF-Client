@@ -1,3 +1,4 @@
+import type { Texture } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ChatImageAsset } from '../src/chat/ChatImageAsset';
@@ -23,7 +24,7 @@ function asset(width = 100, height = 100, frameCount = 1, restore = true) {
   return {
     frames: [...frames],
     bitmaps: [...bitmaps],
-    value: new ChatImageAsset(frames, [0, 40], width, height, bitmaps),
+    value: new ChatImageAsset(frames as unknown as Texture[], [0, 40], width, height, bitmaps),
   };
 }
 function fixture() {

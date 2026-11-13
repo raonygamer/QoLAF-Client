@@ -1,3 +1,5 @@
+import type { API } from '../src/api/Types';
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installRibbonPool } from '../src/rendering/RibbonPool';
@@ -5,6 +7,7 @@ import { installRibbonPool } from '../src/rendering/RibbonPool';
 import { Hooks } from './fixtures/HostCore.js';
 
 class Trail {
+  poolIndex = -1;
   mNumRibbonSegments = 2;
   mRibbonSegments = Array.from({ length: 2 }, () => ({
     x0: 90,
@@ -59,13 +62,24 @@ class Pool {
   inactiveRibbonTrails: Trail[] = [];
   getRibbonTrail() {
     const trail = this.inactiveRibbonTrails.pop() ?? new Trail();
+    trail.poolIndex = this.activeRibbonTrails.length;
     this.activeRibbonTrails.push(trail);
     return trail;
   }
   removeRibbonTrail(trail: Trail) {
-    const index = this.activeRibbonTrails.indexOf(trail);
-    if (index < 0) return;
-    this.activeRibbonTrails.splice(index, 1);
+    const index = trail.poolIndex;
+    if (
+      index < 0 ||
+      index >= this.activeRibbonTrails.length ||
+      this.activeRibbonTrails[index] !== trail
+    )
+      return;
+    const last = this.activeRibbonTrails.pop()!;
+    if (last !== trail) {
+      this.activeRibbonTrails[index] = last;
+      last.poolIndex = index;
+    }
+    trail.poolIndex = -1;
     this.inactiveRibbonTrails.push(trail);
   }
   reclaimOrphans() {
@@ -82,13 +96,15 @@ function fixture() {
     'extensions.RibbonTrail': Trail,
     'core.pools.RibbonTrailPool': Pool,
   };
-  installRibbonPool({
+  const api = {
     cls: (name: string) => classes[name],
     after: (target: any, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'after', fn)),
     around: (target: any, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, 'around', fn)),
-  } as any);
+  } as unknown as API;
+  bindGameClasses({ ...api, cls: (name: string) => classes[name] ?? class BindingFixture {} });
+  installRibbonPool(api);
   return { pool: new Pool(), dispose: () => cleanups.reverse().forEach((fn) => fn()) };
 }
 
@@ -152,6 +168,23 @@ test('native orphan reclamation retains its result and resets only reclaimed tra
     const unrelated = new Trail();
     pool.removeRibbonTrail(unrelated);
     assert.equal(unrelated.color, 0x123456);
+  } finally {
+    dispose();
+  }
+});
+
+test('native pool rejection does not reset a trail still owned by the active list', () => {
+  const { pool, dispose } = fixture();
+  try {
+    const trail = pool.getRibbonTrail();
+    trail.mIsPlaying = true;
+    trail.color = 0x123456;
+    trail.poolIndex = -1;
+    pool.removeRibbonTrail(trail);
+    assert.deepEqual(pool.activeRibbonTrails, [trail]);
+    assert.equal(pool.inactiveRibbonTrails.length, 0);
+    assert.equal(trail.mIsPlaying, true);
+    assert.equal(trail.color, 0x123456);
   } finally {
     dispose();
   }

@@ -47,8 +47,44 @@ test('native command casing is preserved in completion', () => {
   );
   assert.equal(
     commands.some((entry) => entry.commandName === 'resync'),
-    false,
+    true,
   );
+});
+
+test('public command help exposes implemented workflows and excludes private-only commands', () => {
+  const commands = new Map(builtInCommandSuggestions().map((entry) => [entry.commandName, entry]));
+  for (const name of [
+    'ssv',
+    'roominvite',
+    'network',
+    'profiler',
+    'disconnect',
+    'pktdbg',
+    'headingdbg',
+    'disposedbg',
+  ])
+    assert.ok(commands.has(name), `${name} has argument help`);
+  for (const name of [
+    'script',
+    'automation',
+    'invitetoroom',
+    'kickfromroom',
+    'switchservice',
+    'joinservice',
+    'radio',
+    'invitetoradio',
+  ])
+    assert.equal(commands.has(name), false, `${name} is not advertised in the public client`);
+  assert.equal(commands.get('roominvite')?.usage, ' <accept|deny>');
+  assert.equal(commands.get('rec')?.description, 'Open the portable recycler');
+  assert.equal(
+    commands.get('spececho')?.description,
+    'Check connected QoLAF clients over IPC; only you see the replies',
+  );
+  const model = new ChatCommandAutocompleteModel([...commands.values()]);
+  assert.equal(model.update('/ssv reset @Pilot'), true);
+  assert.equal(model.argumentMode, true);
+  assert.equal(model.matches[0].commandName, 'ssv');
 });
 
 class Node {
@@ -83,6 +119,9 @@ class Node {
   }
   set_visible(value: boolean) {
     this.visible = value;
+  }
+  get_visible(): boolean {
+    return this.visible;
   }
   set_alpha(value: number) {
     this.alpha = value;
@@ -180,6 +219,7 @@ function popupFixture(emoji = false, previews = false, applyCompletion = true) {
         Array.from({ length: 20 }, (_, index) =>
           suggestion(`cmd${String(index).padStart(2, '0')}`),
         ),
+        128, // Match the actual chat popup's explicit limit.
       );
   const completions: string[] = [];
   const popup = new ChatCommandAutocompletePopup(
@@ -189,11 +229,16 @@ function popupFixture(emoji = false, previews = false, applyCompletion = true) {
       completions.push(text);
       if (applyCompletion) popup.update(text);
     },
-    emoji ? () => new Node(20, 20) : undefined,
+    emoji
+      ? () =>
+          new Node(20, 20) as unknown as InstanceType<
+            ReturnType<typeof import('../src/ported/Text').createText>
+          >
+      : undefined,
     previews
       ? (key) => {
           if (key === 'broken') throw new Error('missing texture');
-          return new Node(72, 40);
+          return new Node(72, 40) as unknown as import('../src/game/Bindings').Texture;
         }
       : undefined,
   );
@@ -214,14 +259,14 @@ test('native popup preserves Enter, completes with Tab and keeps argument help p
   assert.equal(popup.handleKey('Escape'), false);
   popup.update('/cmd');
   assert.equal(popup.handleKey('Escape'), true);
-  assert.equal(popup.node.visible, false);
+  assert.equal(popup.node.get_visible(), false);
 });
 
 test('native popup scrolls rows, ellipsizes descriptions and disposes listeners', () => {
   const { popup, model, completions, cleanupCount } = popupFixture();
   popup.layout(180, 100);
   popup.update('/cmd');
-  const node = popup.node as Node;
+  const node = popup.node as unknown as Node;
   assert.equal(node.children[0].height, 78, 'only two rows fit above the editor');
   assert.ok(node.children[3].text.endsWith('...'));
   popup.scroll(1);
@@ -241,7 +286,7 @@ test('native popup scrolls rows, ellipsizes descriptions and disposes listeners'
 test('emoji popup uses source preview column and resets pooled rows on query changes', () => {
   const { popup, model, completions } = popupFixture(true);
   popup.update('grinning');
-  const node = popup.node as Node;
+  const node = popup.node as unknown as Node;
   assert.equal(node.children[2].font, 'verdana16_bitmap');
   assert.equal(node.children[3].font, 'verdana16_bitmap');
   assert.equal(node.children[2].x, 50);
@@ -267,7 +312,7 @@ test('roster section heading reserves source height and offsets rows and scrollb
   popup.layout(400, 100);
   popup.update('/cmd');
   popup.sectionTitle = 'IPC Peers Online';
-  const node = popup.node as Node;
+  const node = popup.node as unknown as Node;
   assert.equal(popup.height, 98);
   assert.equal(node.children[1].y, 25);
   assert.equal(node.children[2].y, 25);
@@ -306,7 +351,7 @@ test('ship previews fit source bounds, reuse images and clear missing textures',
   const matches = [new ChatCommandSuggestion('Pilot', '', 'Online', '@Pilot', '@Pilot', 0, 'ship')];
   Object.defineProperty(model, 'matches', { get: () => matches });
   popup.update('/cmd');
-  const node = popup.node as Node;
+  const node = popup.node as unknown as Node;
   const preview = node.children.at(-1)!;
   assert.equal(preview.width, 36);
   assert.equal(preview.height, 20);
@@ -351,7 +396,7 @@ test('mouse press selects before release and cancelled scrollbar touches stop dr
   const { popup, model, completions } = popupFixture();
   popup.layout(400, 100);
   popup.update('/cmd');
-  const node = popup.node as Node;
+  const node = popup.node as unknown as Node;
   node.children[4].listeners.get('press')!();
   assert.equal(model.selectedIndex, 1);
   assert.equal(completions.length, 0);
@@ -383,11 +428,11 @@ test('mouse acceptance dismisses before a rejected edit while Tab preserves the 
   popup.update('/cmd');
   popup.handleKey('Tab');
   assert.equal(model.active, true, 'source Tab relies on the editor change to refresh');
-  assert.equal(popup.node.visible, true);
-  const node = popup.node as Node;
+  assert.equal(popup.node.get_visible(), true);
+  const node = popup.node as unknown as Node;
   node.children[1].listeners.get('click')!();
   assert.equal(model.active, false, 'source mouse completion dismisses even if insertion fails');
-  assert.equal(popup.node.visible, false);
+  assert.equal(popup.node.get_visible(), false);
   assert.deepEqual(completions, ['/cmd00 ', '/cmd00 ']);
   popup.update('/cmd00 argument');
   assert.equal(
@@ -398,4 +443,19 @@ test('mouse acceptance dismisses before a rejected edit while Tab preserves the 
   node.children[1].listeners.get('click')!();
   assert.equal(completions.length, 2, 'passive command help never inserts text');
   popup.dispose();
+});
+
+test('command models snapshot built-ins and retain source default versus popup result limits', () => {
+  const builtIns = Array.from({ length: 12 }, (_, index) => suggestion('command' + index));
+  const model = new ChatCommandAutocompleteModel(builtIns);
+  const popupModel = new ChatCommandAutocompleteModel(builtIns, 128);
+  builtIns.splice(0, builtIns.length, suggestion('replacement'));
+  assert.equal(model.update('/command'), true);
+  assert.equal(model.matches.length, 8);
+  assert.equal(model.update('/replacement'), false);
+  assert.equal(popupModel.update('/command'), true);
+  assert.equal(popupModel.matches.length, 12);
+  const returned = popupModel.matches;
+  returned.length = 0;
+  assert.equal(popupModel.matches.length, 12, 'returned matches cannot mutate model state');
 });

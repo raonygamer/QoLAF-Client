@@ -1,3 +1,4 @@
+import { GameReflection } from '../api/GameReflection';
 import { read, type API, type Raw } from '../api/Types';
 import { portedClasses } from '../ported/Registry';
 import { ClientHelpContent } from './ClientHelpContent';
@@ -38,7 +39,13 @@ export function installNativeClientHelp(
     popup!.addEventListener('close', close);
     game.addChildToOverlay(popup, true);
   };
-  const dismissWelcome = installNativeClientWelcome(api, game, resolve, open, waitingForRelease);
+  const dismissWelcome = installNativeClientWelcome(
+    api,
+    new GameReflection(api).cast(game, 'core.scene.Game'),
+    resolve,
+    open,
+    waitingForRelease,
+  );
   const original = Object.getOwnPropertyDescriptor(chat, 'openClientHelp');
   chat.openClientHelp = open;
   api.defer(installPopupKeyboard(window, () => popup !== null, close));

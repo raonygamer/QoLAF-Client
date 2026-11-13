@@ -1,3 +1,4 @@
+import { bindGameClasses } from '../src/game/Bindings';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 // @ts-expect-error actual host JavaScript fixture
@@ -45,13 +46,14 @@ test('HTML composition stays outside cached traversal and cancels deferred work 
   };
   const hooks = new Hooks((error: unknown) => errors.push(error));
   const api: any = {
-    cls: (name: string) => classes[name],
+    cls: (name: string) => classes[name] ?? {},
     defer: (fn: () => void) => cleanups.push(fn),
   };
   for (const kind of ['before', 'after', 'around'])
     api[kind] = (target: any, key: string, fn: Function) =>
       cleanups.push(hooks.add(target, key, kind, fn));
   try {
+    bindGameClasses(api);
     installBitmapCompositionQueue(api);
     const field = new TextField();
     new Container().addChildAt(field, 0);

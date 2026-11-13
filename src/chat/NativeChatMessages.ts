@@ -1,64 +1,83 @@
+import type { SimpleChatRenderer } from './SimpleChatImages';
+import { ChatPerformanceProfiler as Profiler } from './ChatPerformanceProfiler';
 import type { ChatFriendPingData } from './ChatFriendPingData';
 import { RichBitmapMarkupParser } from './rich/RichBitmapMarkupParser';
 import type { ChatImageCache } from './ChatImageCache';
 import { ChatDiscordImageLink } from './ChatDiscordImageLink';
 import { createChatImageThumbnail } from '../ported/ChatImageThumbnail';
-import { read, type API, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import {
+  WrapText,
+  type DisplayObject,
+  type GameScene,
+  type Point,
+  type StarlingTextField,
+} from '../game/Bindings';
+import type { ChatMessage } from '../game/ChatMessage';
+import type { createRichBitmapFontTextRenderer } from '../ported/RichBitmapFontTextRenderer';
+import { BitmapFontTextFormat } from '../ui/BitmapFontTextFormat';
+import type { Resolve } from '../runtime/HaxeInterop';
 import type { DeviceSettings } from '../settings/DeviceSettings';
 import type { ChatArtifactLinkResolver } from './ChatArtifactLinkResolver';
 import { ChatArtifactToken } from './rich/ChatArtifactToken';
+import { ChatRows } from './ChatRows';
 
 /** Project received messages with the original rich bitmap renderer. */
 export function installNativeChatMessages(
   api: API,
-  game: Raw,
+  game: GameScene,
   resolve: Resolve,
   preferences?: DeviceSettings,
   images?: ChatImageCache,
   artifacts?: ChatArtifactLinkResolver,
 ):
   | {
-      simpleRenderer: Raw;
-      imageLinkAtStagePoint(point: Raw): ChatDiscordImageLink | null;
-      roleTagAtStagePoint(point: Raw, simple: boolean): string | null;
-      pingAtStagePoint(point: Raw): { row: Raw; ping: ChatFriendPingData } | null;
-      artifactAtStagePoint(point: Raw): { row: Raw; token: ChatArtifactToken } | null;
+      simpleRenderer: SimpleChatRenderer;
+      imageLinkAtStagePoint(point: Point): ChatDiscordImageLink | null;
+      roleTagAtStagePoint(point: Point, simple: boolean): string | null;
+      pingAtStagePoint(point: Point): { row: DisplayObject; ping: ChatFriendPingData } | null;
+      artifactAtStagePoint(point: Point): { row: DisplayObject; token: ChatArtifactToken } | null;
     }
   | undefined {
   const log = game.messageLog;
-  const WrapText = api.cls('core.hud.components.ui.WrapText');
+  const reflection = new GameReflection(api);
   if (!log?.simple?.tf || !log.advanced?.scroll || !WrapText) return;
-  const Renderer = resolve('core.hud.components.chat.rich.RichBitmapFontTextRenderer');
-  const BitmapFormat = resolve('feathers.text.BitmapFontTextFormat');
-  const Thumbnail = images ? createChatImageThumbnail(resolve, images) : null;
+  const Renderer = resolve(
+    'core.hud.components.chat.rich.RichBitmapFontTextRenderer',
+  ) as ReturnType<typeof createRichBitmapFontTextRenderer>;
+  const Thumbnail = images ? createChatImageThumbnail(images) : null;
   const rows = new Map<
-    Raw,
+    DisplayObject,
     {
-      renderer: Raw;
-      field: Raw;
+      row: WrapText;
+      renderer: InstanceType<typeof Renderer>;
+      field: StarlingTextField;
       alpha: number;
       index: number;
-      message?: Raw;
-      thumbnail?: Raw;
+      message?: ChatMessage;
+      thumbnail?: InstanceType<ReturnType<typeof createChatImageThumbnail>>;
     }
   >();
   const scroll = log.advanced.scroll;
+  const materializedRows = ChatRows.install(api, log.advanced, () => log.getQueue());
   const arrangePreservingPosition = () => {
-    const position = read(scroll, 'verticalScrollPosition', 0);
-    const followBottom = position >= read(scroll, 'maxVerticalScrollPosition', 0) - 2;
+    const position = scroll.get_verticalScrollPosition();
+    const followBottom = position >= scroll.get_maxVerticalScrollPosition() - 2;
     scroll.arrange();
-    scroll.scrollToPosition(
-      0,
-      followBottom ? read(scroll, 'maxVerticalScrollPosition', 0) : position,
-    );
+    scroll.scrollToPosition(0, followBottom ? scroll.get_maxVerticalScrollPosition() : position);
   };
   const font = () =>
-    new BitmapFormat('verdana48_bitmap', preferences?.get('legacyChatFontSize') ?? 14, 0xffffff);
-  const project = (row: Raw) => {
+    new BitmapFontTextFormat(
+      'verdana48_bitmap',
+      preferences?.get('legacyChatFontSize') ?? 14,
+      0xffffff,
+    );
+  const project = (row: WrapText) => {
     const entry = rows.get(row)!;
-    const text = String(read(entry.field, 'text', ''));
-    const allowImages = !!images && ChatDiscordImageLink.isEmbedChannel(entry.message?.type);
+    const text = String(entry.field.get_text());
+    const allowImages =
+      !!images && ChatDiscordImageLink.isEmbedChannel(entry.message?.type ?? null);
     const link = allowImages ? ChatDiscordImageLink.firstIn(text) : null;
     if (link && !entry.thumbnail && Thumbnail) {
       const thumbnail = (entry.thumbnail = new Thumbnail());
@@ -78,7 +97,16 @@ export function installNativeChatMessages(
     entry.renderer.text = text;
     entry.renderer.maxWidth = row.maxWidth > 0 ? row.maxWidth : Infinity;
     entry.renderer.set_width(row.hasWidth ? row.viewWidth : NaN);
+    const profileStarted = Profiler.active ? Profiler.now() : 0;
     entry.renderer.validate();
+    if (Profiler.active)
+      Profiler.record(
+        'advanced.item',
+        'validate',
+        Profiler.now() - profileStarted,
+        text.length,
+        entry.renderer.get_width() * entry.renderer.get_height(),
+      );
     row.measuredWidth = entry.renderer.get_width();
     const labelHeight = entry.renderer.get_height();
     row.measuredHeight = Math.max(labelHeight, link ? (entry.thumbnail?.previewHeight ?? 0) : 0);
@@ -96,11 +124,19 @@ export function installNativeChatMessages(
       const x = entry.renderer.localXAtSourceIndex(sourceIndex);
       entry.thumbnail.set_x(Number.isFinite(x) ? Math.max(0, x) : 0);
       entry.thumbnail.set_y(Math.max(0, row.measuredHeight - entry.thumbnail.previewHeight));
-      row.setChildIndex(entry.thumbnail, read(row, 'numChildren') - 1);
+      row.setChildIndex(entry.thumbnail, row.get_numChildren() - 1);
     }
   };
-  const bind = (row: Raw) => {
-    if (!row?.field || rows.has(row)) return;
+  const bind = (row: WrapText, message?: ChatMessage) => {
+    if (!row?.field) return;
+    const existing = rows.get(row);
+    if (existing) {
+      if (message && existing.message !== message) {
+        existing.message = message;
+        project(row);
+      }
+      return;
+    }
     const renderer = new Renderer();
     renderer.artifactTokenLabelResolver = artifacts?.resolvePresentation ?? null;
     renderer.textFormat = font();
@@ -118,21 +154,21 @@ export function installNativeChatMessages(
     renderer.set_touchable(false);
     const field = row.field;
     const index = row.getChildIndex(field);
-    rows.set(row, { renderer, field, index, alpha: read(row, 'alpha') });
+    rows.set(row, { row, renderer, field, index, alpha: row.get_alpha(), message });
     row.removeChild(field);
     row.addChildAt(renderer, Math.max(0, index));
     row.set_alpha(1);
     project(row);
   };
-  api.around(WrapText.prototype, 'layoutText', function (next, ...args) {
+  reflection.around(WrapText.prototype, 'layoutText', function (this: WrapText, next) {
     if (rows.has(this)) return project(this);
-    return next(...args);
+    return next();
   });
-  api.around(WrapText.prototype, 'get_width', function (next, ...args) {
+  reflection.around(WrapText.prototype, 'get_width', function (this: WrapText, next) {
     const entry = rows.get(this);
-    return entry ? entry.renderer.get_width() : next(...args);
+    return entry ? entry.renderer.get_width() : next();
   });
-  api.around(WrapText.prototype, 'dispose', function (next, ...args) {
+  reflection.around(WrapText.prototype, 'dispose', function (this: WrapText, next) {
     const entry = rows.get(this);
     if (entry) {
       rows.delete(this);
@@ -140,30 +176,44 @@ export function installNativeChatMessages(
       // The detached upstream field still belongs to this row.
       entry.field.dispose();
     }
-    return next(...args);
+    return next();
   });
-  const bindAdvanced = (_result?: unknown, message?: Raw) => {
-    for (let index = 0; index < read(scroll, 'numChildren'); index++)
-      bind(scroll.getChildAt(index));
-    if (message && read(scroll, 'numChildren') > 0) {
-      const row = scroll.getChildAt(read(scroll, 'numChildren') - 1);
-      const entry = rows.get(row);
-      if (entry && read(entry.field, 'text') === message.text) {
-        entry.message = message;
-        project(row);
+  api.defer(
+    materializedRows.onRelease((node) => {
+      const entry = rows.get(node);
+      if (!entry) return;
+      entry.message = undefined;
+      if (entry.thumbnail) {
+        entry.thumbnail.onPreviewSizeChanged = null;
+        entry.thumbnail.removeFromParent(true);
+        entry.thumbnail = undefined;
       }
-    }
-    scroll.arrange();
-  };
-  api.after(log.advanced, 'addText', bindAdvanced);
+      // Clear the retained renderer before assigning another message. In
+      // particular, a new row must not inherit the previous channel's embeds.
+      entry.field.set_text('');
+      entry.renderer.text = '';
+    }),
+  );
+  api.defer(
+    materializedRows.subscribe(({ node, message }) => {
+      bind(node, message);
+      scroll.arrange();
+    }),
+  );
   bind(log.simple.tf);
-  bindAdvanced();
+  for (let index = 0; index < scroll.get_numChildren(); index++) {
+    const row = scroll.getChildAt(index);
+    if (reflection.is(row, 'core.hud.components.ui.WrapText'))
+      bind(row, materializedRows.messageFor(row));
+  }
+  scroll.arrange();
   if (artifacts)
     api.defer(
       artifacts.onResolved(() => {
-        for (const [row, entry] of rows) {
+        scroll.dispatchEventWith('qolafChatMetricsChanged');
+        for (const entry of rows.values()) {
           entry.renderer.refreshArtifactTokenLabels();
-          row.layoutText();
+          entry.row.layoutText();
         }
         arrangePreservingPosition();
       }),
@@ -172,23 +222,25 @@ export function installNativeChatMessages(
     api.defer(
       preferences.subscribe((key) => {
         if (key !== 'legacyChatFontSize') return;
-        const position = read(scroll, 'verticalScrollPosition');
-        const followBottom = position >= read(scroll, 'maxVerticalScrollPosition') - 2;
-        for (const [row, entry] of rows) {
+        scroll.dispatchEventWith('qolafChatMetricsChanged');
+        const position = scroll.get_verticalScrollPosition();
+        const followBottom = position >= scroll.get_maxVerticalScrollPosition() - 2;
+        for (const entry of rows.values()) {
           entry.renderer.textFormat = font();
-          project(row);
+          project(entry.row);
         }
         // Also run Simple's viewport positioning hook after font reflow.
-        log.simple.tf.set_text(read(log.simple.tf, 'text', ''));
+        log.simple.tf.set_text(log.simple.tf.get_text());
         scroll.arrange();
         scroll.scrollToPosition(
           0,
-          followBottom ? read(scroll, 'maxVerticalScrollPosition') : position,
+          followBottom ? scroll.get_maxVerticalScrollPosition() : position,
         );
       }),
     );
   api.defer(() => {
-    for (const [row, entry] of rows) {
+    for (const entry of rows.values()) {
+      const row = entry.row;
       rows.delete(row);
       if (entry.thumbnail) {
         entry.thumbnail.onPreviewSizeChanged = null;
@@ -204,27 +256,30 @@ export function installNativeChatMessages(
   return {
     simpleRenderer: rows.get(log.simple.tf)!.renderer,
     pingAtStagePoint(point) {
-      for (let index = read(scroll, 'numChildren') - 1; index >= 0; index--) {
+      for (let index = scroll.get_numChildren() - 1; index >= 0; index--) {
         const row = scroll.getChildAt(index);
         const entry = rows.get(row);
-        if (!entry?.message?.pings || !read(row, 'visible') || read(row, 'alpha') <= 0) continue;
+        if (!entry?.message?.pings || !row.get_visible() || row.get_alpha() <= 0) continue;
         const local = entry.renderer.globalToLocal(point);
         const visibleIndex = entry.renderer.visibleTextIndexAtPoint(local.x, local.y);
         const sourceIndex = entry.renderer.sourceTextIndexAtVisibleIndex(visibleIndex);
-        if (sourceIndex < 0) continue;
-        const source = String(read(entry.field, 'text', ''));
-        if (ChatArtifactToken.parseAt(source, sourceIndex)) continue;
-        const markup = RichBitmapMarkupParser.parse(
-          source,
-          14,
-          0xffffff,
-          null,
-          null,
-          ChatDiscordImageLink.isEmbedChannel(entry.message.type),
-          false,
-        );
-        const rawVisibleIndex = markup.visibleIndexAtSource(sourceIndex, false);
-        const ping = (entry.message.pings as ChatFriendPingData[]).find((ping) =>
+        const source = entry.field.get_text();
+        if (sourceIndex >= 0 && ChatArtifactToken.parseAt(source, sourceIndex)) continue;
+        let rawVisibleIndex = visibleIndex;
+        if (sourceIndex >= 0) {
+          const markup = RichBitmapMarkupParser.parse(
+            source,
+            14,
+            0xffffff,
+            null,
+            null,
+            ChatDiscordImageLink.isEmbedChannel(entry.message.type ?? null),
+            false,
+          );
+          rawVisibleIndex = markup.visibleIndexAtSource(sourceIndex, false);
+        }
+        if (rawVisibleIndex < 0) continue;
+        const ping = entry.message.pings.find((ping) =>
           ping?.containsVisibleIndex(rawVisibleIndex),
         );
         if (ping) return { row, ping };
@@ -232,15 +287,15 @@ export function installNativeChatMessages(
       return null;
     },
     artifactAtStagePoint(point) {
-      for (let index = read(scroll, 'numChildren') - 1; index >= 0; index--) {
+      for (let index = scroll.get_numChildren() - 1; index >= 0; index--) {
         const row = scroll.getChildAt(index);
         const entry = rows.get(row);
-        if (!entry || !read(row, 'visible') || read(row, 'alpha') <= 0) continue;
+        if (!entry || !row.get_visible() || row.get_alpha() <= 0) continue;
         const local = entry.renderer.globalToLocal(point);
         const visibleIndex = entry.renderer.visibleTextIndexAtPoint(local.x, local.y);
         const sourceIndex = entry.renderer.sourceTextIndexAtVisibleIndex(visibleIndex);
         if (sourceIndex < 0) continue;
-        const token = ChatArtifactToken.parseAt(String(read(entry.field, 'text', '')), sourceIndex);
+        const token = ChatArtifactToken.parseAt(String(entry.field.get_text()), sourceIndex);
         if (token) return { row, token };
       }
       return null;
@@ -248,12 +303,12 @@ export function installNativeChatMessages(
     roleTagAtStagePoint(point, simple) {
       const candidates = simple
         ? [log.simple.tf]
-        : Array.from({ length: read(scroll, 'numChildren') }, (_, i) =>
+        : Array.from({ length: scroll.get_numChildren() }, (_, i) =>
             scroll.getChildAt(i),
           ).reverse();
       for (const row of candidates) {
         const renderer = rows.get(row)?.renderer;
-        if (!renderer || !read(row, 'visible') || read(row, 'alpha') <= 0) continue;
+        if (!renderer || !row.get_visible() || row.get_alpha() <= 0) continue;
         const local = renderer.globalToLocal(point);
         const role = renderer.roleTagAtPoint(local.x, local.y);
         if (role) return role;
@@ -261,23 +316,23 @@ export function installNativeChatMessages(
       return null;
     },
     imageLinkAtStagePoint(point) {
-      for (let index = read(scroll, 'numChildren') - 1; index >= 0; index--) {
+      for (let index = scroll.get_numChildren() - 1; index >= 0; index--) {
         const row = scroll.getChildAt(index);
         const thumbnail = rows.get(row)?.thumbnail;
         if (
           !thumbnail?.link ||
-          !read(row, 'visible') ||
-          read(row, 'alpha') <= 0 ||
-          !read(thumbnail, 'visible') ||
-          !read(thumbnail, 'parent')
+          !row.get_visible() ||
+          row.get_alpha() <= 0 ||
+          !thumbnail.get_visible() ||
+          !thumbnail.get_parent()
         )
           continue;
         const rowPoint = row.globalToLocal(point);
         if (
           rowPoint.x < 0 ||
           rowPoint.y < 0 ||
-          rowPoint.x >= read(row, 'width') ||
-          rowPoint.y >= read(row, 'height')
+          rowPoint.x >= row.get_width() ||
+          rowPoint.y >= row.get_height()
         )
           continue;
         const local = thumbnail.globalToLocal(point);

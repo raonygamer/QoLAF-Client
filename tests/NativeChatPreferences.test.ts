@@ -1,3 +1,5 @@
+import { bindGameClasses, type GameScene } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installNativeChatPreferences } from '../src/chat/NativeChatPreferences';
@@ -25,9 +27,13 @@ test('native composer font, DPI placement, narrow window and cleanup preserve in
   const chat = Object.assign(new Display(), { input, tabs: new Display(), toggleChatMode() {} });
   chat.tabs.set_width(300);
   const stage = Object.assign(new Display(), { stageWidth: 1000, stageHeight: 800 });
-  const game = { chatInput: chat, stage };
+  const game = { chatInput: chat, stage, get_stage: () => stage };
   const cleanups: Function[] = [];
   let scale = 1;
+  Object.assign(stage, {
+    get_stageWidth: () => stage.stageWidth,
+    get_stageHeight: () => stage.stageHeight,
+  });
   const preferences = new DeviceSettings({ get: (_key, fallback) => fallback, set() {} });
   const api: any = {
     cls: (name: string) =>
@@ -56,7 +62,8 @@ test('native composer font, DPI placement, narrow window and cleanup preserve in
     },
   };
   const originalFormat = input.textFormat;
-  installNativeChatPreferences(api, game, preferences);
+  bindGameClasses({ cls: (name: string) => api.cls(name) ?? {} } as unknown as API);
+  installNativeChatPreferences(api, game as unknown as GameScene, preferences);
   assert.equal(input.textFormat.size, 14);
   assert.equal(input.element.style.fontSize, '14px');
   assert.equal(input.element.style.fontFamily, 'Verdana, Arial, sans-serif');

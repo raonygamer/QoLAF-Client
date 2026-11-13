@@ -1,3 +1,4 @@
+import { steeringCommands } from './SteeringCommands';
 import { AimAssistDebugOverlay } from './AimAssistDebugOverlay';
 import { read, type API, type Raw } from '../api/Types';
 import { isMapNavigating } from '../map/NativeMapNavigation';
@@ -66,6 +67,10 @@ export function installNativeAimAssist(
   method(prototype, 'applyAimAssistDebugVisibility', function (this: Raw) {
     drawDebug(this);
   });
+  method(prototype, 'releaseAimAssist', function (this: Raw) {
+    if (this.g !== game) return;
+    states.get(this)?.release('player commands cancelled');
+  });
   if (settings.setAimAssistBoolean)
     method(Play!, 'toggleAimAssistDebug', () => {
       const value = !settings.getAimAssistBoolean('aim_assist_debug');
@@ -99,10 +104,10 @@ export function installNativeAimAssist(
   };
   api.before(prototype, 'updateCommands', function () {
     if (!belongs(this)) return;
-    if (automated() || isMapNavigating(game)) {
+    if (isMapNavigating(game)) {
       const assist = states.get(this);
       assist?.resetDiagnostics();
-      assist?.release(automated() ? 'automation owns aim control' : 'map navigation');
+      assist?.release('map navigation');
       return;
     }
     let assist = states.get(this);
@@ -110,12 +115,15 @@ export function installNativeAimAssist(
       assist = new AimAssist(settings);
       states.set(this, assist);
     }
+    if (automated()) {
+      assist.automate(contacts.now(), this.get_currentAimAngle());
+      return;
+    }
     const ship = this.me?.ship;
     const starling = read(api.cls('starling.core.Starling'), 'current');
     const overlay = read(starling, 'nativeOverlay');
     if (!ship || !ship.engine || !overlay) {
-      assist.resetDiagnostics();
-      assist.release('player, ship, or native overlay unavailable');
+      assist.suspend(contacts.now(), 'player, ship, or native overlay unavailable');
       return;
     }
     const usingMouse = mouseAim();
@@ -173,7 +181,7 @@ export function installNativeAimAssist(
     return next(...args);
   });
   api.around(prototype, 'updateMouseAim', function (next, ...args) {
-    if (!belongs(this) || !enabled() || automated()) return next(...args);
+    if (!belongs(this) || automated()) return next(...args);
     if (isMapNavigating(game)) return;
     const assist = states.get(this);
     if (!assist || !Number.isFinite(assist.aimAngle)) return next(...args);
@@ -185,38 +193,22 @@ export function installNativeAimAssist(
     if (assist.active) threshold *= assist.thresholdRatio();
     else if (!course.rotateLeft && !course.rotateRight) threshold = Math.max(threshold, step * 2);
     const error = aimAngleDifference(read(ship, 'rotation'), assist.aimAngle);
-    const stop =
-      assist.shouldStopTracking(step, error) || (error < threshold && error > -threshold);
-    let command = -1;
-    let value = false;
-    if (stop) {
-      if (course.rotateLeft) command = 1;
-      else if (course.rotateRight) command = 2;
-    } else if (error > threshold) {
-      if (course.rotateRight) command = 2;
-      else if (!course.rotateLeft) {
-        command = 1;
-        value = true;
-      }
-    } else if (error < -threshold) {
-      if (course.rotateLeft) command = 1;
-      else if (!course.rotateRight) {
-        command = 2;
-        value = true;
-      }
-    }
-    // Preserve current Haxe transport: at most one turn command per send interval.
-    const interval = Play!.MOUSE_AIM_SEND_INTERVAL ?? 66;
-    if (command >= 0 && game.time - this.mouseAimLastSendTime >= interval) {
-      this.mouseAimLastSendTime = game.time;
-      this.sendCommand(command, value);
-    }
+    const settle = assist.shouldStopTracking(step, error);
+    // handleTurn is gated on the 33ms course boundary by NativeControlTiming.
+    // Source stopMouseTurn releases both axes if both are latched.
+    for (const command of steeringCommands(
+      course.rotateLeft,
+      course.rotateRight,
+      error,
+      threshold,
+      settle,
+    ))
+      this.sendCommand(command.type, command.active);
   });
   if (typeof prototype.get_currentAimAngle === 'function')
     api.around(prototype, 'get_currentAimAngle', function (next, ...args) {
       const assist = states.get(this);
       return belongs(this) &&
-        enabled() &&
         !automated() &&
         !isMapNavigating(game) &&
         assist &&

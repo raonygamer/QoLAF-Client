@@ -1,3 +1,5 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { Display } from './fixtures/NativeGame';
@@ -70,7 +72,13 @@ function fixture() {
   clip.set_y(65);
   clip.set_alpha(0.4);
   const ship: any = { alive: true, isAddedToCanvas: true, movieClip: clip, radius: 20 };
+  ship.get_movieClip = () => ship.movieClip;
+  ship.get_radius = () => ship.radius;
+  const bind = () =>
+    bindGameClasses({ cls: (name: string) => classes[name] ?? {} } as unknown as API);
+  bind();
   return {
+    bind,
     api,
     classes,
     game,
@@ -87,7 +95,7 @@ function fixture() {
 
 test('beam estimate follows observed shots and current reload stats, with original fixed bitmap geometry', () => {
   const f = fixture(),
-    countdown = new NetherBlobBeamCountdown(f.api);
+    countdown = new NetherBlobBeamCountdown();
   const weapon = { key: NetherBlobBeamCountdown.weaponKey, reloadTime: 1000 };
   countdown.draw(f.game, f.ship);
   assert.equal(f.labels.length, 0);
@@ -193,6 +201,12 @@ test('early native hooks observe before heading catch-up, respect enemy identity
     isAddedToCanvas = true;
     radius = 20;
     movieClip = f.clip;
+    get_movieClip() {
+      return this.movieClip;
+    }
+    get_radius() {
+      return this.radius;
+    }
     hasFaction(faction: string) {
       assert.equal(faction, 'Nether');
       return this.nether;
@@ -231,6 +245,7 @@ test('early native hooks observe before heading catch-up, respect enemy identity
     'core.projectile.ProjectileManager': Manager,
     'core.projectile.ProjectileFactory': factory,
   });
+  f.bind();
   installNetherBlobBeamHooks(f.api);
   const manager = new Manager(),
     cachedHandler = manager.addEnemyProjectile.bind(manager),

@@ -1,0 +1,2 @@
+// Captured build564 SHA256 35c056ba87b1cc5f6d97f8a3066b103eb261ef42ca955efb0f7d9a94ee318427; only dependency identifiers rebound.
+export function createNativeMissionText(StringTools, Std) { return function(t,e,i){return null!=e.value&&(i=StringTools.replace(i,"[amount]","<font color='#ffffff'>"+Std.string(e.value)+"</font>")),i=StringTools.replace(i,"[player]",t.get_me().get_name()),i=StringTools.replace(i,"[h]","<font color='#ffffff'>"),i=StringTools.replace(i,"[/h]","</font>")}; }

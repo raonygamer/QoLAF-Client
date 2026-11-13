@@ -1,5 +1,5 @@
 import { read } from '../api/Types';
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 
 /** Original RGB editor. Values stay in the dialog until the owner accepts them. */
 export function createWeaponColorPopup(resolve: Resolve, InputText: any) {

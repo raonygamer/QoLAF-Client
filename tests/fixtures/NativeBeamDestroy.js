@@ -1,0 +1,2 @@
+// Captured build564 SHA256 35c056ba87b1cc5f6d97f8a3066b103eb261ef42ca955efb0f7d9a94ee318427; only dependency identifiers rebound.
+export function createNativeBeamDestroy(Weapon) { return function(){for(var t=0,e=this.startEffect;t<e.length;){var i=e[t];++t,i.alive=!1}if(this.twin)for(t=0,e=this.startEffect2;t<e.length;){i=e[t];++t,i.alive=!1}for(t=0,e=this.endEffect;t<e.length;){var s=e[t];++t,s.alive=!1}this.set_fire(!1),this.effectsInitialized=!1,this.lineBatch.clear(),this.g.canvasEffects.removeChild(this.lineBatch),Weapon.prototype.destroy.call(this)}; }

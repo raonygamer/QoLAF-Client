@@ -1,5 +1,5 @@
 // Source port of qolaf/states/SettingsQoLAF.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createSettingsQoLAF(resolve: Resolve): any {
   const Text: any = resolve('core.hud.components.Text');
   type Text = any;

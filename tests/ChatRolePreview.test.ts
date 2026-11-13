@@ -1,3 +1,4 @@
+import { invalidateChatView } from '../src/chat/ChatViewInvalidation';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
@@ -79,11 +80,15 @@ test('both chat views show roles on hover and close for covering UI, scroll, cli
   log.advanced = advanced;
   log.addChild(simple);
   log.updateTexts = () => {};
+  log.getQueue = () => [];
+  log.advanced.addText = () => {};
   const game = { stage, messageLog: log, isLeaving: false };
   const hooks = new Hooks();
   const cleanup: (() => void)[] = [];
   let frame: (event: any) => void = () => {};
   const api: any = {
+    around: (object: any, key: string, fn: Function) =>
+      cleanup.push(hooks.add(object, key, 'around', fn)),
     after: (object: any, key: string, fn: Function) =>
       cleanup.push(hooks.add(object, key, 'after', fn)),
     on: (_event: string, fn: typeof frame) => {
@@ -110,11 +115,15 @@ test('both chat views show roles on hover and close for covering UI, scroll, cli
   };
   touch();
   assert.equal(simplePopup.get_visible(), true);
+  invalidateChatView(simple);
+  assert.equal(simplePopup.get_visible(), false, 'clear closes the card before another frame');
+  touch();
   assert.equal(simple.get_touchable(), false);
   const covering = node();
   stage.addChild(covering);
   hit = covering;
-  frame({ game });
+  simple.dispatchEventWith('enterFrame');
+  advanced.dispatchEventWith('enterFrame');
   assert.equal(simplePopup.get_visible(), false);
   stage.removeChild(covering);
   hit = stage;
@@ -127,9 +136,13 @@ test('both chat views show roles on hover and close for covering UI, scroll, cli
   hit = scroll;
   touch();
   assert.equal(advancedPopup.get_visible(), true);
+  invalidateChatView(advanced);
+  assert.equal(advancedPopup.get_visible(), false, 'advanced clear closes its card immediately');
+  touch();
   assert.equal(requests.at(-1), false);
   role = null;
-  frame({ game });
+  simple.dispatchEventWith('enterFrame');
+  advanced.dispatchEventWith('enterFrame');
   assert.equal(
     advancedPopup.get_visible(),
     false,
@@ -138,19 +151,22 @@ test('both chat views show roles on hover and close for covering UI, scroll, cli
   role = 'mod';
   touch();
   hit = advanced;
-  frame({ game });
+  simple.dispatchEventWith('enterFrame');
+  advanced.dispatchEventWith('enterFrame');
   assert.equal(advancedPopup.get_visible(), false, 'only the scroll content can own a badge hover');
   hit = scroll;
   touch();
   position++;
-  frame({ game });
+  simple.dispatchEventWith('enterFrame');
+  advanced.dispatchEventWith('enterFrame');
   assert.equal(advancedPopup.get_visible(), false);
   touch();
   log.updateTexts();
   assert.equal(advancedPopup.get_visible(), false);
   touch();
   advanced.set_visible(false);
-  frame({ game });
+  simple.dispatchEventWith('enterFrame');
+  advanced.dispatchEventWith('enterFrame');
   assert.equal(advancedPopup.get_visible(), false);
   cleanup.reverse().forEach((fn) => fn());
   assert.equal(stage.listeners('touch').length, 0);

@@ -1,9 +1,10 @@
-import type { Raw } from '../api/Types';
+import type { ChatCommandDescriptor } from './ChatCommandDescriptor';
+import type { AutomationGame } from '../game/AutomationGame';
 import { EventBus, type AutomationCommands } from '../automation/EventBus';
 import { AutomationStopError } from '../automation/AutomationStopError';
 import { parseCommand } from './ChatCommandParser';
 import { ChatCommandDispatchResult as Result } from './ChatCommandDispatchResult';
-import { ChatCommandInvocation } from './ChatCommandInvocation';
+import { ChatCommandInvocation, type ChatCommandCallback } from './ChatCommandInvocation';
 
 export interface CommandField {
   readonly name: string;
@@ -24,7 +25,7 @@ type Entry = Omit<CommandHelpEntry, 'ownsBareName'> & {
   owner: object;
   namespace: string;
   name: string;
-  callback: Function;
+  callback: ChatCommandCallback;
 };
 const trim = (value: string | null | undefined) => (value ?? '').trim().toLowerCase();
 const localPattern = /^[a-z0-9][a-z0-9_-]*$/;
@@ -35,14 +36,18 @@ export class ChatCommandRegistry implements AutomationCommands {
   private entries: Entry[] = [];
   private readonly reserved = new Set<string>();
 
-  registerCommand(fullName: string, descriptor: object, callback: Function): string {
+  registerCommand(
+    fullName: string,
+    descriptor: ChatCommandDescriptor,
+    callback: ChatCommandCallback,
+  ): string {
     return this.registerOwnedCommand(callback, fullName, descriptor, callback);
   }
   registerOwnedCommand(
     owner: object,
     fullName: string,
-    descriptor: object,
-    callback: Function,
+    descriptor: ChatCommandDescriptor,
+    callback: ChatCommandCallback,
   ): string {
     if (!owner) throw new Error('A chat command owner is required.');
     if (!callback) throw new Error('A chat command callback is required.');
@@ -51,8 +56,8 @@ export class ChatCommandRegistry implements AutomationCommands {
     if (this.entries.some((entry) => entry.fullName === canonical))
       throw new Error(`Chat command '${canonical}' is already registered.`);
     if (!descriptor) throw new Error(`Chat command '${canonical}' requires a descriptor.`);
-    const d = descriptor as Raw;
-    const text = (key: string) =>
+    const d = descriptor;
+    const text = (key: 'description' | 'summary' | 'usage') =>
       Object.hasOwn(d, key) && d[key] != null ? String(d[key]).trim() : '';
     const description = text('description') || text('summary');
     if (!description) throw new Error(`Chat command '${canonical}' requires a description.`);
@@ -85,7 +90,7 @@ export class ChatCommandRegistry implements AutomationCommands {
     });
     return canonical;
   }
-  unregisterCommand(name: string, callback: Function): boolean {
+  unregisterCommand(name: string, callback: ChatCommandCallback): boolean {
     return !!callback && this.unregisterOwnedCommand(callback, name);
   }
   unregisterOwnedCommand(owner: object, name: string): boolean {
@@ -121,7 +126,7 @@ export class ChatCommandRegistry implements AutomationCommands {
       if (localPattern.test(name)) this.reserved.add(name);
     }
   }
-  dispatch(commandName: string, rawArguments = '', game: Raw | null = null): Result {
+  dispatch(commandName: string, rawArguments = '', game: AutomationGame | null = null): Result {
     const invoked = trim(commandName),
       entry = this.resolve(invoked);
     if (!entry) return new Result(Result.NOT_FOUND);
@@ -165,7 +170,7 @@ export class ChatCommandRegistry implements AutomationCommands {
       game,
     );
     try {
-      if (entry.callback.length === 0) entry.callback();
+      if (entry.callback.length === 0) (entry.callback as () => unknown)();
       else entry.callback(invocation);
     } catch (error) {
       if (
@@ -219,17 +224,22 @@ export class ChatCommandRegistry implements AutomationCommands {
   private fields(value: unknown, mandatory: boolean): CommandField[] {
     if (value == null) return [];
     if (!Array.isArray(value)) throw new Error('Command fields must be an Array or Vector.');
-    return value.map((raw) => {
+    return value.map((raw: unknown) => {
       let name: string,
         description = '',
         hasDefault = false,
         defaultValue: string | undefined;
       if (typeof raw === 'string') name = raw;
-      else if (raw != null && Object.hasOwn(raw, 'name')) {
+      else if (
+        raw != null &&
+        typeof raw === 'object' &&
+        'name' in raw &&
+        Object.hasOwn(raw, 'name')
+      ) {
         name = String(raw.name);
-        if (Object.hasOwn(raw, 'description') && raw.description != null)
+        if ('description' in raw && Object.hasOwn(raw, 'description') && raw.description != null)
           description = String(raw.description).trim();
-        if (Object.hasOwn(raw, 'defaultValue')) {
+        if ('defaultValue' in raw && Object.hasOwn(raw, 'defaultValue')) {
           hasDefault = true;
           defaultValue = raw.defaultValue == null ? '' : String(raw.defaultValue);
         }

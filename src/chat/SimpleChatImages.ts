@@ -1,44 +1,60 @@
-import { read, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { DisplayObject, WrapText } from '../game/Bindings';
+import type { ChatMessage } from '../game/ChatMessage';
+import type { Resolve } from '../runtime/HaxeInterop';
 import type { ChatImageCache } from './ChatImageCache';
 import { ChatDiscordImageLink } from './ChatDiscordImageLink';
 import { createChatImageThumbnail } from '../ported/ChatImageThumbnail';
 
+export interface SimpleChatRenderer {
+  validate(): void;
+  get_x(): number;
+  get_y(): number;
+  localXAtSourceIndex(index: number): number;
+  localYAtSourceIndex(index: number): number;
+  readonly currentTextFormat?: { font?: { lineHeight: number; size: number } | null } | null;
+}
+
+type ImageMessage = Pick<ChatMessage, 'text' | 'type'>;
+interface ImageThumbnail extends DisplayObject {
+  onPreviewSizeChanged: (() => void) | null;
+  link: ChatDiscordImageLink | null;
+  readonly previewHeight: number;
+}
 interface ImageEntry {
-  thumbnail: Raw;
+  thumbnail: ImageThumbnail;
   sourceIndex: number;
 }
 
 /** ChatSimple's source spacer markup and bitmap-source attachment positions. */
 export class SimpleChatImages {
-  private readonly entries = new Map<Raw, ImageEntry>();
-  private readonly Thumbnail: ReturnType<typeof createChatImageThumbnail>;
+  private readonly entries = new Map<ImageMessage, ImageEntry>();
+  private readonly Thumbnail: new () => ImageThumbnail;
 
   constructor(
-    resolve: Resolve,
+    _resolve: Resolve,
     private readonly cache: ChatImageCache,
-    private readonly field: Raw,
-    private readonly renderer: Raw,
+    private readonly field: Pick<WrapText, 'addChild'>,
+    private readonly renderer: SimpleChatRenderer,
     private readonly invalidate: () => void,
   ) {
-    this.Thumbnail = createChatImageThumbnail(resolve, cache);
+    this.Thumbnail = createChatImageThumbnail(cache);
   }
 
-  prefetch(message?: Raw): void {
-    if (!message || !ChatDiscordImageLink.isEmbedChannel(message.type)) return;
+  prefetch(message?: ImageMessage): void {
+    if (!message || !ChatDiscordImageLink.isEmbedChannel(message.type ?? '')) return;
     const link = ChatDiscordImageLink.firstIn(String(message.text));
     if (link) this.cache.prefetch(link);
   }
 
-  textForRows(messages: Raw[]): string {
-    const used = new Set<Raw>();
+  textForRows(messages: readonly ImageMessage[]): string {
+    const used = new Set<ImageMessage>();
     const parts: string[] = [];
     let sourceCursor = 0;
     this.renderer.validate();
     const font = this.renderer.currentTextFormat?.font;
     for (const message of messages) {
       let text = String(message.text);
-      const link = ChatDiscordImageLink.isEmbedChannel(message.type)
+      const link = ChatDiscordImageLink.isEmbedChannel(message.type ?? '')
         ? ChatDiscordImageLink.firstIn(text)
         : null;
       if (link) {
@@ -55,7 +71,9 @@ export class SimpleChatImages {
         entry.thumbnail.link = link;
         const height = entry.thumbnail.previewHeight;
         const size =
-          font?.lineHeight > 0 && font?.size > 0 ? (height * font.size) / font.lineHeight : height;
+          font && font.lineHeight > 0 && font.size > 0
+            ? (height * font.size) / font.lineHeight
+            : height;
         const spacer = `<font size='${Math.max(1, size).toFixed(2)}'> </font>`;
         const prefix = text.substring(0, link.sourceBegin);
         const suffix = text.substring(link.sourceEnd);
@@ -83,21 +101,21 @@ export class SimpleChatImages {
     // transforms apply identically to text and images, including after resize.
     for (const entry of this.entries.values()) {
       entry.thumbnail.set_x(
-        Math.round(
-          read(this.renderer, 'x', 0) + this.renderer.localXAtSourceIndex(entry.sourceIndex),
-        ),
+        Math.round(this.renderer.get_x() + this.renderer.localXAtSourceIndex(entry.sourceIndex)),
       );
       entry.thumbnail.set_y(
-        Math.round(
-          read(this.renderer, 'y', 0) + this.renderer.localYAtSourceIndex(entry.sourceIndex),
-        ),
+        Math.round(this.renderer.get_y() + this.renderer.localYAtSourceIndex(entry.sourceIndex)),
       );
     }
   }
 
-  dispose(): void {
+  clear(): void {
     for (const entry of this.entries.values()) this.release(entry);
     this.entries.clear();
+  }
+
+  dispose(): void {
+    this.clear();
   }
 
   private release(entry: ImageEntry): void {

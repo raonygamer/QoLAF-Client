@@ -1,3 +1,5 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createJapaneseGlyphCache } from '../src/ported/JapaneseGlyphCache';
@@ -66,11 +68,11 @@ test('Japanese cache preserves active glyphs, evicts only released entries, and 
     'starling.text.TextField': { getBitmapFont: () => kana },
     'starling.textures.Texture': {
       fromBitmapData: () => ({
-        root: {
+        get_root: () => ({
           uploadBitmapData() {
             uploads++;
           },
-        },
+        }),
       }),
       fromTexture: () => ({
         dispose() {
@@ -88,6 +90,7 @@ test('Japanese cache preserves active glyphs, evicts only released entries, and 
     assert.ok(registry[name], name);
     return registry[name];
   };
+  bindGameClasses({ cls: (name: string) => registry[name] ?? {} } as unknown as API);
   const Glyph = createJapaneseCachedGlyph(resolve);
   const Page = createJapaneseGlyphPage(resolve);
   registry['core.hud.components.chat.rich.JapaneseCachedGlyph'] = Glyph;
@@ -95,6 +98,7 @@ test('Japanese cache preserves active glyphs, evicts only released entries, and 
   const Cache = createJapaneseGlyphCache(resolve);
   assert.equal(Page.CAPACITY, 324);
   const staticGlyph = Cache.acquire(0x3042);
+  assert.ok(staticGlyph);
   assert.equal(staticGlyph.batchGroup, 1);
   assert.equal(Cache.acquire(0x3042), staticGlyph);
   assert.equal(Cache.acquire(65), null);
@@ -105,6 +109,7 @@ test('Japanese cache preserves active glyphs, evicts only released entries, and 
   assert.equal(disposals, 0);
   Cache.release(active[0]);
   const replacement = Cache.acquire(0x6000);
+  assert.ok(replacement);
   assert.equal(replacement.page, active[0].page);
   assert.equal(replacement.slot, active[0].slot);
   assert.equal(Cache.allocatedKanjiPages, 3);
@@ -120,6 +125,7 @@ test('Japanese cache preserves active glyphs, evicts only released entries, and 
   Cache.prepare('漢字漢');
   assert.equal(uploads - before, 1, 'prepare uploads a dirty page once for the entire string');
   const character = Cache.acquire('字'.charCodeAt(0));
+  assert.ok(character?.character);
   assert.equal(character.character.yOffset, 10, 'source baseline 48 minus glyph ascent 38');
   assert.equal(character.character.xAdvance, 42);
   Cache.release(character);

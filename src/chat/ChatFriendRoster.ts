@@ -1,55 +1,64 @@
-import { read, type API, type Raw } from '../api/Types';
+import { Player, MessageLog, TextureLocator, type GameScene, type Texture } from '../game/Bindings';
 import type { AutocompleteFriend } from './ChatFriendAutocompleteModel';
+import { ChatMessageContextData } from './ChatMessageContextData';
 
 /** Reads persistent friend identities and hydrates previews from live room players. */
 export class ChatFriendRoster {
   private nextRefreshAt = 0;
   private disposed = false;
-  private textures = new Map<string, Raw | null>();
+  private textures = new Map<string, Texture | null>();
 
   constructor(
-    private api: API,
-    private game: Raw,
+    private game: Pick<GameScene, 'playerManager' | 'dataManager' | 'friendManager'>,
     private now = () => performance.now(),
   ) {}
 
   records(): AutocompleteFriend[] {
-    const Player = this.api.cls('core.player.Player');
-    const players: Raw[] = read(this.game.playerManager, 'players', []);
-    const messages: Raw[] = this.api.cls('core.hud.components.chat.MessageLog')?.textQueue ?? [];
-    const records: Raw[] = [...(Player?.onlineFriends ?? []), ...(Player?.friends ?? [])];
+    const manager = this.game.playerManager;
+    const players = manager?.get_players() ?? [];
+    const messages = MessageLog.textQueue ?? [];
+    const records: AutocompleteFriend[] = [
+      ...(Player.onlineFriends ?? []),
+      ...(Player.friends ?? []),
+    ];
     for (const friend of records) {
       if (!friend) continue;
-      let player = friend.id ? players.find((player) => player.id === friend.id) : undefined;
+      let player = friend.id ? manager?.get_playersById().h[friend.id] : undefined;
       if (!player && friend.name) {
+        const name = friend.name.toLowerCase();
         const matches = players.filter(
-          (player) => read(player, 'name', '').toLowerCase() === friend.name.toLowerCase(),
+          (player) => player && player.get_name()?.toLowerCase() === name,
         );
         if (matches.length === 1) player = matches[0];
       }
       if (player) {
-        const skin = read(player, 'activeSkin');
-        if (skin) friend.skin = skin;
-        const fleet = player.getActiveFleetObj?.();
-        if (fleet)
-          for (const property of ['Hue', 'Brightness', 'Saturation', 'Contrast']) {
-            friend['previewShip' + property] = read(fleet, 'ship' + property, 0);
-          }
+        if (player.activeSkin) friend.skin = player.activeSkin;
+        const fleet = player.getActiveFleetObj();
+        if (fleet) {
+          friend.previewShipHue = fleet.shipHue;
+          friend.previewShipBrightness = fleet.shipBrightness;
+          friend.previewShipSaturation = fleet.shipSaturation;
+          friend.previewShipContrast = fleet.shipContrast;
+        }
       }
       if (!friend.playerId) {
         friend.playerId = player?.id || friend.id || '';
         if (!friend.playerId && friend.name) {
-          const normalized = friend.name.toLowerCase();
-          const message = [...messages]
-            .reverse()
-            .find(
-              (message) => message.playerName?.toLowerCase() === normalized && message.playerId,
-            );
-          friend.playerId = message?.playerId ?? '';
+          const name = friend.name.toLowerCase();
+          for (let index = messages.length - 1; index >= 0; index--) {
+            const message = messages[index];
+            if (ChatMessageContextData.propertyText(message, 'playerName').toLowerCase() !== name)
+              continue;
+            const id = ChatMessageContextData.propertyText(message, 'playerId');
+            if (id) {
+              friend.playerId = id;
+              break;
+            }
+          }
         }
       }
     }
-    return records as AutocompleteFriend[];
+    return records;
   }
 
   refresh(onReady: () => void): void {
@@ -60,19 +69,28 @@ export class ChatFriendRoster {
     });
   }
 
-  texture(skinKey: string): Raw | null {
+  texture(skinKey: string): Texture | null {
+    if (!skinKey || !this.game.dataManager) return null;
     if (this.textures.has(skinKey)) return this.textures.get(skinKey)!;
-    let texture: Raw | null = null;
+    let texture: Texture | null = null;
     try {
-      const skin = this.game.dataManager.loadKey('Skins', skinKey);
-      const ship = skin ? this.game.dataManager.loadKey('Ships', skin.ship) : null;
-      const manager = this.api.cls('textures.TextureLocator')?.getService();
-      if (ship?.bitmap && manager) texture = manager.getTexturesMainByKey(ship.bitmap)?.[0] ?? null;
+      const skin: unknown = this.game.dataManager.loadKey('Skins', skinKey);
+      const shipKey = this.recordText(skin, 'ship');
+      const ship: unknown = shipKey ? this.game.dataManager.loadKey('Ships', shipKey) : null;
+      const bitmap = this.recordText(ship, 'bitmap');
+      const manager = TextureLocator.getService();
+      if (bitmap && manager) texture = manager.getTexturesMainByKey(bitmap)?.[0] ?? null;
     } catch {
       /* Source caches missing previews as well as valid shared textures. */
     }
     this.textures.set(skinKey, texture);
     return texture;
+  }
+
+  private recordText(record: unknown, key: string): string {
+    return record !== null && typeof record === 'object'
+      ? ChatMessageContextData.propertyText(record, key)
+      : '';
   }
 
   dispose(): void {

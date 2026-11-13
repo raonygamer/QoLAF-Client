@@ -1,4 +1,4 @@
-import type { Resolve } from '../runtime/As3';
+import type { Resolve } from '../runtime/HaxeInterop';
 
 /** Original AstroTheme automation rows on the upstream list/scroll/pointer engine. */
 export function createAutomationList(resolve: Resolve): any {

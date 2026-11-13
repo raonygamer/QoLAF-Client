@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { installEmitterMirroring } from '../src/rendering/EmitterMirroring';
 import type { Raw } from '../src/api/Types';
+import { bindGameClasses } from '../src/game/Bindings';
 // @ts-expect-error inspected upstream factory
 import makeFactory from './fixtures/UpstreamEmitterFactory.js';
 // @ts-expect-error actual host hooks
@@ -51,13 +52,15 @@ test('native self factory preserves absolute hull scale, authored size signs and
   assert.equal(emitter.startSize, -4, 'native baseline multiplies signed scale');
   const hooks = new Hooks();
   const cleanups: Array<() => void> = [];
-  installEmitterMirroring({
+  const api = {
     cls: (name: string) => (name === 'core.particle.Emitter' ? Emitter : factory),
     after: (object: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(object, key, 'after', fn)),
     before: (object: Raw, key: string, fn: Function) =>
       cleanups.push(hooks.add(object, key, 'before', fn)),
-  } as any);
+  } as any;
+  bindGameClasses(api);
+  installEmitterMirroring(api);
   try {
     for (const [x, y, mirrored] of [
       [-2, 3, true],

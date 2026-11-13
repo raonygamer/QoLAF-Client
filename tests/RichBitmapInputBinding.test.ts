@@ -1,3 +1,4 @@
+import type { ArtifactLabelResolver } from '../src/chat/rich/ArtifactLabelResolver';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { RichBitmapEditorModel } from '../src/chat/rich/RichBitmapEditorModel';
@@ -22,7 +23,7 @@ class Input extends EventTarget {
   }
 }
 
-function fixture(source = '', resolver: Function | null = null) {
+function fixture(source = '', resolver: ArtifactLabelResolver | null = null, activity = () => {}) {
   const model = new RichBitmapEditorModel(13, 0xffffff, resolver);
   model.text = source;
   const input = new Input();
@@ -31,6 +32,8 @@ function fixture(source = '', resolver: Function | null = null) {
     model,
     input as unknown as HTMLInputElement,
     () => changes++,
+    undefined,
+    activity,
   );
   const type = (data: string) => input.emit('beforeinput', { inputType: 'insertText', data });
   return { model, input, binding, type, changes: () => changes };
@@ -182,6 +185,30 @@ test('Ctrl and Alt word movement use source boundaries and keep artifact labels 
   binding.dispose();
 });
 
+test('unconsumed Up and Down use source line boundaries and preserve selection direction', () => {
+  const source = "A<font color='#ff0000'>BC</font>Z";
+  const { model, input, binding, changes } = fixture(source);
+  model.select(2);
+  binding.project();
+  assert.equal(input.emit('keydown', { key: 'ArrowUp', ctrlKey: true }).defaultPrevented, true);
+  assert.equal(model.selectionActive, 0);
+  input.emit('keydown', { key: 'ArrowDown', shiftKey: true });
+  assert.equal(model.selectionAnchor, 0);
+  assert.equal(model.selectionActive, 4);
+  model.select(2);
+  binding.project();
+  input.emit('keydown', { key: 'ArrowUp', shiftKey: true });
+  assert.equal(model.selectionAnchor, 2);
+  assert.equal(model.selectionActive, 0);
+  assert.equal(input.selectionDirection, 'backward');
+  input.emit('keydown', { key: 'ArrowDown' });
+  assert.equal(model.selectionBegin, 4);
+  assert.equal(model.selectionEnd, 4);
+  assert.equal(model.text, source);
+  assert.equal(changes(), 0, 'navigation does not publish an edit');
+  binding.dispose();
+});
+
 test('word deletion preserves markup and atomic links through keyboard and beforeinput', () => {
   const token = '$artifact:player:item$';
   const { model, input, binding, changes } = fixture(
@@ -210,4 +237,41 @@ test('word deletion preserves markup and atomic links through keyboard and befor
   input.emit('keydown', { key: 'Backspace', altKey: true });
   assert.equal(model.text, before);
   binding.dispose();
+});
+
+test('typing stops gameplay bubbling without blocking native Enter, defaults or key releases', () => {
+  let actions = 0;
+  const { input, binding } = fixture('', null, () => actions++);
+  let nativeKeys = 0;
+  input.addEventListener('keydown', () => nativeKeys++);
+  for (const key of ['a', 'w', ' ', 'Enter']) {
+    let stopped = false;
+    const down = input.emit('keydown', {
+      key,
+      stopPropagation: () => {
+        stopped = true;
+      },
+    });
+    assert.equal(stopped, true, key);
+    assert.equal(down.defaultPrevented, false, 'browser typing and native Enter retain defaults');
+  }
+  assert.equal(nativeKeys, 4, 'same-element native listeners still run');
+  assert.equal(actions, 4, 'typing still counts as player activity');
+  let releaseStopped = false;
+  input.emit('keyup', {
+    key: 'w',
+    stopPropagation: () => {
+      releaseStopped = true;
+    },
+  });
+  assert.equal(releaseStopped, false, 'release must reach a previously-held gameplay key');
+  binding.dispose();
+  let stoppedAfterUnload = false;
+  input.emit('keydown', {
+    key: 'w',
+    stopPropagation: () => {
+      stoppedAfterUnload = true;
+    },
+  });
+  assert.equal(stoppedAfterUnload, false);
 });

@@ -1,5 +1,5 @@
 // Source port of core/states/gameStates/SettingsAutomations.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 import { AutomationManager, type AutomationModule } from '../automation/AutomationManager';
 import type { AutomationInfo } from '../automation/AutomationInfo';
 import { createAutomationList } from '../settings/AutomationList';
@@ -126,7 +126,7 @@ export function createSettingsAutomations(resolve: Resolve): any {
       this.urlInput.input.element.style.fontFamily = 'Verdana, Arial, sans-serif';
       this.scrollArea.addChild(this.urlInput);
 
-      let addUrlButton: Button = new Button(
+      let addURLButton: Button = new Button(
         this.importURL,
         Localize.t('Add URL'),
         Button.STYLE_HIGHLIGHT,
@@ -138,21 +138,21 @@ export function createSettingsAutomations(resolve: Resolve): any {
         Button.STYLE_HIGHLIGHT,
         SettingsAutomations.IMPORT_BUTTON_FONT_SIZE,
       );
-      addUrlButton.height = SettingsAutomations.IMPORT_BUTTON_HEIGHT;
+      addURLButton.height = SettingsAutomations.IMPORT_BUTTON_HEIGHT;
       addFileButton.height = SettingsAutomations.IMPORT_BUTTON_HEIGHT;
       let buttonStackHeight: number =
-        addUrlButton.height + SettingsAutomations.IMPORT_BUTTON_GAP + addFileButton.height;
+        addURLButton.height + SettingsAutomations.IMPORT_BUTTON_GAP + addFileButton.height;
       let buttonStackY: number =
         importRowY + (SettingsAutomations.URL_INPUT_HEIGHT - buttonStackHeight) / 2;
-      addUrlButton.x = importButtonX;
-      addUrlButton.y = buttonStackY;
-      addUrlButton.width = SettingsAutomations.IMPORT_BUTTON_WIDTH;
-      addUrlButton.autoEnableAfterClick = true;
-      this.scrollArea.addChild(addUrlButton);
+      addURLButton.x = importButtonX;
+      addURLButton.y = buttonStackY;
+      addURLButton.width = SettingsAutomations.IMPORT_BUTTON_WIDTH;
+      addURLButton.autoEnableAfterClick = true;
+      this.scrollArea.addChild(addURLButton);
 
       addFileButton.x = importButtonX;
       addFileButton.y =
-        addUrlButton.y + addUrlButton.height + SettingsAutomations.IMPORT_BUTTON_GAP;
+        addURLButton.y + addURLButton.height + SettingsAutomations.IMPORT_BUTTON_GAP;
       addFileButton.width = SettingsAutomations.IMPORT_BUTTON_WIDTH;
       addFileButton.autoEnableAfterClick = true;
       this.scrollArea.addChild(addFileButton);

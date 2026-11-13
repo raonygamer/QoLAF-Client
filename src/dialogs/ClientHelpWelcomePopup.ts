@@ -1,27 +1,30 @@
-import { read } from '../api/Types';
-import { bound, type Resolve } from '../runtime/As3';
+import { PopupConfirmMessage } from '../game/Bindings';
+import type { Game } from '../game/Game';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 
 /** Source welcome text, dimensions and native positive/neutral buttons. */
-export function createClientHelpWelcomePopup(resolve: Resolve): any {
-  const Popup = resolve('core.hud.components.dialogs.PopupConfirmMessage');
-  class ClientHelpWelcomePopup extends Popup {
-    private observedStage: any = null;
+export function createClientHelpWelcomePopup(resolve: Resolve) {
+  resolve('core.hud.components.dialogs.PopupConfirmMessage');
+  class ClientHelpWelcomePopup extends PopupConfirmMessage {
+    private observedStage: Game.starling.display.Stage | null = null;
     private destroyed = false;
 
     constructor() {
       super('Open client help', 'Later', 'positive');
-      this.textField.width = 420;
-      this.text =
+      this.textField.set_width(420);
+      this.set_text(
         "<font color='#FFF1A8'>New to QoLAF? Welcome aboard!</font><br/><br/>" +
-        "The client help explains QoLAF's features and useful commands. " +
-        "Take a look now, or type <font color='#80DFFF'>/clienthelp</font> " +
-        'in chat whenever you need it.<br/><br/>' +
-        'This welcome message only appears once.';
+          "The client help explains QoLAF's features and useful commands. " +
+          "Take a look now, or type <font color='#80DFFF'>/clienthelp</font> " +
+          'in chat whenever you need it.<br/><br/>' +
+          'This welcome message only appears once.',
+      );
     }
 
     @bound
     stageAddHandler(): void {
-      this.observedStage = this.stage;
+      this.observedStage = this.get_stage();
+      if (!this.observedStage) return;
       this.addEventListener('removedFromStage', this.clean);
       this.observedStage.addEventListener('keyDown', this.keyDown);
       this.observedStage.addEventListener('resize', this.redraw);
@@ -30,15 +33,16 @@ export function createClientHelpWelcomePopup(resolve: Resolve): any {
 
     @bound
     redraw(): void {
-      if (this.destroyed || !this.stage) return;
+      const stage = this.get_stage();
+      if (this.destroyed || !stage) return;
       super.redraw();
-      this.box.x = Math.round((this.stage.stageWidth - this.box.width) / 2);
-      this.box.y = Math.round((this.stage.stageHeight - this.box.height) / 2);
+      this.box.set_x(Math.round((stage.get_stageWidth() - this.box.get_width()) / 2));
+      this.box.set_y(Math.round((stage.get_stageHeight() - this.box.get_height()) / 2));
     }
 
     @bound
-    keyDown(event: any): void {
-      if (read(event, 'keyCode') !== 13) return;
+    keyDown(event: Game.starling.events.KeyboardEvent): void {
+      if (event.get_keyCode() !== 13) return;
       event.stopImmediatePropagation();
       this.confirm();
     }

@@ -21,15 +21,20 @@ test('native bars ease like the original without changing ship health or shield 
   const field = () => ({
     text: '',
     writes: 0,
+    get_text() {
+      return this.text;
+    },
     set_text(value: string) {
       this.text = value;
       this.writes++;
+      return value;
     },
   });
   const bar = () => ({
     width: 0,
     set_width(value: number) {
       this.width = value;
+      return value;
     },
   });
   const native = {
@@ -68,4 +73,51 @@ test('native bars ease like the original without changing ship health or shield 
     writes,
     'unchanged text does not rebuild its bitmap',
   );
+});
+
+test('health smoothing has the same elapsed-time result at 30, 60, 120 and 180 Hz', () => {
+  const results: number[] = [];
+  for (const fps of [30, 60, 120, 180]) {
+    const text = () => ({
+      value: '',
+      get_text() {
+        return this.value;
+      },
+      set_text(value: string) {
+        this.value = value;
+        return value;
+      },
+    });
+    const native = {
+      playerHPBar: {
+        set_width(value: number) {
+          return value;
+        },
+      },
+      playerShieldBar: {
+        set_width(value: number) {
+          return value;
+        },
+      },
+      playerHPText: text(),
+      playerShieldText: text(),
+    };
+    const display = new HealthAndShield(native, () => null);
+    const ship = {
+      hp: 10000,
+      shieldHp: 10000,
+      get_hpMax: () => 10000,
+      get_shieldHpMax: () => 10000,
+    };
+    display.update(ship);
+    ship.hp = 0;
+    ship.shieldHp = 0;
+    display.update(ship);
+    for (let frame = 0; frame < fps / 2; frame++) display.animate(1 / fps);
+    results.push(display.displayedHP);
+    assert.ok(Math.abs(display.displayedHP - 10000 * Math.exp(-6)) < 1e-8);
+    assert.equal(ship.hp, 0);
+    assert.equal(ship.shieldHp, 0);
+  }
+  assert.ok(Math.max(...results) - Math.min(...results) < 1e-8);
 });

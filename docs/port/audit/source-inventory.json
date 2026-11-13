@@ -45,7 +45,7 @@
     },
     {
       "path": "Login.as",
-      "sha256": "464ba18f3106a14e33bf0248dd027882d9fba4de2f41c92de334c087e3054291",
+      "sha256": "05c0067e7fbdb01783767f6cbad044c3a84b0939f107ee6d53ff628c8ed32d8e",
       "lines": 2282,
       "change": "changed",
       "status": "pending",
@@ -986,17 +986,15 @@
       "sha256": "4fb67b0a1406dc7901a938550ebcd6f7098908bbb68c20257ac137db0338a678",
       "lines": 135,
       "change": "added",
-      "status": "source-translated; integration and visual verification pending",
-      "typescript": "src/Ported/LoginAccountTypePanel.ts"
+      "status": "pending"
     },
     {
       "path": "core/hud/components/LoginButton.as",
       "sha256": "01e0059918be56191e8550da5b1b0e02bc42954efa1421544d1b2337975be47d",
       "lines": 66,
       "change": "changed",
-      "status": "source-translated; integration and visual verification pending",
-      "vanillaSha256": "ab6445987a4328efd64e27590b3899223d0e9e7f26c3d9b4f1a3f39980114e8d",
-      "typescript": "src/Ported/LoginButton.ts"
+      "status": "pending",
+      "vanillaSha256": "ab6445987a4328efd64e27590b3899223d0e9e7f26c3d9b4f1a3f39980114e8d"
     },
     {
       "path": "core/hud/components/LoginInput.as",
@@ -1011,8 +1009,7 @@
       "sha256": "2b03a7be658b3f7d604544cc93ce39e3a8cfc683055c217972bc5a0e77cf6636",
       "lines": 875,
       "change": "added",
-      "status": "source-translated; integration and visual verification pending",
-      "typescript": "src/Ported/LoginProfilePanel.ts"
+      "status": "pending"
     },
     {
       "path": "core/hud/components/LootItem.as",
@@ -1156,8 +1153,7 @@
       "sha256": "2faed7922115fa9095f4cb25ab77029b9cd1835db42d8db38fb2708ff92f2f1a",
       "lines": 55,
       "change": "added",
-      "status": "source-translated; integration and visual verification pending",
-      "typescript": "src/Ported/SettingsWindowChrome.ts"
+      "status": "pending"
     },
     {
       "path": "core/hud/components/ShopIcons.as",
@@ -1496,7 +1492,7 @@
     },
     {
       "path": "core/hud/components/chat/ChatInputText.as",
-      "sha256": "c2f31145fe9d8644b28341a9c62db46296f50164d93fa12938eb0d58043e08b5",
+      "sha256": "df0564c05ed02be1a1ada20b1f59c893ff23c10c93725d60eb6b4cb74cb5b401",
       "lines": 5115,
       "change": "changed",
       "status": "pending",
@@ -1610,7 +1606,7 @@
     },
     {
       "path": "core/hud/components/chat/ClientRoomControl.as",
-      "sha256": "15dee3de8e63f3de4654f3bc624eaeade77d0eaef85403b5f7d13fe393fba5e3",
+      "sha256": "b7737c3a97fe5b3e180538677218f0adb3f72e97b490f0103eff282c67ad02d0",
       "lines": 725,
       "change": "added",
       "status": "pending"
@@ -1759,7 +1755,7 @@
     },
     {
       "path": "core/hud/components/chat/ServiceConnectionPool.as",
-      "sha256": "809a43fa0f439dc668aba9a9f7911c1be0fc3758e568d9dce4e5694b67cb0b13",
+      "sha256": "a3eb61ac68c186678eb1372c98c3e864aaad57af310ffe4ecf9e7ba3a95619af",
       "lines": 410,
       "change": "added",
       "status": "pending"
@@ -2088,7 +2084,7 @@
     },
     {
       "path": "core/hud/components/dialogs/ClientChangelogPopup.as",
-      "sha256": "bc7b3d4ee6992bcbb7a711114a05188b5a7dabebb3ce5b629f4a6487c3cdf688",
+      "sha256": "7e5c126a55b2cec6194182f811972f43cfa4f05fc6112d380e7b3520843aee96",
       "lines": 746,
       "change": "added",
       "status": "pending"
@@ -2109,7 +2105,7 @@
     },
     {
       "path": "core/hud/components/dialogs/ClientHelpPopup.as",
-      "sha256": "919c931e89f20498a43372bc6d9adc52a42dcc2b20d21a2b9c390e4a80894880",
+      "sha256": "16e44e4b014c9dbfcc14302d9a91b50d455dad387b1197ce8c5d70415ec46518",
       "lines": 495,
       "change": "added",
       "status": "pending"
@@ -2827,7 +2823,7 @@
     },
     {
       "path": "core/ipc/ClientIpcService.as",
-      "sha256": "b1bc65839525021235574c809367ced39bdf848e56f4c522bcdd1d96237b5368",
+      "sha256": "8053d0b5593cfd0d5689dcd4df78d475c2071bf6ace3857cf399682b1b8eded6",
       "lines": 1306,
       "change": "added",
       "status": "pending"
@@ -2894,7 +2890,7 @@
     },
     {
       "path": "core/login/ServiceRoomPreview.as",
-      "sha256": "bff5ebd64e942e82b593d555da22eaec2977914733c7eee397342e44bf1bb4e7",
+      "sha256": "fc559cf084d06f93d037c40685c273a796e9fbccc6940bd9b3b7bb70e5b006a5",
       "lines": 379,
       "change": "changed",
       "status": "pending",
@@ -3352,7 +3348,7 @@
     },
     {
       "path": "core/scene/Game.as",
-      "sha256": "83ef5ec9ba2608ffea979e4fa709869d985aaf26e0b9d62289a2ad1b71e1263e",
+      "sha256": "8951137d67c5e24d590ac407c66935bbceaa80198e45e17d4d05cf8d8c0a743f",
       "lines": 2078,
       "change": "changed",
       "status": "pending",
@@ -3890,7 +3886,7 @@
     },
     {
       "path": "core/states/gameStates/GoWarpState.as",
-      "sha256": "5f49264236981fc47012e3d83fb80be915cfa8cf49b47e3fe8894fd1b0afdc84",
+      "sha256": "d2fdb07514d175214dab9719f67132ab79bf944dec2638797b1fa23c52b38d00",
       "lines": 104,
       "change": "changed",
       "status": "pending",
@@ -4093,18 +4089,16 @@
       "sha256": "c4997cf9368ce7b562f935991da02a48beca3e6ec4b951434b02ef86af2669b9",
       "lines": 519,
       "change": "changed",
-      "status": "source-translated; integration and visual verification pending",
-      "vanillaSha256": "f44a4bfa7150c2c046c7ab0f42fc9db03789dd6ef5e4b8cb44b7d592fff2b0d4",
-      "typescript": "src/Ported/SettingsGeneral.ts"
+      "status": "pending",
+      "vanillaSha256": "f44a4bfa7150c2c046c7ab0f42fc9db03789dd6ef5e4b8cb44b7d592fff2b0d4"
     },
     {
       "path": "core/states/gameStates/SettingsState.as",
       "sha256": "87ac3a7b1a34afb7a3ad86a75377c95598b569714f1909f1a4bb2df9eec769b8",
       "lines": 194,
       "change": "changed",
-      "status": "source-translated; integration and visual verification pending",
-      "vanillaSha256": "d6920e96da9ab7c76230f9134c0d225c971b9f462b883fa98dc9ade402d0628a",
-      "typescript": "src/Ported/SettingsState.ts"
+      "status": "pending",
+      "vanillaSha256": "d6920e96da9ab7c76230f9134c0d225c971b9f462b883fa98dc9ade402d0628a"
     },
     {
       "path": "core/states/gameStates/Shop.as",
@@ -4864,7 +4858,7 @@
     },
     {
       "path": "joinRoom/JoinRoomManager.as",
-      "sha256": "004a16f058dcdf21aab34d6e81cc408d383390874c60dde319d0afdbe34c242b",
+      "sha256": "62477ddaebffbab94c313b55872bf760feddb815df87582348ef1900369dbc10",
       "lines": 2665,
       "change": "changed",
       "status": "pending",
@@ -4958,8 +4952,7 @@
       "sha256": "2a21b3d1f01e3b89f48b04f2cda2b30dd869cb83c0a4cb109195ba17b94dee77",
       "lines": 872,
       "change": "added",
-      "status": "source-translated; integration and visual verification pending",
-      "typescript": "src/Ported/ClientSettings.ts"
+      "status": "pending"
     },
     {
       "path": "qolaf/data/ClientVersion.as",
@@ -5120,8 +5113,7 @@
       "sha256": "73b76fd9980d515f85e5a8506d5e2796613662f99805b521650ebd3f530d98c3",
       "lines": 583,
       "change": "added",
-      "status": "source-translated; integration and visual verification pending",
-      "typescript": "src/Ported/SettingsQoLAF.ts"
+      "status": "pending"
     },
     {
       "path": "qolaf/target/TargetSystem.as",

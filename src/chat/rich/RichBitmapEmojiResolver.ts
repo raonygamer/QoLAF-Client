@@ -1,5 +1,5 @@
 // Source port of core/hud/components/chat/rich/RichBitmapEmojiResolver.as.
-import { bound } from '../../runtime/As3';
+import { bound } from '../../runtime/HaxeInterop';
 import { RichBitmapEmojiMatch } from './RichBitmapEmojiMatch';
 import { EmojiGlyphLookup } from './EmojiGlyphLookup';
 

@@ -1,21 +1,15 @@
 import { samePlayerGroup } from './PlayerGroup';
-import { read, type Raw } from '../api/Types';
-import { NativeUI } from '../ui/NativeUI';
+import { Boss, EnemyShip, PlayerShip, Spawner, Unit, type GameScene } from '../game/Bindings';
 export class TargetPresentation {
-  constructor(
-    private ui: NativeUI,
-    private game: Raw,
-  ) {}
-  isPlayer(unit: Raw) {
-    return !!unit && unit instanceof this.ui.cls('core.ship.PlayerShip');
+  constructor(private readonly game: Pick<GameScene, 'get_me'>) {}
+  isPlayer(unit: Unit): unit is PlayerShip {
+    return !!unit && unit instanceof PlayerShip;
   }
-  sameGroup(unit: Raw) {
-    return samePlayerGroup(read(this.game, 'me'), unit?.player);
+  sameGroup(unit: Unit): boolean {
+    return this.isPlayer(unit) && samePlayerGroup(this.game.get_me(), unit.player);
   }
-  boss(unit: Raw | null) {
+  boss(unit: Unit | null): Boss | null {
     let p = unit?.parentObj;
-    const Boss = this.ui.cls('core.boss.Boss'),
-      Unit = this.ui.cls('core.unit.Unit');
     for (let i = 0; p && i < 32; i++) {
       if (p instanceof Boss) return p;
       if (!(p instanceof Unit)) break;
@@ -23,65 +17,69 @@ export class TargetPresentation {
     }
     return null;
   }
-  identity(unit: Raw) {
+  identity(unit: Unit) {
     return this.boss(unit) ?? unit;
   }
-  level(unit: Raw) {
+  level(unit: Unit) {
     return this.boss(unit)?.level ?? unit.level ?? 0;
   }
-  bossIcon(unit: Raw) {
-    return !!(unit && (unit.isBossUnit || this.boss(unit) || unit.miniboss));
+  bossIcon(unit: Unit) {
+    return !!(
+      unit &&
+      (unit.isBossUnit || this.boss(unit) || (unit instanceof EnemyShip && unit.miniboss))
+    );
   }
-  hideStats(unit: Raw) {
+  hideStats(unit: Unit) {
     return this.isPlayer(unit) && unit.isHostile && !this.sameGroup(unit);
   }
-  name(unit: Raw) {
-    const compact = (name: string) =>
-      name.toLowerCase().includes('regius') ? 'Exterminatore' : name;
+  activeName(unit: Unit | null): string {
     const boss = this.boss(unit);
-    if (boss) return compact(boss.name || 'Unknown');
-    if (unit instanceof this.ui.cls('core.spawner.Spawner')) {
+    return boss ? this.compactName(boss.get_name() || 'Unknown') : this.name(unit);
+  }
+  private compactName(name: string): string {
+    return name.toLowerCase().includes('regius') ? 'Exterminatore' : name;
+  }
+  name(unit: Unit | null) {
+    if (!unit) return 'Unknown';
+    if (unit instanceof Spawner) {
       if (unit.factions?.length) return unit.factions[0] + ' Spawner';
       const t = unit.spawnerType;
       return (t ? t[0].toUpperCase() + t.slice(1) : 'Unknown') + ' Spawner';
     }
-    return compact(
-      String(read(unit, 'name', read(unit.player, 'name', 'Unknown')))
-        .split('lvl')[0]
-        .trim(),
-    );
+    const boss = this.boss(unit);
+    if (boss) return this.compactName(boss.get_name() || 'Unknown');
+    return this.compactName((unit.get_name() || 'Unknown').split('lvl')[0].trim());
   }
-  aura(unit: Raw) {
-    const E = this.ui.cls('core.ship.EnemyShip');
-    if (!(unit instanceof E)) return 0;
+  aura(unit: Unit) {
+    if (!(unit instanceof EnemyShip)) return 0;
     const colors: Record<number, number> = {
-      [E.RARE_TYPE_DEFENDER]: 0x00bff5,
-      [E.RARE_TYPE_ATTACKER]: 0xb8000a,
-      [E.RARE_TYPE_SPEEDER]: 0xff9970,
-      [E.RARE_TYPE_LEGENDARY]: 0x44ff44,
-      [E.RARE_TYPE_UNIQUE]: 0xffff22,
+      [EnemyShip.RARE_TYPE_DEFENDER]: 0x00bff5,
+      [EnemyShip.RARE_TYPE_ATTACKER]: 0xb8000a,
+      [EnemyShip.RARE_TYPE_SPEEDER]: 0xff9970,
+      [EnemyShip.RARE_TYPE_LEGENDARY]: 0x44ff44,
+      [EnemyShip.RARE_TYPE_UNIQUE]: 0xffff22,
     };
     return colors[unit.rareType] ?? 0;
   }
-  values(unit: Raw) {
+  values(unit: Unit) {
     const boss = this.boss(unit);
     return boss
       ? { hp: boss.hp, hpMax: boss.hpMax, shield: 0, shieldMax: 0 }
       : {
           hp: unit.hp,
-          hpMax: read(unit, 'hpMax'),
+          hpMax: unit.get_hpMax(),
           shield: unit.shieldHp,
-          shieldMax: read(unit, 'shieldHpMax'),
+          shieldMax: unit.get_shieldHpMax(),
         };
   }
-  compare(a: Raw, b: Raw, distance: (u: Raw) => number) {
+  compare(a: Unit, b: Unit, distance: (u: Unit) => number) {
     return (
       Number(this.sameGroup(a)) - Number(this.sameGroup(b)) ||
       Number(this.isPlayer(b)) - Number(this.isPlayer(a)) ||
       Number(this.bossIcon(b)) - Number(this.bossIcon(a)) ||
       this.level(b) - this.level(a) ||
       distance(a) - distance(b) ||
-      a.id - b.id
+      a.get_id() - b.get_id()
     );
   }
 }

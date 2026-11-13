@@ -7,6 +7,10 @@ export interface AutocompleteFriend {
   level?: number;
   playerId?: string | null;
   skin?: string | null;
+  previewShipHue?: number;
+  previewShipBrightness?: number;
+  previewShipSaturation?: number;
+  previewShipContrast?: number;
 }
 interface AutocompletePlayer {
   id: string;

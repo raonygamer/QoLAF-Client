@@ -1,16 +1,32 @@
-import { read, type Raw } from '../api/Types';
-import type { IpcServerMessage } from './ClientIpcService';
+import type { IPCServerMessage } from './ClientIPCService';
 
-/** Preserve the SDK's primitive types; typed getters would coerce malformed replies. */
-export function readNativeMessage(message: Raw | null): IpcServerMessage | null {
+function member(value: unknown, key: string): unknown {
+  return value !== null && (typeof value === 'object' || typeof value === 'function')
+    ? Reflect.get(value, key)
+    : undefined;
+}
+
+function property(value: unknown, key: string): unknown {
+  const getter = member(value, `get_${key}`);
+  return typeof getter === 'function' ? Reflect.apply(getter, value, []) : member(value, key);
+}
+
+/** Preserve SDK primitive types: coercing getters would accept malformed replies. */
+export function readNativeMessage(message: unknown): IPCServerMessage | null {
   try {
-    const fields = message?.raw?._internal_('get-objects');
-    const type = read(message, 'type');
-    return Array.isArray(fields) &&
-      fields.length === read(message, 'length') &&
-      typeof type === 'string'
-      ? { type, fields: fields.slice() }
-      : null;
+    const raw = member(message, 'raw');
+    const internal = member(raw, '_internal_');
+    if (typeof internal !== 'function') return null;
+    const fields: unknown = Reflect.apply(internal, raw, ['get-objects']);
+    const type = property(message, 'type');
+    if (
+      !Array.isArray(fields) ||
+      fields.length !== property(message, 'length') ||
+      typeof type !== 'string'
+    )
+      return null;
+    const values: readonly unknown[] = fields;
+    return { type, fields: values.slice() };
   } catch {
     return null;
   }

@@ -1,9 +1,13 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import type { GameScene, Message } from '../game/Bindings';
+import { GameReflection } from '../api/GameReflection';
 
-type Callback = ((message: Raw) => void) | null;
+type CargoArguments = NonNullable<Parameters<GameScene['rpc']>[2]>;
+
+type Callback = ((message: Message) => void) | null;
 type Failure = ((reason: string) => void) | null;
 interface CargoRequest {
-  arguments: unknown[];
+  arguments: CargoArguments;
   callback: Callback;
   onError: Failure;
 }
@@ -16,11 +20,11 @@ export class CargoReadQueue {
   private failed = false;
 
   constructor(
-    private readonly send: (callback: (message: Raw) => void, args: unknown[]) => void,
-    private readonly isCurrent: () => boolean,
+    private send: ((callback: (message: Message) => void, args: CargoArguments) => void) | null,
+    private isCurrent: (() => boolean) | null,
   ) {}
 
-  enqueue(args: unknown[], callback: Callback, onError: Failure = null): void {
+  enqueue(args: CargoArguments, callback: Callback, onError: Failure = null): void {
     if (this.stopped || this.failed) {
       this.invoke(onError, 'Cargo reads are unavailable until the next room connection.');
       return;
@@ -39,22 +43,23 @@ export class CargoReadQueue {
 
   private pump(): void {
     if (this.stopped || this.failed || this.inFlight || !this.pending.length) return;
-    if (!this.isCurrent()) {
+    const send = this.send;
+    if (!send || !this.isCurrent?.()) {
       this.dispose();
       return;
     }
     const request = this.pending.shift()!;
     this.inFlight = request;
     try {
-      this.send((message) => this.finish(request, message), request.arguments);
+      send((message) => this.finish(request, message), request.arguments);
     } catch {
       if (!this.stopped && this.inFlight === request) this.failClosed();
     }
   }
 
-  private finish(request: CargoRequest, message: Raw): void {
+  private finish(request: CargoRequest, message: Message): void {
     if (this.stopped) return;
-    if (!this.isCurrent()) {
+    if (!this.isCurrent?.()) {
       this.dispose();
       return;
     }
@@ -68,10 +73,12 @@ export class CargoReadQueue {
     this.pump();
   }
 
-  private validResponse(message: Raw): boolean {
-    if (!message || read(message, 'length', -1) % 4 !== 0) return false;
+  private validResponse(message: Message): boolean {
+    if (!message) return false;
     try {
-      for (let index = 0; index < read(message, 'length', -1); index += 4) {
+      const length = message.length;
+      if (length % 4 !== 0) return false;
+      for (let index = 0; index < length; index += 4) {
         message.getString(index);
         message.getString(index + 1);
         message.getString(index + 2);
@@ -92,12 +99,12 @@ export class CargoReadQueue {
     for (const request of rejected) {
       const onError = request.onError;
       this.release(request);
-      if (!this.stopped && this.isCurrent())
+      if (!this.stopped && this.isCurrent?.())
         this.invoke(onError, 'Cargo send failed; reconnect before requesting cargo again.');
     }
   }
 
-  private invoke(callback: Function | null, value: unknown): void {
+  private invoke<T>(callback: ((value: T) => void) | null, value: T): void {
     try {
       callback?.(value);
     } catch (error) {
@@ -117,17 +124,21 @@ export class CargoReadQueue {
     this.inFlight = null;
     for (const request of this.pending) this.release(request);
     this.pending.length = 0;
+    // Match the source: late reply closures may retain this queue after exit.
+    // They must not retain the old Game through its sender/current predicates.
+    this.send = null;
+    this.isCurrent = null;
   }
 }
 
 /** Haxe represents rest arguments as one array at the RPC boundary. */
-export function installNativeCargoQueue(api: API, game: Raw): CargoReadQueue {
+export function installNativeCargoQueue(api: API, game: GameScene): CargoReadQueue {
   const rpc = game.rpc.bind(game);
   const queue = new CargoReadQueue(
     (receive, args) => rpc('getCargo', receive, args),
-    () => api.game === game && !game.isLeaving,
+    () => api.game === game && !game.get_isLeaving(),
   );
-  api.around(game, 'rpc', (next, type, callback, args = []) => {
+  new GameReflection(api).around(game, 'rpc', (next, type, callback, args = []) => {
     if (type !== 'getCargo') return next(type, callback, args);
     queue.enqueue(args, callback);
   });

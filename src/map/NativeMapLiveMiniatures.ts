@@ -1,28 +1,37 @@
-import { read, type API, type Raw } from '../api/Types';
+import type { API } from '../api/Types';
+import { GameReflection } from '../api/GameReflection';
+import {
+  GameObject,
+  StarMap,
+  type Boss,
+  type EnemyShip,
+  type GameScene,
+  type Sprite,
+} from '../game/Bindings';
 import { NativeUI } from '../ui/NativeUI';
 import { NexarEnemyIdentification } from '../ship/NexarEnemyIdentification';
 import { MapLiveMiniature } from './MapLiveMiniature';
 
 /** Reconcile live identities while the map is open; never mutate game units. */
 export class MapLiveMiniatures {
-  private readonly bosses = new Map<Raw, MapLiveMiniature>();
-  private readonly minibosses = new Map<Raw, MapLiveMiniature>();
+  private readonly bosses = new Map<Boss, MapLiveMiniature>();
+  private readonly minibosses = new Map<EnemyShip, MapLiveMiniature>();
   constructor(
-    private readonly game: Raw,
+    private readonly game: GameScene,
     private readonly scale: number,
-    private readonly create: (owner: Raw, boss: boolean) => MapLiveMiniature,
+    private readonly create: (owner: Boss | EnemyShip, boss: boolean) => MapLiveMiniature,
   ) {}
 
   update(): void {
-    const bosses: Raw[] = this.game.bossManager?.bosses ?? [];
-    const enemies: Raw[] = this.game.shipManager?.enemies ?? [];
+    const bosses = this.game.bossManager?.bosses ?? [];
+    const enemies = this.game.shipManager?.enemies ?? [];
     const byId = this.game.shipManager?.enemiesById;
-    const validBoss = (owner: Raw) =>
+    const validBoss = (owner: Boss) =>
       owner.alive && !owner.awaitingActivation && bosses.includes(owner);
-    const validMiniboss = (owner: Raw) => {
-      const id = read(owner, 'id');
+    const validMiniboss = (owner: EnemyShip) => {
+      const id = owner.get_id();
       // Haxe's IntMap stores numeric keys in its .h object.
-      const current = typeof byId?.get === 'function' ? byId.get(id) : (byId?.h ?? byId)?.[id];
+      const current = byId?.h[id];
       return (
         owner.alive &&
         id > 0 &&
@@ -31,10 +40,10 @@ export class MapLiveMiniatures {
         NexarEnemyIdentification.usesMinibossMarker(owner)
       );
     };
-    const sync = (
-      items: Map<Raw, MapLiveMiniature>,
-      sources: Raw[],
-      valid: (owner: Raw) => boolean,
+    const sync = <T extends Boss | EnemyShip>(
+      items: Map<T, MapLiveMiniature>,
+      sources: T[],
+      valid: (owner: T) => boolean,
       boss: boolean,
     ) => {
       for (const [owner, marker] of items)
@@ -57,54 +66,58 @@ export class MapLiveMiniatures {
   }
 }
 
-export function installMapLiveMiniatures(api: API, game: Raw): void {
-  const MapClass = api.cls('core.hud.components.map.Map'),
-    prototype = MapClass?.prototype;
-  if (!prototype?.load) return;
+export function installMapLiveMiniatures(api: API, game: GameScene): void {
+  const reflection = new GameReflection(api);
+  const prototype = StarMap.prototype;
   const ui = new NativeUI(api),
-    lives = new WeakMap<Raw, number>();
-  const life = (object: Raw) => lives.get(object) ?? 0;
-  const object = api.cls('core.GameObject')?.prototype;
-  if (typeof object?.reset === 'function')
-    api.before(object, 'reset', function () {
+    lives = new WeakMap<object, number>();
+  const life = (object: object) => lives.get(object) ?? 0;
+  if (typeof GameObject.prototype.reset === 'function')
+    reflection.before(GameObject.prototype, 'reset', function () {
       lives.set(this, life(this) + 1);
     });
-  const maps = new Map<Raw, { controller: MapLiveMiniatures; original: [Raw, boolean][] }>();
-  const dispose = (map: Raw) => {
+  const maps = new Map<
+    StarMap,
+    {
+      controller: MapLiveMiniatures;
+      original: Array<[Sprite, boolean]>;
+    }
+  >();
+  const dispose = (map: StarMap) => {
     const state = maps.get(map);
     if (!state) return;
     state.controller.dispose();
     for (const [layer, visible] of state.original) layer.set_visible(visible);
     maps.delete(map);
   };
-  api.before(prototype, 'load', function () {
+  reflection.before(prototype, 'load', function () {
     dispose(this);
   });
-  api.after(prototype, 'load', function () {
+  reflection.after(prototype, 'load', function () {
     if (this.g !== game) return;
-    const original: [Raw, boolean][] = [];
+    const original: Array<[Sprite, boolean]> = [];
     for (const marker of this.mapBosses) {
-      original.push([marker.layer, read(marker.layer, 'visible')]);
+      original.push([marker.layer, marker.layer.get_visible()]);
       marker.layer.set_visible(false);
     }
     const map = this;
     const controller = new MapLiveMiniatures(
       game,
-      MapClass!.SCALE,
+      StarMap.SCALE,
       (owner, boss) => new MapLiveMiniature(ui, map.mapContainer, owner, boss, life),
     );
     maps.set(map, { controller, original });
     controller.update();
   });
-  api.after(prototype, 'update', function () {
+  reflection.after(prototype, 'update', function () {
     maps.get(this)?.controller.update();
   });
-  api.before(prototype, 'dispose', function () {
+  reflection.before(prototype, 'dispose', function () {
     dispose(this);
   });
   api.on('frame', ({ game: current }) => {
     if (current !== game) return;
-    for (const [map, state] of maps) if (read(map, 'stage')) state.controller.update();
+    for (const [map, state] of maps) if (map.get_stage()) state.controller.update();
   });
   api.defer(() => {
     for (const map of maps.keys()) dispose(map);

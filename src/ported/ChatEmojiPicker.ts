@@ -2,7 +2,7 @@ import { EmojiPickerCatalog } from '../chat/EmojiPickerCatalog';
 import { ChatEmojiPickerModel } from '../chat/ChatEmojiPickerModel';
 import { EmojiGlyphLookup } from '../chat/rich/EmojiGlyphLookup';
 // Source port of core/hud/components/chat/ChatEmojiPicker.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createChatEmojiPicker(resolve: Resolve): any {
   const BitmapFontTextFormat: any = resolve('feathers.text.BitmapFontTextFormat');
   type BitmapFontTextFormat = any;

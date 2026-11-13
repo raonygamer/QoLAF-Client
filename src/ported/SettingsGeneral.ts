@@ -1,5 +1,5 @@
 // Source port of core/states/gameStates/SettingsGeneral.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createSettingsGeneral(resolve: Resolve): any {
   const RymdenRunt: any = resolve('RymdenRunt');
   type RymdenRunt = any;

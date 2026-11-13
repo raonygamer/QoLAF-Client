@@ -1,3 +1,5 @@
+import { bindGameClasses, type Quad, type StarlingTextField } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createChatComposerFormatButton } from '../src/ported/ChatComposerFormatButton';
@@ -60,6 +62,21 @@ function fixture() {
     'core.hud.components.chat.rich.RichBitmapFontTextEditor': class {},
   };
   const resolve = (name: string): any => definitions[name] ?? bitmap.resolve(name);
+  class NativeText extends Text {
+    static getBitmapFont() {
+      return bitmap.font;
+    }
+  }
+  definitions['starling.text.TextField'] = NativeText;
+  bindGameClasses({
+    cls: (name: string) => {
+      try {
+        return resolve(name);
+      } catch {
+        return {};
+      }
+    },
+  } as unknown as API);
   const Slider = createChatSelectionValueSlider(resolve);
   definitions['core.hud.components.chat.ChatSelectionValueSlider'] = Slider;
   return {
@@ -75,6 +92,9 @@ function touch(target: any, phase: string, x = 0, y = 0, cancelled = false) {
   const point = {
     id: 7,
     phase,
+    get_id: () => 7,
+    get_phase: () => phase,
+    get_cancelled: () => cancelled,
     cancelled,
     getLocation: (_target: any, output: any) => Object.assign(output, { x, y }),
   };
@@ -98,11 +118,11 @@ test('source format button preserves native colors, disabled state and touch iso
   t.after(() => button.dispose());
   let triggered = 0;
   button.addEventListener('triggered', () => triggered++);
-  assert.equal(button.background.color, 0x252525);
+  assert.equal((button.getChildAt(0) as Quad).get_color(), 0x252525);
   assert.equal(touch(button, 'hover'), true);
-  assert.equal(button.background.color, 0x333333);
+  assert.equal((button.getChildAt(0) as Quad).get_color(), 0x333333);
   touch(button, 'began');
-  assert.equal(button.background.color, 0x454545);
+  assert.equal((button.getChildAt(0) as Quad).get_color(), 0x454545);
   touch(button, 'ended', 0, 0, true);
   assert.equal(triggered, 0);
   touch(button, 'ended');
@@ -110,8 +130,8 @@ test('source format button preserves native colors, disabled state and touch iso
   button.enabled = false;
   touch(button, 'ended');
   assert.equal(triggered, 1);
-  assert.equal(button.background.color, 0x171717);
-  assert.equal(button.label.format.color, 0x666666);
+  assert.equal((button.getChildAt(0) as Quad).get_color(), 0x171717);
+  assert.equal((button.getChildAt(1) as StarlingTextField).get_format().get_color(), 0x666666);
 });
 
 test('source slider has full-height hit area, snapped drag values and silent programmatic updates', (t) => {
@@ -121,8 +141,8 @@ test('source slider has full-height hit area, snapped drag values and silent pro
   t.after(() => slider.dispose());
   let changes = 0;
   slider.addEventListener('change', () => changes++);
-  assert.equal(slider.interactionArea.height, 24);
-  assert.equal(slider.interactionArea.alpha, 0.001);
+  assert.equal(slider.getChildAt(0).get_height(), 24);
+  assert.equal(slider.getChildAt(0).get_alpha(), 0.001);
   slider.value = NaN;
   assert.equal(slider.value, 12);
   slider.value = 999;
@@ -130,12 +150,12 @@ test('source slider has full-height hit area, snapped drag values and silent pro
   assert.equal(changes, 0);
   touch(slider, 'began', 125, 2);
   assert.equal(slider.value, 30);
-  assert.equal(slider.knob.x, 119);
+  assert.equal(slider.getChildAt(3).get_x(), 119);
   assert.equal(changes, 1);
   touch(slider, 'moved', -50, 2);
   assert.equal(slider.value, 12);
   touch(slider, 'ended');
-  assert.equal(slider.activeTouchID, -1);
+  assert.equal((slider.getChildAt(3) as Quad).get_color(), 0xd0d0d0);
 });
 
 test('format popup preserves mixed preview styles, bounds and hexadecimal editing contract', (t) => {

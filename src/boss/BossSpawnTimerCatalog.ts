@@ -1,4 +1,59 @@
-import type { Raw } from '../api/Types';
+/** PlayerIO cache values retain their serialized scalar representation. */
+type CacheScalar = string | number | boolean | null;
+
+export interface SpawnAnchor {
+  key?: string;
+  hidden?: boolean;
+  alive?: boolean;
+}
+
+interface EventDefinition {
+  active?: boolean;
+  event?: CacheScalar;
+}
+
+export interface BossAnchorDefinition extends EventDefinition {
+  boss?: string | null;
+  spawnTime?: CacheScalar;
+}
+
+export interface EnemySpawnOption {
+  key?: string | null;
+  probability?: CacheScalar;
+}
+
+export interface EnemySpawnerDefinition extends EventDefinition {
+  hasSecondSpawn?: boolean;
+  triggeredByMission?: boolean;
+  triggeredByTimer?: boolean;
+  enemy?: string | null;
+  enemy2?: string | null;
+  enemies?: readonly (string | EnemySpawnOption | null)[] | null;
+  enemies2?: readonly (string | EnemySpawnOption | null)[] | null;
+  maxActiveEnemies?: CacheScalar;
+  maxActiveEnemies2?: CacheScalar;
+  spawnOnDeath?: boolean;
+  spawnOnDeath2?: boolean;
+  resetTime?: CacheScalar;
+  resetTime2?: CacheScalar;
+}
+
+export interface TimerSpawner extends SpawnAnchor {
+  obj?: EnemySpawnerDefinition | null;
+  isBossUnit?: boolean;
+}
+
+export interface TimerBody extends SpawnAnchor {
+  obj?: BossAnchorDefinition | null;
+  spawners?: readonly (TimerSpawner | null)[] | null;
+}
+
+export interface TimerDefinition {
+  name?: string;
+  miniBoss?: boolean;
+}
+
+type DefinitionTable = Readonly<Record<string, TimerDefinition | undefined>> | null;
 
 export interface BossTimerEntry {
   id: string;
@@ -7,7 +62,7 @@ export interface BossTimerEntry {
   name: string;
   primary: boolean;
   conditional: boolean;
-  sources: { anchor: Raw; periodMs: number }[];
+  sources: { anchor: SpawnAnchor; periodMs: number }[];
   alive?: boolean;
   seenAlive?: boolean;
 }
@@ -17,7 +72,11 @@ export class BossSpawnTimerCatalog {
   static readonly zhersisKey = '1gr5DQtiFU2VF1DR2lmd0A';
   private static readonly maxOptions = 512;
 
-  static build(bodies: Raw[] | null, bosses: Raw, enemies: Raw): BossTimerEntry[] {
+  static build(
+    bodies: readonly (TimerBody | null)[] | null,
+    bosses: DefinitionTable,
+    enemies: DefinitionTable,
+  ): BossTimerEntry[] {
     const rows = new Map<string, BossTimerEntry>();
     const add = (
       kind: BossTimerEntry['kind'],
@@ -25,7 +84,7 @@ export class BossSpawnTimerCatalog {
       name: string,
       primary: boolean,
       conditional: boolean,
-      anchor: Raw,
+      anchor: SpawnAnchor,
       periodMs: number,
     ) => {
       if (conditional) periodMs = 0;
@@ -62,7 +121,9 @@ export class BossSpawnTimerCatalog {
       for (const spawner of body.spawners ?? []) {
         if (!spawner?.obj || spawner.isBossUnit === true || spawner.obj.active === false) continue;
         const data = spawner.obj;
-        for (const suffix of data.hasSecondSpawn === true ? ['', '2'] : ['']) {
+        for (const suffix of data.hasSecondSpawn === true
+          ? (['', '2'] as const)
+          : ([''] as const)) {
           const values = data[`enemies${suffix}`];
           const options = this.optionKeys(values, data[`enemy${suffix}`]);
           const capacity = data[`maxActiveEnemies${suffix}`];
@@ -142,7 +203,7 @@ export class BossSpawnTimerCatalog {
       : 0;
   }
 
-  private static hasEvent(value: Raw): boolean {
+  private static hasEvent(value: EventDefinition): boolean {
     return value?.event != null && String(value.event).length > 0;
   }
 }

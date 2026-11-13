@@ -1,8 +1,21 @@
-import type { Raw } from '../api/Types';
+import type { Sprite, StarlingTextField } from '../game/Bindings';
+import type { GameScene, Unit, EnemyShip } from '../game/Bindings';
 import { NativeUI } from './NativeUI';
+import { ToolTip } from '../game/Bindings';
+import { styleClientTooltip } from './NativeTooltip';
 
 /** Descriptive UI from RareAuraStyle.as; never applies enemy stat modifiers. */
-export function auraTooltip(enemyClass: Raw, type: number): string {
+export function auraTooltip(
+  enemyClass: Pick<
+    typeof EnemyShip,
+    | 'RARE_TYPE_DEFENDER'
+    | 'RARE_TYPE_ATTACKER'
+    | 'RARE_TYPE_SPEEDER'
+    | 'RARE_TYPE_LEGENDARY'
+    | 'RARE_TYPE_UNIQUE'
+  >,
+  type: number,
+): string {
   const line = (label: string, value: string) =>
     `<font color='#cccccc'>${label}:</font> ${value}<br>`;
   let title: string,
@@ -73,16 +86,16 @@ export function auraTooltip(enemyClass: Raw, type: number): string {
 
 let nextTooltipId = 0;
 export class AuraInfo {
-  readonly node: Raw;
-  private readonly label: Raw;
+  readonly node: Sprite;
+  private readonly label: StarlingTextField;
   private readonly tooltipType = `qolafAuraInfo${++nextTooltipId}`;
-  private tooltip?: Raw;
-  private unit: Raw | null = null;
+  private tooltip?: ToolTip;
+  private unit: Unit | null = null;
   private type = -1;
 
   constructor(
     private readonly ui: NativeUI,
-    private readonly game: Raw,
+    private readonly game: GameScene,
   ) {
     this.node = ui.sprite();
     this.node.addChild(ui.quad(20, 20, 0x101010, 0.9));
@@ -91,9 +104,9 @@ export class AuraInfo {
     this.node.set_visible(false);
   }
 
-  update(unit: Raw | null, color: number): boolean {
+  update(unit: Unit | null, color: number): boolean {
     const enemyClass = this.ui.cls('core.ship.EnemyShip');
-    const type = unit instanceof enemyClass ? unit!.rareType : -1;
+    const type = unit instanceof enemyClass ? unit.rareType : -1;
     const text = color ? auraTooltip(enemyClass, type) : '';
     if (unit !== this.unit || type !== this.type || !text) this.clearTooltip();
     this.unit = unit;
@@ -102,16 +115,16 @@ export class AuraInfo {
     if (!text) return false;
     this.label.get_format().set_color(color);
     if (!this.tooltip) {
-      const Tooltip = this.ui.cls('core.hud.components.ToolTip');
-      this.tooltip = new Tooltip(this.game, this.node, text, null, this.tooltipType, 260);
-      this.tooltip!.set_color(0xffffff);
+      this.tooltip = new ToolTip(this.game, this.node, text, null, this.tooltipType, 260);
+      styleClientTooltip(this.tooltip);
+      this.tooltip.set_color(0xffffff);
     }
     return true;
   }
 
   private clearTooltip(): void {
     if (!this.tooltip) return;
-    this.ui.cls('core.hud.components.ToolTip').disposeType(this.tooltipType);
+    ToolTip.disposeType(this.tooltipType);
     this.tooltip = undefined;
   }
 

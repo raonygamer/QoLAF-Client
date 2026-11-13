@@ -28,8 +28,8 @@ Latest verification: TypeScript check and all 58 tests pass. These tests do not 
 
 The earlier single screenshots were insufficient: surrounding labels can remain intact initially and disappear later. `scripts/ProbeBitmapText.js` now preserves the local stress probe (native TextField insertion, five text changes/second, removal after 45 seconds). It is not shipped or automatically loaded.
 
-- HTML glyph colors remain correct, but nearby static labels/buttons can disappear after subsequent updates or removal. Screenshots: `/tmp/QoLAF-HtmlRepeated2.png` initially intact, `/tmp/QoLAF-HtmlRepeated3.png` broken.
-- Plain native TextField text also reproduces it (`/tmp/QoLAF-PlainRepeated.png`). Explicit batching does not reliably fix it; `/tmp/QoLAF-HtmlBatchableRemoved.png` is broken after removal.
+- HTML glyph colors remain correct, but nearby static labels/buttons can disappear after subsequent updates or removal. Screenshots: `/tmp/QoLAF-HTMLRepeated2.png` initially intact, `/tmp/QoLAF-HTMLRepeated3.png` broken.
+- Plain native TextField text also reproduces it (`/tmp/QoLAF-PlainRepeated.png`). Explicit batching does not reliably fix it; `/tmp/QoLAF-HTMLBatchableRemoved.png` is broken after removal.
 - Temporarily disabling the new Text bridge and then disabling interpolation, background layers, artifact UI and game-session installation still reproduced missing native buttons. The full development bundle was rebuilt afterward; these isolation changes were never retained in source.
 - Instrumented cached vertex ranges stayed within batch bounds. Sampled IndexData.copyTo outputs matched source indices plus the requested offset even while labels disappeared (`/tmp/QoLAF-IndexCopiesLater.png`). This rules out those sampled range/copy failures, not every GPU/cache fault.
 - Marking the parent dirty after each change keeps the tested labels visible while updates run, but they disappear after removal. This is not a fix and was not added to production code.
@@ -255,7 +255,7 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   native-field preservation, healing/foreign-weapon rejection, pooled targets,
   duplicate contacts, beam heat/return preservation and DPS setting/row layout.
 - Live reload reached gameplay and rendered `Current DPS: ~0` above the radar in
-  /tmp/QoLAF-DpsRadar.png. Closed the sale dialog afterward. This verifies idle
+  /tmp/QoLAF-DPSRadar.png. Closed the sale dialog afterward. This verifies idle
   rendering only; live hit estimates, pet beam timing and SWF combat comparison
   remain pending. No combat input or purchase was performed for this check.
 
@@ -448,7 +448,7 @@ those mechanics; do not restore old shield/regen or corrosive-as-all formulas.
   Add URL successfully imported it after removal. Removed the probe again and
   deleted its temporary preview endpoint. No gameplay actions or chat were sent.
   Evidence: /tmp/QoLAF-AutomationRunning.png, AutomationStopped.png,
-  AutomationRestored.png, AutomationDuplicate.png, AutomationUrlImported.png and
+  AutomationRestored.png, AutomationDuplicate.png, AutomationURLImported.png and
   AutomationCleaned.png (all with the same QoLAF- prefix).
 - TypeScript/build and all 119 tests pass. Added page selection/lifecycle/stale
   callback tests and file picker selection, cancellation and abort cleanup tests.
@@ -1232,7 +1232,7 @@ Starling Images to the stage. The PNG rendered cyan; CPU getPixel32(0,0) returne
 -14764836 (0xff1eb4dc), matching the fixture. GIF returned four 8x8 textures and
 [100,20,70,100] ms delays; frame 0 rendered red and switching to frame 2 rendered
 the expected blue square. Evidence: /tmp/QoLAF-ImageProbeGameRealm.png and
-/tmp/QoLAF-ImageProbeGifThird.png. Image assets reported 512 and 2048 bytes,
+/tmp/QoLAF-ImageProbeGIFThird.png. Image assets reported 512 and 2048 bytes,
 respectively, including retained CPU pixels.
 
 The first probe was incorrectly imported in the launcher realm; that canvas
@@ -1670,12 +1670,12 @@ nothing was sent. Added regression covers this case; all 442 tests pass.
 
 ## Authentication-owned IPC connection — 2026-11-10
 
-Installed NativeIpcAuthentication at classesReady. One NativeIpcClient adapter is
+Installed NativeIPCAuthentication at classesReady. One NativeIPCClient adapter is
 retained per authenticated client, across primary service reconnects and game
 scenes. Login reset, duplicate login, root exit and plugin disposal shut IPC down;
 pagehide/pageshow support bfcache restoration. Reserved service selection and
 explicit game-room destinations are rejected. The service is exposed through
-the source-compatible core.ipc.ClientIpcService class path, restored on cleanup.
+the source-compatible core.ipc.ClientIPCService class path, restored on cleanup.
 
 Live connection investigation: Service-1409_24 accepted a socket then disconnected
 before a joined handshake, using either client_version 1410 or 1409. The same
@@ -1684,7 +1684,7 @@ passed the existing strict 19-field handshake validator. Status became online
 with zero peers. This establishes current-server transport, not old-AS3 interop.
 No human chat message, reward announcement, purchase or equipment change was sent.
 
-ClientIpcService now derives its reserved address and join version from the current
+ClientIPCService now derives its reserved address and join version from the current
 native JoinRoomManager service version, preserving slot 24 and the original QIPC3
 wire protocol. Changing configured version shuts down the old connection before
 moving addresses. Native authentication cleanup restores the previous configuration.
@@ -1837,3 +1837,297 @@ including the native Plugins entry. The user was interacting with key bindings;
 no further automated keys were sent into that capture state. Preview diagnostics
 reported a connected canvas and zero runtime errors. This is startup and Settings
 render evidence, not proof of full screen parity or every gameplay hook.
+
+
+### Local preview restored after restart (resource checks only)
+
+Port 8087 was not listening. Started the existing npm preview server on 127.0.0.1:8087, serving the public dist build (1.1.23) and existing host dist. HTTP GETs returned 200 for the host page, game.html, plugin core, local client module and upstream astroflux.js. The plugin core response points its default client URL to /Client/qolaf-client.js; the returned module matches current dist bytes. The served upstream bundle matches /home/raony/Documentos/astroflux.js, SHA-256 7c49ee6caf843c3b109ebb7a979bc443a16fd92c503cb4aa25e81138a3b1f10d. Private output remains separate in private-dist.
+
+This only proves local resource availability. No browser was opened/reloaded and no rendered login, authentication, gameplay or SWF comparison was performed in this pass. Runtime tests remain paused; the live-comparison objective remains incomplete. No published deployment changed.
+
+### Cage provider and credential screens (2026-11-12)
+
+- Desktop capture unavailable in this session: CUA inventory empty, desktop compositor rejects grim capture protocol. Isolated Cage Firefox still renders the local port; these checks do not compare a live SWF window.
+- Opened Add through the actual profile button callback, then Simple/Kongregate/Armor credential callbacks. Provider chooser renders at 460x300, matching LoginAccountTypePanel.as. Source labels and four provider/create rows are present; screenshot /tmp/qolaf-login-providers-audit.png.
+- All credential fields measure 300x30. Simple limits 320/512, Kongregate 320/64 with numeric identifier restriction, Armor 32/32; second field masks the secret in each case. These match Login.as and LoginInput.as. No credentials entered, stored or submitted. Screenshot /tmp/qolaf-login-field-measurements.png.
+- Credential Back callback returns to qolaf-account-types with provider chooser visible; screenshot /tmp/qolaf-login-provider-navigation.png. This verifies callback navigation, not physical pointer hit-testing. No implementation mismatch found in these measured properties.
+
+### Native artifact context menu probe — 2026-11-12
+
+- Confirmed Cage Firefox and local preview processes live. Bundled only current ArtifactContextPopup plus bindings into a temporary local module, bound actual Haxe classes, and placed a test popup on the login stage. No account credentials, inventory mutation or chat submission involved.
+- Rendered dimensions: 190 x 66, position 23/223; labels Share on Chat... and Unfavorite visible (/tmp/qolaf-context-runtime.png).
+- Actual native Touch and TouchEvent dispatch (including native vector and coordinate conversion) selected the share row once and closed the popup (/tmp/qolaf-context-touch.png). Unrevealed share remained open without an action; cancelled favorite remained open; valid favorite dispatched once and closed (/tmp/qolaf-context-native-checks.png).
+- Disposed popup and removed temporary served module. This proves current native rendering/event compatibility for the context menu; it does not prove physical-pointer transport, logged-in sharing or side-by-side SWF visual parity.
+
+### Steering ownership clock — 2026-11-12
+
+Compared original PlayState.updateAutomationAim, handleTurn and clearAutomationAimAngle.
+The source keeps one lastTurnCourseTime on the state; clearing a target and changing
+control ownership do not reset it. The port previously kept separate player and
+per-target automation clocks. Both paths now share SteeringClock per state.
+Host-dispatcher tests cover player-to-automation and automation-to-player handoffs,
+clear/set within a tick, the 32/33ms boundary, and existing clock rollback behavior.
+The four automation/control/aim tests, type checking and both builds passed.
+Public and private bundles deployed. Live steering feel is not certified by these tests.
+
+### Map gesture steering — 2026-11-12
+
+Original PlayState.handleTurn runs keyboard press/release transitions during map
+navigation, bypassing mouse aim and the mouse integrator. Native Haxe has no map
+gesture branch, so suppressing updateMouseAim alone could leave a turn latched.
+NativeMapNavigation now implements that branch with the shared SteeringClock.
+Map tests use the actual hook dispatcher and install NativeControlTiming in the
+production order: held-axis releases, keyboard press, and the transition back to
+normal steering pass, including no duplicate turn within the same simulation tick.
+Six map/automation/control/aim tests, type checking and both builds pass.
+Actual ship movement while dragging has not been visually compared in this pass.
+
+### Aim handoff sample timing — 2026-11-12
+
+Original updateAimAngle advances lastAimUpdateTime before its automation and
+missing-overlay guards. The port froze it at the last player sample, causing fast
+mouse movement on handoff to appear slow after a long automated interval.
+AimAssist.suspend now advances time without replacing the last mouse sample;
+NativeAimAssist uses it for those early returns. Map navigation still skips the
+clock, matching the source's separate releaseAimAssist branch.
+A pure regression and the native host-hook fixture both cover a ten-second
+suspension followed by fast player input. Nine focused tests, type checking and
+public/private builds pass. Full interactive aim feel remains unverified.
+
+### Contact history to aim eligibility — 2026-11-12
+
+Compared source Weapon.registerSimulatedHit/reset, Projectile.registerMineBlastHit,
+Beam due-fire contact registration, and PlayState target selection/projectile lead.
+Reviewed contact ownership, healing exclusions, pinned-target restrictions,
+minimum distance, hit-window expiry, orbit velocity, closing speed and TTL caps.
+Added an integration regression running extracted native bullet collision into
+DamageObserver and selectAimAssistTarget: no contact before collision, eligibility
+with DPS disabled, inclusive expiry boundary, and history cleared on weapon reset.
+All 25 contact/damage/target tests pass. No runtime change or deployment in this
+pass; remaining live weapon-family and debug-screen parity is not certified.
+
+### Aim debug automation state — 2026-11-12
+
+Compared source panel typography/geometry, all diagnostic rows, ray angles,
+colors/widths/lengths, duplicate removal and owner cleanup with AimAssistDebugOverlay.
+Found and fixed a diagnostic mismatch: automation previously left the previous
+player angle in the final-angle display and omitted the waiting-for-angle reason.
+AimAssist.automate now preserves the last player sample while publishing the actual
+automation angle (or NaN), with original reason text. Tests assert both states,
+source panel properties/rays and cleanup. Eight focused tests and both builds pass;
+this is source/test evidence, not a full native-rendered visual comparison.
+
+### Zoom persistence on screen exit — 2026-11-12
+
+Original PlayState.exit commits pending zoom preferences for every derived screen;
+MapState, PlayerListState and PvpScreenState also process keyboard zoom. The port
+only hooked RoamingState.exit. Moved persistence cleanup to PlayState.exit and
+confirmed the captured native RoamingState.exit delegates to that base method.
+The dispatcher regression covers wheel saving through roaming exit, unfinished
+keyboard zoom on a map-like PlayState and idempotent repeated exits. Three zoom
+tests, type checking and both builds pass. Direct container removal and live-key
+sampling during a wheel-idle timeout still need review; full lifecycle parity is
+not claimed by this fix.
+
+### Zoom wheel idle and detached screens — 2026-11-12
+
+Closed the source-reviewed wheel-idle and removal gaps above. The idle callback
+now polls the owning state's current zoom keys; command frames can stop while
+chat or another overlay owns input, so a cached keysHeld flag was insufficient.
+A removedFromStage listener commits and releases the owning gesture; wheel input
+also requires the roaming container to remain attached. Shared PlayState.container
+now has a concrete Starling Sprite declaration. Tests cover key transitions without
+command updates, direct removal, listener cleanup and no late save. Type checking
+and both builds passed. Steam read-only inspection confirmed current SettingsState
+has the expected native attached container and key reader. Full live movement and
+zoom visual parity remains unverified.
+
+### Key-bindings page source review — 2026-11-12
+
+Reviewed the complete SettingsBindings diff and resulting port. The custom source
+changes (left offsets, wider scroll area, and stage-listener disposal) are present.
+Added coverage for all 29 row IDs in original order, section headings, initial row
+spacing, refresh delivery, disposal and reopening without listener accumulation.
+Both the bindings-page test and parent SettingsState navigation test pass. Marked
+SettingsBindings source-reviewed; native visual behavior and the existing untyped
+factory are not certified by this check. No runtime deployment was necessary.
+
+### Chat settings source review — 2026-11-12
+
+Compared the complete SettingsChat custom delta with its port and followed device
+preference setter bridges to NativeChatPreferences/NativeRichChatInput subscriptions.
+Added a page regression covering the integration toggle, 12–24px step-one slider,
+rounding/value label, translated labels, and all ten independent mute handlers.
+Eleven page/navigation/composer tests pass. Read-only Steam inspection confirms
+both native preference setter bridges are present (integration true, font size14).
+No live preferences changed. Marked SettingsChat source-reviewed; this does not
+certify full native visual parity or the legacy factory's TypeScript typing.
+
+### General settings category routing — 2026-11-12
+
+Compared original settings property writes with all five ported categories.
+Added control-event coverage for 32 checkbox routes and seven sliders, including
+inverted mouse-aim setting, volume/rotation, frame cap/DPI, background/star values,
+HUD toggles and combat helpers. Verified graphics refresh, background refresh and
+torpedo cue callbacks, slider ranges, and Unlimited/percentage labels. Ten focused
+page/frame/DPI/background tests pass. No production change or deployment needed.
+SettingsGeneral remains partial until remaining text/layout and each feature's
+native visual behavior are checked; routing alone does not certify every feature.
+
+### Live settings hot-enable discrepancy — 2026-11-12
+
+Actual Steam screenshot showed vanilla settings under an inactivity-disconnect
+notice, despite installed replacement methods. Host active/error-empty status was
+insufficient evidence of rendered parity. NativeSettings rebuilt lazily only when
+another wrapped settings method ran. It now re-enters an already-open Settings
+state at installation. initializeNative also removes/disposes the native active
+page and tab/background nodes before dropping references, avoiding leftover UI.
+Six focused settings tests, type checking and both builds pass. One Steam reload
+to clear the disconnected session reached the private access-key prompt; user was
+asked to authenticate there. Live fresh/hot-enable verification remains open.
+
+### Automation settings page source review — 2026-11-12
+
+Reviewed source page layout/constants, selection retention, import callbacks,
+metadata/details, start/stop/remove dispatch, confirmation and listener cleanup.
+Browser module terminology/file picker replace SWF/AIR-specific UI as intended.
+Extended tests verify escaped descriptions, duplicate-import informational status,
+and escaped asynchronous import errors. Existing lifecycle tests cover selection,
+start/stop, removal confirmation and stale callbacks after disposal. Page and
+file-picker tests pass. Source page mapping is reviewed; automation backends,
+native rendering and legacy factory typing remain separate outstanding scope.
+No production change or deployment needed in this pass.
+
+### InstantSplitting source review — 2026-11-12
+
+Compared the complete normalized original/Preload diff with rendering and color
+adapters. Added checks for rendered rotation (different from simulation rotation)
+and pooled-line release after reparenting. Both ordinary and split rays pass; all
+15 rendering/tint tests pass. This establishes source mapping and regression
+coverage, not live visual parity. No production change or deployment in this pass.
+
+### Reconstruction state identity — 2026-11-12
+
+Found and corrected a missed original change: AIResurect.get_type now returns
+AIResurect while enabled, restoring the original native method on unload. Build564
+EnemyShip.destroy checks teleport string labels and previously included resurrection
+by mistake. Source observation/effect changes remain mapped separately. Three
+focused lifecycle tests, type checking and both builds pass. Live reconstruction
+visuals have not been verified in this pass.
+
+### Server-bullet source mapping — 2026-11-12
+
+Reviewed ProjectileBullet normalized diff and TorpedoCourses adapter. Added hooked
+course tests for crossing-target earliest contact, impact observer order, contact
+cleanup, unchanged HP, discontinuity/rollback, boost transitions and eligibility.
+Combined course/frame/native outgoing-contact suite: 15 passing tests. Incoming
+and debug integration plus live rendering remain separate verification scope;
+ProjectileBullet remains partial. No production change/deployment this pass.
+
+### Deferred boss component effects — 2026-11-12
+
+Found missing paired BossFactory/BossComponent change: component effects were
+starting during native construction at the origin. Added typed BossFactory binding
+and deferred effect startup until the first active positioned update. Reset/destroy
+cancel pending starts; unload restores native creation. Six boss-effect, multipart
+frame-hook and incoming-contact tests pass; type check and builds pass. Live visual
+verification remains outstanding. Trigger normalized diff has no custom changes.
+
+### Boss spawn localization — 2026-11-12
+
+Ported missing translated boss-name/template composition for spawn notices. Typed
+TextManager signature and tests cover translation, untranslated fallback, unrelated
+notices and hot-disable restoration. Seven notice/timer tests, type checking and
+both builds pass. Native build564 component lookup already matches the corrected
+source loop. BossManager remains partial pending event API/live notice verification.
+
+### Engine mount and loot audit — 2026-11-12
+
+Compared full engine/engine-factory/drop-manager/drop-factory diffs. Added an
+installed-render-getter test for fractional motion, zero/negative-X offsets, stale
+engine ownership, dead engine, pooled ship and unload. 25 related tests pass.
+Engine source mapping reviewed; drop manager/factory changes are AS3 loop typing
+only, engine factory unchanged. Drop rendering/expiry/unique effect mappings were
+rechecked; its unused isCrate API is not exposed and Drop remains partial. No
+production changes or deployment in this pass; live visuals remain unverified.
+
+### Camera review and credit refresh batching — 2026-11-12
+
+Camera full diff maps to frame easing, shake suppression, view geometry/revisions;
+11 related tests pass. Constructor initial-view timing remains unverified. Control
+zone manager, clan application check and SaleEvent have empty normalized diffs.
+Found missing CreditManager batching and ported it with typed scene binding. Fake
+transport test covers batching, reentrant refresh, submission failure, pending
+reply after unload and restored native method; no purchases or live balance edits.
+Steam read-only status reports no loaded Haxe classes/game, so live verification
+remains unavailable.
+
+### Chat command source review — 2026-11-12
+
+Compared parser, invocation/result structures, field records and player-target
+normalizer with original source; reviewed registry dispatch/registration behavior.
+Added exact malformed-input errors, escape-over-quote precedence, no callback on
+parse failure and explicit empty argument coverage. 28 combined tests pass.
+Internal TS arrays/exceptions/records replace AS3 helper objects; audit records
+these boundaries explicitly. Live command integration remains separate; no
+production change or deployment in this pass.
+
+### Artifact sorting and favorites source review — 2026-11-12
+
+Compared complete sorting panel, favorites persistence and inset marker sources.
+Fixed a coverage gap: the test claiming every sorting action now actually clicks
+all ten sort controls and verifies one sort-before-close dispatch each. Seven
+related tests pass, including account isolation, unavailable storage, recycle
+protection, share-after-close and popup disposal. ArtifactFactory diff contains
+only AS3 loop typing. No production edit/deployment; live visual parity remains
+unverified. ArtifactStat full diff was located but is not certified by this pass.
+
+### Artifact stat arithmetic and corrosion text — 2026-11-12
+
+Compared 83 fitness branches plus default against original source return
+expressions: all match. Executed the extracted build564 native stat formatter
+with identity localization: corrosiveMulti values 10/-10/0 produce +10.0%,
+-10.0%, 0.0% corrosive damage, without the obsolete all% claim or double sign.
+This preserves the requested updated vanilla corrosion behavior. 17 related
+tests pass. Native formatter all-case coverage and helper API remain partial.
+No production change or deployment in this pass.
+
+### Artifact context popup and locked favorite slots — 2026-11-12
+
+Compared complete original context popup against port and verified its existing
+input/lifecycle tests. Fixed an actual ArtifactBox difference: locked active slots
+now suppress favorite outlines even when retaining an artifact identity. Added
+locked/unlocked regression and typed locked binding; three popup/integration tests
+and type checking pass. Locked-slot/reveal prompt localization remains an explicit
+ArtifactBox audit gap. Live screen verification remains outstanding.
+
+### Artifact prompt localization — 2026-11-12
+
+Resolved the prior locked-slot/reveal prompt gap with a target-scoped native
+tooltip setter hook. Original exact phrases use Localize.t for active/cargo
+artifact boxes; other targets, custom text and null retain native behavior.
+A one-time actual-hook check verifies scoping and unload restoration. Type check
+and public/private builds pass. Live translated rendering remains unverified.
+
+### Boss bar and player-list audit — 2026-11-12
+
+Found missing player-list role/developer label mapping and recorded it explicitly.
+Full-client integration test fails at missing FragmentFilter before reaching HUD
+assertions. Extracted the unchanged boss-visibility controller to a focused module
+and verified setting/native visibility/unload behavior directly. Type check and
+both builds pass. No runtime behavior change or deployment in this pass; full
+integration and live UI remain unverified.
+
+### Player-list role labels port — 2026-11-12
+
+Implemented previously missing client-developer/custom-role labels using native
+TextBitmap and shared role/color adapters. Game developer/moderator precedence,
+width+6 level shifts, style-only animated tint and lifecycle cleanup match source.
+Added typed PlayerListItem binding. Focused hook fixture verifies label layout,
+staff precedence, rebuild cleanup, tint and unload restoration. Live native rows
+remain unverified; do not treat this as full player-list or integration parity.
+
+
+### Local comparison refresh — 2026-11-12 20:52 UTC
+
+Confirmed the existing Node preview process is listening on 127.0.0.1:8087 and the isolated Cage Firefox process exists. No Steam/browser debugging listener is exposed. The last /__preview/status report was 05:33 UTC, so its login-panel/zero-error fields are stale and do not prove the current build works. Refreshed dist host files from public without deleting the existing snapshot first, then fetched all 195 public upstream resources (63,640,985 bytes) with loader/SDK hash validation and unchanged-upstream verification. Snapshot timestamp 20:52:44 UTC. Served /upstream/astroflux.js SHA-256 is 41e0c3c9fd3677c7b76f556cd4e804707024c084834418c1d1989b0f10a5e099, matching the current source used for regenerated types. Served /Client/qolaf-client.js matches local build SHA-256 1abce821b9ca7dba9d341f8a322f63b5adc5802e53fbec0134ff90deabb5bb35. Verified the local core points its default client to this local bundle and game.html includes diagnostics. Requested a reload/login for comparison; no current visual/login result claimed.

@@ -1,35 +1,59 @@
 import { createTargetBossIcon } from './TargetBossIcon';
-import type { Raw } from '../api/Types';
-import { NativeUI } from './NativeUI';
+import {
+  Sprite,
+  Quad,
+  StarlingTextField,
+  TextFormat,
+  type Image,
+  type Unit,
+  type TouchEvent,
+} from '../game/Bindings';
+import { RussoBitmapFontRegistry } from './RussoBitmapFontRegistry';
 import { AuraText } from './AuraText';
 import { TargetPresentation, levelColor } from '../target/TargetPresentation';
 // qolaf/ui/elements/NearbyTargetBar.as — 300×27, original fills and spacing.
 export class NearbyTargetBar {
-  readonly node: Raw;
-  unit: Raw | null = null;
-  private background: Raw;
-  private health: Raw;
-  private shield: Raw;
-  private boss: Raw;
-  private level: Raw;
+  readonly node: Sprite;
+  unit: Unit | null = null;
+  private background: Quad;
+  private health: Quad;
+  private shield: Quad;
+  private boss: Image;
+  private level: StarlingTextField;
   private name: AuraText;
-  private distance: Raw;
+  private distance: StarlingTextField;
   constructor(
-    private ui: NativeUI,
     private info: TargetPresentation,
-    select: (unit: Raw) => void,
+    select: (unit: Unit) => void,
   ) {
-    this.node = ui.sprite();
-    this.background = ui.quad(300, 27, 0x050505, 0.82);
-    this.health = ui.quad(1, 27, 0x8b1524, 0.72);
-    this.shield = ui.quad(1, 4, 0x2769d8, 0.95);
+    this.node = new Sprite();
+    this.background = new Quad(300, 27, 0x050505);
+    this.background.set_alpha(0.82);
+    this.health = new Quad(1, 27, 0x8b1524);
+    this.health.set_alpha(0.72);
+    this.shield = new Quad(1, 4, 0x2769d8);
+    this.shield.set_alpha(0.95);
     this.shield.set_y(23);
-    this.boss = createTargetBossIcon(ui, 16);
-    ui.place(this.boss, 6, (27 - this.boss.get_height()) / 2);
-    this.level = ui.text(50, 27, '', 12);
+    this.boss = createTargetBossIcon(16);
+    this.boss.set_x(6);
+    this.boss.set_y((27 - this.boss.get_height()) / 2);
+    this.level = new StarlingTextField(
+      50,
+      27,
+      '',
+      new TextFormat(RussoBitmapFontRegistry.UI_24_FONT_NAME, 12, 0xffffff, 'left', 'center'),
+    );
+    this.level.set_pixelSnapping(false);
+    this.level.set_wordWrap(false);
     this.level.set_autoSize('horizontal');
-    this.name = new AuraText(ui, 1, 27, 12);
-    this.distance = ui.text(56, 27, '', 11, 0xbbbbbb, 'right');
+    this.name = new AuraText(1, 27, 12);
+    this.distance = new StarlingTextField(
+      56,
+      27,
+      '',
+      new TextFormat(RussoBitmapFontRegistry.UI_24_FONT_NAME, 11, 0xbbbbbb, 'right', 'center'),
+    );
+    this.distance.set_pixelSnapping(false);
     this.distance.set_x(239);
     for (const child of [
       this.background,
@@ -43,7 +67,7 @@ export class NearbyTargetBar {
       this.node.addChild(child);
       if (child !== this.background) child.set_touchable(false);
     }
-    this.node.addEventListener('touch', (event: Raw) => {
+    this.node.addEventListener('touch', (event: TouchEvent) => {
       const touch = event.getTouch(this.node);
       if (!touch) {
         this.background.set_color(0x050505);
@@ -57,8 +81,9 @@ export class NearbyTargetBar {
       }
     });
     this.show(null, 0, 0);
+    this.node.set_visible(false);
   }
-  show(unit: Raw | null, distance: number, dt: number) {
+  show(unit: Unit | null, distance: number, dt: number) {
     this.unit = unit;
     this.node.set_visible(true);
     if (!unit) {
@@ -72,6 +97,7 @@ export class NearbyTargetBar {
       this.name.viewport(232, 27);
       this.distance.set_text('');
       this.health.set_width(0.01);
+      this.shield.set_width(0.01);
       this.shield.set_visible(false);
       return;
     }
@@ -99,6 +125,8 @@ export class NearbyTargetBar {
   }
   dispose() {
     this.name.dispose();
-    this.ui.dispose(this.node);
+    this.unit = null;
+    if (this.node.get_parent()) this.node.removeFromParent(true);
+    else this.node.dispose();
   }
 }

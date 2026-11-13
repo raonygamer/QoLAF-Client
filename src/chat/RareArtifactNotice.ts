@@ -20,7 +20,7 @@ export class RareArtifactNotice {
   static format(playerName: string, name: string, level = 76): string {
     if (!this.validLevel(level) || !playerName || !PodRewardNotice.validLabel(name)) return '';
     return PodRewardNotice.wrap(
-      `${PodRewardNotice.escape(playerName)} got ${/^[aeiou]/i.test(name) ? 'an' : 'a'} ${PodRewardNotice.escape(name)}!`,
+      `${PodRewardNotice.escape(playerName, 700)} got ${/^[aeiou]/i.test(name) ? 'an' : 'a'} ${PodRewardNotice.escape(name, 1000)}!`,
       level < 76,
     );
   }

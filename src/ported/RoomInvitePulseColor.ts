@@ -1,9 +1,8 @@
 // Source port of core/hud/components/RoomInvitePulseColor.as.
-import type { Resolve } from '../runtime/As3';
-import { read } from '../api/Types';
-export function createRoomInvitePulseColor(resolve: Resolve): any {
-  const Game: any = resolve('core.scene.Game');
-  type Game = any;
+import type { Resolve } from '../runtime/HaxeInterop';
+import type { GameScene } from '../game/Bindings';
+export function createRoomInvitePulseColor(resolve: Resolve) {
+  const Game: typeof GameScene = resolve('core.scene.Game');
 
   /** Render-only gold/red emphasis for local invitations, logins and attention notices. */
 
@@ -49,13 +48,8 @@ export function createRoomInvitePulseColor(resolve: Resolve): any {
     }
 
     public static get currentColor(): number {
-      let game: Game = Game.instance;
-      if (
-        game == null ||
-        read(game, 'isLeaving', false) ||
-        !isFinite(game.time) ||
-        game.time <= 0
-      ) {
+      const game = Game.instance;
+      if (game == null || game.get_isLeaving() || !isFinite(game.time) || game.time <= 0) {
         return RoomInvitePulseColor.MARKER_COLOR;
       }
       let now: number = game.clock == null ? NaN : game.clock.getServerTime();

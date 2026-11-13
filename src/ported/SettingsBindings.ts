@@ -1,5 +1,5 @@
 // Source port of core/states/gameStates/SettingsBindings.as.
-import { bound, type Resolve } from '../runtime/As3';
+import { bound, type Resolve } from '../runtime/HaxeInterop';
 export function createSettingsBindings(resolve: Resolve): any {
   const SettingsKeybind: any = resolve('core.hud.components.SettingsKeybind');
   type SettingsKeybind = any;

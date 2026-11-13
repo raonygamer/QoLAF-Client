@@ -1,3 +1,6 @@
+import { bindGameClasses } from '../src/game/Bindings';
+import type { Artifact, Texture, GameScene } from '../src/game/Bindings';
+import type { API } from '../src/api/Types';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { bitmapRendererFixture } from './fixtures/BitmapRenderer';
@@ -15,6 +18,20 @@ function fixture() {
     constructor(public texture: any) {
       super();
       this.readjustSize();
+    }
+    set_color(value: number) {
+      this.color = value;
+      return value;
+    }
+    set_textureSmoothing(value: string) {
+      this.textureSmoothing = value;
+      return value;
+    }
+    get_texture() {
+      return this.texture;
+    }
+    set_texture(texture: unknown) {
+      this.texture = texture;
     }
     readjustSize() {
       this.set_width(this.texture.width);
@@ -34,6 +51,16 @@ function fixture() {
       };
     return bitmap.resolve(name);
   };
+  bindGameClasses({
+    cls: (name: string) => {
+      if (name === 'starling.text.TextField') return bitmap.resolve(name);
+      try {
+        return resolve(name);
+      } catch {
+        return {};
+      }
+    },
+  } as unknown as API);
   const artifact = {
     name: 'Test artifact',
     bitmap: 'artifact_icon',
@@ -43,7 +70,13 @@ function fixture() {
     stats: [{ type: 'healthAdd', value: 1000, get_isUnique: () => true }],
     getColor: () => 0xffaa44,
   };
-  const data = new ChatArtifactLinkData('pilot', 'artifact', 'Pilot', artifact, 90);
+  const data = new ChatArtifactLinkData(
+    'pilot',
+    'artifact',
+    'Pilot',
+    artifact as unknown as Artifact,
+    90,
+  );
   return { ...bitmap, resolve, parsed, data };
 }
 
@@ -60,7 +93,7 @@ test('artifact card uses source geometry, rich wrapped stats, fitness and borrow
       disposed = true;
     },
   };
-  popup.showFor(f.data, texture, 675, 495, 680, 500);
+  popup.showFor(f.data, texture as unknown as Texture, 675, 495, 680, 500);
   assert.equal(popup.get_touchable(), false);
   assert.equal(popup.get_width(), 390);
   assert.equal(popup.get_x(), 273);
@@ -69,15 +102,21 @@ test('artifact card uses source geometry, rich wrapped stats, fitness and borrow
   assert.equal(icon.get_height(), 32);
   assert.equal(icon.get_x(), 8);
   assert.equal(icon.get_y(), 24);
-  assert.equal(popup.nameField.text, 'Test artifact');
-  assert.equal(popup.nameField.format.color, f.data.color);
-  assert.equal(popup.ownerField.text, 'Pilot  •  Level 90  •  pilot');
-  assert.match(popup.detailsField.text, /Level 80, strength 42<br>Fitness: 2<br>2 upgrades/);
+  const nameField = popup.getChildAt(2);
+  const ownerField = popup.getChildAt(3);
+  const detailsField = popup.getChildAt(4);
+  assert.ok(nameField instanceof Text);
+  assert.ok(ownerField instanceof Text);
+  assert.ok(detailsField instanceof f.Renderer);
+  assert.equal(nameField.get_text(), 'Test artifact');
+  assert.equal(nameField.get_format().color, f.data.color);
+  assert.equal(ownerField.get_text(), 'Pilot  •  Level 90  •  pilot');
+  assert.match(detailsField.text, /Level 80, strength 42<br>Fitness: 2<br>2 upgrades/);
   assert.deepEqual(f.parsed, [['healthAdd', 1000, true]]);
-  assert.ok(popup.detailsField.numLines > 4, 'wrapped stat lines increase height');
-  assert.equal(popup.get_height(), 45 + popup.detailsField.numLines * 17 + 4 + 8);
+  assert.ok(detailsField.numLines > 4, 'wrapped stat lines increase height');
+  assert.equal(popup.get_height(), 45 + detailsField.numLines * 17 + 4 + 8);
   assert.equal(popup.get_y(), 495 - popup.get_height() - 12);
-  popup.showFor(f.data, texture, 0, 0, 680, 500);
+  popup.showFor(f.data, texture as unknown as Texture, 0, 0, 680, 500);
   assert.equal(f.parsed.length, 1, 'pointer movement does not rebuild unchanged stats');
   popup.showFor(f.data, null, 0, 0, 100, 50);
   assert.equal(icon.get_visible(), false);
@@ -116,13 +155,23 @@ test('artifact hover revalidates delayed data, scroll, covering UI and row ident
   scroll.addChild(row);
   let hit: any = scroll;
   stage.hitTest = () => hit;
-  const game = { stage, messageLog: log, isLeaving: false };
+  const game = {
+    stage,
+    messageLog: log,
+    isLeaving: false,
+    get_stage: () => stage,
+    get_isLeaving: () => game.isLeaving,
+  };
   log.updateTexts = () => {};
+  log.getQueue = () => [];
+  log.advanced.addText = () => {};
   const hooks = new Hooks();
   const cleanup: (() => void)[] = [];
   let frame: (event: any) => void = () => {};
   const api: any = {
     cls: () => ({ getService: () => ({ getTextureGUIByKey: () => null }) }),
+    around: (object: any, key: string, fn: Function) =>
+      cleanup.push(hooks.add(object, key, 'around', fn)),
     after: (object: any, key: string, fn: Function) =>
       cleanup.push(hooks.add(object, key, 'after', fn)),
     on: (_name: string, fn: typeof frame) => {
@@ -152,7 +201,7 @@ test('artifact hover revalidates delayed data, scroll, covering UI and row ident
   };
   installNativeChatArtifactPreview(
     api,
-    game,
+    game as unknown as GameScene,
     f.resolve,
     { artifactAtStagePoint: () => candidate },
     resolver,
@@ -176,17 +225,17 @@ test('artifact hover revalidates delayed data, scroll, covering UI and row ident
   resolved(f.data);
   assert.equal(popup.get_visible(), true);
   position++;
-  frame({ game });
+  view.dispatchEventWith('enterFrame');
   assert.equal(popup.get_visible(), false);
   touch();
   hit = stage;
-  frame({ game });
+  view.dispatchEventWith('enterFrame');
   assert.equal(popup.get_visible(), false);
   hit = scroll;
   touch();
   assert.equal(popup.get_visible(), true);
   candidate = { ...candidate, row: node() };
-  frame({ game });
+  view.dispatchEventWith('enterFrame');
   assert.equal(popup.get_visible(), false, 'replacement rows cannot inherit hover');
   touch('hover', 700);
   assert.equal(popup.get_visible(), false);
@@ -195,7 +244,7 @@ test('artifact hover revalidates delayed data, scroll, covering UI and row ident
   assert.equal(popup.get_visible(), false);
   touch();
   view.set_visible(false);
-  frame({ game });
+  view.dispatchEventWith('enterFrame');
   assert.equal(popup.get_visible(), false);
   cleanup.reverse().forEach((fn) => fn());
   resolved(f.data);

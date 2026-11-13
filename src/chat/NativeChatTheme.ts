@@ -1,26 +1,23 @@
-import { read, type API, type Raw } from '../api/Types';
-import type { Resolve } from '../runtime/As3';
+import type { API } from '../api/Types';
+import { Quad, PressButton, type GameScene } from '../game/Bindings';
+import { RussoBitmapFontRegistry } from '../ui/RussoBitmapFontRegistry';
 import type { DeviceSettings } from '../settings/DeviceSettings';
 
 /** AstroTheme.integratedChatTab and bitmapChatInput on native controls. */
 export function installNativeChatTheme(
   api: API,
-  game: Raw,
-  resolve: Resolve,
+  game: Pick<GameScene, 'chatInput'>,
   preferences?: DeviceSettings,
 ): void {
   const input = game.chatInput?.input,
     tabs = game.chatInput?.tabs;
   if (!input?.skinLayer || !tabs?.tabs) return;
-  const Quad = resolve('starling.display.Quad');
-  const Fonts = resolve('core.text.RussoBitmapFontRegistry');
-  const PressButton = api.cls('core.hud.components.ui.PressButton');
-  if (!PressButton) return;
+
   const integrated = () => preferences?.get('enableNewChatIntegrationSystem') ?? true;
   const entries = new Map<
-    Raw,
+    PressButton,
     {
-      background: Raw;
+      background: Quad;
       skinVisible: boolean;
       font: string;
       size: number;
@@ -28,14 +25,14 @@ export function installNativeChatTheme(
       padding: number;
     }
   >();
-  const paintTab = (button: Raw) => {
+  const paintTab = (button: PressButton) => {
     const entry = entries.get(button);
     if (!entry) return;
     const enabled = integrated();
     entry.background.set_visible(enabled);
     button.skinLayer.set_visible(enabled ? false : entry.skinVisible);
     const format = button.textField.get_format();
-    format.set_font(enabled ? Fonts.fontNameForSize(12) : entry.font);
+    format.set_font(enabled ? RussoBitmapFontRegistry.fontNameForSize(12) : entry.font);
     format.set_size(enabled ? 12 : entry.size);
     format.set_color(
       enabled
@@ -58,12 +55,12 @@ export function installNativeChatTheme(
               ? 0x3b3b3b
               : 0x191919;
       entry.background.set_color(color);
-      entry.background.set_width(read(button, 'width'));
-      entry.background.set_height(read(button, 'height'));
+      entry.background.set_width(button.get_width());
+      entry.background.set_height(button.get_height());
     }
     button.relayout();
   };
-  const restoreTab = (button: Raw) => {
+  const restoreTab = (button: PressButton) => {
     const entry = entries.get(button);
     if (!entry) return;
     entries.delete(button);
@@ -77,8 +74,9 @@ export function installNativeChatTheme(
     button.relayout();
   };
   const layoutTabs = () => {
-    const buttons: Raw[] = tabs.tabs;
-    for (const button of [...entries.keys()]) if (!buttons.includes(button)) restoreTab(button);
+    const buttons = tabs.tabs;
+    for (const button of [...entries.keys()])
+      if (!buttons.some((candidate) => candidate === button)) restoreTab(button);
     let x = 0;
     for (const button of buttons) {
       if (!entries.has(button)) {
@@ -88,10 +86,10 @@ export function installNativeChatTheme(
         background.set_touchable(false);
         entries.set(button, {
           background,
-          skinVisible: read(button.skinLayer, 'visible'),
-          font: read(format, 'font'),
-          size: read(format, 'size'),
-          color: read(format, 'color'),
+          skinVisible: button.skinLayer.get_visible(),
+          font: format.get_font(),
+          size: format.get_size(),
+          color: format.get_color(),
           padding: button.labelPadding,
         });
         button.addChildAt(background, 0);
@@ -99,10 +97,7 @@ export function installNativeChatTheme(
       paintTab(button);
       if (integrated()) {
         const width = tabs.equalTabs
-          ? Math.max(
-              1,
-              (read(tabs, 'width') - Math.max(0, buttons.length - 1) * 3) / buttons.length,
-            )
+          ? Math.max(1, (tabs.get_width() - Math.max(0, buttons.length - 1) * 3) / buttons.length)
           : // Source ImageSkin(null) inherits Image's 100px width, which
             // Feathers Button.autoSizeIfNeeded includes in its natural size.
             Math.max(100, button.labelWidth() + 24);
@@ -112,24 +107,24 @@ export function installNativeChatTheme(
       }
     }
   };
-  api.after(PressButton.prototype, 'showSkin', function () {
+  const stopPaintTabs = api.after(PressButton.prototype, 'showSkin', function () {
     paintTab(this);
   });
-  api.after(tabs, 'layoutTabs', layoutTabs);
+  const stopLayoutTabs = api.after(tabs, 'layoutTabs', layoutTabs);
 
   const inputBackground = new Quad(1, 1, 0x191919);
   inputBackground.set_alpha(0.86);
   inputBackground.set_touchable(false);
   input.addChildAt(inputBackground, 0);
-  const skinVisible = read(input.skinLayer, 'visible');
+  const skinVisible = input.skinLayer.get_visible();
   const paddingRight = input.paddingRight,
     paddingBottom = input.paddingBottom;
   input.paddingRight = 8;
   input.paddingBottom = 3;
   const paintInput = () => {
     input.skinLayer.set_visible(false);
-    inputBackground.set_width(read(input, 'width'));
-    inputBackground.set_height(read(input, 'height'));
+    inputBackground.set_width(input.get_width());
+    inputBackground.set_height(input.get_height());
     const element = input.element;
     inputBackground.set_color(
       element?.disabled
@@ -139,7 +134,7 @@ export function installNativeChatTheme(
           : 0x191919,
     );
   };
-  api.after(input, 'showSkin', paintInput);
+  const stopPaintInput = api.after(input, 'showSkin', paintInput);
   input.addEventListener('focusIn', paintInput);
   input.addEventListener('focusOut', paintInput);
   if (preferences)
@@ -149,6 +144,10 @@ export function installNativeChatTheme(
       }),
     );
   api.defer(() => {
+    // Stop repainting before native relayout; otherwise cleanup reapplies the theme.
+    stopPaintTabs();
+    stopLayoutTabs();
+    stopPaintInput();
     input.removeEventListener('focusIn', paintInput);
     input.removeEventListener('focusOut', paintInput);
     inputBackground.removeFromParent(true);
@@ -156,6 +155,8 @@ export function installNativeChatTheme(
     input.paddingRight = paddingRight;
     input.paddingBottom = paddingBottom;
     for (const button of [...entries.keys()]) restoreTab(button);
+    tabs.layoutTabs();
+    input.updatePlacement();
   });
   layoutTabs();
   paintInput();

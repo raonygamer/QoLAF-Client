@@ -6,13 +6,13 @@ export class ChatDiscordImageLink {
   public static readonly SIMPLE_LABEL: string = '[Image]';
   public static readonly LINK_COLOR: number = 0x66d5ff;
 
-  public rawUrl: string;
+  public rawURL: string;
   public sourceBegin: number;
   public sourceEnd: number;
   public fileName: string;
 
-  constructor(rawUrl: string, sourceBegin: number, sourceEnd: number, fileName: string) {
-    this.rawUrl = rawUrl;
+  constructor(rawURL: string, sourceBegin: number, sourceEnd: number, fileName: string) {
+    this.rawURL = rawURL;
     this.sourceBegin = sourceBegin;
     this.sourceEnd = sourceEnd;
     this.fileName = fileName;
@@ -27,7 +27,7 @@ export class ChatDiscordImageLink {
     if (match == null) return null;
     let raw: string = ChatDiscordImageLink.trimTrailingPunctuation(String(match[1]));
     if (raw.length == 0 || raw.length > 4096) return null;
-    let normalized: string = ChatDiscordImageLink.decodeHtmlAmp(raw);
+    let normalized: string = ChatDiscordImageLink.decodeHTMLAmp(raw);
     let question: number = normalized.indexOf('?');
     let hash: number = normalized.indexOf('#');
     let cut: number = question < 0 ? normalized.length : question;
@@ -100,14 +100,14 @@ export class ChatDiscordImageLink {
 
   /** Exact original first; known providers get decoder-friendly fallbacks. */
 
-  public candidateUrls(maxWidth: number, maxHeight: number): string[] {
-    let original: string = ChatDiscordImageLink.decodeHtmlAmp(this.rawUrl);
+  public candidateURLs(maxWidth: number, maxHeight: number): string[] {
+    let original: string = ChatDiscordImageLink.decodeHTMLAmp(this.rawURL);
     let result: string[] = [original];
     let host: string = ChatDiscordImageLink.hostOf(original);
     if (host == 'cdn.discordapp.com' || host == 'media.discordapp.net') {
       ChatDiscordImageLink.appendUnique(
         result,
-        ChatDiscordImageLink.discordPreviewUrl(original, maxWidth, maxHeight),
+        ChatDiscordImageLink.discordPreviewURL(original, maxWidth, maxHeight),
       );
     } else if (host == 'i.imgur.com' && ChatDiscordImageLink.extensionOf(original) == 'webp') {
       ChatDiscordImageLink.appendUnique(
@@ -126,7 +126,7 @@ export class ChatDiscordImageLink {
     return result;
   }
 
-  private static discordPreviewUrl(original: string, maxWidth: number, maxHeight: number): string {
+  private static discordPreviewURL(original: string, maxWidth: number, maxHeight: number): string {
     let pathStart: number = original.indexOf('/', original.indexOf('://') + 3);
     if (pathStart < 0) return original;
     let pathAndQuery: string = original.substring(pathStart);
@@ -201,7 +201,7 @@ export class ChatDiscordImageLink {
     return value;
   }
 
-  private static decodeHtmlAmp(value: string): string {
+  private static decodeHTMLAmp(value: string): string {
     return value.replace(/&amp;/gi, '&');
   }
 
