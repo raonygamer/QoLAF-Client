@@ -4,6 +4,11 @@ export const defaults = {
   target_search_distance: 2000,
   nearby_enemy_radar_lines: 5,
   show_radar_fps: true,
+  show_radar_xp: true,
+  show_radar_cargo: true,
+  show_radar_arts: true,
+  radar_count_recycled_arts: false,
+
   show_radar_latency: true,
   show_radar_dps: true,
   show_radar_speed: true,

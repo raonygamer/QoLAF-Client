@@ -1,3 +1,4 @@
+import { rewardRates } from '../telemetry/NativeRewardRates';
 import { ClientIPCService } from '../ipc/ClientIPCService';
 import { servicePoolFor } from '../service/ServicePools';
 import { SceneBase, type Sprite, type StarlingTextField } from '../game/Bindings';
@@ -31,7 +32,7 @@ export class RadarTelemetry {
     this.bossTimers = new BossTimerRadarTelemetry(ui);
     this.emperors = new EmperorRadarTelemetry(ui, game);
     this.node.addChild(this.emperors.node);
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 9; i++) {
       const label = ui.text(i >= 4 ? 420 : 200, 15, '', 10, 0xbfc4cc, 'left', 'QoLAF_Verdana16');
       label.set_alpha(0.85);
       label.set_batchable(true);
@@ -94,6 +95,15 @@ export class RadarTelemetry {
       lines[4] = service;
       lines[5] = `Service IPC: ${ClientIPCService.instance?.statusText ?? 'disconnected'}`;
     }
+    const rates = rewardRates(this.game)?.perHour(
+      performance.now(),
+      this.config.radar_count_recycled_arts,
+    );
+    lines.push(
+      this.config.show_radar_xp ? `XP/h: ${format(rates?.xp ?? 0)}` : null,
+      this.config.show_radar_cargo ? `Cargo/h: ${format(rates?.cargo ?? 0)}` : null,
+      this.config.show_radar_arts ? `Arts/h: ${format(rates?.artifacts ?? 0)}` : null,
+    );
     let textHeight = 0;
     this.labels.forEach((label, index) => {
       const text = lines[index];

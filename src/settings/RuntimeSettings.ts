@@ -27,6 +27,11 @@ const properties = {
   target_search_distance: 'targetSearchDistance',
   nearby_enemy_radar_lines: 'nearbyEnemyRadarLines',
   show_radar_fps: 'showRadarFPS',
+  show_radar_xp: 'showRadarXP',
+  show_radar_cargo: 'showRadarCargo',
+  show_radar_arts: 'showRadarArts',
+  radar_count_recycled_arts: 'radarCountRecycledArts',
+
   show_radar_latency: 'showRadarLatency',
   show_radar_dps: 'showRadarDPS',
   show_radar_speed: 'showRadarSpeed',

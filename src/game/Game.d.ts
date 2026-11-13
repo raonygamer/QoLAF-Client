@@ -2271,7 +2271,7 @@ export declare namespace Game {
             get_commoditites(): any;
             get_dataItems(): any;
             get_isFull(): any;
-            get_minerals(): any;
+            get_minerals(): Game.core.hud.components.cargo.CargoItem[];
             get_spaceJunk(): any;
             getCommoditiesAmount(arg0?: any): any;
             handleServerSaysCargoIsFull(arg0?: any): any;
@@ -2290,7 +2290,7 @@ export declare namespace Game {
             upgradeNames: any;
           }
           interface CargoItem extends Game.starling.display.Sprite {
-            amount: any;
+            amount: number;
             bgr: any;
             dataManager: any;
             draw(arg0?: any): any;
@@ -4843,7 +4843,7 @@ export declare namespace Game {
         changeArtifactSetup(arg0?: any): any;
         changeSkin(arg0?: any): any;
         changeWeapon(message: Game.playerio.Message, offset: number): void;
-        checkPickupMessage(arg0?: any, arg1?: any): any;
+        checkPickupMessage(message: Game.playerio.Message, offset: number): void;
         clanApplicationId: any;
         clanId: string;
         clanLogo: Game.starling.display.Image | null;
@@ -4905,7 +4905,7 @@ export declare namespace Game {
         hasTriggeredMission(arg0?: any): any;
         hasXpProtection(): any;
         id: string;
-        increaseXp(arg0?: any, arg1?: any): any;
+        increaseXp(earned: number, total: number): void;
         init(arg0?: any, arg1?: any): any;
         initArtifactsFromMessage(arg0?: any, arg1?: any): any;
         initCompletedMissionsFromMessage(arg0?: any, arg1?: any): any;

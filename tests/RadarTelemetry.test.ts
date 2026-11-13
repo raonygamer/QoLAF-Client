@@ -133,8 +133,12 @@ test('radar source wording, placement, timing, service room and ship lifecycle',
       'Service IPC: disconnected',
     ],
   );
+  assert.deepEqual(
+    node.children.slice(7, 10).map((label) => label.text),
+    ['XP/h: 0', 'Cargo/h: 0', 'Arts/h: 0'],
+  );
   assert.equal(node.x, 8);
-  assert.equal(node.y, 600 - 75 - 18);
+  assert.equal(node.y, 600 - 120 - 18);
   ship.course.speed.x = 0;
   ship.generation++;
   telemetry.update(0.1);
@@ -145,7 +149,7 @@ test('radar source wording, placement, timing, service room and ship lifecycle',
   );
   config.show_radar_latency = false;
   telemetry.update(0.1);
-  assert.equal(node.y, 600 - 60 - 18);
+  assert.equal(node.y, 600 - 105 - 18);
   assert.equal(labels[1].visible, false);
   game.hud.radar.visible = false;
   telemetry.update(0.1);
@@ -216,7 +220,7 @@ test('DPS occupies the original third radar row and responds to its source setti
   const node = telemetry.node as unknown as Node;
   const labels = node.children.slice(1, 7);
   assert.equal(labels[2].text, 'Current DPS: ~124 (partial)');
-  assert.equal(node.y, 600 - 90 - 18);
+  assert.equal(node.y, 600 - 135 - 18);
   partial = false;
   telemetry.update(0.1);
   assert.equal(labels[2].text, 'Current DPS: ~124');
@@ -224,7 +228,7 @@ test('DPS occupies the original third radar row and responds to its source setti
   telemetry.update(0.1);
   assert.equal(labels[3].text, 'Current speed: 0 km/h');
   assert.equal(labels[2].visible, false);
-  assert.equal(node.y, 600 - 75 - 18);
+  assert.equal(node.y, 600 - 120 - 18);
 });
 
 test('service rows include auxiliary rooms and wrap before positioning the boss block', () => {
@@ -286,6 +290,9 @@ test('service rows include auxiliary rooms and wrap before positioning the boss 
     show_radar_dps: false,
     show_radar_speed: false,
     show_radar_service: true,
+    show_radar_xp: false,
+    show_radar_cargo: false,
+    show_radar_arts: false,
   };
   bindRadarFixtures();
   const telemetry = new RadarTelemetry(
@@ -302,7 +309,7 @@ test('service rows include auxiliary rooms and wrap before positioning the boss 
     assert.equal(labels[4].width, 100);
     assert.equal(labels[4].height, 45);
     assert.equal(labels[5].y, 45);
-    assert.equal(node.children[7].y, 75);
+    assert.equal(node.children[10].y, 75);
     assert.equal(node.y, 600 - 75 - 18);
     rooms = [];
     telemetry.update(0.1);

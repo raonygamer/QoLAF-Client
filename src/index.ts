@@ -1,3 +1,4 @@
+import { installRewardRates } from './telemetry/NativeRewardRates';
 import { installWeaponAcknowledgement } from './weapon/WeaponAcknowledgement';
 import { installPlayerMessageGuards } from './ship/PlayerMessageGuards';
 import { installWarpAnnouncement } from './chat/WarpAnnouncement';
@@ -270,6 +271,7 @@ export default {
       installNativeDeathMessages(api);
       installWeaponInput(api);
       installNativeController(api);
+      installRewardRates(api);
       installPaintShop(api);
       installShipCreation(api);
       installRangeIndex(api);

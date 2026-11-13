@@ -426,6 +426,35 @@ export function createClientSettings(resolve: Resolve) {
       return values == null || !Object.hasOwn(values, key) || <boolean>values[key];
     }
 
+    public get showRadarXP(): boolean {
+      return this.defaultOn('show_radar_xp');
+    }
+    public set showRadarXP(value: boolean) {
+      this.getPlayerSettings(true)['show_radar_xp'] = value;
+      this.save();
+    }
+    public get showRadarCargo(): boolean {
+      return this.defaultOn('show_radar_cargo');
+    }
+    public set showRadarCargo(value: boolean) {
+      this.getPlayerSettings(true)['show_radar_cargo'] = value;
+      this.save();
+    }
+    public get showRadarArts(): boolean {
+      return this.defaultOn('show_radar_arts');
+    }
+    public set showRadarArts(value: boolean) {
+      this.getPlayerSettings(true)['show_radar_arts'] = value;
+      this.save();
+    }
+    public get radarCountRecycledArts(): boolean {
+      return this.getPlayerSettings(false)?.['radar_count_recycled_arts'] === true;
+    }
+    public set radarCountRecycledArts(value: boolean) {
+      this.getPlayerSettings(true)['radar_count_recycled_arts'] = value;
+      this.save();
+    }
+
     public get showRadarFPS(): boolean {
       return this.defaultOn(ClientSettings.SHOW_RADAR_FPS);
     }

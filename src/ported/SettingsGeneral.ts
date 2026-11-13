@@ -342,6 +342,30 @@ export function createSettingsGeneral(resolve: Resolve): any {
         SceneBase.clientSettings.showRadarService = radarService.isSelected;
       });
       this.addCheckbox(radarService, 'Show connected Service room above the radar');
+      const showRadarXP = new Check();
+      showRadarXP.isSelected = SceneBase.clientSettings.showRadarXP;
+      showRadarXP.addEventListener('change', () => {
+        SceneBase.clientSettings.showRadarXP = showRadarXP.isSelected;
+      });
+      this.addCheckbox(showRadarXP, 'Show XP/h above the radar');
+      const showRadarCargo = new Check();
+      showRadarCargo.isSelected = SceneBase.clientSettings.showRadarCargo;
+      showRadarCargo.addEventListener('change', () => {
+        SceneBase.clientSettings.showRadarCargo = showRadarCargo.isSelected;
+      });
+      this.addCheckbox(showRadarCargo, 'Show Cargo/h above the radar');
+      const showRadarArts = new Check();
+      showRadarArts.isSelected = SceneBase.clientSettings.showRadarArts;
+      showRadarArts.addEventListener('change', () => {
+        SceneBase.clientSettings.showRadarArts = showRadarArts.isSelected;
+      });
+      this.addCheckbox(showRadarArts, 'Show Arts/h above the radar');
+      const radarCountRecycledArts = new Check();
+      radarCountRecycledArts.isSelected = SceneBase.clientSettings.radarCountRecycledArts;
+      radarCountRecycledArts.addEventListener('change', () => {
+        SceneBase.clientSettings.radarCountRecycledArts = radarCountRecycledArts.isSelected;
+      });
+      this.addCheckbox(radarCountRecycledArts, 'Include auto-recycled drops in Arts/h');
       var radarMph: Check = new Check();
       radarMph.isSelected = SceneBase.clientSettings.radarSpeedInMph;
       radarMph.addEventListener('change', (event: Event): void => {
