@@ -4,6 +4,7 @@ import type { DualSenseOutput, TriggerEffect } from './DualSenseReport';
 export interface WeaponFeedback {
   type: string;
   interval: number;
+  nominalInterval?: number;
   speed: number;
   firing: boolean;
   charging: boolean;
@@ -18,7 +19,7 @@ export function weaponTrigger(weapon: WeaponFeedback | null, strength: number): 
   if (!weapon.firing) return { kind: 'off' };
   // A detent releases near the end of travel, so it cannot kick a fully held trigger.
   // Slow confirmed shots instead apply a short full-travel force pulse.
-  if (weapon.type !== 'beam' && weapon.interval >= 250)
+  if (weapon.type !== 'beam' && (weapon.nominalInterval ?? weapon.interval) >= 250)
     return { kind: 'resistance', start: 0, strength };
   const shotFrequency = 1000 / Math.max(17, weapon.interval);
   return {

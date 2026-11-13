@@ -1,4 +1,4 @@
-import { readControllers, controllerStatus } from './ControllerDevices';
+import { readControllers, controllerStatus, selectController } from './ControllerDevices';
 import { controllerButtonName, controllerStyle } from './ControllerIdentity';
 import { ControllerCapture, setControllerCapture } from './ControllerCapture';
 import { PaintButton as Button, ScrollBox, Sprite, Text, SceneBase } from '../game/Bindings';
@@ -147,10 +147,7 @@ export function createControllerPage(): Sprite {
     );
     const buttonName = (index: number) => {
       const pads = readControllers();
-      const pad =
-        values.controllerIndex >= 0
-          ? pads[values.controllerIndex]
-          : Array.from(pads).find((candidate) => candidate?.connected);
+      const pad = selectController(pads, values.controllerIndex);
       return controllerButtonName(index, controllerStyle(pad?.id ?? '', values.iconStyle));
     };
     const describe = () =>
@@ -170,10 +167,7 @@ export function createControllerPage(): Sprite {
       const deadline = performance.now() + 10000;
       const timer = window.setInterval(() => {
         const pads = readControllers();
-        const pad =
-          values.controllerIndex < 0
-            ? Array.from(pads).find((candidate) => candidate?.connected)
-            : pads[values.controllerIndex];
+        const pad = selectController(pads, values.controllerIndex);
         const binding = pad ? capture.sample(pad) : null;
         if (binding) {
           if (mapping) mapping.binding = binding;

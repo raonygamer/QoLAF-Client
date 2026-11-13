@@ -47,3 +47,9 @@ Automated tests cover input merging, boost edges, disconnect/focus behavior, dea
 The controller settings page was also constructed and rendered against the live game's native Haxe classes and GUI atlases. A simulated controller confirmation activated a real native settings button through Starling's touch dispatcher; the binding list was rendered after scrolling. This uses an isolated, unauthenticated UI fixture, not a live combat session. Physical trigger feel and combat tuning remain user-testable limitations.
 
 The Controller page shows detection/focus status, and changes are recorded in `/log`. Invisible Lime IME helpers do not block controller input; visible text fields and chat still do.
+
+PlayStation prompts use Xelu's CC0 PS5 assets from https://thoseawesomeguys.com/prompts/ (license included under src/assets/controller). D-pad directions, stick clicks, shoulders and triggers use glyphs rather than text substitutes.
+
+An authorized DualSense now also supplies direct WebHID input, preferred in Automatic mode over the browser Gamepad snapshot. USB and both Bluetooth layouts are decoded; reports older than 250ms are released rather than replayed. Firefox retains the standard Gamepad path. Logs include analog values and thresholds.
+
+Incoming damage rumble scales with damage during the last second relative to total HP/shields, with a short fade after damage stops. The configured vibration slider remains the maximum. Local SmartGun/Blaster shot timing (including Acid Blaster) is observed as well as synchronized projectiles.

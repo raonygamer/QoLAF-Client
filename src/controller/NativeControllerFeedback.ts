@@ -1,3 +1,5 @@
+import { DamageRumble } from './DamageRumble';
+import type { ControllerDevice } from './ControllerDevices';
 import { hasControllerFocus } from './ControllerFocus';
 import {
   getRumbleActuator,
@@ -6,7 +8,7 @@ import {
   type RumbleActuator,
 } from './ControllerRumble';
 import type { API } from '../api/Types';
-import { ProjectileGun, type GameScene, type Weapon } from '../game/Bindings';
+import { ProjectileGun, Weapon, type GameScene } from '../game/Bindings';
 import { WeaponCadence } from './WeaponCadence';
 import type { ControllerSettings } from './ControllerSettings';
 import type { DualSenseHID } from './DualSenseHID';
@@ -16,24 +18,36 @@ export function installControllerFeedback(
   api: API,
   settings: ControllerSettings,
   hid: DualSenseHID,
-  currentPad: () => Gamepad | null,
+  currentPad: () => ControllerDevice | null,
 ): void {
   const cadence = new WeakMap<Weapon, WeaponCadence>();
-  // This is the server-synchronized projectile path, after native heat/rate checks.
-  if (typeof ProjectileGun?.prototype?.shootSyncedProjectile === 'function') {
+  const recordShot = (weapon: Weapon) => {
+    if (weapon.unit !== weapon.g.get_me()?.ship) return;
+    let observed = cadence.get(weapon);
+    if (!observed) cadence.set(weapon, (observed = new WeaponCadence()));
+    observed.shot(weapon.g.time, weapon.reloadTime);
+  };
+  // Network projectiles arrive through this separate native path.
+  if (typeof ProjectileGun?.prototype?.shootSyncedProjectile === 'function')
     api.after(ProjectileGun.prototype, 'shootSyncedProjectile', function () {
-      if (this.unit !== this.g.get_me()?.ship) return;
-      let observed = cadence.get(this);
-      if (!observed) cadence.set(this, (observed = new WeaponCadence()));
-      observed.shot(this.g.time, this.reloadTime);
+      recordShot(this);
     });
-  }
+  // SmartGun (Acid Blaster), Blaster and other local weapon families advance
+  // lastFire only after their native heat check and firing loop succeed.
+  if (typeof Weapon?.prototype?.update === 'function')
+    api.around(Weapon.prototype, 'update', function (next) {
+      const previous = this.lastFire;
+      const result = next();
+      if (this.type !== 'projectile' && this.lastFire !== previous && this.lastFire === this.g.time)
+        recordShot(this);
+      return result;
+    });
+  const damageRumble = new DamageRumble();
   let lastShip: object | null = null;
   let lastRoom: GameScene | null = null;
   let lastDamage = 0;
   let lastHealth = 0;
-  let damageUntil = 0;
-  let damageStrength = 0;
+
   let lastUpdate = 0;
   let active = false;
   let previousLight = false;
@@ -50,8 +64,7 @@ export function installControllerFeedback(
     active = false;
     lastShip = null;
     lastRoom = null;
-    damageUntil = 0;
-    damageStrength = 0;
+    damageRumble.clear();
   };
   window.addEventListener('blur', reset);
   window.addEventListener('pagehide', reset);
@@ -86,12 +99,10 @@ export function installControllerFeedback(
     const damageTime: unknown = ship.lastDmgTime;
     const marker = typeof damageTime === 'number' && Number.isFinite(damageTime) ? damageTime : 0;
     if (lastRoom !== game || lastShip !== ship) {
-      damageUntil = 0;
-      damageStrength = 0;
+      damageRumble.clear();
     } else if (marker > lastDamage && health < lastHealth) {
       const maximum = Math.max(1, ship.get_hpMax() + ship.get_shieldHpMax());
-      damageStrength = Math.min(1, 0.2 + ((lastHealth - health) / maximum) * 5);
-      damageUntil = now + 180;
+      damageRumble.record(now, lastHealth - health, maximum);
     }
     lastRoom = game;
     lastShip = ship;
@@ -103,6 +114,7 @@ export function installControllerFeedback(
       ? {
           type: typeof weapon.type === 'string' ? weapon.type : '',
           interval: observed?.interval ?? weapon.reloadTime,
+          nominalInterval: weapon.reloadTime,
           speed: weapon.speed,
           firing:
             ship.alive &&
@@ -117,7 +129,7 @@ export function installControllerFeedback(
       ship.alive ? description : null,
       game.solarSystem?.key ?? '',
       game.playerManager?.get_players().length ?? game.shipManager.players.length,
-      now < damageUntil ? damageStrength : 0,
+      damageRumble.intensity(now),
       ship.get_usingBoost(),
     );
     // Explicitly relinquish lights on a toggle transition; absence alone means "leave unchanged".

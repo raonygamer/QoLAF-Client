@@ -110,3 +110,31 @@ test('remembers and restores only an already authorized HID device without a pic
   });
   assert.equal(revoked.connected, false);
 });
+
+test('HID input expires when reports stop and detaches on disposal', async (t) => {
+  let now = 100;
+  t.mock.method(performance, 'now', () => now);
+  const { result } = device();
+  let listener: ((event: { reportId: number; data: DataView }) => void) | undefined;
+  result.addEventListener = (_type, callback) => {
+    listener = callback;
+  };
+  result.removeEventListener = () => {
+    listener = undefined;
+  };
+  const hid = new DualSenseHID((error) => {
+    throw error;
+  });
+  await hid.connect({ requestDevice: async () => [result] });
+  const bytes = new Uint8Array(63);
+  bytes.set([128, 128, 128, 128]);
+  bytes[5] = 255;
+  bytes[7] = 8;
+  listener!({ reportId: 1, data: new DataView(bytes.buffer) });
+  assert.equal(hid.inputSnapshot()?.buttons[7].value, 1);
+  now += 300;
+  assert.equal(hid.inputSnapshot(), null, 'stale input cannot keep firing');
+  await hid.dispose();
+  assert.equal(listener, undefined);
+  assert.equal(hid.hasInput, false);
+});

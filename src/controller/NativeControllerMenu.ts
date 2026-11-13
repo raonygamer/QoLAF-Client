@@ -1,5 +1,5 @@
 import { hasControllerFocus } from './ControllerFocus';
-import { readControllers } from './ControllerDevices';
+import { readControllers, selectController } from './ControllerDevices';
 import { createControllerHints } from './ControllerHints';
 import type { API } from '../api/Types';
 import type { Game } from '../game/Game';
@@ -101,10 +101,7 @@ export function installControllerMenu(
       return;
     }
     const pads = readControllers();
-    const pad =
-      settings.values.controllerIndex >= 0
-        ? pads[settings.values.controllerIndex]
-        : Array.from(pads).find((candidate) => candidate?.connected);
+    const pad = selectController(pads, settings.values.controllerIndex);
     if (!pad?.connected) {
       hide();
       repeat.clear();

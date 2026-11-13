@@ -36,3 +36,43 @@ export const xboxIcons = [
   icon16,
 ];
 export const genericIcon = generic;
+
+import ps0 from '../assets/controller/PlayStationCross.png';
+import ps1 from '../assets/controller/PlayStationCircle.png';
+import ps2 from '../assets/controller/PlayStationSquare.png';
+import ps3 from '../assets/controller/PlayStationTriangle.png';
+import ps4 from '../assets/controller/PlayStationL1.png';
+import ps5 from '../assets/controller/PlayStationR1.png';
+import ps6 from '../assets/controller/PlayStationL2.png';
+import ps7 from '../assets/controller/PlayStationR2.png';
+import ps8 from '../assets/controller/PlayStationShare.png';
+import ps9 from '../assets/controller/PlayStationOptions.png';
+import ps10 from '../assets/controller/PlayStationLeftStickClick.png';
+import ps11 from '../assets/controller/PlayStationRightStickClick.png';
+import ps12 from '../assets/controller/PlayStationDpadUp.png';
+import ps13 from '../assets/controller/PlayStationDpadDown.png';
+import ps14 from '../assets/controller/PlayStationDpadLeft.png';
+import ps15 from '../assets/controller/PlayStationDpadRight.png';
+import ps16 from '../assets/controller/PlayStationTouchPad.png';
+import ps17 from '../assets/controller/PlayStationMicrophone.png';
+export const playStationIcons = [
+  ps0,
+  ps1,
+  ps2,
+  ps3,
+  ps4,
+  ps5,
+  ps6,
+  ps7,
+  ps8,
+  ps9,
+  ps10,
+  ps11,
+  ps12,
+  ps13,
+  ps14,
+  ps15,
+  generic,
+  ps16,
+  ps17,
+];

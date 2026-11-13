@@ -1,3 +1,5 @@
+import { decodeDualSenseInput } from './DualSenseInput';
+import type { ControllerSnapshot } from './ControllerInput';
 import type { API } from '../api/Types';
 import { encodeDualSenseReport, type DualSenseOutput } from './DualSenseReport';
 
@@ -8,7 +10,13 @@ interface HIDCollection {
   children: readonly HIDCollection[];
 }
 
+interface HIDInputEvent {
+  reportId: number;
+  data: DataView;
+}
 export interface ControllerHIDDevice {
+  addEventListener?(type: 'inputreport', listener: (event: HIDInputEvent) => void): void;
+  removeEventListener?(type: 'inputreport', listener: (event: HIDInputEvent) => void): void;
   vendorId: number;
   productId: number;
   productName: string;
@@ -51,6 +59,25 @@ export class DualSenseHID {
   private connecting = false;
   private failed = false;
   status = 'Not connected';
+  private input: ControllerSnapshot | null = null;
+  private inputTime = -Infinity;
+  private readonly receiveInput = (event: HIDInputEvent) => {
+    const value = decodeDualSenseInput(event.reportId, event.data);
+    if (value) {
+      this.input = value;
+      this.inputTime = performance.now();
+    }
+  };
+
+  get hasInput(): boolean {
+    return !!this.device?.opened && this.input !== null;
+  }
+  get inputName(): string {
+    return `${this.device?.productName ?? 'DualSense'} (WebHID)`;
+  }
+  inputSnapshot(): ControllerSnapshot | null {
+    return this.hasInput && performance.now() - this.inputTime < 250 ? this.input : null;
+  }
 
   constructor(
     private readonly reportError: (error: unknown) => void,
@@ -114,6 +141,7 @@ export class DualSenseHID {
         return;
       }
       this.device = device;
+      device.addEventListener?.('inputreport', this.receiveInput);
       this.failed = false;
       this.bluetooth = bluetooth;
       this.lastBytes = '';
@@ -148,6 +176,9 @@ export class DualSenseHID {
   async disconnect(): Promise<void> {
     const device = this.device;
     if (!device) return;
+    device.removeEventListener?.('inputreport', this.receiveInput);
+    this.input = null;
+    this.inputTime = -Infinity;
     await this.reset();
     this.device = null;
     this.pending = null;

@@ -1,3 +1,4 @@
+import type { ControllerDevice } from './ControllerDevices';
 import { hasControllerFocus } from './ControllerFocus';
 import type { API } from '../api/Types';
 import type { Game } from '../game/Game';
@@ -12,7 +13,7 @@ type Hotkey = Game.core.hud.components.hotkeys.AbilityHotkey;
 export function installControllerHints(
   api: API,
   settings: ControllerSettings,
-  currentPad: () => Gamepad | null,
+  currentPad: () => ControllerDevice | null,
 ): void {
   const reflection = new GameReflection(api);
   const badges = new Map<

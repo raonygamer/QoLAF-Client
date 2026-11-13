@@ -1,6 +1,6 @@
 import { BitmapData, Image, Sprite, Text, Texture } from '../game/Bindings';
 import { controllerButtonName, type ControllerStyle } from './ControllerIdentity';
-import { xboxIcons } from './ControllerIcons';
+import { xboxIcons, playStationIcons } from './ControllerIcons';
 
 /** All hint graphics are native Starling children, so scaling matches the game. */
 export function createControllerHints(): {
@@ -26,8 +26,8 @@ export function createControllerHints(): {
       const asset =
         currentStyle === 'xbox'
           ? (xboxIcons[entry.button] ?? '')
-          : currentStyle === 'playstation' && entry.button < 4
-            ? `playstation:${entry.button}`
+          : currentStyle === 'playstation'
+            ? (playStationIcons[entry.button] ?? '')
             : '';
       if (!textures.has('badge')) {
         const canvas = document.createElement('canvas');
@@ -57,37 +57,6 @@ export function createControllerHints(): {
         image.set_x(x);
         node.addChild(image);
       }
-      if (asset.startsWith('playstation:') && !textures.has(asset)) {
-        const canvas = document.createElement('canvas');
-        canvas.width = canvas.height = 48;
-        const context = canvas.getContext('2d');
-        if (context) {
-          context.strokeStyle = ['#83bdff', '#ff8585', '#eca1e8', '#86e5bd'][entry.button];
-          context.lineWidth = 4;
-          context.lineCap = 'round';
-          context.beginPath();
-          if (entry.button === 0) {
-            context.moveTo(12, 12);
-            context.lineTo(36, 36);
-            context.moveTo(36, 12);
-            context.lineTo(12, 36);
-          } else if (entry.button === 1) context.arc(24, 24, 15, 0, Math.PI * 2);
-          else if (entry.button === 2) context.rect(10, 10, 28, 28);
-          else {
-            context.moveTo(24, 8);
-            context.lineTo(41, 37);
-            context.lineTo(7, 37);
-            context.closePath();
-          }
-          context.stroke();
-          const bitmap = BitmapData.fromCanvas(canvas, true);
-          if (bitmap)
-            textures.set(asset, {
-              bitmap,
-              texture: Texture.fromBitmapData(bitmap, false, false, 1),
-            });
-        }
-      }
       const loaded = textures.get(asset);
       if (loaded) {
         const image = new Image(loaded.texture);
@@ -96,7 +65,7 @@ export function createControllerHints(): {
         image.set_x(x + 2);
         image.set_y(2);
         node.addChild(image);
-      } else if (asset && !asset.startsWith('playstation:') && !loading.has(asset)) {
+      } else if (asset && !loading.has(asset)) {
         loading.add(asset);
         const future = BitmapData.loadFromBase64(asset.slice(asset.indexOf(',') + 1), 'image/png');
         future.onComplete((bitmap) => {
@@ -131,12 +100,7 @@ export function createControllerHints(): {
         }
       }
       const label = new Text(x + 28, 5);
-      const name = controllerButtonName(entry.button, currentStyle);
-      label.set_text(
-        (currentStyle === 'xbox' || asset.startsWith('playstation:')) && loaded
-          ? entry.text
-          : entry.text,
-      );
+      label.set_text(entry.text);
       node.addChild(label);
       x += Math.max(95, label.get_width() + 48);
     }

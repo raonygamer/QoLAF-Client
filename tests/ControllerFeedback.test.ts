@@ -66,3 +66,12 @@ test('full-strength pulses reach full trigger travel and beams have a higher car
   assert.equal(beam.kind, 'vibration');
   if (beam.kind === 'vibration') assert.equal(beam.frequency, 40);
 });
+
+test('Acid Blaster pulse mode does not fluctuate with simulation tick jitter', () => {
+  for (const interval of [231, 250, 264]) {
+    assert.equal(
+      weaponTrigger({ ...weapon, type: 'smartGun', interval, nominalInterval: 250 }, 1).kind,
+      'resistance',
+    );
+  }
+});

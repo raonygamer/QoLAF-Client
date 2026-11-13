@@ -1,5 +1,5 @@
 import { hasControllerFocus } from './ControllerFocus';
-import { readControllers, controllerStatus } from './ControllerDevices';
+import { readControllers, controllerStatus, selectController } from './ControllerDevices';
 import { installControllerHints } from './NativeControllerHints';
 import { registerControllerContext } from './ControllerContext';
 import { installControllerMenu } from './NativeControllerMenu';
@@ -121,17 +121,16 @@ export function installNativeController(api: API): void {
       return next();
     }
     const pads = readControllers();
-    const pad =
-      preferences.controllerIndex >= 0
-        ? pads[preferences.controllerIndex]
-        : ((selectedIndex === null ? null : pads[selectedIndex]) ??
-          Array.from(pads).find((candidate) => candidate?.connected));
+    const pad = selectController(pads, preferences.controllerIndex, selectedIndex);
     if (!pad?.connected) {
       inputBlock = 'No exposed controller';
       clear();
       return next();
     }
-    if (selectedIndex !== pad.index || selectedID !== pad.id) input.clear();
+    if (selectedIndex !== pad.index || selectedID !== pad.id) {
+      input.clear();
+      suspended = true;
+    }
     inputBlock = `Reading controller ${pad.index}`;
     selectedIndex = pad.index;
     selectedID = pad.id;
@@ -163,7 +162,7 @@ export function installNativeController(api: API): void {
       return next();
     } finally {
       const buttons = pad.buttons.flatMap((button, index) =>
-        button.value > preferences.release ? [index] : [],
+        button.value > preferences.release ? [`${index}:${button.value.toFixed(2)}`] : [],
       );
       const axes = pad.axes.map((value) =>
         Math.abs(value) < preferences.deadzone ? 0 : Math.round(value * 10) / 10,
@@ -171,7 +170,7 @@ export function installNativeController(api: API): void {
       const actions = preferences.mappings
         .filter((mapping) => input.isDown(mapping.action))
         .map((mapping) => mapping.action);
-      sample = `buttons [${buttons}], axes [${axes}], actions [${actions}], native queries ${nativeQueries > 0 ? 'yes' : 'NO'}`;
+      sample = `buttons [${buttons}], axes [${axes}], actions [${actions}], press ${preferences.press.toFixed(2)}, release ${preferences.release.toFixed(2)}, native queries ${nativeQueries > 0 ? 'yes' : 'NO'}`;
       querying = false;
       input.finishTick();
     }
