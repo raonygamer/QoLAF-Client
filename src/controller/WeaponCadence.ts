@@ -16,6 +16,10 @@ export class WeaponCadence {
 
   sample(now: number, nominalInterval: number): { interval: number; firing: boolean } {
     const interval = this.interval || Math.max(17, nominalInterval);
-    return { interval, firing: now - this.lastShot < Math.min(150, Math.max(70, interval * 1.5)) };
+    return {
+      interval,
+      firing:
+        now - this.lastShot < (interval >= 250 ? 70 : Math.min(150, Math.max(70, interval * 1.5))),
+    };
   }
 }

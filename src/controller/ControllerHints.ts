@@ -29,6 +29,34 @@ export function createControllerHints(): {
           : currentStyle === 'playstation' && entry.button < 4
             ? `playstation:${entry.button}`
             : '';
+      if (!textures.has('badge')) {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 48;
+        const context = canvas.getContext('2d');
+        if (context) {
+          context.fillStyle = '#08090b';
+          context.strokeStyle = '#454950';
+          context.lineWidth = 2;
+          context.beginPath();
+          context.roundRect(1, 1, 46, 46, 10);
+          context.fill();
+          context.stroke();
+          const bitmap = BitmapData.fromCanvas(canvas, true);
+          if (bitmap)
+            textures.set('badge', {
+              bitmap,
+              texture: Texture.fromBitmapData(bitmap, false, false, 1),
+            });
+        }
+      }
+      const badge = textures.get('badge');
+      if (badge) {
+        const image = new Image(badge.texture);
+        image.set_width(24);
+        image.set_height(24);
+        image.set_x(x);
+        node.addChild(image);
+      }
       if (asset.startsWith('playstation:') && !textures.has(asset)) {
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = 48;
@@ -63,9 +91,10 @@ export function createControllerHints(): {
       const loaded = textures.get(asset);
       if (loaded) {
         const image = new Image(loaded.texture);
-        image.set_width(24);
-        image.set_height(24);
-        image.set_x(x);
+        image.set_width(20);
+        image.set_height(20);
+        image.set_x(x + 2);
+        image.set_y(2);
         node.addChild(image);
       } else if (asset && !asset.startsWith('playstation:') && !loading.has(asset)) {
         loading.add(asset);
@@ -90,14 +119,23 @@ export function createControllerHints(): {
         x += 28;
         continue;
       }
-      const label = new Text(x + (asset ? 28 : 0), 5);
+      if (!asset) {
+        const name = controllerButtonName(entry.button, currentStyle);
+        const key = new Text(x + 3, 5);
+        key.set_size(name.length > 2 ? 9 : 11);
+        key.set_text(name);
+        node.addChild(key);
+        if (!entry.text) {
+          x += 28;
+          continue;
+        }
+      }
+      const label = new Text(x + 28, 5);
       const name = controllerButtonName(entry.button, currentStyle);
       label.set_text(
         (currentStyle === 'xbox' || asset.startsWith('playstation:')) && loaded
           ? entry.text
-          : entry.text
-            ? `${name}: ${entry.text}`
-            : name,
+          : entry.text,
       );
       node.addChild(label);
       x += Math.max(95, label.get_width() + 48);

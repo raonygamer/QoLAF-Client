@@ -15,15 +15,20 @@ export function weaponTrigger(weapon: WeaponFeedback | null, strength: number): 
     return { kind: 'off' };
   if (weapon.charging && !weapon.firing)
     return { kind: 'resistance', start: 2, strength: strength * 0.35 };
-  if (!weapon.firing) return { kind: 'weapon', start: 2, end: 6, strength: strength * 0.45 };
+  if (!weapon.firing) return { kind: 'off' };
+  // A detent releases near the end of travel, so it cannot kick a fully held trigger.
+  // Slow confirmed shots instead apply a short full-travel force pulse.
   if (weapon.type !== 'beam' && weapon.interval >= 250)
-    return { kind: 'weapon', start: 2, end: 7, strength };
+    return { kind: 'resistance', start: 0, strength };
+  const shotFrequency = 1000 / Math.max(17, weapon.interval);
   return {
     kind: 'vibration',
-    start: 2,
-    strength:
-      strength * Math.max(0.35, Math.min(1, weapon.type === 'beam' ? 0.65 : weapon.speed / 1000)),
-    frequency: Math.max(1, Math.min(60, Math.round(1000 / Math.max(17, weapon.interval)))),
+    start: 0,
+    strength,
+    frequency:
+      weapon.type === 'beam'
+        ? Math.round(Math.max(30, Math.min(120, shotFrequency * 4)))
+        : Math.round(Math.max(1, Math.min(60, shotFrequency))),
   };
 }
 

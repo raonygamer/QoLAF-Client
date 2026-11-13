@@ -52,3 +52,17 @@ test('weapon trigger feedback follows a remapped fire trigger', () => {
   assert.equal(output.right.kind, 'off');
   assert.equal(output.left.kind, 'vibration');
 });
+
+test('full-strength pulses reach full trigger travel and beams have a higher carrier frequency', () => {
+  const projectile = weaponTrigger({ ...weapon, speed: 1 }, 1);
+  assert.deepEqual(projectile, { kind: 'vibration', start: 0, strength: 1, frequency: 10 });
+  assert.deepEqual(weaponTrigger({ ...weapon, interval: 1000 }, 1), {
+    kind: 'resistance',
+    start: 0,
+    strength: 1,
+  });
+  assert.deepEqual(weaponTrigger({ ...weapon, firing: false }, 1), { kind: 'off' });
+  const beam = weaponTrigger({ ...weapon, type: 'beam' }, 1);
+  assert.equal(beam.kind, 'vibration');
+  if (beam.kind === 'vibration') assert.equal(beam.frequency, 40);
+});
