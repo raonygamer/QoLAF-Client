@@ -55,11 +55,19 @@ export function feedbackOutput(
   damage: number,
   boosting: boolean,
 ): DualSenseOutput {
+  const effect = preferences.adaptiveTriggers
+    ? weaponTrigger(weapon, preferences.triggerStrength)
+    : { kind: 'off' as const };
+  const firesWith = (index: number) =>
+    preferences.mappings.some(
+      (mapping) =>
+        mapping.action === 19 &&
+        mapping.binding.kind === 'button' &&
+        mapping.binding.index === index,
+    );
   return {
-    right: preferences.adaptiveTriggers
-      ? weaponTrigger(weapon, preferences.triggerStrength)
-      : { kind: 'off' },
-    left: { kind: 'off' },
+    right: firesWith(7) ? effect : { kind: 'off' },
+    left: firesWith(6) ? effect : { kind: 'off' },
     weak: preferences.vibration * Math.min(1, damage * 0.6 + (boosting ? 0.15 : 0)),
     strong: preferences.vibration * Math.min(1, damage),
     light: preferences.systemLight ? systemLight(system) : undefined,

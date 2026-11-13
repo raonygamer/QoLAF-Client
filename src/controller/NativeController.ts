@@ -18,6 +18,8 @@ export function installNativeController(api: API): void {
   api.defer(registerControllerContext(settings, hid));
   const input = new ControllerInput();
   let querying = false;
+  let suspended = true;
+  let lastState: RoamingState | null = null;
   let selectedIndex: number | null = null;
   let selectedID: string | null = null;
   const currentPad = () => {
@@ -28,6 +30,7 @@ export function installNativeController(api: API): void {
   installControllerHints(api, settings, currentPad);
   const clear = () => {
     input.clear();
+    suspended = true;
     querying = false;
     selectedIndex = null;
     selectedID = null;
@@ -45,6 +48,13 @@ export function installNativeController(api: API): void {
     window.removeEventListener('blur', resetFeedback);
     void hid.dispose();
     settings.save();
+  });
+
+  api.on('frame', ({ game }) => {
+    if (game.gameStateMachine?.currentState !== lastState) {
+      input.clear();
+      suspended = true;
+    }
   });
 
   api.around(KeyBinds.prototype, 'isInputDown', function (next, action) {
@@ -85,6 +95,9 @@ export function installNativeController(api: API): void {
     selectedIndex = pad.index;
     selectedID = pad.id;
     input.update(pad, preferences.mappings, preferences);
+    if (suspended || lastState !== this) input.finishTick();
+    suspended = false;
+    lastState = this;
     querying = true;
     try {
       const player = this.me;

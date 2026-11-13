@@ -1,3 +1,4 @@
+import { controllerButtonName, controllerStyle } from './ControllerIdentity';
 import { ControllerCapture, setControllerCapture } from './ControllerCapture';
 import { PaintButton as Button, ScrollBox, Sprite, Text, SceneBase } from '../game/Bindings';
 import { controllerHID, controllerSettings } from './ControllerContext';
@@ -23,9 +24,11 @@ export function createControllerPage(): Sprite {
   scroll.set_height(460);
   root.addChild(scroll);
   let y = 0;
+  const refreshBindings: (() => void)[] = [];
   function label(text: string, x = 20): Text {
     const node = new Text(x, y + 7);
     node.set_text(text);
+    node.set_size(13);
     scroll.addChild(node);
     return node;
   }
@@ -60,7 +63,13 @@ export function createControllerPage(): Sprite {
     maximum: number,
   ): void {
     label(title);
-    const value = label(values[key].toFixed(2), 390);
+    const displayValue = () =>
+      key === 'controllerIndex'
+        ? values[key] < 0
+          ? 'Automatic'
+          : String(values[key])
+        : values[key].toFixed(2);
+    const value = label(displayValue(), 390);
     const change = (direction: number) => {
       values[key] = Math.max(
         minimum,
@@ -68,10 +77,10 @@ export function createControllerPage(): Sprite {
       );
       if (key === 'press') values.release = Math.min(values.release, values.press - 0.01);
       if (key === 'release') values.release = Math.min(values.release, values.press - 0.01);
-      value.set_text(values[key].toFixed(2));
+      value.set_text(displayValue());
       settings!.save();
     };
-    const minus = button('−', 500, () => change(-1));
+    const minus = button('-', 500, () => change(-1));
     minus.set_width(55);
     const plus = button('+', 570, () => change(1));
     plus.set_width(55);
@@ -83,10 +92,11 @@ export function createControllerPage(): Sprite {
   const style = button(values.iconStyle, 500, () => {
     values.iconStyle = styles[(styles.indexOf(values.iconStyle) + 1) % styles.length];
     style.set_text(values.iconStyle);
+    refreshBindings.forEach((refresh) => refresh());
     settings.save();
   });
   y += 42;
-  number('controllerIndex', 'Controller index (−1 = automatic)', 1, -1, 15);
+  number('controllerIndex', 'Controller index (-1 = automatic)', 1, -1, 15);
   number('deadzone', 'Stick deadzone', 0.05, 0, 0.9);
   number('exponent', 'Stick response curve', 0.25, 0.25, 4);
   number('press', 'Press threshold', 0.05, 0.05, 1);
@@ -96,7 +106,7 @@ export function createControllerPage(): Sprite {
   const connection = button('Connect', 500, () => {
     const hid = controllerHID();
     if (!hid) return;
-    connection.set_text('Connecting…');
+    connection.set_text('Connecting...');
     void hid.connect().then(() => {
       connection.set_text(hid.connected ? 'Connected' : 'Connect');
       status.set_text(hid.status);
@@ -110,7 +120,7 @@ export function createControllerPage(): Sprite {
   number('triggerStrength', 'Trigger resistance', 0.1, 0, 1);
   toggle('systemLight', 'Light bar follows solar system');
   toggle('populationLights', 'Player lights show room population');
-  label('Bindings — axes use their positive or negative direction.');
+  label('Bindings - axes use their positive or negative direction.');
   y += 40;
   for (let action = 0; action <= 30; action++) {
     let mapping = values.mappings.find((mapping) => mapping.action === action);
@@ -121,12 +131,20 @@ export function createControllerPage(): Sprite {
           ? 'Next weapon'
           : String(SceneBase.settings?.keybinds.getName(action) ?? `Action ${action}`),
     );
+    const buttonName = (index: number) => {
+      const pads = navigator.getGamepads?.() ?? [];
+      const pad =
+        values.controllerIndex >= 0
+          ? pads[values.controllerIndex]
+          : Array.from(pads).find((candidate) => candidate?.connected);
+      return controllerButtonName(index, controllerStyle(pad?.id ?? '', values.iconStyle));
+    };
     const describe = () =>
       !mapping
         ? 'Unbound'
         : mapping.binding.kind === 'button'
-          ? `Button ${mapping.binding.index}`
-          : `Axis ${mapping.binding.index} ${mapping.binding.direction > 0 ? '+' : '−'}`;
+          ? buttonName(mapping.binding.index)
+          : `Axis ${mapping.binding.index} ${mapping.binding.direction > 0 ? '+' : '-'}`;
     const control = button(describe(), 500, () => {
       if (stopCapture) {
         stopCapture();
@@ -134,7 +152,7 @@ export function createControllerPage(): Sprite {
       }
       const capture = new ControllerCapture();
       setControllerCapture(true);
-      control.set_text('Press / move…');
+      control.set_text('Press / move...');
       const deadline = performance.now() + 10000;
       const timer = window.setInterval(() => {
         const pads = navigator.getGamepads?.() ?? [];
@@ -160,7 +178,8 @@ export function createControllerPage(): Sprite {
         stopCapture = null;
       };
     });
-    const clear = button('×', 640, () => {
+    refreshBindings.push(() => control.set_text(describe()));
+    const clear = button('X', 640, () => {
       stopCapture?.();
       values.mappings = values.mappings.filter((entry) => entry.action !== action);
       mapping = undefined;

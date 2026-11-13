@@ -34,6 +34,7 @@ const neutral: DualSenseOutput = {
   weak: 0,
   strong: 0,
   releaseLights: true,
+  population: 0,
 };
 
 /** Serialize writes and coalesce stale feedback so a slow Bluetooth link cannot build a backlog. */

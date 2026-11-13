@@ -43,3 +43,12 @@ test('lighting and vibration preferences independently control outputs', () => {
   assert.equal(on.population, 10);
   assert.notDeepEqual(systemLight('argoon'), systemLight('fulzar'));
 });
+
+test('weapon trigger feedback follows a remapped fire trigger', () => {
+  const preferences = defaultControllerPreferences();
+  preferences.adaptiveTriggers = true;
+  preferences.mappings = [{ action: 19, binding: { kind: 'button', index: 6 } }];
+  const output = feedbackOutput(preferences, weapon, 'argoon', 1, 0, false);
+  assert.equal(output.right.kind, 'off');
+  assert.equal(output.left.kind, 'vibration');
+});

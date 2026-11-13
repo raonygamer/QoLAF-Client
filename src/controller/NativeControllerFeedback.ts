@@ -1,21 +1,14 @@
+import {
+  getRumbleActuator,
+  playRumble,
+  resetRumble,
+  type RumbleActuator,
+} from './ControllerRumble';
 import type { API } from '../api/Types';
 import type { GameScene } from '../game/Bindings';
 import type { ControllerSettings } from './ControllerSettings';
 import type { DualSenseHID } from './DualSenseHID';
 import { feedbackOutput, type WeaponFeedback } from './ControllerFeedback';
-
-interface RumbleActuator {
-  playEffect(
-    type: 'dual-rumble',
-    parameters: {
-      duration: number;
-      startDelay: number;
-      weakMagnitude: number;
-      strongMagnitude: number;
-    },
-  ): Promise<unknown>;
-  reset(): Promise<unknown>;
-}
 
 export function installControllerFeedback(
   api: API,
@@ -35,11 +28,12 @@ export function installControllerFeedback(
   let previousPopulation = false;
   let actuator: RumbleActuator | null = null;
   let rumblePending = false;
+  const failedActuators = new WeakSet<RumbleActuator>();
   const logError = (error: unknown) => api.log('Controller feedback:', error);
   const reset = () => {
     if (active) {
       void hid.reset();
-      void actuator?.reset().catch(logError);
+      void resetRumble(actuator).catch(logError);
     }
     active = false;
     lastShip = null;
@@ -106,7 +100,7 @@ export function installControllerFeedback(
       preferences,
       ship.alive ? description : null,
       game.solarSystem?.key ?? '',
-      game.shipManager.players.length,
+      game.playerManager?.get_players().length ?? game.shipManager.players.length,
       now < damageUntil ? damageStrength : 0,
       ship.get_usingBoost(),
     );
@@ -117,31 +111,27 @@ export function installControllerFeedback(
     previousPopulation = preferences.populationLights;
     if (hid.connected) {
       if (actuator) {
-        void actuator.reset().catch(logError);
+        void resetRumble(actuator).catch(logError);
         actuator = null;
       }
       hid.update(output);
     } else {
-      const nextActuator =
-        (pad as Gamepad & { vibrationActuator?: RumbleActuator }).vibrationActuator ?? null;
+      const nextActuator = getRumbleActuator(pad);
       if (nextActuator !== actuator) {
-        void actuator?.reset().catch(logError);
+        void resetRumble(actuator).catch(logError);
         actuator = nextActuator;
       }
-      if (!actuator || rumblePending) return;
+      if (!actuator || rumblePending || failedActuators.has(actuator)) return;
+      const target = actuator;
       rumblePending = true;
-      const effect =
-        output.weak || output.strong
-          ? actuator.playEffect('dual-rumble', {
-              duration: 100,
-              startDelay: 0,
-              weakMagnitude: output.weak,
-              strongMagnitude: output.strong,
-            })
-          : actuator.reset();
-      void effect.catch(logError).finally(() => {
-        rumblePending = false;
-      });
+      void playRumble(target, output.weak, output.strong)
+        .catch((error) => {
+          failedActuators.add(target);
+          logError(error);
+        })
+        .finally(() => {
+          rumblePending = false;
+        });
     }
   });
 }

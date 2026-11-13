@@ -72,6 +72,8 @@ test('controller hooks merge keyboard input, preserve boost edges, cycle weapons
     send: (name: string) => {
       if (name === 'respawn') respawns++;
     },
+    get_me: () => null,
+    gameStateMachine: { currentState: null as object | null },
     get_isLeaving: () => false,
     chatInput: { isActive: () => false },
     get_stage: () => null,
@@ -112,10 +114,12 @@ test('controller hooks merge keyboard input, preserve boost edges, cycle weapons
     'starling.display.Quad': Display,
     'starling.core.Starling': { get_current: () => null },
   };
+  const frames: ((value: { game: typeof game }) => void)[] = [];
   const api = {
     cls: (name: string) => classes[name] ?? {},
     storage: { get: () => preferences, set() {} },
-    on() {
+    on(_name: string, callback: (value: { game: typeof game }) => void) {
+      frames.push(callback);
       return () => {};
     },
     defer(cleanup: () => void) {
@@ -140,6 +144,9 @@ test('controller hooks merge keyboard input, preserve boost edges, cycle weapons
     }),
   );
   const state = new Roaming();
+  game.gameStateMachine.currentState = state;
+  state.updateInput();
+  fire.length = 0;
   buttons[0].value = buttons[7].value = 1;
   state.updateInput();
   state.updateInput();
@@ -154,6 +161,11 @@ test('controller hooks merge keyboard input, preserve boost edges, cycle weapons
   state.updateInput();
   state.updateInput();
   assert.deepEqual(switches, [3]);
+  game.gameStateMachine.currentState = {};
+  frames.forEach((callback) => callback({ game }));
+  game.gameStateMachine.currentState = state;
+  state.updateInput();
+  assert.equal(boosts, 1, 'holding confirm through a menu does not trigger boost on return');
   commandable = false;
   state.updateInput();
   assert.equal(respawns, 0, 'a held boost must not immediately respawn after death');

@@ -42,4 +42,6 @@ USB and Bluetooth reports have separate framing; Bluetooth includes CRC32. Outpu
 
 ## Verification status
 
-Automated tests cover input merging, boost edges, disconnect/focus behavior, deadzones/hysteresis, binding capture, carousel selection, menu navigation, identity fallback, feedback profiles, output report encoding, and HID cleanup. Physical trigger feel, OS device access, and visual/runtime behavior still require an attached controller and game session; passing these tests is not hardware validation.
+Automated tests cover input merging, boost edges, disconnect/focus behavior, deadzones/hysteresis, binding capture, carousel selection, menu navigation, identity fallback, feedback profiles, output report encoding, and HID cleanup. A USB DualSense (Sony 054c:0ce6) was opened through WebHID in an isolated Electron 41 test. The production writer sent a short low-strength trigger/LED report, reset the outputs, and closed with no errors. Bluetooth framing is covered by encoding tests, not a physical Bluetooth run.
+
+The controller settings page was also constructed and rendered against the live game's native Haxe classes and GUI atlases. A simulated controller confirmation activated a real native settings button through Starling's touch dispatcher; the binding list was rendered after scrolling. This uses an isolated, unauthenticated UI fixture, not a live combat session. Physical trigger feel and combat tuning remain user-testable limitations.
