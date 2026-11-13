@@ -54,7 +54,7 @@ export function installControllerHints(
     if (!active) return;
     const actions = [
       [19, 'Fire'],
-      [15, 'Boost'],
+      [15, game.get_me()?.ship?.alive === false ? 'Respawn' : 'Boost'],
       [10, 'Land'],
       [29, 'Previous weapon'],
       [30, 'Next weapon'],

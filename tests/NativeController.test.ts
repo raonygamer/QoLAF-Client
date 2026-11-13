@@ -64,9 +64,14 @@ test('controller hooks merge keyboard input, preserve boost edges, cycle weapons
     }
   }
   let boosts = 0;
+  let commandable = true;
+  let respawns = 0;
   const fire: boolean[] = [];
   const switches: number[] = [];
   const game = {
+    send: (name: string) => {
+      if (name === 'respawn') respawns++;
+    },
     get_isLeaving: () => false,
     chatInput: { isActive: () => false },
     get_stage: () => null,
@@ -76,7 +81,9 @@ test('controller hooks merge keyboard input, preserve boost edges, cycle weapons
     g = game;
     keybinds = new Keys();
     me = {
-      get_commandable: () => true,
+      get_commandable: () => commandable,
+      respawnReady: () => true,
+      respawnNextReady: 123,
       ship: {
         weaponIsChanging: false,
         weapons: [
@@ -147,6 +154,15 @@ test('controller hooks merge keyboard input, preserve boost edges, cycle weapons
   state.updateInput();
   state.updateInput();
   assert.deepEqual(switches, [3]);
+  commandable = false;
+  state.updateInput();
+  assert.equal(respawns, 0, 'a held boost must not immediately respawn after death');
+  buttons[0].value = 0;
+  state.updateInput();
+  buttons[0].value = 1;
+  state.updateInput();
+  state.updateInput();
+  assert.equal(respawns, 1, 'respawn requires a fresh press and uses the native request');
   focused = false;
   state.updateInput();
   assert.equal(fire.at(-1), false);

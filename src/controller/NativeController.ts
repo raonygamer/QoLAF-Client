@@ -89,6 +89,10 @@ export function installNativeController(api: API): void {
     try {
       const player = this.me;
       const ship = player?.ship;
+      if (player && !player.get_commandable() && input.isPressed(15) && player.respawnReady()) {
+        player.respawnNextReady = 0;
+        this.g.send('respawn');
+      }
       if (player && ship && player.get_commandable() && !ship.weaponIsChanging) {
         const previous = input.isPressed(previousWeaponAction);
         const forward = input.isPressed(nextWeaponAction);

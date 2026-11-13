@@ -10,7 +10,7 @@ Open Settings → Input → Controller. Controller input is off until enabled. S
 | Left stick Y | Forward/stop |
 | Right trigger | Fire |
 | Left trigger | Harden shield |
-| Bottom face button (A / Cross) | Boost |
+| Bottom face button (A / Cross) | Boost; respawn after death with a fresh press |
 | Left face button (X / Square) | Damage boost |
 | Right face button (B / Circle) | Shield convert |
 | Top face button (Y / Triangle) | Land |
