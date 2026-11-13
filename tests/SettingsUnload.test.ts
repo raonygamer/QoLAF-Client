@@ -3,7 +3,10 @@ import test from 'node:test';
 import type { API } from '../src/api/Types';
 import { bindGameClasses } from '../src/game/Bindings';
 import type { Game } from '../src/game/Game';
-import { closeSettingsForUnload, detachSettingsResizeListeners } from '../src/settings/SettingsUnload';
+import {
+  closeSettingsForUnload,
+  detachSettingsResizeListeners,
+} from '../src/settings/SettingsUnload';
 
 test('hot enable removes only resize listeners owned by the rebuilt Settings state', () => {
   const resize = () => {};

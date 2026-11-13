@@ -46,7 +46,10 @@ test('clan widgets own icons and tooltips, reject stale replies, and preserve ca
   const tips: Tip[] = [];
   class Tip {
     disposed = false;
-    constructor(_game: unknown, public target: object | null) {
+    constructor(
+      _game: unknown,
+      public target: object | null,
+    ) {
       tips.push(this);
     }
     dispose() {

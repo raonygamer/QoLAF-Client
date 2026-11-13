@@ -8,7 +8,9 @@ import type {} from '../game/TechLevelIcon';
 export function installTechPresentation(api: API): void {
   const reflection = new GameReflection(api);
   const owner = TechLevelIcon.prototype;
-  const getTechBar = function (this: TechLevelIcon) { return this.tb; };
+  const getTechBar = function (this: TechLevelIcon) {
+    return this.tb;
+  };
   for (const [name, descriptor] of Object.entries({
     techBar: { get: getTechBar },
     get_techBar: { value: getTechBar, writable: true },

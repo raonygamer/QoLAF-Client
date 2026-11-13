@@ -347,6 +347,7 @@ export function installExpandedArtifactOverview(api: API, resolve: Resolve): voi
   for (const method of [
     'reloadStats',
     'onRecycleMessage',
+    'onRecycled',
     'onSort',
     'drawArtifactsInCargo',
     'onBuyArtifactConfirm',

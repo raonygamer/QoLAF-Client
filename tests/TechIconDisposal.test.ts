@@ -10,7 +10,9 @@ test('tech icon disposal releases only owned tooltips and cancels elite tweens b
   const killed: object[] = [];
   class LevelIcon {
     disposals = 0;
-    dispose() { this.disposals++; }
+    dispose() {
+      this.disposals++;
+    }
   }
   class EliteIcon {
     number: object | null = {};
@@ -19,14 +21,19 @@ test('tech icon disposal releases only owned tooltips and cancels elite tweens b
     dispose() {
       if (this.number) assert.ok(killed.includes(this.number));
       if (this.icon) assert.ok(killed.includes(this.icon));
-      assert.equal(Tooltip.toolTips.some((tip) => tip.target === this), false);
+      assert.equal(
+        Tooltip.toolTips.some((tip) => tip.target === this),
+        false,
+      );
       this.disposals++;
     }
   }
   class Tooltip {
     static toolTips: Tooltip[] = [];
     disposals = 0;
-    constructor(public target: object | null) { Tooltip.toolTips.push(this); }
+    constructor(public target: object | null) {
+      Tooltip.toolTips.push(this);
+    }
     dispose() {
       this.disposals++;
       this.target = null;
@@ -39,7 +46,9 @@ test('tech icon disposal releases only owned tooltips and cancels elite tweens b
     'core.hud.components.ToolTip': Tooltip,
     'com.greensock.TweenMax': { killTweensOf: (target: object) => killed.push(target) },
   };
-  const hooks = new Hooks((error: unknown) => { throw error; });
+  const hooks = new Hooks((error: unknown) => {
+    throw error;
+  });
   const cleanups: (() => void)[] = [];
   const api = {
     cls: (name: string) => classes[name] ?? {},

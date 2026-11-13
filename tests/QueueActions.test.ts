@@ -41,14 +41,18 @@ test('queue buttons preserve state during service loss and resume native actions
   // The real classes own separate implementations of these three methods.
   for (const action of ['join', 'leave', 'accept'] as const) {
     Object.defineProperty(QuickMatch.prototype, action, {
-      value: QueueButton.prototype[action], configurable: true, writable: true,
+      value: QueueButton.prototype[action],
+      configurable: true,
+      writable: true,
     });
   }
-  const hooks = new Hooks((error: unknown) => { throw error; });
+  const hooks = new Hooks((error: unknown) => {
+    throw error;
+  });
   const cleanups: (() => void)[] = [];
   const api = {
-    cls: (name: string) => name === 'core.hud.components.ButtonPvPQuickMatch'
-      ? QuickMatch : QueueButton,
+    cls: (name: string) =>
+      name === 'core.hud.components.ButtonPvPQuickMatch' ? QuickMatch : QueueButton,
     around: (owner: object, key: string, callback: (...args: never[]) => unknown) => {
       const off = hooks.add(owner, key, 'around', callback);
       cleanups.push(off);
@@ -77,9 +81,13 @@ test('queue buttons preserve state during service loss and resume native actions
         assert.equal(button.accepted, action === 'accept');
         assert.equal(button.removedQueues, action === 'join' ? 1 : 0);
         assert.deepEqual(button.events, [event]);
-        assert.deepEqual(button.messages, [{
-          join: 'tryJoinQueue', leave: 'tryLeaveQueue', accept: 'acceptMatch',
-        }[action]]);
+        assert.deepEqual(button.messages, [
+          {
+            join: 'tryJoinQueue',
+            leave: 'tryLeaveQueue',
+            accept: 'acceptMatch',
+          }[action],
+        ]);
       }
     }
   } finally {

@@ -23,7 +23,9 @@ test('native screen text hooks preserve lore timing, cancel owned work and resto
       return {
         get_font: () => this.font,
         get_size: () => 16,
-        set_font: (font: string) => { this.font = font; },
+        set_font: (font: string) => {
+          this.font = font;
+        },
       };
     }
     _textArray: string[][] | null = [['x']];

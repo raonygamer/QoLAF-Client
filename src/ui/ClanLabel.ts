@@ -120,11 +120,9 @@ export class ClanLabel {
     const lifecycle = this.lifecycle;
     const attempt = ++this.attempt;
     try {
-      this.ui.cls('core.clan.ClanClient').brief(
-        this.game,
-        clanId,
-        playerId,
-        (clan: ClanBrief | null) => {
+      this.ui
+        .cls('core.clan.ClanClient')
+        .brief(this.game, clanId, playerId, (clan: ClanBrief | null) => {
           try {
             if (
               this.disposed ||
@@ -161,8 +159,7 @@ export class ClanLabel {
             ClientErrorDiagnostics.record(error, 'Clan label rendering');
             this.ui.api.log('Clan label update failed', error);
           }
-        },
-      );
+        });
     } catch (error) {
       ClientErrorDiagnostics.record(error, 'Clan label lookup');
       // Failed lookups retry with the original bounded backoff.

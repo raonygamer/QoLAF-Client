@@ -2715,7 +2715,6 @@
       "selectAllForRecycle": "(event?: Game.starling.events.TouchEvent | null) => void",
       "onRecycle": "(event?: Game.starling.events.TouchEvent | null) => void",
       "onRecycleSelect": "(event: Game.starling.events.Event) => void",
-      "onRecycleMessage": "(message: Game.playerio.Message) => void",
       "drawComponents": "() => void",
       "recycleText": "Game.starling.text.TextField",
       "recycleTextInfo": "Game.starling.text.TextField",
@@ -2724,7 +2723,8 @@
       "autoRecycleButton": "Game.core.hud.components.Button",
       "buySupporter": "Game.core.hud.components.Button",
       "autoRecycleInput": "Game.core.hud.components.InputText",
-      "load": "() => void"
+      "load": "() => void",
+      "onRecycled": "(items: Array<{ junk: string; amount: number }>) => void"
     }
   },
   "core.states.player.Killed": {

@@ -44,7 +44,12 @@ for (const [name, factory] of [
       panel.dispose();
       for (const cleanup of cleanups.reverse()) cleanup();
       assert.equal('graphics' in classes['openfl.display.Sprite'].prototype, false);
-      if (room === 0) assert.throws(() => new Window(), /reading 'clear'/, 'old cached-constructor path reproduces the reported failure');
+      if (room === 0)
+        assert.throws(
+          () => new Window(),
+          /reading 'clear'/,
+          'old cached-constructor path reproduces the reported failure',
+        );
     }
   });
 }

@@ -280,7 +280,14 @@ test('native viewport uses original padding, gestures, wheel hit testing and ind
   play.updateAimAngle();
   assert.equal(aims, 0, 'map drag owns mouse aim');
   play.handleTurn();
-  assert.deepEqual(turns.splice(0), [[1, false], [2, false]], 'drag releases both held axes');
+  assert.deepEqual(
+    turns.splice(0),
+    [
+      [1, false],
+      [2, false],
+    ],
+    'drag releases both held axes',
+  );
   assert.equal(nativeTurns, 0);
   course.rotateLeft = course.rotateRight = false;
   held.add(13);

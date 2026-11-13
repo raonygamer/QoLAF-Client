@@ -102,6 +102,10 @@ test('favorite recycle guards exclude protected items before selection and nativ
         },
       },
       artifactRecyclePending: false,
+      completeRecycle: (_response: unknown) => {},
+      rpcMessage(_message: { type: string }, callback: (response: unknown) => void) {
+        this.completeRecycle = callback;
+      },
     };
     submissions: string[][] = [];
     onRecycleSelect(event: any) {
@@ -113,8 +117,8 @@ test('favorite recycle guards exclude protected items before selection and nativ
     }
     onRecycle() {
       this.submissions.push(this.markedForRecycle.map((a) => a.id));
+      this.g.rpcMessage({ type: 'bulkRecycle' }, () => {});
     }
-    onRecycleMessage() {}
   }
   const classes: any = {
     'core.artifact.ArtifactCargoBox': Box,
@@ -162,6 +166,6 @@ test('favorite recycle guards exclude protected items before selection and nativ
   reopened.markedForRecycle = [reopened.cargoBoxes[1].a];
   reopened.onRecycle();
   assert.equal(reopened.submissions.length, 0, 'a reopened screen shares the room recycle lock');
-  view.onRecycleMessage();
+  view.g.completeRecycle({ getBoolean: () => false });
   assert.equal(view.g.artifactRecyclePending, false);
 });

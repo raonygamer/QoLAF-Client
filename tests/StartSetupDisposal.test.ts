@@ -10,7 +10,9 @@ test('ship selection releases owned parallax displays once before native screen 
   class Display {
     attached = true;
     disposals = 0;
-    removeFromParent() { this.attached = false; }
+    removeFromParent() {
+      this.attached = false;
+    }
     dispose() {
       assert.equal(this.attached, false);
       this.disposals++;
@@ -25,7 +27,9 @@ test('ship selection releases owned parallax displays once before native screen 
     clears = 0;
     load() {}
     refresh() {}
-    clear() { this.clears++; }
+    clear() {
+      this.clears++;
+    }
   }
   class Setup {
     pm: Parallax | null = new Parallax();
@@ -37,24 +41,34 @@ test('ship selection releases owned parallax displays once before native screen 
       this.disposals++;
     }
   }
-  class Scene { exit() {} dispose() {} fadeIntoState() {} }
-  class Textures { disposeCustomTextures() {} }
+  class Scene {
+    exit() {}
+    dispose() {}
+    fadeIntoState() {}
+  }
+  class Textures {
+    disposeCustomTextures() {}
+  }
   const classes: Record<string, unknown> = {
     'core.parallax.ParallaxManager': Parallax,
     'startSetup.StartSetup': Setup,
     'core.scene.Game': Scene,
     'textures.TextureManager': Textures,
   };
-  const hooks = new Hooks((error: unknown) => { throw error; });
+  const hooks = new Hooks((error: unknown) => {
+    throw error;
+  });
   const cleanups: (() => void)[] = [];
-  const hook = (kind: string) => (owner: object, key: string, callback: (...args: never[]) => unknown) => {
-    const off = hooks.add(owner, key, kind, callback);
-    cleanups.push(off);
-    return off;
-  };
+  const hook =
+    (kind: string) => (owner: object, key: string, callback: (...args: never[]) => unknown) => {
+      const off = hooks.add(owner, key, kind, callback);
+      cleanups.push(off);
+      return off;
+    };
   const api = {
     cls: (name: string) => classes[name] ?? {},
-    around: hook('around'), before: hook('before'),
+    around: hook('around'),
+    before: hook('before'),
     defer: (off: () => void) => cleanups.push(off),
   } as unknown as API;
   bindGameClasses(api);
@@ -76,5 +90,7 @@ test('ship selection releases owned parallax displays once before native screen 
     const partial = new Setup();
     partial.pm = null;
     partial.dispose();
-  } finally { cleanups.reverse().forEach(off => off()); }
+  } finally {
+    cleanups.reverse().forEach((off) => off());
+  }
 });

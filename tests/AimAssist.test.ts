@@ -44,7 +44,11 @@ test('automation suspension advances sample time without replacing the last play
   assert.equal(f.assist.active, false);
   f.update({ now: 10016, angle: -0.01 });
   assert.ok(Math.abs(f.assist.mouseSpeed - 5.625) < 1e-12);
-  assert.equal(f.assist.active, false, 'handoff cannot dilute fast movement across automation time');
+  assert.equal(
+    f.assist.active,
+    false,
+    'handoff cannot dilute fast movement across automation time',
+  );
   assert.match(f.assist.reason, /acquisition limit/);
 });
 

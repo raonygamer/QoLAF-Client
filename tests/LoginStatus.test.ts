@@ -28,7 +28,6 @@ test('cancel hint is removed when Haxe ignores empty subText assignments', () =>
   assert.equal(label, '');
 });
 
-
 test('parallel loading lines retain source spacing and cleanup restores native visibility', () => {
   class Label extends Display {
     text = '';

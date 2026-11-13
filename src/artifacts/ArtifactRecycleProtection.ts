@@ -91,15 +91,27 @@ export function installArtifactRecycleProtection(api: API, favorites: ArtifactFa
     }
     const cargo = this.g.myCargo;
     if (!cargo || cargo.get_isFull()) return next(...args);
-    this.g.artifactRecyclePending = true;
+    const game = this.g;
+    game.artifactRecyclePending = true;
+    let sent = false;
+    // Newer Haxe clients deliver recycling through ArtifactActions.recycle;
+    // observe the response boundary rather than a removed screen callback.
+    const restore = reflection.around(game, 'rpcMessage', function (send, message, callback) {
+      if (message.type !== 'bulkRecycle') return send(message, callback);
+      sent = true;
+      return send(message, (response) => {
+        game.artifactRecyclePending = false;
+        callback(response);
+      });
+    });
     try {
       return next(...args);
     } catch (error) {
-      this.g.artifactRecyclePending = false;
+      game.artifactRecyclePending = false;
       throw error;
+    } finally {
+      restore();
+      if (!sent) game.artifactRecyclePending = false;
     }
-  });
-  reflection.before(Overview, 'onRecycleMessage', function () {
-    this.g.artifactRecyclePending = false;
   });
 }

@@ -17,7 +17,9 @@ test('map player death and landing hide every marker part, reappearance restores
     layer = new Display();
     text = new Display();
     supporterImage = new Display();
-    player: { ship: { alive: boolean; hp: number; get_landed?: () => boolean } | null } | null = { ship: { alive: true, hp: 100, get_landed: () => false } };
+    player: { ship: { alive: boolean; hp: number; get_landed?: () => boolean } | null } | null = {
+      ship: { alive: true, hp: 100, get_landed: () => false },
+    };
     draws = 0;
     disposed = false;
     update() {
@@ -35,11 +37,12 @@ test('map player death and landing hide every marker part, reappearance restores
     'core.hud.components.map.MapPlayer': Marker,
     'com.greensock.TweenMax': { killTweensOf: (target: unknown) => killed.push(target) },
   };
-  const hook = (kind: string) => (target: object, name: string, fn: (...args: never[]) => unknown) => {
-    const off = hooks.add(target, name, kind, fn);
-    cleanups.push(off);
-    return off;
-  };
+  const hook =
+    (kind: string) => (target: object, name: string, fn: (...args: never[]) => unknown) => {
+      const off = hooks.add(target, name, kind, fn);
+      cleanups.push(off);
+      return off;
+    };
   const api = {
     cls: (name: string) => classes[name] ?? Marker,
     around: hook('around'),

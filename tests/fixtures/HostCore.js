@@ -1,4 +1,6 @@
 export const API_VERSION = 1;
+// Large client bundles can take over a minute on a slow connection.
+const IMPORT_TIMEOUT_MS = 180000;
 export const DEFAULT_CLIENT_URL = 'https://raonygamer.github.io/QoLAF-Client/qolaf-client.js';
 export const CONFIG_KEY = 'qolaf.plugins.v1';
 
@@ -88,8 +90,22 @@ export class Hooks {
         for (const h of current.filter(h => h.kind === 'around').reverse()) {
           const inner = next;
           next = (...values) => {
-            try { return h.callback.call(this, inner, ...values); }
-            catch (error) { onError(error, `around ${String(key)} (hook or downstream method)`); throw error; }
+            let called = false, result, downstreamError, downstreamFailed = false;
+            const proceed = (...forwarded) => {
+              called = true;
+              try { result = inner(...forwarded); return result; }
+              catch (error) { downstreamFailed = true; downstreamError = error; throw error; }
+            };
+            try { return h.callback.call(this, proceed, ...values); }
+            catch (error) {
+              if (downstreamFailed && error === downstreamError) {
+                onError(error, `around ${String(key)} (downstream method)`);
+                throw error;
+              }
+              onError(error, `around ${String(key)} (hook failed; native fallback)`);
+              if (downstreamFailed) throw downstreamError;
+              return called ? result : inner(...values);
+            }
           };
         }
         // Around hooks intentionally control execution, arguments and return values.
@@ -199,6 +215,13 @@ export class PluginHost {
     const host = this;
     const keyPrefix = `qolaf.plugin.${id}.`;
     const track = dispose => { scope.defer(dispose); return dispose; };
+    const hook = (target, key, kind, callback) => {
+      try { return track(host.hooks.add(target, key, kind, callback)); }
+      catch (error) {
+        host.hooks.onError(error, `install ${kind} ${String(key)}`);
+        return () => {};
+      }
+    };
     return Object.freeze({
       diagnostics: Object.freeze({ snapshot: () => host.diagnostics.map(entry => ({ ...entry })) }),
       version: API_VERSION,
@@ -248,9 +271,9 @@ export class PluginHost {
         track(host.on('gameExit', game => { if (game === sessionGame) close(); }));
         track(close);
       },
-      before: (target, key, callback) => track(host.hooks.add(target, key, 'before', callback)),
-      after: (target, key, callback) => track(host.hooks.add(target, key, 'after', callback)),
-      around: (target, key, callback) => track(host.hooks.add(target, key, 'around', callback)),
+      before: (target, key, callback) => hook(target, key, 'before', callback),
+      after: (target, key, callback) => hook(target, key, 'after', callback),
+      around: (target, key, callback) => hook(target, key, 'around', callback),
       defer: fn => scope.defer(fn),
       listen(target, name, callback, options) {
         target.addEventListener(name, callback, options);
@@ -282,12 +305,16 @@ export class PluginHost {
     this.pluginScopes.set(record, scope);
     this.scope.defer(() => scope.dispose());
     let timer;
+    let cancelImport;
+    const cancelledImport = new Promise(resolve => { cancelImport = () => resolve(null); });
+    scope.defer(() => cancelImport?.());
     try {
       const address = new URL(pluginURL(url));
       if (fresh) address.searchParams.set('qolafReload', Date.now() + '-' + ++this.importRevision);
       const module = await Promise.race([
         this.importer(address.href),
-        new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Plugin import timed out. Check its URL, CORS headers and JavaScript MIME type.')), 10000); }),
+        new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Plugin import timed out. Check its URL, CORS headers and JavaScript MIME type.')), IMPORT_TIMEOUT_MS); }),
+        cancelledImport,
       ]);
       if (scope.closed || this.scope.closed || record.state === 'stopped') { scope.dispose(); return record; }
       const plugin = module.default;
@@ -316,7 +343,7 @@ export class PluginHost {
       record.state = cancelled ? 'stopped' : 'error';
       if (!cancelled) record.error = String(error.message || error);
       this.log.error('[QoLAF plugin]', url, error);
-    } finally { clearTimeout(timer); this.onChange(); }
+    } finally { cancelImport = null; clearTimeout(timer); this.onChange(); }
     return record;
   }
   unload(url) {

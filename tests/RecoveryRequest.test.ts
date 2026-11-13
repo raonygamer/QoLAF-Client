@@ -15,8 +15,12 @@ test('recovery blocks duplicate button/Enter requests until failure or success d
   let failure: (error: { message: string }) => void = () => {};
   let throwRequest = false;
   const quickConnect = {
-    simpleRecoverPassword(_gameId: string, _email: string,
-      accepted: () => void, rejected: (error: { message: string }) => void) {
+    simpleRecoverPassword(
+      _gameId: string,
+      _email: string,
+      accepted: () => void,
+      rejected: (error: { message: string }) => void,
+    ) {
       requestCount++;
       if (throwRequest) throw new Error('transport failure');
       success = accepted;
@@ -25,8 +29,8 @@ test('recovery blocks duplicate button/Enter requests until failure or success d
   };
   const login = { currentState: 'password_recover' };
   const api = {
-    cls: (name: string) => name === 'Login' ? login
-      : name === 'playerio.PlayerIO' ? { quickConnect } : {},
+    cls: (name: string) =>
+      name === 'Login' ? login : name === 'playerio.PlayerIO' ? { quickConnect } : {},
     around: (target: object, name: string, callback: (...args: never[]) => unknown) => {
       const remove = hooks.add(target, name, 'around', callback);
       cleanups.push(remove);
@@ -42,7 +46,10 @@ test('recovery blocks duplicate button/Enter requests until failure or success d
   class Button {
     enabled = true;
     callback = () => {};
-    set_enabled(value: boolean) { this.enabled = value; return value; }
+    set_enabled(value: boolean) {
+      this.enabled = value;
+      return value;
+    }
   }
   const recoverButton = new Button();
   const cancelButton = new Button();
@@ -50,15 +57,27 @@ test('recovery blocks duplicate button/Enter requests until failure or success d
   let errorText = '';
   let popups = 0;
   const dialog = {
-    recoverButton, cancelButton,
+    recoverButton,
+    cancelButton,
     get_visible: () => true,
     onRecover() {
-      if (!email.trim()) { errorText = 'Enter email address'; return; }
+      if (!email.trim()) {
+        errorText = 'Enter email address';
+        return;
+      }
       recoverButton.set_enabled(false);
       errorText = '';
-      quickConnect.simpleRecoverPassword('game', email,
-        () => { popups++; },
-        (error) => { errorText = error.message; recoverButton.set_enabled(true); });
+      quickConnect.simpleRecoverPassword(
+        'game',
+        email,
+        () => {
+          popups++;
+        },
+        (error) => {
+          errorText = error.message;
+          recoverButton.set_enabled(true);
+        },
+      );
     },
   };
   recoverButton.callback = dialog.onRecover.bind(dialog);
@@ -103,8 +122,14 @@ test('recovery blocks duplicate button/Enter requests until failure or success d
     assert.notEqual(errorText, 'Late response');
     assert.equal(recoverButton.callback, nativeCallback);
     assert.equal(dialog.onRecover, nativeMethod);
-    assert.equal(hookErrors.length, 2, 'only the injected transport exception reaches both hook boundaries');
-    assert.ok(hookErrors.every((error) => error instanceof Error && error.message === 'transport failure'));
+    assert.equal(
+      hookErrors.length,
+      2,
+      'only the injected transport exception reaches both hook boundaries',
+    );
+    assert.ok(
+      hookErrors.every((error) => error instanceof Error && error.message === 'transport failure'),
+    );
     dispose();
   } finally {
     dispose();

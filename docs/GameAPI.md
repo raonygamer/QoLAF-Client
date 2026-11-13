@@ -31,7 +31,11 @@ api.on('classesReady', () => {
 - `cast(value, name)` checks at runtime and returns the typed instance.
 - `before`, `after`, and `around` retain native hook cleanup and typed `this`.
   `after` receives the result **first**, then the original arguments. `around`
-  receives `next`, then the original arguments.
+  receives `next`, then the original arguments. Missing or incompatible hook registrations
+  are recorded in diagnostics and return a no-op cleanup so other hooks can install.
+  An around-hook exception falls back to native execution only if `next` was not
+  called; otherwise it preserves the completed result. Downstream game errors
+  still propagate, and later calls can retry a hook after a transient failure.
 - `dynamic(name)` is the explicit escape hatch for classes absent from the snapshot.
 
 The generated namespaces preserve game names (`Game.core.ship.PlayerShip`). These

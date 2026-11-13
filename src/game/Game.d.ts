@@ -2,28 +2,27 @@
 import type { ServicePlayerInfo } from './ServicePlayerInfo';
 import type { HaxeIterable } from './HaxeCollections';
 import type { PlayerIOChannel, AuthenticationResponse } from './PlayerIOChannel';
-// Source SHA-256: 41e0c3c9fd3677c7b76f556cd4e804707024c084834418c1d1989b0f10a5e099
+// Source SHA-256: 54b7d5d192bfcc1c959520afd87da3e865ef224a1cf76edc31803f1e63277514
 // Runtime members come from Haxe; types use reviewed signatures and conservative static-write inference.
 // Unreconstructed members remain explicitly incomplete; do not treat this as full type coverage.
-export interface HaxeObject { readonly __class__: HaxeClass<HaxeObject>; }
-export interface HaxeClass<T, Args extends unknown[] = unknown[]> { new (...args: Args): T; readonly prototype: T; readonly __name__: string; readonly __super__?: HaxeClass<HaxeObject>; }
+export interface HaxeObject {
+  readonly __class__: HaxeClass<HaxeObject>;
+}
+export interface HaxeClass<T, Args extends unknown[] = unknown[]> {
+  new (...args: Args): T;
+  readonly prototype: T;
+  readonly __name__: string;
+  readonly __super__?: HaxeClass<HaxeObject>;
+}
 export declare namespace Game {
-  interface __ASSET__OPENFL__ui_russo_one_ttf extends Game.openfl.text.Font {
-  }
-  interface __ASSET__ui_russo_one_ttf extends Game.lime.text.Font {
-  }
-  interface ApplicationMain extends HaxeObject {
-  }
-  interface Array extends HaxeObject {
-  }
-  interface BuyButtonBitmap extends Game.openfl.display.Bitmap {
-  }
-  interface Date extends HaxeObject {
-  }
-  interface DocumentClass extends Game.Main {
-  }
-  interface EmbeddedAssets extends HaxeObject {
-  }
+  interface __ASSET__OPENFL__ui_russo_one_ttf extends Game.openfl.text.Font {}
+  interface __ASSET__ui_russo_one_ttf extends Game.lime.text.Font {}
+  interface ApplicationMain extends HaxeObject {}
+  interface Array extends HaxeObject {}
+  interface BuyButtonBitmap extends Game.openfl.display.Bitmap {}
+  interface Date extends HaxeObject {}
+  interface DocumentClass extends Game.Main {}
+  interface EmbeddedAssets extends HaxeObject {}
   interface EReg extends HaxeObject {
     map(arg0?: any, arg1?: any): any;
     match(arg0?: any): any;
@@ -35,12 +34,9 @@ export declare namespace Game {
     r: any;
     split(arg0?: any): any;
   }
-  interface GetFluxNowButtonBitmap extends Game.openfl.display.Bitmap {
-  }
-  interface HxOverrides extends HaxeObject {
-  }
-  interface Lambda extends HaxeObject {
-  }
+  interface GetFluxNowButtonBitmap extends Game.openfl.display.Bitmap {}
+  interface HxOverrides extends HaxeObject {}
+  interface Lambda extends HaxeObject {}
   interface LoadingBar extends Game.starling.display.Sprite {
     percent: Game.starling.text.TextField;
     status: Game.core.hud.components.TextBitmap;
@@ -67,6 +63,7 @@ export declare namespace Game {
     effectTweens: any;
     emailInput: any;
     enqueueEmbedded(): any;
+    enterFullscreenOnTouchDevice(): any;
     enterPressed: boolean;
     exitButton: any;
     handleConnect(client: Game.playerio.Client): void;
@@ -77,6 +74,7 @@ export declare namespace Game {
     init(): void;
     initStartSetup(): void;
     isLoggedIn: boolean;
+    isPortrait(): any;
     isSteamAuthError(arg0?: any): any;
     joinData: Record<string, string | number | boolean | null>;
     joinGameRoom(): void;
@@ -89,6 +87,7 @@ export declare namespace Game {
     mySharedObject: any;
     onConnectSimple(arg0?: any): any;
     onConnectStatus(event: Game.core.login.ConnectEvent): void;
+    onFieldEnter(arg0?: any): any;
     onJoinedServiceRoom(event: Game.starling.events.Event & { data: ServicePlayerInfo }): void;
     onKeyPress(event: Game.starling.events.KeyboardEvent): void;
     onKeyUp(event: Game.starling.events.KeyboardEvent): void;
@@ -122,12 +121,9 @@ export declare namespace Game {
     theStartSetup: any;
     updateStatus(status: string): void;
   }
-  interface Main extends Game.RymdenRunt {
-  }
-  interface ManifestResources extends HaxeObject {
-  }
-  interface Math extends HaxeObject {
-  }
+  interface Main extends Game.RymdenRunt {}
+  interface ManifestResources extends HaxeObject {}
+  interface Math extends HaxeObject {}
   interface Preload extends Game.starling.events.EventDispatcher {
     embeddedLoaded: boolean;
     finishIfReady(): void;
@@ -141,8 +137,7 @@ export declare namespace Game {
     preloadComplete(): void;
     textureManager: Game.textures.TextureManager;
   }
-  interface Reflect extends HaxeObject {
-  }
+  interface Reflect extends HaxeObject {}
   interface RymdenRunt extends Game.openfl.display.Sprite {
     focused(arg0?: any): any;
     init(arg0?: any): any;
@@ -153,17 +148,13 @@ export declare namespace Game {
     resize(arg0?: any): any;
     startRoot(): any;
   }
-  interface Std extends HaxeObject {
-  }
-  interface String extends HaxeObject {
-  }
+  interface Std extends HaxeObject {}
+  interface String extends HaxeObject {}
   interface StringBuf extends HaxeObject {
     b: any;
   }
-  interface StringTools extends HaxeObject {
-  }
-  interface Type extends HaxeObject {
-  }
+  interface StringTools extends HaxeObject {}
+  interface Type extends HaxeObject {}
   interface Xml extends HaxeObject {
     addChild(arg0?: any): any;
     attributeMap: any;
@@ -182,8 +173,7 @@ export declare namespace Game {
     toString(): any;
   }
   namespace as3hx {
-    interface Compat extends HaxeObject {
-    }
+    interface Compat extends HaxeObject {}
     interface FlashRegExpAdapter extends HaxeObject {
       _ereg: any;
       _global: any;
@@ -212,8 +202,7 @@ export declare namespace Game {
     }
   }
   namespace bootstrap {
-    interface SteamBridge extends HaxeObject {
-    }
+    interface SteamBridge extends HaxeObject {}
   }
   namespace camerafocus {
     interface StarlingCameraFocus extends HaxeObject {
@@ -252,7 +241,10 @@ export declare namespace Game {
       _zoomStartedEvent: any;
       destroy(): any;
       enableCallBack: boolean;
-      focusTarget: Game.starling.display.DisplayObject | Pick<Game.openfl.geom.Point, 'x' | 'y'> | null;
+      focusTarget:
+        | Game.starling.display.DisplayObject
+        | Pick<Game.openfl.geom.Point, 'x' | 'y'>
+        | null;
       get_globalTrackerLoc(): any;
       get_zoomFactor(): any;
       getCameraCenter(): Game.openfl.geom.Point;
@@ -333,13 +325,11 @@ export declare namespace Game {
   namespace com {
     namespace adobe {
       namespace crypto {
-        interface MD5 extends HaxeObject {
-        }
+        interface MD5 extends HaxeObject {}
       }
       namespace serialization {
         namespace json {
-          interface JSON extends HaxeObject {
-          }
+          interface JSON extends HaxeObject {}
           interface JSONDecoder extends HaxeObject {
             checkValidToken(): any;
             getValue(): any;
@@ -392,19 +382,14 @@ export declare namespace Game {
             strict: any;
             unescapeString(arg0?: any): any;
           }
-          interface JSONTokenType extends HaxeObject {
-          }
+          interface JSONTokenType extends HaxeObject {}
         }
       }
       namespace utils {
-        interface DateUTCExt extends HaxeObject {
-        }
-        interface DateUtil extends HaxeObject {
-        }
-        interface IntUtil extends HaxeObject {
-        }
-        interface StringUtil extends HaxeObject {
-        }
+        interface DateUTCExt extends HaxeObject {}
+        interface DateUtil extends HaxeObject {}
+        interface IntUtil extends HaxeObject {}
+        interface StringUtil extends HaxeObject {}
       }
     }
     namespace greensock {
@@ -415,8 +400,7 @@ export declare namespace Game {
         name: any;
         start: any;
       }
-      interface StarlingTweenHost extends HaxeObject {
-      }
+      interface StarlingTweenHost extends HaxeObject {}
       interface TweenMax extends HaxeObject {
         _active: any;
         addLive(): any;
@@ -468,30 +452,21 @@ export declare namespace Game {
         advanceTime(arg0?: any): any;
       }
       namespace easing {
-        interface Back extends HaxeObject {
-        }
-        interface Circ extends HaxeObject {
-        }
-        interface Elastic extends HaxeObject {
-        }
-        interface Expo extends HaxeObject {
-        }
-        interface Power1 extends HaxeObject {
-        }
-        interface Sine extends HaxeObject {
-        }
+        interface Back extends HaxeObject {}
+        interface Circ extends HaxeObject {}
+        interface Elastic extends HaxeObject {}
+        interface Expo extends HaxeObject {}
+        interface Power1 extends HaxeObject {}
+        interface Sine extends HaxeObject {}
       }
       namespace plugins {
-        interface RemoveTintPlugin extends HaxeObject {
-        }
+        interface RemoveTintPlugin extends HaxeObject {}
       }
     }
   }
   namespace config {
-    interface AssetVersion extends HaxeObject {
-    }
-    interface GameRooms extends HaxeObject {
-    }
+    interface AssetVersion extends HaxeObject {}
+    interface GameRooms extends HaxeObject {}
   }
   namespace core {
     interface GameObject extends HaxeObject {
@@ -641,11 +616,9 @@ export declare namespace Game {
         upgradeMode: any;
         upgradingImage: any;
       }
-      interface ArtifactFactory extends HaxeObject {
-      }
+      interface ArtifactFactory extends HaxeObject {}
       interface ArtifactOverview extends Game.starling.display.Sprite {
         activeSlots: Game.core.artifact.ArtifactBox[];
-        addStatsToSummary(arg0?: any): any;
         artifactSetupButtonHeight: any;
         artifactSetupY: any;
         artifactUpgradeComplete(arg0?: any, arg1?: any): any;
@@ -674,15 +647,15 @@ export declare namespace Game {
         markedForRecycle: Game.core.artifact.Artifact[];
         onActiveRemoved(arg0?: any): any;
         onAutoRecycle(arg0?: any): any;
-        onBuyArtifactConfirm(arg0?: any): any;
+        onBuyArtifactConfirm(): any;
         onCrewSelected(arg0?: any): any;
         onLoadUpgradeArtifactComplete(arg0?: any, arg1?: any): any;
         onRecycle(event?: Game.starling.events.TouchEvent | null): void;
-        onRecycleMessage(message: Game.playerio.Message): void;
+        onRecycled(items: Array<{ junk: string; amount: number }>): void;
         onRecycleSelect(event: Game.starling.events.Event): void;
         onSelect(arg0?: any): any;
         onSetupBuy(arg0?: any): any;
-        onSetupBuyConfirm(arg0?: any): any;
+        onSetupBuyConfirm(): any;
         onSetupChange(arg0?: any): any;
         onSlotUnlock(arg0?: any): any;
         onSort(order: string): void;
@@ -706,7 +679,6 @@ export declare namespace Game {
         sendArtifactComplete(arg0?: any, arg1?: any): any;
         setActiveArtifacts(): any;
         setups: any;
-        sortStatsForSummary(): any;
         startedUpgrade(arg0?: any): any;
         statisticSummary: any;
         statsContainer: any;
@@ -715,7 +687,6 @@ export declare namespace Game {
         toggleRecycleButton: Game.core.hud.components.Button;
         toggleUpgrade(arg0?: any): any;
         toggleUpgradeButton: any;
-        updateLoadedArtifact(arg0?: any, arg1?: any): any;
         upgradeButton: any;
         upgradeMode: any;
       }
@@ -740,8 +711,7 @@ export declare namespace Game {
         type: string;
         value: number;
       }
-      interface ArtifactStatModifiers extends HaxeObject {
-      }
+      interface ArtifactStatModifiers extends HaxeObject {}
     }
     namespace boss {
       interface Boss extends Game.core.GameObject {
@@ -835,8 +805,7 @@ export declare namespace Game {
         triggers: any;
         update(): void;
       }
-      interface BossFactory extends HaxeObject {
-      }
+      interface BossFactory extends HaxeObject {}
       interface BossManager extends HaxeObject {
         add(arg0?: any): any;
         addMessageHandlers(): any;
@@ -905,8 +874,7 @@ export declare namespace Game {
         checkSpecific(arg0?: any, arg1?: any, arg2?: any): any;
         g: any;
       }
-      interface ClanClient extends HaxeObject {
-      }
+      interface ClanClient extends HaxeObject {}
       interface PlayerClanLogo extends Game.starling.display.Sprite {
         callback: ((success?: boolean) => void) | null;
         dispose(): void;
@@ -1069,8 +1037,7 @@ export declare namespace Game {
         reputation: any;
         xp: any;
       }
-      interface DropFactory extends HaxeObject {
-      }
+      interface DropFactory extends HaxeObject {}
       interface DropItem extends HaxeObject {
         bitmapKey: any;
         hasTechTree: any;
@@ -1142,12 +1109,10 @@ export declare namespace Game {
         thrustEmitters: any;
         update(): any;
       }
-      interface EngineFactory extends HaxeObject {
-      }
+      interface EngineFactory extends HaxeObject {}
     }
     namespace error {
-      interface ErrorReport extends HaxeObject {
-      }
+      interface ErrorReport extends HaxeObject {}
     }
     namespace friend {
       interface Friend extends HaxeObject {
@@ -1249,6 +1214,8 @@ export declare namespace Game {
         hintMapText: any;
         initMissionsButtons(): any;
         isShowingNewMissionsButton: any;
+        landPlanetName: any;
+        landTarget(): any;
         landText: Game.core.hud.components.TextBitmap;
         leaderboardButton: any;
         load(): any;
@@ -1313,7 +1280,16 @@ export declare namespace Game {
           get_color(): number;
           glowColor: number;
           glowWidth: number;
-          init(thickness?: number, frequency?: number, amplitude?: number, color?: number, alpha?: number, glowWidth?: number, glowColor?: number, texture?: string): void;
+          init(
+            thickness?: number,
+            frequency?: number,
+            amplitude?: number,
+            color?: number,
+            alpha?: number,
+            glowWidth?: number,
+            glowColor?: number,
+            texture?: string,
+          ): void;
           lines: any;
           lineTexture: string;
           lineTo(x: number, y: number, width?: number): void;
@@ -1639,7 +1615,6 @@ export declare namespace Game {
           img: any;
           injuryStatus: any;
           injuryTimer: any;
-          instantArtifactUpgrade(arg0?: any): any;
           instantCrewTraining(arg0?: any): any;
           isSelected: any;
           mode: any;
@@ -1894,6 +1869,7 @@ export declare namespace Game {
           set_text(text: string): string;
           setFocus(): void;
           setPrevious(previous: Game.core.hud.components.LoginInput): void;
+          useAsLoginField(arg0?: any): any;
         }
         interface LootItem extends Game.starling.display.Sprite {
           bgr: any;
@@ -1938,8 +1914,7 @@ export declare namespace Game {
           update(arg0?: any): any;
           updateStyle(): any;
         }
-        interface Position extends HaxeObject {
-        }
+        interface Position extends HaxeObject {}
         interface PowerBar extends Game.starling.display.DisplayObjectContainer {
           colorBlue: any;
           colorRed: any;
@@ -1949,6 +1924,7 @@ export declare namespace Game {
           heatNumber: Game.starling.text.TextField | null;
           load(): any;
           loadBar: any;
+          loadShare: any;
           smoother: any;
           soundManager: any;
           turnedLow: any;
@@ -1995,8 +1971,7 @@ export declare namespace Game {
           supporterPackage: any;
           tween: any;
         }
-        interface SaleSticker extends Game.starling.display.Sprite {
-        }
+        interface SaleSticker extends Game.starling.display.Sprite {}
         interface SaleTimer extends Game.starling.display.Sprite {
           callback: any;
           hudTimer: any;
@@ -2117,6 +2092,7 @@ export declare namespace Game {
           set_canAfford(arg0?: any): any;
           set_enabled(arg0?: any): any;
           set_hasItem(arg0?: any): any;
+          shopItem: any;
           showInfo(arg0?: any): any;
           table: any;
           textureManager: any;
@@ -2130,8 +2106,7 @@ export declare namespace Game {
           barFull: any;
           compact: any;
         }
-        interface Style extends HaxeObject {
-        }
+        interface Style extends HaxeObject {}
         interface Text extends Game.starling.display.DisplayObjectContainer {
           _centerVertical: any;
           _hAlign: any;
@@ -2199,7 +2174,10 @@ export declare namespace Game {
           to: any;
         }
         interface ToolTip extends HaxeObject {
-          addImage(image: import('./TooltipImage').TooltipImage, label?: Game.core.hud.components.ui.WrapText | null): void;
+          addImage(
+            image: import('./TooltipImage').TooltipImage,
+            label?: Game.core.hud.components.ui.WrapText | null,
+          ): void;
           addListeners(): void;
           c: number;
           container: Game.starling.display.Sprite | null;
@@ -2333,12 +2311,15 @@ export declare namespace Game {
         namespace chat {
           interface ChatAdvanced extends Game.starling.display.Sprite {
             addText(message: import('./ChatMessage').ChatMessage): void;
+            background: any;
             dispose(): any;
             g: any;
             load(arg0?: any): any;
             playerChatOptions: Game.starling.display.DisplayObject | null;
             scroll: Game.core.hud.components.ui.ScrollBox;
+            scrollPadding: any;
             scrollView: Game.starling.display.Sprite;
+            setSize(arg0?: any, arg1?: any, arg2?: any): any;
             unload(arg0?: any): any;
             updateText(arg0?: any): any;
           }
@@ -2361,6 +2342,7 @@ export declare namespace Game {
             previous(): void;
             reportPlayer(arg0?: any): any;
             savedPrivateTarget: string | null;
+            send(arg0?: any): any;
             sendChatMessageMod(text: string): void;
             sendConfirmInviteGroup(): any;
             sendGlobal(text: string): void;
@@ -2390,11 +2372,15 @@ export declare namespace Game {
             dispose(): any;
             get_muted(): any;
             getQueue(): import('./ChatMessage').ChatMessage[];
+            isAdvancedShown(): any;
             isMuted(channel: string): boolean;
             nextTimeout: any;
             removePlayerMessages(arg0?: any): any;
+            setAdvancedSize(arg0?: any, arg1?: any, arg2?: any): any;
             simple: Game.core.hud.components.chat.ChatSimple;
             textureManager: any;
+            toggleAdvanced(): any;
+            toggleButton: any;
             toggleMuted(arg0?: any, arg1?: any): any;
             toggleView(view: string): void;
             update(arg0?: any): any;
@@ -2468,7 +2454,8 @@ export declare namespace Game {
             textureManager: any;
             update(): any;
           }
-          interface CreditBeginnerPackage extends Game.core.hud.components.credits.CreditPackageItem {
+          interface CreditBeginnerPackage
+            extends Game.core.hud.components.credits.CreditPackageItem {
             dispose(): any;
             load(): any;
             onSuccess(arg0?: any): any;
@@ -2718,7 +2705,17 @@ export declare namespace Game {
             onReadTimerComplete(arg0?: any): any;
             readTime: any;
             readTimer: any;
-            show(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any): any;
+            show(
+              arg0?: any,
+              arg1?: any,
+              arg2?: any,
+              arg3?: any,
+              arg4?: any,
+              arg5?: any,
+              arg6?: any,
+              arg7?: any,
+              arg8?: any,
+            ): any;
             showCloseButton: any;
             showOverlay: any;
             soundManager: any;
@@ -2730,7 +2727,14 @@ export declare namespace Game {
           interface CrewJoinOffer extends Game.starling.display.Sprite {
             accept(arg0?: any): any;
             acceptButton: any;
-            addSkillIcon(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): any;
+            addSkillIcon(
+              arg0?: any,
+              arg1?: any,
+              arg2?: any,
+              arg3?: any,
+              arg4?: any,
+              arg5?: any,
+            ): any;
             addSkills(arg0?: any): any;
             bgr: any;
             body: any;
@@ -2775,7 +2779,8 @@ export declare namespace Game {
             dayTextField: Game.core.hud.components.Text | null;
             redraw(arg0?: any): any;
           }
-          interface LootPopupConfirmMessage extends Game.core.hud.components.dialogs.PopupConfirmMessage {
+          interface LootPopupConfirmMessage
+            extends Game.core.hud.components.dialogs.PopupConfirmMessage {
             addItem(arg0?: any): any;
             items: any;
             redraw(arg0?: any): any;
@@ -2786,7 +2791,12 @@ export declare namespace Game {
             redraw(arg0?: any): any;
           }
           interface PopupBuyMessage extends Game.core.hud.components.dialogs.PopupConfirmMessage {
-            addBuyForFluxButton(cost: number, slot: number, message: string, confirmation: string): void;
+            addBuyForFluxButton(
+              cost: number,
+              slot: number,
+              message: string,
+              confirmation: string,
+            ): void;
             addCost(arg0?: any): any;
             fluxButton: any;
             g: any;
@@ -2800,8 +2810,7 @@ export declare namespace Game {
             keyDown(arg0?: any): any;
             redraw(arg0?: any): any;
           }
-          interface PopupEvent extends Game.starling.events.Event {
-          }
+          interface PopupEvent extends Game.starling.events.Event {}
           interface PopupInputMessage extends Game.core.hud.components.dialogs.PopupConfirmMessage {
             get_text(): any;
             input: any;
@@ -2921,7 +2930,10 @@ export declare namespace Game {
             canJoinOld(arg0?: any, arg1?: any): any;
             clearSelected(arg0?: any): any;
             createMatrix(arg0?: any, arg1?: any): any;
-            createShell(area: number, previous?: Game.openfl.geom.Point[] | null): Game.openfl.geom.Point[] | null;
+            createShell(
+              area: number,
+              previous?: Game.openfl.geom.Point[] | null,
+            ): Game.openfl.geom.Point[] | null;
             createShells(arg0?: any): any;
             dist(arg0?: any, arg1?: any): any;
             dist2(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
@@ -2938,9 +2950,19 @@ export declare namespace Game {
             getDirection(points: Game.openfl.geom.Point[]): number;
             getMapArea(arg0?: any): any;
             getMinDist(arg0?: any, arg1?: any): any;
-            getNextPoint(x: number, y: number, area: number, direction: number): Game.openfl.geom.Point | null;
+            getNextPoint(
+              x: number,
+              y: number,
+              area: number,
+              direction: number,
+            ): Game.openfl.geom.Point | null;
             getRandomPosList(): any;
-            getStartPoint(points: Game.openfl.geom.Point[], area: number, x?: number, y?: number): void;
+            getStartPoint(
+              points: Game.openfl.geom.Point[],
+              area: number,
+              x?: number,
+              y?: number,
+            ): void;
             grid: any;
             isDone(points: Game.openfl.geom.Point[]): boolean;
             joinOldGroup(arg0?: any): any;
@@ -3094,9 +3116,18 @@ export declare namespace Game {
         }
         namespace hotkeys {
           interface Abilities extends Game.starling.display.Sprite {
-            createHotkey(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+            createHotkey(
+              arg0?: any,
+              arg1?: any,
+              arg2?: any,
+              arg3?: any,
+              arg4?: any,
+              arg5?: any,
+              arg6?: any,
+            ): any;
             dataManager: any;
             g: any;
+            getHotkeys(): any;
             hotkeys: Game.core.hud.components.hotkeys.AbilityHotkey[];
             initiateCooldown(ability: string): void;
             keyBinds: any;
@@ -3109,10 +3140,14 @@ export declare namespace Game {
             _cooldownTime: number;
             cooldownEndTime: any;
             cooldownFinished(): any;
+            cooldownLeft(): any;
+            cooldownLength(): any;
             cooldownOverlay: any;
             draw(): any;
             g: any;
             hotkeySymbol: any;
+            iconTexture: any;
+            inactiveIconTexture: any;
             initiateCooldown(): any;
             MIN_COOLDOWN: any;
             obj: { name: string } | null;
@@ -3135,6 +3170,7 @@ export declare namespace Game {
             clickedHotkey(arg0?: any): any;
             createWeaponToolTip(arg0?: any): any;
             g: any;
+            getHotkeys(): any;
             highlightWeapon(arg0?: any): any;
             hotkeys: any;
             load(): any;
@@ -3214,8 +3250,7 @@ export declare namespace Game {
             addOrbits(): any;
             addText(): any;
           }
-          interface MapHidden extends Game.core.hud.components.map.MapBodyBase {
-          }
+          interface MapHidden extends Game.core.hud.components.map.MapBodyBase {}
           interface MapKilled extends HaxeObject {
             clean(arg0?: any): any;
             dropShowTime: any;
@@ -3554,7 +3589,10 @@ export declare namespace Game {
             add(arg0?: any): any;
             blipBatch: any;
             blips: Game.core.hud.components.radar.Blip[] | null;
-            createBlip(owner: Game.core.GameObject, player?: Game.core.ship.PlayerShip | null): void;
+            createBlip(
+              owner: Game.core.GameObject,
+              player?: Game.core.ship.PlayerShip | null,
+            ): void;
             dispose(): void;
             drawBackground(): any;
             drawCenter(): any;
@@ -3583,7 +3621,15 @@ export declare namespace Game {
         }
         namespace shipMenu {
           interface ArtifactSelector extends Game.starling.display.Sprite {
-            createArtifactIcon(index: number, texture: Game.starling.textures.Texture | null, type: string, locked?: boolean, inUse?: boolean, enabled?: boolean, tooltip?: string | null): void;
+            createArtifactIcon(
+              index: number,
+              texture: Game.starling.textures.Texture | null,
+              type: string,
+              locked?: boolean,
+              inUse?: boolean,
+              enabled?: boolean,
+              tooltip?: string | null,
+            ): void;
             dispose(): any;
             g: any;
             icons: any;
@@ -3594,7 +3640,15 @@ export declare namespace Game {
             textureManager: any;
           }
           interface CrewSelector extends Game.starling.display.Sprite {
-            createCrewIcon(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+            createCrewIcon(
+              arg0?: any,
+              arg1?: any,
+              arg2?: any,
+              arg3?: any,
+              arg4?: any,
+              arg5?: any,
+              arg6?: any,
+            ): any;
             dispose(): any;
             g: any;
             icons: any;
@@ -3623,7 +3677,16 @@ export declare namespace Game {
             textureManager: any;
           }
           interface WeaponSelector extends Game.starling.display.Sprite {
-            addWeaponSelectIcon(index: number, texture: Game.starling.textures.Texture | null, type: string, locked?: boolean, inUse?: boolean, enabled?: boolean, caption?: string | null, tooltip?: string | null): void;
+            addWeaponSelectIcon(
+              index: number,
+              texture: Game.starling.textures.Texture | null,
+              type: string,
+              locked?: boolean,
+              inUse?: boolean,
+              enabled?: boolean,
+              caption?: string | null,
+              tooltip?: string | null,
+            ): void;
             dispose(): void;
             g: Game.core.scene.Game;
             icons: Game.core.hud.components.shipMenu.MenuSelectIcon[] | null;
@@ -3786,8 +3849,7 @@ export declare namespace Game {
             set_bought(arg0?: any): any;
             set_selected(arg0?: any): any;
           }
-          interface WarpToFriendRow extends Game.starling.display.Sprite {
-          }
+          interface WarpToFriendRow extends Game.starling.display.Sprite {}
         }
         namespace techTree {
           interface EliteTechBar extends Game.starling.display.Sprite {
@@ -3877,7 +3939,9 @@ export declare namespace Game {
             dispose(): void;
             eliteTechIcon: Game.core.hud.components.techTree.EliteTechIcon | null;
             eti: Game.core.hud.components.techTree.EliteTechIcon | null;
-            getUpgradeByLevel(level: number): Game.core.hud.components.techTree.TechLevelIcon | null;
+            getUpgradeByLevel(
+              level: number,
+            ): Game.core.hud.components.techTree.TechLevelIcon | null;
             maxLevel: any;
             me: any;
             reset(): any;
@@ -4004,8 +4068,7 @@ export declare namespace Game {
           interface CheckBox extends Game.core.hud.components.ui.PressButton {
             onTriggered(): any;
           }
-          interface DomOverlay extends HaxeObject {
-          }
+          interface DomOverlay extends HaxeObject {}
           interface ItemList extends Game.starling.display.Sprite {
             border: any;
             dataProvider: any;
@@ -4243,6 +4306,7 @@ export declare namespace Game {
             get_text(): string;
             get_width(): number;
             getDisplayedSkin(): any;
+            isAutofilled(): any;
             maxChars: number;
             onAdded(arg0?: any): any;
             onFrame(arg0?: any): any;
@@ -4262,7 +4326,9 @@ export declare namespace Game {
             set_paddingLeft(value: number): number;
             set_restrict(value: string | null): string | null;
             set_text(value: string): string;
-            set_textFormat(value: Game.openfl.text.TextFormat | null): Game.openfl.text.TextFormat | null;
+            set_textFormat(
+              value: Game.openfl.text.TextFormat | null,
+            ): Game.openfl.text.TextFormat | null;
             set_width(arg0?: any): any;
             setBackground(skin: Game.starling.display.DisplayObject): void;
             setFocus(): void;
@@ -4272,6 +4338,7 @@ export declare namespace Game {
             skins: any;
             textFormat: Game.openfl.text.TextFormat | null;
             updatePlacement(): boolean;
+            useAsLoginField(arg0?: any): any;
             viewHeight: any;
             viewWidth: any;
           }
@@ -4284,8 +4351,7 @@ export declare namespace Game {
             set_label(arg0?: any): any;
             showSkin(): void;
           }
-          interface UiLook extends HaxeObject {
-          }
+          interface UiLook extends HaxeObject {}
           interface WrapText extends Game.starling.display.Sprite {
             background: any;
             backgroundMinHeight: any;
@@ -4413,8 +4479,7 @@ export declare namespace Game {
         updateRecommended(): any;
         updateTotalFree(): any;
       }
-      interface Username extends HaxeObject {
-      }
+      interface Username extends HaxeObject {}
     }
     namespace missions {
       interface DailyManager extends HaxeObject {
@@ -4448,7 +4513,10 @@ export declare namespace Game {
         isIntro: boolean;
         keepBackgroundCovered(): any;
         lastAdjustment: any;
-        load(system: { background: string; x: number; y: number; galaxy: string }, callback?: (() => void) | null): void;
+        load(
+          system: { background: string; x: number; y: number; galaxy: string },
+          callback?: (() => void) | null,
+        ): void;
         loadData(arg0?: any, arg1?: any): any;
         miniDusts: Game.starling.display.Image[];
         miniStars: Game.starling.display.Image[];
@@ -4487,8 +4555,7 @@ export declare namespace Game {
         markUpdated(): void;
         remove(arg0?: any): any;
       }
-      interface EffectConst extends HaxeObject {
-      }
+      interface EffectConst extends HaxeObject {}
       interface Emitter extends HaxeObject {
         _duration: number;
         _finishColor: number;
@@ -4507,7 +4574,11 @@ export declare namespace Game {
         canvasTarget: Game.starling.display.Sprite | null;
         centralGravity: boolean;
         changeHue(arg0?: any): any;
-        collectiveMeshBatch: (Game.starling.display.MeshBatch & { remove(emitter: Game.core.particle.Emitter): void }) | null;
+        collectiveMeshBatch:
+          | (Game.starling.display.MeshBatch & {
+              remove(emitter: Game.core.particle.Emitter): void;
+            })
+          | null;
         delay: number;
         dispose(): void;
         distanceToCamera: number;
@@ -4593,8 +4664,7 @@ export declare namespace Game {
         xOffset: number;
         yOffset: number;
       }
-      interface EmitterFactory extends HaxeObject {
-      }
+      interface EmitterFactory extends HaxeObject {}
       interface EmitterManager extends HaxeObject {
         clean(target: Game.core.GameObject): void;
         dispose(): void;
@@ -4671,8 +4741,7 @@ export declare namespace Game {
         trainingEnd: any;
         trainingType: any;
       }
-      interface EliteTechs extends HaxeObject {
-      }
+      interface EliteTechs extends HaxeObject {}
       interface EliteTechSkill extends HaxeObject {
         eliteTech: any;
         eliteTechLevel: any;
@@ -4780,6 +4849,7 @@ export declare namespace Game {
         clanLogo: Game.starling.display.Image | null;
         clanLogoColor: number;
         clanName: string;
+        clanNameKey: any;
         clanRankName: string;
         completedMissions: any;
         compressorLevel: number;
@@ -4870,7 +4940,11 @@ export declare namespace Game {
         lastBody: any;
         leaveBody(): any;
         levelUp(): any;
-        loadArtifactsFromMessage(message: Game.playerio.Message, index: number, isLoot?: boolean): number;
+        loadArtifactsFromMessage(
+          message: Game.playerio.Message,
+          index: number,
+          isLoot?: boolean,
+        ): number;
         loadCourse(arg0?: any): any;
         loadShip(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         megaPackage: any;
@@ -5150,15 +5224,23 @@ export declare namespace Game {
         waveFrequency: any;
         weapon: Game.core.weapon.Weapon | null;
       }
-      interface ProjectileFactory extends HaxeObject {
-      }
+      interface ProjectileFactory extends HaxeObject {}
       interface ProjectileManager extends HaxeObject {
         activateProjectile(projectile: Game.core.projectile.Projectile): void;
         addEnemyProjectile(message: Game.playerio.Message): void;
         addInitProjectiles(arg0?: any, arg1?: any, arg2?: any): any;
         addMessageHandlers(): any;
         addPlayerProjectile(message: Game.playerio.Message): void;
-        createSetProjectile(projectile: Game.core.projectile.Projectile | null, id: number, unit: Game.core.unit.Unit, heading: Game.movement.Heading, index: number, offsetX?: number, offsetY?: number, speed?: number): void;
+        createSetProjectile(
+          projectile: Game.core.projectile.Projectile | null,
+          id: number,
+          unit: Game.core.unit.Unit,
+          heading: Game.movement.Heading,
+          index: number,
+          offsetX?: number,
+          offsetY?: number,
+          speed?: number,
+        ): void;
         dispose(): void;
         forceUpdate(): any;
         g: Game.core.scene.Game;
@@ -5272,6 +5354,7 @@ export declare namespace Game {
         m_sdf(arg0?: any): any;
         messageLog: Game.core.hud.components.chat.MessageLog | null;
         messagePackHandler: any;
+        mobileHud: any;
         nextSync: number;
         noAutoReconnect: boolean;
         onInitDrops(arg0?: any): any;
@@ -5291,7 +5374,9 @@ export declare namespace Game {
         quality: any;
         qualityText: any;
         queueManager: Game.core.queue.QueueManager | null;
+        rejoinAfterIdle(): any;
         reload(): void;
+        reloadPage(): any;
         resize(arg0?: any): any;
         respawned(): any;
         ribbonTrailPool: any;
@@ -5308,7 +5393,12 @@ export declare namespace Game {
         showModalLoadingScreen(arg0?: any): any;
         showQuality(): any;
         softDisconnect(arg0?: any): any;
-        solarSystem: { key: string; name: string; type: string; isPvpSystemInEditor?: boolean } | null;
+        solarSystem: {
+          key: string;
+          name: string;
+          type: string;
+          isPvpSystemInEditor?: boolean;
+        } | null;
         solarSystemData: any;
         spawnManager: Game.core.spawner.SpawnManager;
         startSystemMusic(): any;
@@ -5320,6 +5410,7 @@ export declare namespace Game {
         tickUpdate(): void;
         toggleHighGraphics(arg0?: any): any;
         totalTime: any;
+        touchControls: any;
         trackFPS(): any;
         trackServerEvent(arg0?: any): any;
         tryEnterIntro(): any;
@@ -5357,7 +5448,10 @@ export declare namespace Game {
         addChildToOverlayAt(arg0?: any, arg1?: any): any;
         addMessageHandler(type: string, callback: (message: Game.playerio.Message) => void): void;
         addResizeListener(arg0?: any): any;
-        addServiceMessageHandler(type: string, callback: (message: Game.playerio.Message) => void): void;
+        addServiceMessageHandler(
+          type: string,
+          callback: (message: Game.playerio.Message) => void,
+        ): void;
         addToCanvasLayer(arg0?: any, arg1?: any): any;
         anyMessage(arg0?: any): any;
         blockHotkeys: boolean;
@@ -5402,6 +5496,7 @@ export declare namespace Game {
         errorFromServer(message: Game.playerio.Message): void;
         execute(): any;
         exit(): any;
+        fitOverlayToScreen(): any;
         get_connected(): boolean;
         get_isLeaving(): boolean;
         getServerTime(): any;
@@ -5422,7 +5517,11 @@ export declare namespace Game {
         isSystemTypeSurvival(): boolean;
         joined(arg0?: any): any;
         joinReady(): void;
-        layersInfo: { name: string; instance: Game.starling.display.DisplayObject; ratio: number }[];
+        layersInfo: {
+          name: string;
+          instance: Game.starling.display.DisplayObject;
+          ratio: number;
+        }[];
         menu: any;
         message(message: Game.playerio.Message): void;
         messageCounter: any;
@@ -5439,18 +5538,38 @@ export declare namespace Game {
         removeChildFromMenu(arg0?: any, arg1?: any): any;
         removeChildFromOverlay(child: Game.starling.display.DisplayObject, dispose?: boolean): void;
         removeFromCanvasLayer(arg0?: any, arg1?: any): any;
-        removeMessageHandler(type: string, callback: (message: Game.playerio.Message) => void): void;
+        removeMessageHandler(
+          type: string,
+          callback: (message: Game.playerio.Message) => void,
+        ): void;
         removeResizeListener(arg0?: any): any;
-        removeServiceMessageHandler(type: string, callback: (message: Game.playerio.Message) => void): void;
+        removeServiceMessageHandler(
+          type: string,
+          callback: (message: Game.playerio.Message) => void,
+        ): void;
         replaceServiceConnection(connection: Game.playerio.Connection): void;
         resize(arg0?: any): any;
         resizeCallbacks: any;
         room: Game.joinRoom.Room;
         roomId: any;
-        rpc(type: string, callback: (message: Game.playerio.Message) => void, values?: (string | number | boolean | Uint8Array)[]): void;
-        rpcMessage(message: Game.playerio.Message, callback: (response: Game.playerio.Message) => void): void;
-        rpcServiceMessage(message: Game.playerio.Message, callback: (response: Game.playerio.Message) => void): () => void;
-        rpcServiceRoom(type: string, callback: (message: Game.playerio.Message) => void, values?: (string | number | boolean | Uint8Array)[]): void;
+        rpc(
+          type: string,
+          callback: (message: Game.playerio.Message) => void,
+          values?: (string | number | boolean | Uint8Array)[],
+        ): void;
+        rpcMessage(
+          message: Game.playerio.Message,
+          callback: (response: Game.playerio.Message) => void,
+        ): void;
+        rpcServiceMessage(
+          message: Game.playerio.Message,
+          callback: (response: Game.playerio.Message) => void,
+        ): () => void;
+        rpcServiceRoom(
+          type: string,
+          callback: (message: Game.playerio.Message) => void,
+          values?: (string | number | boolean | Uint8Array)[],
+        ): void;
         send(arg0?: any, arg1?: any): any;
         sendMessage(message: Game.playerio.Message): void;
         sendMessageToServiceRoom(message: Game.playerio.Message): void;
@@ -5712,14 +5831,26 @@ export declare namespace Game {
         weaponPos: any;
         weapons: Game.core.weapon.Weapon[];
       }
-      interface ShipFactory extends HaxeObject {
-      }
+      interface ShipFactory extends HaxeObject {}
       interface ShipManager extends HaxeObject {
         activateEnemyShip(arg0?: any): any;
         activatePlayerShip(arg0?: any): any;
         addEarlyMessageHandlers(): any;
         addMessageHandlers(): any;
-        createSetEnemy(enemy: Game.core.ship.EnemyShip, id: number, heading: Game.movement.Heading, count: number, time: number, spawner: Game.core.spawner.Spawner | null, orbitAngle: number, orbitRadius: number, ellipseAlpha: number, ellipseFactor: number, angleVelocity: number, hardenedShield?: boolean): void;
+        createSetEnemy(
+          enemy: Game.core.ship.EnemyShip,
+          id: number,
+          heading: Game.movement.Heading,
+          count: number,
+          time: number,
+          spawner: Game.core.spawner.Spawner | null,
+          orbitAngle: number,
+          orbitRadius: number,
+          ellipseAlpha: number,
+          ellipseFactor: number,
+          angleVelocity: number,
+          hardenedShield?: boolean,
+        ): void;
         damaged(message: Game.playerio.Message, start: number): void;
         dispose(): any;
         enemies: Game.core.ship.EnemyShip[];
@@ -5769,8 +5900,7 @@ export declare namespace Game {
       }
     }
     namespace solarSystem {
-      interface Area extends HaxeObject {
-      }
+      interface Area extends HaxeObject {}
       interface Body extends Game.core.GameObject {
         addChild(arg0?: any): any;
         addChildren(arg0?: any): any;
@@ -5786,7 +5916,12 @@ export declare namespace Game {
         controlZoneGrabRewardFactor: any;
         controlZoneTimeFactor: any;
         course: any;
-        createSpawner(definition: object, key: string, parent: Game.core.solarSystem.Body, count: number): void;
+        createSpawner(
+          definition: object,
+          key: string,
+          parent: Game.core.solarSystem.Body,
+          count: number,
+        ): void;
         currentRandom: any;
         currentStep: any;
         dataManager: Game.data.IDataManager;
@@ -5861,8 +5996,7 @@ export declare namespace Game {
         warningRadius: any;
         wpArray: any;
       }
-      interface BodyFactory extends HaxeObject {
-      }
+      interface BodyFactory extends HaxeObject {}
       interface BodyHeading extends HaxeObject {
         angle: any;
         body: any;
@@ -5941,8 +6075,7 @@ export declare namespace Game {
         update(): any;
         updatePos(arg0?: any): any;
       }
-      interface SpawnFactory extends HaxeObject {
-      }
+      interface SpawnFactory extends HaxeObject {}
       interface SpawnManager extends HaxeObject {
         addEarlyMessageHandlers(): any;
         addMessageHandlers(): any;
@@ -5984,7 +6117,9 @@ export declare namespace Game {
       interface DisplayStateMachine extends HaxeObject {
         changeState(arg0?: any): any;
         currentState: any;
-        inState(state: Pick<HaxeClass<Game.core.states.DisplayState>, 'prototype' | '__name__'>): boolean;
+        inState(
+          state: Pick<HaxeClass<Game.core.states.DisplayState>, 'prototype' | '__name__'>,
+        ): boolean;
         parent: Game.starling.display.DisplayObjectContainer;
         previousState: any;
         revertState(): void;
@@ -6217,8 +6352,7 @@ export declare namespace Game {
           sm: any;
           target: any;
         }
-        interface AIStateFactory extends HaxeObject {
-        }
+        interface AIStateFactory extends HaxeObject {}
         interface AITeleport extends HaxeObject {
           duration: any;
           emitters1: any;
@@ -6441,8 +6575,7 @@ export declare namespace Game {
         }
       }
       namespace exploreStates {
-        interface ControlTime extends Game.starling.display.Sprite {
-        }
+        interface ControlTime extends Game.starling.display.Sprite {}
         interface ControlZoneState extends Game.core.states.DisplayState {
           _exploring: any;
           addPlanetData(): any;
@@ -6513,7 +6646,11 @@ export declare namespace Game {
         }
         interface ReportState extends Game.core.states.DisplayState {
           area: any;
-          createArtifactFunction(count: number, index: number, id: string): (artifact: Game.core.artifact.Artifact | null) => void;
+          createArtifactFunction(
+            count: number,
+            index: number,
+            id: string,
+          ): (artifact: Game.core.artifact.Artifact | null) => void;
           crewMembers: any;
           crewStepContainers: any;
           crewTweens: any;
@@ -6642,9 +6779,14 @@ export declare namespace Game {
           execute(): any;
           exit(arg0?: any): any;
           hyperDriveEngaged: any;
+          layout(arg0?: any): any;
           onAnimationFinished(arg0?: any): any;
           overlay: any;
           ship: any;
+          skip(): any;
+          skipButton: any;
+          skipText: any;
+          startsText: any;
           startX: any;
           startY: any;
           stf: any;
@@ -6750,6 +6892,7 @@ export declare namespace Game {
           execute(): void;
           exit(arg0?: any): any;
           fitStationName(arg0?: any): any;
+          fitToScreen(): any;
           fleetButton: any;
           hideMenu(): void;
           input: Game.io.InputManager;
@@ -6872,6 +7015,7 @@ export declare namespace Game {
           execute(): void;
           exit(completed: () => void): void;
           fireWithHotkeys: boolean;
+          fitMenuToScreen(arg0?: any, arg1?: any): any;
           handleDeathlines(): any;
           handleTurn(): void;
           handleWeaponFire(): void;
@@ -6879,9 +7023,11 @@ export declare namespace Game {
           isInHostileZone: any;
           loadCompleted(): void;
           mouseAimLastSendTime: any;
+          nextSafeZoneNotice: any;
           resize(arg0?: any): any;
           sendCommand(type: number, active: boolean): void;
           soundManager: any;
+          steerToward(arg0?: any): any;
           textureManager: any;
           tickUpdate(): any;
           updateCommands(): void;
@@ -7196,12 +7342,10 @@ export declare namespace Game {
             redrawParentList(): any;
             removeAndRedrawList(): any;
             reputation(): any;
-            rewardArrived(arg0?: any): any;
             ship(): any;
             spawner(): any;
             textureManager: any;
             timeLeft: any;
-            transferItemToCargo(arg0?: any): any;
             transport(): any;
             tryCollectReward(arg0?: any): any;
             tween: any;
@@ -7449,7 +7593,16 @@ export declare namespace Game {
         setCourse(heading: Game.movement.Heading, fastforward?: boolean): void;
         setNextTurnDirection(arg0?: any): any;
         ship: Game.core.ship.Ship;
-        startBlend(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any): any;
+        startBlend(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+          arg7?: any,
+        ): any;
         target: Game.movement.Heading | null;
         updateHeading(heading: Game.movement.Heading): void;
         velFactorAt(arg0?: any): any;
@@ -7463,7 +7616,17 @@ export declare namespace Game {
     }
     namespace text {
       interface TextHandler extends HaxeObject {
-        add(text: string, position: Game.openfl.geom.Point, speed: Game.openfl.geom.Point, ttl?: number, color?: number, size?: number, fixed?: boolean, alignment?: string, blendMode?: string): Game.core.text.TextParticle;
+        add(
+          text: string,
+          position: Game.openfl.geom.Point,
+          speed: Game.openfl.geom.Point,
+          ttl?: number,
+          color?: number,
+          size?: number,
+          fixed?: boolean,
+          alignment?: string,
+          blendMode?: string,
+        ): Game.core.text.TextParticle;
         dispose(): void;
         g: Game.core.scene.Game | null;
         inactiveTexts: Game.core.text.TextParticle[] | null;
@@ -7491,6 +7654,7 @@ export declare namespace Game {
         createMissionFinishedText(): any;
         createMissionUpdateText(arg0?: any, arg1?: any): any;
         createNewMissionArrivedText(): any;
+        createNoticeText(arg0?: any, arg1?: any, arg2?: any): any;
         createPvpText(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         createReputationText(arg0?: any, arg1?: any): any;
         createScoreText(arg0?: any): any;
@@ -7560,8 +7724,7 @@ export declare namespace Game {
         weapon: Game.core.weapon.Weapon | null;
         weaponPos: any;
       }
-      interface TurretFactory extends HaxeObject {
-      }
+      interface TurretFactory extends HaxeObject {}
       interface TurretManager extends HaxeObject {
         addEarlyMessageHandlers(): any;
         addMessageHandlers(): any;
@@ -7569,7 +7732,10 @@ export declare namespace Game {
         g: Game.core.scene.Game;
         getTurret(): Game.core.turret.Turret;
         getTurretById(id: number, silent?: boolean): Game.core.turret.Turret | null;
-        getTurretsByParentAndSyncId(parentId: number, syncId: number): Game.core.turret.Turret | null;
+        getTurretsByParentAndSyncId(
+          parentId: number,
+          syncId: number,
+        ): Game.core.turret.Turret | null;
         killed(arg0?: any, arg1?: any): any;
         onTurretUpdate(message: Game.playerio.Message): void;
         removeTurret(turret: Game.core.turret.Turret): void;
@@ -7661,7 +7827,10 @@ export declare namespace Game {
         armorThreshold: any;
         armorThresholdBase: any;
         barMaxWidth: any;
-        canBeDamage(attacker: Game.core.unit.Unit, projectile: Game.core.projectile.Projectile): boolean;
+        canBeDamage(
+          attacker: Game.core.unit.Unit,
+          projectile: Game.core.projectile.Projectile,
+        ): boolean;
         collisionRadius: number;
         damageFilter: any;
         damageFlash(arg0?: any, arg1?: any, arg2?: any): any;
@@ -7760,7 +7929,11 @@ export declare namespace Game {
         xp: any;
       }
       interface UnitManager extends HaxeObject {
-        add(unit: Game.core.unit.Unit, canvas: Game.starling.display.Sprite, addToRadar?: boolean): void;
+        add(
+          unit: Game.core.unit.Unit,
+          canvas: Game.starling.display.Sprite,
+          addToRadar?: boolean,
+        ): void;
         forceUpdate(): any;
         g: any;
         getTarget(id: number): Game.core.unit.Unit | null;
@@ -7784,7 +7957,12 @@ export declare namespace Game {
         destroy(): void;
         draw(): any;
         drawBeam: boolean;
-        drawBeamEffect(index: number, start: import('../weapon/PhaseBladeMounts').RenderPoint, end: import('../weapon/PhaseBladeMounts').RenderPoint, strands: number): number;
+        drawBeamEffect(
+          index: number,
+          start: import('../weapon/PhaseBladeMounts').RenderPoint,
+          end: import('../weapon/PhaseBladeMounts').RenderPoint,
+          strands: number,
+        ): number;
         effectsInitialized: boolean;
         endEffect: Game.core.particle.Emitter[];
         endPos: Game.openfl.geom.Point;
@@ -7836,8 +8014,7 @@ export declare namespace Game {
         setBaseDmg(arg0?: any): any;
         type: number;
       }
-      interface Debuff extends HaxeObject {
-      }
+      interface Debuff extends HaxeObject {}
       interface Heat extends HaxeObject {
         _current: any;
         _lastUpdate: any;
@@ -7869,7 +8046,16 @@ export declare namespace Game {
       interface ProjectileGun extends Game.core.weapon.Weapon {
         onChargeReleased(): any;
         shoot(): void;
-        shootSyncedProjectile(id: number, target: Game.core.unit.Unit | null, heading: Game.movement.Heading, index: number, time: number, offsetX: number, offsetY: number, speed: number): void;
+        shootSyncedProjectile(
+          id: number,
+          target: Game.core.unit.Unit | null,
+          heading: Game.movement.Heading,
+          index: number,
+          time: number,
+          offsetX: number,
+          offsetY: number,
+          speed: number,
+        ): void;
       }
       interface SmartGun extends Game.core.weapon.Weapon {
         destroy(): any;
@@ -7887,7 +8073,10 @@ export declare namespace Game {
         active: boolean;
         addDebuff(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         addEliteTechStats(arg0?: any, arg1?: any, arg2?: any): any;
-        addTechStats(definition: import('./WeaponTechDefinition').WeaponTechDefinition, level: number): void;
+        addTechStats(
+          definition: import('./WeaponTechDefinition').WeaponTechDefinition,
+          level: number,
+        ): void;
         aim(): any;
         aimArc: any;
         alive: boolean;
@@ -7976,8 +8165,7 @@ export declare namespace Game {
         effect: any;
         type: any;
       }
-      interface WeaponFactory extends HaxeObject {
-      }
+      interface WeaponFactory extends HaxeObject {}
       interface WeaponManager extends HaxeObject {
         g: any;
         getWeapon(kind: string): Game.core.weapon.Weapon;
@@ -7988,8 +8176,7 @@ export declare namespace Game {
     }
   }
   namespace data {
-    interface DataLocator extends HaxeObject {
-    }
+    interface DataLocator extends HaxeObject {}
     interface DataManager extends Game.starling.display.Sprite {
       _artifacts: any;
       _client: any;
@@ -7999,9 +8186,32 @@ export declare namespace Game {
       IsNullOrEmpty(arg0?: any): any;
       json: Record<string, import('../data/RangeIndex').DataTable>;
       loadFirstByProperty(arg0?: any, arg1?: any, arg2?: any): any;
-      loadKey: { (table: "SolarSystems", key: string): { name: string; pvpLvlCap: number; background: string; x: number; y: number; galaxy: string } | null; (table: "Images", key: string): { fileName: string; textureName: string } | null; (table: "Effects", key: string): import('./EffectSequence').EffectSequence | null; (table: "Projectiles", key: string): import('./ProjectileAISettings').ProjectileAISettings | null; (table: string, key: string): unknown; };
+      loadKey: {
+        (
+          table: 'SolarSystems',
+          key: string,
+        ): {
+          name: string;
+          pvpLvlCap: number;
+          background: string;
+          x: number;
+          y: number;
+          galaxy: string;
+        } | null;
+        (table: 'Images', key: string): { fileName: string; textureName: string } | null;
+        (table: 'Effects', key: string): import('./EffectSequence').EffectSequence | null;
+        (
+          table: 'Projectiles',
+          key: string,
+        ): import('./ProjectileAISettings').ProjectileAISettings | null;
+        (table: string, key: string): unknown;
+      };
       loadKeys(arg0?: any, arg1?: any): any;
-      loadRange(table: string, field: string, value: string): import('../data/RangeIndex').DataTable | null;
+      loadRange(
+        table: string,
+        field: string,
+        value: string,
+      ): import('../data/RangeIndex').DataTable | null;
       loadTable(arg0?: any): any;
       setClient(arg0?: any): any;
     }
@@ -8009,7 +8219,26 @@ export declare namespace Game {
       cacheCommonData: () => void;
       getArtifacts: any;
       loadFirstByProperty: any;
-      loadKey: { (table: "SolarSystems", key: string): { name: string; pvpLvlCap: number; background: string; x: number; y: number; galaxy: string } | null; (table: "Images", key: string): { fileName: string; textureName: string } | null; (table: "Effects", key: string): import('./EffectSequence').EffectSequence | null; (table: "Projectiles", key: string): import('./ProjectileAISettings').ProjectileAISettings | null; (table: string, key: string): unknown; };
+      loadKey: {
+        (
+          table: 'SolarSystems',
+          key: string,
+        ): {
+          name: string;
+          pvpLvlCap: number;
+          background: string;
+          x: number;
+          y: number;
+          galaxy: string;
+        } | null;
+        (table: 'Images', key: string): { fileName: string; textureName: string } | null;
+        (table: 'Effects', key: string): import('./EffectSequence').EffectSequence | null;
+        (
+          table: 'Projectiles',
+          key: string,
+        ): import('./ProjectileAISettings').ProjectileAISettings | null;
+        (table: string, key: string): unknown;
+      };
       loadKeys: any;
       loadRange: any;
       loadTable: any;
@@ -8090,8 +8319,7 @@ export declare namespace Game {
       setPlayerValues(arg0?: any): any;
       soundManager: any;
     }
-    interface Table extends HaxeObject {
-    }
+    interface Table extends HaxeObject {}
   }
   namespace debug {
     interface Console extends Game.starling.display.Sprite {
@@ -8178,13 +8406,34 @@ export declare namespace Game {
       updatevertexData(): any;
     }
   }
+  namespace game {
+    interface ArtifactActions extends HaxeObject {}
+    interface CargoActions extends HaxeObject {}
+    interface ClanActions extends HaxeObject {}
+    interface CrewActions extends HaxeObject {}
+    interface EncounterInfo extends HaxeObject {}
+    interface ExploreLogic extends HaxeObject {}
+    interface LeaderboardData extends HaxeObject {}
+    interface MissionActions extends HaxeObject {}
+    interface MissionBriefs extends HaxeObject {}
+    interface PlanetInfo extends HaxeObject {}
+    interface PlayerStats extends HaxeObject {}
+    interface PodActions extends HaxeObject {}
+    interface Purchases extends HaxeObject {}
+    interface PvpActions extends HaxeObject {}
+    interface SaleList extends HaxeObject {}
+    interface ShipActions extends HaxeObject {}
+    interface SlotUnlock extends HaxeObject {}
+    interface SocialActions extends HaxeObject {}
+    interface StationActions extends HaxeObject {}
+    interface TechActions extends HaxeObject {}
+    interface TechInfo extends HaxeObject {}
+    interface WarpPlanner extends HaxeObject {}
+  }
   namespace generics {
-    interface ArrayCompat extends HaxeObject {
-    }
-    interface Color extends HaxeObject {
-    }
-    interface GUID extends HaxeObject {
-    }
+    interface ArrayCompat extends HaxeObject {}
+    interface Color extends HaxeObject {}
+    interface GUID extends HaxeObject {}
     interface List extends HaxeObject {
       _list: any;
       add(arg0?: any): any;
@@ -8192,20 +8441,16 @@ export declare namespace Game {
       length: any;
       remove(arg0?: any): any;
     }
-    interface Localize extends HaxeObject {
-    }
-    interface ObjUtils extends HaxeObject {
-    }
-    interface PaymentWindow extends HaxeObject {
-    }
+    interface Localize extends HaxeObject {}
+    interface ObjUtils extends HaxeObject {}
+    interface PaymentWindow extends HaxeObject {}
     interface Random extends HaxeObject {
       r: any;
       random(arg0?: any): any;
       randomNumber(): any;
       stepTo(arg0?: any): any;
     }
-    interface Util extends HaxeObject {
-    }
+    interface Util extends HaxeObject {}
   }
   namespace haxe {
     interface Exception extends HaxeObject {
@@ -8232,10 +8477,8 @@ export declare namespace Game {
       remove: any;
       set: any;
     }
-    interface Log extends HaxeObject {
-    }
-    interface NativeStackTrace extends HaxeObject {
-    }
+    interface Log extends HaxeObject {}
+    interface NativeStackTrace extends HaxeObject {}
     interface Serializer extends HaxeObject {
       buf: any;
       cache: any;
@@ -8295,8 +8538,7 @@ export declare namespace Game {
         equals(arg0?: any): any;
         update(arg0?: any, arg1?: any, arg2?: any): any;
       }
-      interface Base64 extends HaxeObject {
-      }
+      interface Base64 extends HaxeObject {}
       interface BaseCode extends HaxeObject {
         base: any;
         decodeBytes(arg0?: any): any;
@@ -8306,8 +8548,7 @@ export declare namespace Game {
       }
     }
     namespace ds {
-      interface ArraySort extends HaxeObject {
-      }
+      interface ArraySort extends HaxeObject {}
       interface BalancedTree extends HaxeObject {
         balance(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         compare(arg0?: any, arg1?: any): any;
@@ -8420,8 +8661,7 @@ export declare namespace Game {
       }
     }
     namespace exceptions {
-      interface NotImplementedException extends Game.haxe.exceptions.PosException {
-      }
+      interface NotImplementedException extends Game.haxe.exceptions.PosException {}
       interface PosException extends Game.haxe.Exception {
         posInfos: any;
         toString(): any;
@@ -8471,8 +8711,7 @@ export declare namespace Game {
       interface Eof extends HaxeObject {
         toString(): any;
       }
-      interface FPHelper extends HaxeObject {
-      }
+      interface FPHelper extends HaxeObject {}
       interface Input extends HaxeObject {
         bigEndian: any;
         read(arg0?: any): any;
@@ -8535,8 +8774,7 @@ export declare namespace Game {
       }
     }
     namespace xml {
-      interface Parser extends HaxeObject {
-      }
+      interface Parser extends HaxeObject {}
       interface Printer extends HaxeObject {
         hasChildren(arg0?: any): any;
         output: any;
@@ -8613,6 +8851,8 @@ export declare namespace Game {
     }
   }
   namespace io {
+    interface Device extends HaxeObject {}
+    interface Fullscreen extends HaxeObject {}
     interface IInput extends HaxeObject {
       consumeKey: any;
       dispose: any;
@@ -8630,8 +8870,7 @@ export declare namespace Game {
       reset: any;
       stopListenToKeys: any;
     }
-    interface InputLocator extends HaxeObject {
-    }
+    interface InputLocator extends HaxeObject {}
     interface InputManager extends HaxeObject {
       _isMousePressed: boolean;
       _isRightMousePressed: any;
@@ -8671,6 +8910,155 @@ export declare namespace Game {
       stage: any;
       stopListenToKeys(arg0?: any): any;
     }
+    interface OverlayFit extends HaxeObject {}
+    interface TouchArt extends HaxeObject {}
+    interface TouchControls extends Game.starling.display.Sprite {
+      addButton(
+        arg0?: any,
+        arg1?: any,
+        arg2?: any,
+        arg3?: any,
+        arg4?: any,
+        arg5?: any,
+        arg6?: any,
+      ): any;
+      addCooldown(arg0?: any): any;
+      addIcon(arg0?: any, arg1?: any): any;
+      autoFireUntil: any;
+      beginStick(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
+      beginTouch(arg0?: any): any;
+      blurListener: any;
+      buildDpad(arg0?: any): any;
+      buildLayout(): any;
+      buildSignature(): any;
+      buildStick(arg0?: any): any;
+      buttonAt(arg0?: any, arg1?: any): any;
+      buttonDown(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
+      buttonLayer: any;
+      buttonMove(arg0?: any, arg1?: any, arg2?: any): any;
+      buttons: any;
+      buttonUp(arg0?: any): any;
+      cruiseButton: any;
+      currentHotkeys(): any;
+      dispose(): any;
+      dpadArrows: any;
+      dpadLayer: any;
+      dpadTouch: any;
+      dpadX: any;
+      dpadY: any;
+      drawWipe(arg0?: any, arg1?: any, arg2?: any): any;
+      endDpad(): any;
+      endStick(): any;
+      endTouch(arg0?: any): any;
+      fireButton: any;
+      fireDownY: any;
+      fireHeld: any;
+      fireLocked: any;
+      fireUnlockTap: any;
+      fitIcon(arg0?: any, arg1?: any): any;
+      freeTouches: any;
+      g: any;
+      hasTargetInAim(): any;
+      hitTest(arg0?: any): any;
+      hotkeysChanged(): any;
+      inDpad(arg0?: any, arg1?: any): any;
+      inFixedStick(arg0?: any, arg1?: any): any;
+      inStickZone(arg0?: any, arg1?: any): any;
+      isSteeringHeld(): any;
+      landButton: any;
+      lastFireUpTime: any;
+      lastFireWasShort: any;
+      layoutHeight: any;
+      layoutHotkeys: any;
+      layoutSignature: any;
+      layoutWidth: any;
+      makeLabel(arg0?: any, arg1?: any, arg2?: any): any;
+      moveDpad(arg0?: any, arg1?: any): any;
+      moveStick(arg0?: any, arg1?: any): any;
+      moveTouch(arg0?: any): any;
+      onDeviceChange(): any;
+      onStageTouch(arg0?: any): any;
+      openSettings(): any;
+      pinchStartDistance: any;
+      pinchStartZoom: any;
+      placeStickHome(): any;
+      releaseAll(): any;
+      releaseAllTouches(): any;
+      scaleNow: any;
+      setHudHotkeysVisible(arg0?: any): any;
+      settingsPanel: any;
+      shown: any;
+      stageRef: any;
+      startPinchIfTwo(): any;
+      steerOnly: any;
+      stickAngle: any;
+      stickBase: any;
+      stickCenterX: any;
+      stickCenterY: any;
+      stickHomeX: any;
+      stickHomeY: any;
+      stickKnob: any;
+      stickLayer: any;
+      stickThrust: any;
+      stickTouch: any;
+      topBand(): any;
+      update(): any;
+      updateButton(arg0?: any, arg1?: any, arg2?: any): any;
+      updateFire(arg0?: any, arg1?: any): any;
+      updatePinch(): any;
+      wantShown(): any;
+    }
+    interface TouchSettings extends HaxeObject {}
+    interface TouchSettingsPanel extends Game.starling.display.Sprite {
+      addChoice(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
+      addLabel(arg0?: any, arg1?: any): any;
+      addStepper(
+        arg0?: any,
+        arg1?: any,
+        arg2?: any,
+        arg3?: any,
+        arg4?: any,
+        arg5?: any,
+        arg6?: any,
+      ): any;
+      addTitle(arg0?: any, arg1?: any): any;
+      box: any;
+      boxHeight: any;
+      boxWidth: any;
+      close(): any;
+      dim: any;
+      g: any;
+      makeButton(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
+      onClose: any;
+      refreshers: any;
+      resize(arg0?: any): any;
+    }
+    interface VirtualInput extends HaxeObject {}
+    namespace _TouchControls {
+      interface TouchButton extends HaxeObject {
+        action: any;
+        badge: any;
+        bg: any;
+        countdown: any;
+        downTime: any;
+        flashUntil: any;
+        halfWidth: any;
+        hotkey: any;
+        icon: any;
+        kind: any;
+        label: any;
+        radius: any;
+        ring: any;
+        shown: any;
+        slot: any;
+        touchId: any;
+        view: any;
+        wipe: any;
+        wipeFraction: any;
+        x: any;
+        y: any;
+      }
+    }
   }
   namespace joinRoom {
     interface IJoinRoomManager extends HaxeObject {
@@ -8683,8 +9071,7 @@ export declare namespace Game {
       set_desiredSystemType: any;
       tryWarpJumpToFriend: any;
     }
-    interface JoinRoomLocator extends HaxeObject {
-    }
+    interface JoinRoomLocator extends HaxeObject {}
     interface JoinRoomManager extends Game.starling.events.EventDispatcher {
       _desiredRoomId: string | null;
       _desiredSystemType: string;
@@ -8703,26 +9090,48 @@ export declare namespace Game {
       inited: boolean;
       joinCurrentSolarSystem(): void;
       joinData: Record<string, string | number | boolean | null>;
-      joinGame(solarSystem: string, joinData: Record<string, string | number | boolean | null>): void;
+      joinGame(
+        solarSystem: string,
+        joinData: Record<string, string | number | boolean | null>,
+      ): void;
       joinServiceRoom(roomId: string): void;
       joinServiceRoomAttempt(roomId: string, retry: number): void;
       login: Game.Login;
       onJoinedServiceRoom(message: Game.playerio.Message): void;
       playerInfo: Partial<ServicePlayerInfo>;
-      reconnectServiceRoom(roomId: string, success: (connection: Game.playerio.Connection) => void, failure: (reason?: string, retryable?: boolean) => void): void;
+      reconnectServiceRoom(
+        roomId: string,
+        success: (connection: Game.playerio.Connection) => void,
+        failure: (reason?: string, retryable?: boolean) => void,
+      ): void;
       room: Game.joinRoom.Room;
       roomStateMachine: Game.core.states.SceneStateMachine;
-      rpcServiceRoom(type: string, callback: (message: Game.playerio.Message) => void, ...values: (string | number | boolean | Uint8Array)[]): void;
+      rpcServiceRoom(
+        type: string,
+        callback: (message: Game.playerio.Message) => void,
+        ...values: (string | number | boolean | Uint8Array)[]
+      ): void;
       serviceConnection: Game.playerio.Connection | null;
       servicePingTimer: Game.haxe.Timer | null;
       session: string;
       set_desiredRoomId(id: string | null): string | null;
       set_desiredSystemType(type: string): string;
-      showErrorDialog(message: string, logError?: boolean, error?: Game.playerio.PlayerIOError | null, onClose?: (() => void) | null, disableClose?: boolean): void;
+      showErrorDialog(
+        message: string,
+        logError?: boolean,
+        error?: Game.playerio.PlayerIOError | null,
+        onClose?: (() => void) | null,
+        disableClose?: boolean,
+      ): void;
       stage: Game.starling.display.Stage;
       startServicePing(connection: Game.playerio.Connection): void;
       stopServicePing(): void;
-      tryWarpJumpToFriend(player: Game.core.player.Player, system: string, success: () => void, failure: (message: string) => void): void;
+      tryWarpJumpToFriend(
+        player: Game.core.player.Player,
+        system: string,
+        success: () => void,
+        failure: (message: string) => void,
+      ): void;
     }
     interface Room extends HaxeObject {
       data: Record<string, string | number | boolean | null>;
@@ -8732,14 +9141,11 @@ export declare namespace Game {
     }
   }
   namespace js {
-    interface Boot extends HaxeObject {
-    }
-    interface Browser extends HaxeObject {
-    }
+    interface Boot extends HaxeObject {}
+    interface Browser extends HaxeObject {}
     namespace html {
       namespace _CanvasElement {
-        interface CanvasUtil extends HaxeObject {
-        }
+        interface CanvasUtil extends HaxeObject {}
       }
     }
   }
@@ -8899,27 +9305,18 @@ export declare namespace Game {
           }
         }
         namespace native {
-          interface NativeCFFI extends HaxeObject {
-          }
+          interface NativeCFFI extends HaxeObject {}
         }
       }
       namespace format {
-        interface Base64 extends HaxeObject {
-        }
-        interface BMP extends HaxeObject {
-        }
-        interface Deflate extends HaxeObject {
-        }
-        interface GZip extends HaxeObject {
-        }
-        interface JPEG extends HaxeObject {
-        }
-        interface LZMA extends HaxeObject {
-        }
-        interface PNG extends HaxeObject {
-        }
-        interface Zlib extends HaxeObject {
-        }
+        interface Base64 extends HaxeObject {}
+        interface BMP extends HaxeObject {}
+        interface Deflate extends HaxeObject {}
+        interface GZip extends HaxeObject {}
+        interface JPEG extends HaxeObject {}
+        interface LZMA extends HaxeObject {}
+        interface PNG extends HaxeObject {}
+        interface Zlib extends HaxeObject {}
       }
       namespace graphics {
         interface BlurStack extends HaxeObject {
@@ -8929,12 +9326,9 @@ export declare namespace Game {
           n: any;
           r: any;
         }
-        interface ImageCanvasUtil extends HaxeObject {
-        }
-        interface ImageDataUtil extends HaxeObject {
-        }
-        interface StackBlur extends HaxeObject {
-        }
+        interface ImageCanvasUtil extends HaxeObject {}
+        interface ImageDataUtil extends HaxeObject {}
+        interface StackBlur extends HaxeObject {}
         namespace _ImageDataUtil {
           interface ImageDataView extends HaxeObject {
             byteOffset: any;
@@ -8954,8 +9348,7 @@ export declare namespace Game {
         }
       }
       namespace macros {
-        interface AssetsMacro extends HaxeObject {
-        }
+        interface AssetsMacro extends HaxeObject {}
       }
     }
     namespace app {
@@ -9364,8 +9757,7 @@ export declare namespace Game {
         then(arg0?: any): any;
         value: any;
       }
-      interface IModule extends HaxeObject {
-      }
+      interface IModule extends HaxeObject {}
       interface Module extends HaxeObject {
         onExit: any;
       }
@@ -9402,7 +9794,15 @@ export declare namespace Game {
         getPixel32(arg0?: any, arg1?: any, arg2?: any): any;
         getPixels(arg0?: any, arg1?: any): any;
         height: any;
-        merge(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+        merge(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
         offsetX: any;
         offsetY: any;
         rect: any;
@@ -9417,7 +9817,17 @@ export declare namespace Game {
         setPixel(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         setPixel32(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         setPixels(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
-        threshold(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any): any;
+        threshold(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+          arg7?: any,
+          arg8?: any,
+        ): any;
         type: any;
         version: any;
         width: any;
@@ -9546,8 +9956,7 @@ export declare namespace Game {
         }
       }
       namespace opengl {
-        interface GL extends HaxeObject {
-        }
+        interface GL extends HaxeObject {}
         namespace ext {
           interface KHR_debug extends HaxeObject {
             BUFFER: any;
@@ -9694,8 +10103,7 @@ export declare namespace Game {
         type: any;
         web: any;
       }
-      interface AudioManager extends HaxeObject {
-      }
+      interface AudioManager extends HaxeObject {}
       interface AudioSource extends HaxeObject {
         __backend: any;
         buffer: any;
@@ -9732,7 +10140,14 @@ export declare namespace Game {
         getURL(arg0?: any): any;
         load(arg0?: any, arg1?: any, arg2?: any): any;
         loadCompressedDataFromByteArray(arg0?: any, arg1?: any, arg2?: any): any;
-        loadPCMFromByteArray(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): any;
+        loadPCMFromByteArray(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+        ): any;
         play(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
       }
       interface HTML5AudioContext extends HaxeObject {
@@ -9952,10 +10367,8 @@ export declare namespace Game {
         VERSION: any;
       }
       namespace openal {
-        interface AL extends HaxeObject {
-        }
-        interface ALC extends HaxeObject {
-        }
+        interface AL extends HaxeObject {}
+        interface ALC extends HaxeObject {}
       }
       namespace vorbis {
         interface VorbisComment extends HaxeObject {
@@ -10041,8 +10454,7 @@ export declare namespace Game {
         userAgent: any;
         withCredentials: any;
       }
-      interface HTTPRequest extends Game.lime.net._HTTPRequest.AbstractHTTPRequest {
-      }
+      interface HTTPRequest extends Game.lime.net._HTTPRequest.AbstractHTTPRequest {}
       interface HTTPRequestHeader extends HaxeObject {
         name: any;
         value: any;
@@ -10071,10 +10483,8 @@ export declare namespace Game {
       }
     }
     namespace system {
-      interface CFFI extends HaxeObject {
-      }
-      interface Clipboard extends HaxeObject {
-      }
+      interface CFFI extends HaxeObject {}
+      interface Clipboard extends HaxeObject {}
       interface Display extends HaxeObject {
         bounds: any;
         currentMode: any;
@@ -10091,8 +10501,7 @@ export declare namespace Game {
         refreshRate: any;
         width: any;
       }
-      interface JNI extends HaxeObject {
-      }
+      interface JNI extends HaxeObject {}
       interface JNIMemberField extends HaxeObject {
         field: any;
         get(arg0?: any): any;
@@ -10105,10 +10514,8 @@ export declare namespace Game {
         getStaticMethod(arg0?: any): any;
         method: any;
       }
-      interface JNISafety extends HaxeObject {
-      }
-      interface JNISafetyTools extends HaxeObject {
-      }
+      interface JNISafety extends HaxeObject {}
+      interface JNISafetyTools extends HaxeObject {}
       interface JNIStaticField extends HaxeObject {
         field: any;
         get(): any;
@@ -10122,15 +10529,13 @@ export declare namespace Game {
         startTime: any;
         state: any;
       }
-      interface JSAsync extends HaxeObject {
-      }
+      interface JSAsync extends HaxeObject {}
       interface Sensor extends HaxeObject {
         id: any;
         onUpdate: any;
         type: any;
       }
-      interface System extends HaxeObject {
-      }
+      interface System extends HaxeObject {}
       interface ThreadPool extends Game.lime.system.WorkOutput {
         __idleThreads: any;
         __multiThreadedJobs: any;
@@ -10229,10 +10634,8 @@ export declare namespace Game {
         verticalBearing: any;
       }
       namespace harfbuzz {
-        interface HB extends HaxeObject {
-        }
-        interface HBFeature extends HaxeObject {
-        }
+        interface HB extends HaxeObject {}
+        interface HBFeature extends HaxeObject {}
         interface HBGlyphInfo extends HaxeObject {
           cluster: any;
           codepoint: any;
@@ -10244,8 +10647,7 @@ export declare namespace Game {
           yAdvance: any;
           yOffset: any;
         }
-        interface HBSegmentProperties extends HaxeObject {
-        }
+        interface HBSegmentProperties extends HaxeObject {}
       }
     }
     namespace ui {
@@ -10472,14 +10874,12 @@ export declare namespace Game {
         serialize(): any;
         version: any;
       }
-      interface Assets extends HaxeObject {
-      }
+      interface Assets extends HaxeObject {}
       interface BytePointerData extends HaxeObject {
         bytes: any;
         offset: any;
       }
-      interface Log extends HaxeObject {
-      }
+      interface Log extends HaxeObject {}
       interface ObjectPool extends HaxeObject {
         __inactiveObject0: any;
         __inactiveObject1: any;
@@ -10533,6 +10933,1097 @@ export declare namespace Game {
       }
     }
   }
+  namespace mobile {
+    interface MobileOverlay extends Game.starling.display.Sprite {
+      close(): any;
+      g: any;
+      host: any;
+      onFrame(arg0?: any): any;
+      onResize(arg0?: any): any;
+      resize(): any;
+    }
+    interface MobileScreens extends HaxeObject {}
+    interface MobileScreenState extends Game.core.states.gameStates.PlayState {
+      addNavigation(arg0?: any): any;
+      close(): any;
+      closeToFlight: any;
+      enter(): any;
+      entered: any;
+      execute(): any;
+      exit(arg0?: any): any;
+      factory: any;
+      get_screen(): any;
+      go(arg0?: any): any;
+      host: any;
+      resize(arg0?: any): any;
+    }
+    interface MScreenHost extends Game.starling.display.Sprite {
+      attach(arg0?: any): any;
+      depth(): any;
+      dispose(): any;
+      height_: any;
+      layoutScreen(): any;
+      onCloseAll: any;
+      pop(): any;
+      previous: any;
+      push(arg0?: any): any;
+      replaceRoot(arg0?: any): any;
+      resize(arg0?: any, arg1?: any): any;
+      screen: any;
+      setRoot(arg0?: any): any;
+      stack: any;
+      width_: any;
+    }
+    namespace hud {
+      interface MobileHud extends Game.starling.display.Sprite {
+        body: any;
+        build(): any;
+        buttonsShown: any;
+        card: any;
+        cardBg: any;
+        cardHeight(): any;
+        chatButton: any;
+        chatIcon: any;
+        chatTouch: any;
+        closeMenu(): any;
+        dispose(): any;
+        g: any;
+        hull: any;
+        isMenuOpen(): any;
+        label(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
+        landText: any;
+        lastUpdateTime: any;
+        layout(): any;
+        layoutHeight: any;
+        layoutInsets: any;
+        layoutWidth: any;
+        levelText: any;
+        menu: any;
+        menuBadge: any;
+        menuBadgeText: any;
+        menuButton: any;
+        minimapHit: any;
+        minimapRing: any;
+        missionButton: any;
+        missionTouch: any;
+        onMenuTouch(arg0?: any): any;
+        onMinimapTouch(arg0?: any): any;
+        openMenu(): any;
+        openMissionBrief(): any;
+        power: any;
+        pvpQueue(): any;
+        radar: any;
+        shield: any;
+        shownBadge: any;
+        shownLand: any;
+        shownLevel: any;
+        shownStatus: any;
+        statusText: any;
+        toggleChat(): any;
+        topBand(): any;
+        uiScale: any;
+        update(): any;
+        updateBadge(): any;
+        updateChatButton(): any;
+        updateFade(arg0?: any): any;
+        updateLand(): any;
+        updateMissionButton(arg0?: any): any;
+        updateStats(): any;
+        updateStatus(): any;
+        xpBg: any;
+        xpFill: any;
+      }
+      interface MobileMenu extends Game.starling.display.Sprite {
+        addTile(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
+        backdrop: any;
+        build(): any;
+        buildHeader(arg0?: any): any;
+        close(): any;
+        g: any;
+        hudIcon(arg0?: any): any;
+        mineralIcon(arg0?: any): any;
+        onClose: any;
+        openBuyFlux(): any;
+        panel: any;
+        resize(arg0?: any): any;
+        text(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): any;
+        texture(arg0?: any): any;
+        tiles: any;
+        toggleFullscreen(): any;
+        u: any;
+      }
+      namespace _MobileHud {
+        interface StatBar extends Game.starling.display.Sprite {
+          barWidth: any;
+          bg: any;
+          charge: any;
+          fill: any;
+          nameText: any;
+          set(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
+          setCharge(arg0?: any): any;
+          shownTextColor: any;
+          shownValue: any;
+          valueText: any;
+        }
+      }
+      namespace _MobileMenu {
+        interface MenuTile extends Game.starling.display.Sprite {
+          tileHeight: any;
+          tileWidth: any;
+        }
+      }
+    }
+    namespace screens {
+      interface MobileArtifacts extends Game.mobile.ui.MScreen {
+        artifactTile(arg0?: any, arg1?: any, arg2?: any): any;
+        build(): any;
+        buildGrid(): any;
+        buildHeader(): any;
+        buildRecycleBar(): any;
+        capacityButton: any;
+        cardActions: any;
+        chooseCrew(arg0?: any): any;
+        claim(arg0?: any, arg1?: any): any;
+        claimFinishedUpgrades(): any;
+        claimNext(): any;
+        claimRest: any;
+        closeKey: any;
+        columnCount(): any;
+        devInfo(): any;
+        dispose(): any;
+        disposed: any;
+        fillSlots(): any;
+        fillStats(): any;
+        grid: any;
+        layout(): any;
+        loadingText: any;
+        marked: any;
+        onArtifact(arg0?: any): any;
+        onCapacity(): any;
+        onSetup(arg0?: any): any;
+        onSlot(arg0?: any): any;
+        onTool(arg0?: any): any;
+        recycleBar: any;
+        recycleCount: any;
+        recycleMarked(): any;
+        recycleMode: any;
+        refresh(): any;
+        resume(): any;
+        selectMax(): any;
+        setRecycleMode(arg0?: any): any;
+        setupTabs: any;
+        showArtifact(arg0?: any): any;
+        slots: any;
+        sortBy(arg0?: any): any;
+        statsBg: any;
+        statsScroll: any;
+        statsText: any;
+        statsTitle: any;
+        tileArtifacts: any;
+        tiles: any;
+        tileSize: any;
+        toggleEquip(arg0?: any): any;
+        toggleMark(arg0?: any): any;
+        toolButtons: any;
+        touches: any;
+        upgradingCrew(arg0?: any): any;
+      }
+      interface MobileBuyFlux extends Game.mobile.ui.MScreen {
+        balance: any;
+        build(): any;
+        buyButtons: any;
+        devInfo(): any;
+        layout(): any;
+        pay(arg0?: any, arg1?: any): any;
+        scroll: any;
+        showBalance(): any;
+      }
+      interface MobileCargo extends Game.mobile.ui.MScreen {
+        build(): any;
+        buildCompressor(): any;
+        buildLevels(arg0?: any, arg1?: any, arg2?: any): any;
+        buildList(): any;
+        closeKey: any;
+        devInfo(): any;
+        ejectButton: any;
+        layout(): any;
+        levelRows: any;
+        refresh(): any;
+        rows: any;
+        showUpgrade(): any;
+        split: any;
+        upgradeButton: any;
+      }
+      interface MobileChat extends Game.mobile.ui.MScreen {
+        build(): any;
+        devInfo(): any;
+        dispose(): any;
+        field: any;
+        layout(): any;
+        lineTouches: any;
+        prefill: any;
+        refresh(): any;
+        scroll: any;
+        send(): any;
+        sendButton: any;
+        shownCount: any;
+        showPlayer(arg0?: any, arg1?: any): any;
+        tabs: any;
+        update(): any;
+      }
+      interface MobileClan extends Game.mobile.ui.MScreen {
+        actions: any;
+        applyDialog(): any;
+        build(): any;
+        buildClan(): any;
+        buildSearch(): any;
+        clan: any;
+        clanId: any;
+        devInfo(): any;
+        done(arg0?: any): any;
+        editDialog(): any;
+        layout(): any;
+        load(): any;
+        results: any;
+        resume(): any;
+        rows: any;
+        scroll: any;
+        search(): any;
+        searchField: any;
+        shipOf(arg0?: any): any;
+        showApplications(): any;
+        showMember(arg0?: any): any;
+      }
+      interface MobileCrew extends Game.mobile.ui.MScreen {
+        build(): any;
+        buildDetail(): any;
+        buildList(): any;
+        button(arg0?: any, arg1?: any, arg2?: any): any;
+        buttons: any;
+        devInfo(): any;
+        heading(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
+        hireList: any;
+        layout(): any;
+        members(): any;
+        nextTick: any;
+        rebuild(): any;
+        resume(): any;
+        rows: any;
+        rowStatus(arg0?: any): any;
+        selected: any;
+        shownState: any;
+        skillRow(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+          arg7?: any,
+          arg8?: any,
+        ): any;
+        split: any;
+        stateKey(arg0?: any): any;
+        statusField: any;
+        update(): any;
+        updateStatus(): any;
+      }
+      interface MobileEncounters extends Game.mobile.ui.MScreen {
+        build(): any;
+        closeKey: any;
+        devInfo(): any;
+        found: any;
+        items: any;
+        layout(): any;
+        scroll: any;
+        showEncounter(arg0?: any): any;
+        tiles: any;
+      }
+      interface MobileFleet extends Game.mobile.ui.MScreen {
+        build(): any;
+        buildDetail(): any;
+        buildList(): any;
+        devInfo(): any;
+        dispose(): any;
+        layout(): any;
+        rows: any;
+        selected: any;
+        split: any;
+        touches: any;
+        useButton: any;
+      }
+      interface MobileLeaderboard extends Game.mobile.ui.MScreen {
+        build(): any;
+        clanOf(arg0?: any): any;
+        devInfo(): any;
+        layout(): any;
+        note: any;
+        openClan(arg0?: any): any;
+        refresh(): any;
+        requestPlayers(arg0?: any): any;
+        rows: any;
+        scroll: any;
+        tabs: any;
+        wars: any;
+      }
+      interface MobileMap extends Game.mobile.ui.MScreen {
+        areaRow(arg0?: any, arg1?: any): any;
+        bodies: any;
+        bosses: any;
+        build(): any;
+        buildBodies(): any;
+        canvas: any;
+        centre: any;
+        closeKey: any;
+        desktopScale: any;
+        devInfo(): any;
+        exploredPercent(): any;
+        exploredText: any;
+        fitZoom: any;
+        labelLayer: any;
+        layout(): any;
+        lineLayer: any;
+        markerLayer: any;
+        onTap(arg0?: any, arg1?: any): any;
+        orbitLayer: any;
+        orbits: any;
+        orbitZoom: any;
+        playerColor(arg0?: any): any;
+        playerCount: any;
+        players: any;
+        positionText: any;
+        showInfo(arg0?: any): any;
+        spawners: any;
+        stationText(arg0?: any): any;
+        steering: any;
+        targetLines: any;
+        update(): any;
+        updateOrbits(): any;
+        updatePlayers(): any;
+        updateTargetLines(): any;
+        zoomIn: any;
+        zoomOut: any;
+      }
+      interface MobileMissionBrief extends Game.mobile.ui.MScreen {
+        brief: any;
+        build(): any;
+        devInfo(): any;
+        fill(arg0?: any): any;
+        gotIt: any;
+        layout(): any;
+        missions: any;
+        scroll: any;
+      }
+      interface MobileMissions extends Game.mobile.ui.MScreen {
+        build(): any;
+        busy: any;
+        cardBackground(arg0?: any, arg1?: any, arg2?: any): any;
+        chipGrid(arg0?: any, arg1?: any): any;
+        claimDaily(arg0?: any): any;
+        clearTouches(): any;
+        closeKey: any;
+        collect(arg0?: any, arg1?: any): any;
+        dailyCard(arg0?: any, arg1?: any): any;
+        dailyChips(arg0?: any, arg1?: any): any;
+        devInfo(): any;
+        dispose(): any;
+        emptyText: any;
+        fill(): any;
+        layout(): any;
+        list: any;
+        missionCard(arg0?: any, arg1?: any): any;
+        placed(arg0?: any, arg1?: any, arg2?: any): any;
+        rewardChips(arg0?: any, arg1?: any): any;
+        showMission(arg0?: any, arg1?: any, arg2?: any): any;
+        skip(arg0?: any): any;
+        startTab(): any;
+        tab: any;
+        tabs: any;
+        timers: any;
+        touches: any;
+        update(): any;
+        updateAgain(arg0?: any, arg1?: any): any;
+        updateExpires(arg0?: any, arg1?: any): any;
+        updateTabBadges(): any;
+      }
+      interface MobilePlayers extends Game.mobile.ui.MScreen {
+        act(arg0?: any): any;
+        build(): any;
+        clanOf(arg0?: any): any;
+        closeKey: any;
+        devInfo(): any;
+        layout(): any;
+        redrawQueued: any;
+        refresh(): any;
+        rows: any;
+        scroll: any;
+        showFriend(arg0?: any): any;
+        showPlayer(arg0?: any): any;
+        tabs: any;
+      }
+      interface MobilePods extends Game.mobile.ui.MScreen {
+        build(): any;
+        buy(arg0?: any): any;
+        buy10Button: any;
+        buy1Button: any;
+        count: any;
+        countField: any;
+        devInfo(): any;
+        hint: any;
+        layout(): any;
+        lootTexture(arg0?: any): any;
+        openButton: any;
+        opening: any;
+        openPod(): any;
+        podImage: any;
+        showCount(): any;
+        showLoot(arg0?: any, arg1?: any): any;
+      }
+      interface MobilePvp extends Game.mobile.ui.MScreen {
+        build(): any;
+        buildQueues(): any;
+        buildScores(): any;
+        centreIn(arg0?: any): any;
+        closeKey: any;
+        confirmLeave(): any;
+        devInfo(): any;
+        inMatch: any;
+        layout(): any;
+        leaveButton: any;
+        nextTick: any;
+        queueButtons: any;
+        queueText(arg0?: any, arg1?: any): any;
+        scoreRows: any;
+        scroll: any;
+        update(): any;
+      }
+      interface MobileSale extends Game.mobile.ui.MScreen {
+        action: any;
+        balance: any;
+        build(): any;
+        buildDetail(): any;
+        buildList(): any;
+        devInfo(): any;
+        fluxIcon: any;
+        fluxOffer(arg0?: any, arg1?: any): any;
+        layout(): any;
+        pulse: any;
+        refresh(): any;
+        resume(): any;
+        rows: any;
+        saleIcon(arg0?: any): any;
+        sales: any;
+        selected: any;
+        showBalance(): any;
+        shownFlux: any;
+        shownTime: any;
+        single: any;
+        split: any;
+        timer: any;
+        update(): any;
+      }
+      interface MobileSettings extends Game.mobile.ui.MScreen {
+        build(): any;
+        chatRows(arg0?: any): any;
+        close(): any;
+        closeKey: any;
+        controlRows(arg0?: any): any;
+        devInfo(): any;
+        fill(): any;
+        generalRows(arg0?: any): any;
+        layout(): any;
+        list: any;
+        tab: any;
+        tabs: any;
+      }
+      interface MobileShip extends Game.mobile.ui.MScreen {
+        body: any;
+        build(): any;
+        buildPilot(arg0?: any): any;
+        buildShip(arg0?: any): any;
+        closeKey: any;
+        devInfo(): any;
+        fillStrip(arg0?: any, arg1?: any, arg2?: any): any;
+        fleetButton: any;
+        layout(): any;
+        onSlot(arg0?: any, arg1?: any): any;
+        openManager(arg0?: any): any;
+        rebuild(): any;
+        rename(): any;
+        renameButton: any;
+        resume(): any;
+        showUnlock(arg0?: any, arg1?: any): any;
+        strips: any;
+        tabs: any;
+        upgradesButton: any;
+      }
+      interface MobileShop extends Game.mobile.ui.MScreen {
+        action(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
+        actionButtons: any;
+        balance: any;
+        build(): any;
+        buildDetail(): any;
+        buildList(): any;
+        closeKey: any;
+        dayBundles(arg0?: any, arg1?: any, arg2?: any): any;
+        devInfo(): any;
+        layout(): any;
+        redeem(): any;
+        refresh(): any;
+        resume(): any;
+        rows: any;
+        selected: any;
+        showBalance(): any;
+        showDayItem(arg0?: any, arg1?: any, arg2?: any): any;
+        showPackage(arg0?: any, arg1?: any, arg2?: any): any;
+        split: any;
+      }
+      interface MobileUpgrades extends Game.mobile.ui.MScreen {
+        build(): any;
+        devInfo(): any;
+        dispose(): any;
+        key: any;
+        layout(): any;
+        legendTouches: any;
+        note: any;
+        rows: any;
+        scroll: any;
+        showTech(arg0?: any, arg1?: any, arg2?: any): any;
+        touches: any;
+      }
+      interface MobileWeapons extends Game.mobile.ui.MScreen {
+        build(): any;
+        devInfo(): any;
+        hint: any;
+        layout(): any;
+        pick(arg0?: any): any;
+        scroll: any;
+        slot: any;
+        tiles: any;
+      }
+      interface ShipArt extends HaxeObject {}
+      interface SlotDialogs extends HaxeObject {}
+      namespace _MobileMap {
+        interface BodyMarker extends HaxeObject {
+          body: any;
+          g: any;
+          image: any;
+          label: any;
+          place(arg0?: any): any;
+          radius: any;
+          tappable: any;
+          textureRadius: any;
+          zone: any;
+        }
+      }
+    }
+    namespace station {
+      interface MobileCantina extends Game.mobile.station.MobileStation {
+        buildList(): any;
+        buildStation(): any;
+        crew: any;
+        devInfo(): any;
+        layoutStation(): any;
+        note: any;
+        resume(): any;
+        rows: any;
+        scroll: any;
+      }
+      interface MobileExplore extends Game.mobile.station.MobileStation {
+        actionButton: any;
+        areas: any;
+        bar: any;
+        buildDetail(): any;
+        buildStation(): any;
+        claim(arg0?: any): any;
+        devInfo(): any;
+        layoutStation(): any;
+        nextTick: any;
+        refresh(): any;
+        resume(): any;
+        rows: any;
+        selected: any;
+        shownStates: any;
+        split: any;
+        stateColor(arg0?: any): any;
+        statesKey(): any;
+        stateText(arg0?: any): any;
+        timer: any;
+        update(): any;
+        updateProgress(): any;
+      }
+      interface MobileExploreTeam extends Game.mobile.ui.MScreen {
+        area: any;
+        body: any;
+        build(): any;
+        devInfo(): any;
+        layout(): any;
+        refresh(): any;
+        rows: any;
+        scroll: any;
+        start(): any;
+        startButton: any;
+        summary: any;
+        team: any;
+      }
+      interface MobileHangar extends Game.mobile.station.MobileStation {
+        buildDetail(): any;
+        buildStation(): any;
+        buyButton: any;
+        devInfo(): any;
+        layoutStation(): any;
+        refresh(): any;
+        rows: any;
+        selected: any;
+        skins: any;
+        split: any;
+      }
+      interface MobileLore extends Game.mobile.station.MobileStation {
+        buildStation(): any;
+        layoutStation(): any;
+        next: any;
+        page: any;
+        pages: any;
+        scroll: any;
+        show(): any;
+        text: any;
+      }
+      interface MobilePaintShop extends Game.mobile.station.MobileStation {
+        applyPreview(): any;
+        buildStation(): any;
+        buy(): any;
+        buyButton: any;
+        devInfo(): any;
+        layoutStation(): any;
+        note: any;
+        preview: any;
+        sliders: any;
+        values: any;
+      }
+      interface MobileRecycle extends Game.mobile.station.MobileStation {
+        buildStation(): any;
+        devInfo(): any;
+        junk(): any;
+        layoutStation(): any;
+        minerals: any;
+        picked: any;
+        recycle(): any;
+        recycleButton: any;
+        recycling: any;
+        refresh(): any;
+        resume(): any;
+        rows: any;
+        selectAll: any;
+        split: any;
+      }
+      interface MobileStation extends Game.mobile.ui.MScreen {
+        body: any;
+        build(): any;
+        buildStation(): any;
+        closeText: any;
+        devInfo(): any;
+        layout(): any;
+        layoutStation(): any;
+        nav: any;
+        navButtons: any;
+        openTab(arg0?: any): any;
+      }
+      interface MobileStationState extends Game.core.states.gameStates.GameState {
+        body: any;
+        enter(): any;
+        execute(): any;
+        exit(arg0?: any): any;
+        factory: any;
+        host: any;
+        leave(): any;
+        resize(arg0?: any): any;
+      }
+      interface MobileUpgradeStation extends Game.mobile.station.MobileStation {
+        buildList(): any;
+        buildStation(): any;
+        busy: any;
+        buyElite(arg0?: any, arg1?: any, arg2?: any): any;
+        buyLevel(arg0?: any, arg1?: any, arg2?: any): any;
+        buyResets(): any;
+        chooseElite(arg0?: any, arg1?: any): any;
+        devInfo(): any;
+        dispose(): any;
+        eliteRow(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): any;
+        eliteRows: any;
+        eliteTarget: any;
+        key: any;
+        keyTouches: any;
+        layoutStation(): any;
+        packageButton: any;
+        reset(): any;
+        resetButton: any;
+        resume(): any;
+        rows: any;
+        scroll: any;
+        sheetOpenTarget: any;
+        showLegend(): any;
+        showTech(arg0?: any, arg1?: any): any;
+        stepButtons: any;
+        touches: any;
+      }
+      interface MobileWarpGate extends Game.mobile.station.MobileStation {
+        buildStation(): any;
+        canvas: any;
+        devInfo(): any;
+        fitted: any;
+        jumping: any;
+        labelLayer: any;
+        layoutStation(): any;
+        lineLayer: any;
+        lines: any;
+        markerLayer: any;
+        markers: any;
+        onRoute(arg0?: any): any;
+        onTap(arg0?: any, arg1?: any): any;
+        paths: any;
+        ring: any;
+        routeSystems: any;
+        select(arg0?: any): any;
+        selected: any;
+        send(arg0?: any, arg1?: any): any;
+        survivalJump(arg0?: any): any;
+        systems: any;
+        update(): any;
+        warpJump(arg0?: any, arg1?: any): any;
+        zoomIn: any;
+        zoomOut: any;
+      }
+      interface MobileWeaponShop extends Game.mobile.station.MobileStation {
+        bought(arg0?: any): any;
+        buildDetail(): any;
+        buildStation(): any;
+        devInfo(): any;
+        fluxButton: any;
+        items: any;
+        layoutStation(): any;
+        pirate: any;
+        produceButton: any;
+        refresh(): any;
+        resume(): any;
+        rows: any;
+        selected: any;
+        split: any;
+      }
+    }
+    namespace ui {
+      interface MBar extends Game.starling.display.Sprite {
+        barWidth: any;
+        bg: any;
+        fill: any;
+        set(arg0?: any, arg1?: any, arg2?: any): any;
+        text: any;
+      }
+      interface MButton extends Game.starling.display.Sprite {
+        action: any;
+        bg: any;
+        bgAlpha: any;
+        buttonHeight: any;
+        buttonWidth: any;
+        dispose(): any;
+        enabled: any;
+        icon: any;
+        labelField: any;
+        set_enabled(arg0?: any): any;
+        setAction(arg0?: any): any;
+        setText(arg0?: any): any;
+        style: any;
+        texture(arg0?: any): any;
+        touch: any;
+        useNativeTap(): any;
+      }
+      interface MBuyDialog extends Game.mobile.ui.MDialog {
+        balance: any;
+        buyButton: any;
+        cost: any;
+        fill: (arg0?: any, arg1?: any) => any;
+        g: any;
+        getFlux(): any;
+        showBalance(): any;
+      }
+      interface MCanvas extends Game.starling.display.Sprite {
+        centerX: any;
+        centerY: any;
+        follow(arg0?: any, arg1?: any): any;
+        following: any;
+        hitArea: any;
+        lookAt(arg0?: any, arg1?: any): any;
+        maskQuad: any;
+        maxZoom: any;
+        minZoom: any;
+        onTap: any;
+        onTouch(arg0?: any): any;
+        panning: any;
+        pinchDistance: any;
+        pinchWorld: any;
+        pinchZoom: any;
+        recenter(): any;
+        setSize(arg0?: any, arg1?: any): any;
+        setZoom(arg0?: any): any;
+        startPinch(): any;
+        tapId: any;
+        tapStart: any;
+        toScreenX(arg0?: any): any;
+        toScreenY(arg0?: any): any;
+        touches: any;
+        toWorldX(arg0?: any): any;
+        toWorldY(arg0?: any): any;
+        twoTouches(): any;
+        updatePinch(): any;
+        viewHeight: any;
+        viewWidth: any;
+        zoom: any;
+        zoomBy(arg0?: any): any;
+      }
+      interface MChoiceRow extends Game.starling.display.Sprite {
+        tabs: any;
+      }
+      interface MCost extends Game.starling.display.Sprite {
+        affordable: any;
+      }
+      interface MDialog extends Game.starling.display.Sprite {
+        addButton(arg0?: any, arg1?: any, arg2?: any): any;
+        append(arg0?: any, arg1?: any): any;
+        background: any;
+        bodyText: any;
+        built: any;
+        buttonRow: any;
+        buttons: any;
+        close(): any;
+        closeButton: any;
+        closed: any;
+        devInfo(): any;
+        fill: any;
+        layoutIn(arg0?: any, arg1?: any, arg2?: any): any;
+        nextY: any;
+        onClosed: any;
+        scroll: any;
+        title: any;
+        titleField: any;
+      }
+      interface MNativeTap extends HaxeObject {}
+      interface MRating extends Game.starling.display.Sprite {}
+      interface MRow extends Game.starling.display.Sprite {
+        dispose(): any;
+        rowHeight: any;
+        rowWidth: any;
+        subtitleField: any;
+        titleField: any;
+        touch: any;
+        valueField: any;
+      }
+      interface MScreen extends Game.starling.display.Sprite {
+        addHeaderItem(arg0?: any): any;
+        backAction: any;
+        backButton: any;
+        background: any;
+        build(): any;
+        built: any;
+        close(): any;
+        closeButton: any;
+        closeDialog(): any;
+        closeKey: any;
+        closeKeyPressed(arg0?: any): any;
+        closeSheet(): any;
+        closeText: any;
+        contentHeight: any;
+        contentWidth: any;
+        contentX: any;
+        contentY: any;
+        devInfo(): any;
+        dialog: any;
+        fitTitle(arg0?: any): any;
+        g: any;
+        header: any;
+        headerCenter: any;
+        headerItems: any;
+        isDialogOpen(): any;
+        isSheetOpen(): any;
+        layout(): any;
+        layoutHeader(): any;
+        nextButton: any;
+        nextId: any;
+        onClose: any;
+        onPush: any;
+        prevButton: any;
+        prevId: any;
+        push(arg0?: any): any;
+        pushScreen(arg0?: any): any;
+        resize(arg0?: any, arg1?: any): any;
+        resume(): any;
+        screenHeight: any;
+        screenId: any;
+        screenWidth: any;
+        setBack(arg0?: any): any;
+        setHeaderCenter(arg0?: any): any;
+        setTitle(arg0?: any): any;
+        sheet: any;
+        showBack(arg0?: any): any;
+        showDialog(arg0?: any): any;
+        showNavigation(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
+        showSheet(arg0?: any, arg1?: any): any;
+        sideInset: any;
+        steering: any;
+        titleField: any;
+        titleText: any;
+        update(): any;
+      }
+      interface MScroll extends Game.starling.display.Sprite {
+        apply(): any;
+        bar: any;
+        barAlpha: any;
+        clamp(arg0?: any): any;
+        content: any;
+        contentHeight: any;
+        dragging: any;
+        get_scrollY(): any;
+        hitArea: any;
+        lastMoveTime: any;
+        lastY: any;
+        maskQuad: any;
+        maxOffset(): any;
+        offset: any;
+        onFrame(arg0?: any): any;
+        onTouch(arg0?: any): any;
+        refresh(): any;
+        reveal(arg0?: any): any;
+        scrollToTop(): any;
+        set_scrollY(arg0?: any): any;
+        setContentHeight(arg0?: any): any;
+        setSize(arg0?: any, arg1?: any): any;
+        startX: any;
+        startY: any;
+        touchId: any;
+        velocity: any;
+        viewHeight: any;
+        viewWidth: any;
+      }
+      interface MShapes extends HaxeObject {}
+      interface MSheet extends Game.starling.display.Sprite {
+        actions: any;
+        addAction(arg0?: any): any;
+        append(arg0?: any, arg1?: any): any;
+        body: any;
+        bodyWidth: any;
+        close(): any;
+        closing: any;
+        devInfo(): any;
+        dim: any;
+        dimTouch: any;
+        dispose(): any;
+        onClosed: any;
+        open(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
+        panel: any;
+        panelWidth: any;
+        title: any;
+      }
+      interface MSliderRow extends Game.starling.display.Sprite {
+        draw(): any;
+        fill: any;
+        format: any;
+        max: any;
+        min: any;
+        onChange: any;
+        onTouch(arg0?: any): any;
+        thumb: any;
+        touchId: any;
+        track: any;
+        trackWidth: any;
+        trackX: any;
+        value: any;
+        valueText: any;
+      }
+      interface MSlotStrip extends Game.starling.display.Sprite {
+        addNumber(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
+        dispose(): any;
+        fit(arg0?: any, arg1?: any, arg2?: any): any;
+        gap: any;
+        setSlot(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
+        tileCenterX(arg0?: any): any;
+        tiles: any;
+        tileSize: any;
+        touches: any;
+      }
+      interface MSplit extends Game.starling.display.Sprite {
+        detail: any;
+        detailWidth: any;
+        line: any;
+        list: any;
+        listWidth: any;
+        setSize(arg0?: any, arg1?: any, arg2?: any): any;
+      }
+      interface MStat extends Game.starling.display.Sprite {}
+      interface MTabs extends Game.starling.display.Sprite {
+        badges: any;
+        dispose(): any;
+        labels: any;
+        onChange: any;
+        outlines: any;
+        panels: any;
+        refreshLook(): any;
+        segments: any;
+        select(arg0?: any, arg1?: any): any;
+        selected: any;
+        setBadge(arg0?: any, arg1?: any): any;
+        tabsHeight: any;
+        tabsWidth: any;
+        texts: any;
+        touches: any;
+      }
+      interface MTextField extends Game.starling.display.Sprite {
+        box: any;
+        entry: any;
+        fieldWidth: any;
+        focus(): any;
+        get_text(): any;
+        onChange: any;
+        set_text(arg0?: any): any;
+        setWidth(arg0?: any): any;
+      }
+      interface MTheme extends HaxeObject {}
+      interface MTile extends Game.starling.display.Sprite {
+        dispose(): any;
+        tileHeight: any;
+        tileWidth: any;
+        touch: any;
+      }
+      interface MToggleRow extends Game.starling.display.Sprite {
+        dispose(): any;
+        draw(arg0?: any, arg1?: any): any;
+        knob: any;
+        onChange: any;
+        set(arg0?: any): any;
+        switchX: any;
+        touch: any;
+        trackOff: any;
+        trackOn: any;
+        value: any;
+      }
+      interface MTouch extends HaxeObject {
+        cancelled: any;
+        clearLong(): any;
+        dispose(): any;
+        fireLong(): any;
+        longCall: any;
+        longFired: any;
+        onLongPress: any;
+        onPress: any;
+        onTap: any;
+        onTouch(arg0?: any): any;
+        setPressed(arg0?: any): any;
+        startsOnNested(arg0?: any): any;
+        startX: any;
+        startY: any;
+        target: any;
+        touchId: any;
+      }
+    }
+  }
   namespace movement {
     interface Command extends HaxeObject {
       active: boolean;
@@ -10546,6 +12037,7 @@ export declare namespace Game {
       addHardenedShieldCommand(arg0?: any): any;
       addMessageHandlers(): any;
       addShieldConvertCommand(arg0?: any): any;
+      canSendOptional(): any;
       clearCommands(time: number): void;
       commandReceived(message: Game.playerio.Message): void;
       commands: Game.movement.Command[];
@@ -10554,13 +12046,18 @@ export declare namespace Game {
       g: any;
       lastSent: any;
       lastSentTime: any;
+      refillSendTokens(): any;
       runCommand(heading: Game.movement.Heading, time: number, cursor?: number): number | undefined;
       sendBuffer: any;
       sendCommand(command: Game.movement.Command): void;
+      sendTokens: any;
+      sendTokensTime: any;
     }
     interface Heading extends HaxeObject {
       accelerate: boolean;
-      almostEqual(heading: Pick<import('./HeadingState').HeadingState, 'pos' | 'speed' | 'rotation'>): boolean;
+      almostEqual(
+        heading: Pick<import('./HeadingState').HeadingState, 'pos' | 'speed' | 'rotation'>,
+      ): boolean;
       clone(): Game.movement.Heading;
       copy(heading: import('./HeadingState').HeadingState): void;
       deaccelerate: boolean;
@@ -10579,8 +12076,7 @@ export declare namespace Game {
     }
   }
   namespace openfl {
-    interface Lib extends HaxeObject {
-    }
+    interface Lib extends HaxeObject {}
     namespace _Vector {
       interface BoolVector extends HaxeObject {
         __array: any;
@@ -10753,7 +12249,9 @@ export declare namespace Game {
         __drawableType: any;
         get_bitmapData(): Game.openfl.display.BitmapData | null;
         pixelSnapping: any;
-        set_bitmapData(data: Game.openfl.display.BitmapData | null): Game.openfl.display.BitmapData | null;
+        set_bitmapData(
+          data: Game.openfl.display.BitmapData | null,
+        ): Game.openfl.display.BitmapData | null;
         set_height(arg0?: any): any;
         set_width(arg0?: any): any;
         smoothing: any;
@@ -10774,11 +12272,33 @@ export declare namespace Game {
         colorTransform(arg0?: any, arg1?: any): any;
         compare(arg0?: any): any;
         copyChannel(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
-        copyPixels(source: Game.openfl.display.BitmapData, sourceRect: Game.openfl.geom.Rectangle, destPoint: Game.openfl.geom.Point, alphaBitmap?: Game.openfl.display.BitmapData | null, alphaPoint?: Game.openfl.geom.Point | null, mergeAlpha?: boolean): void;
+        copyPixels(
+          source: Game.openfl.display.BitmapData,
+          sourceRect: Game.openfl.geom.Rectangle,
+          destPoint: Game.openfl.geom.Point,
+          alphaBitmap?: Game.openfl.display.BitmapData | null,
+          alphaPoint?: Game.openfl.geom.Point | null,
+          mergeAlpha?: boolean,
+        ): void;
         dispose(): void;
         disposeImage(): any;
-        draw(source: Game.openfl.display.DisplayObject | Game.openfl.display.BitmapData, matrix?: Game.openfl.geom.Matrix | null, colorTransform?: Game.openfl.geom.ColorTransform | null, blendMode?: number | null, clipRect?: Game.openfl.geom.Rectangle | null, smoothing?: boolean): void;
-        drawWithQuality(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+        draw(
+          source: Game.openfl.display.DisplayObject | Game.openfl.display.BitmapData,
+          matrix?: Game.openfl.geom.Matrix | null,
+          colorTransform?: Game.openfl.geom.ColorTransform | null,
+          blendMode?: number | null,
+          clipRect?: Game.openfl.geom.Rectangle | null,
+          smoothing?: boolean,
+        ): void;
+        drawWithQuality(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
         encode(arg0?: any, arg1?: any, arg2?: any): any;
         fillRect(rect: Game.openfl.geom.Rectangle, color: number): void;
         floodFill(arg0?: any, arg1?: any, arg2?: any): any;
@@ -10797,10 +12317,36 @@ export declare namespace Game {
         hitTest(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
         image: any;
         lock(): any;
-        merge(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+        merge(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
         noise(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
-        paletteMap(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
-        perlinNoise(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any): any;
+        paletteMap(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
+        perlinNoise(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+          arg7?: any,
+          arg8?: any,
+        ): any;
         readable: any;
         rect: any;
         scroll(arg0?: any, arg1?: any): any;
@@ -10808,7 +12354,16 @@ export declare namespace Game {
         setPixel32(x: number, y: number, color: number): void;
         setPixels(arg0?: any, arg1?: any): any;
         setVector(arg0?: any, arg1?: any): any;
-        threshold(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any): any;
+        threshold(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+          arg7?: any,
+        ): any;
         transparent: any;
         unlock(arg0?: any): any;
         width: number;
@@ -11007,7 +12562,16 @@ export declare namespace Game {
         __worldTransform: any;
         beginBitmapFill(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         beginFill(arg0?: any, arg1?: any): any;
-        beginGradientFill(type: number, colors: number[], alphas: number[] | null, ratios: number[] | null, matrix?: Game.openfl.geom.Matrix | null, spreadMethod?: number, interpolationMethod?: number, focalPointRatio?: number): void;
+        beginGradientFill(
+          type: number,
+          colors: number[],
+          alphas: number[] | null,
+          ratios: number[] | null,
+          matrix?: Game.openfl.geom.Matrix | null,
+          spreadMethod?: number,
+          interpolationMethod?: number,
+          focalPointRatio?: number,
+        ): void;
         beginShaderFill(arg0?: any, arg1?: any): any;
         clear(): any;
         copyFrom(arg0?: any): any;
@@ -11020,12 +12584,39 @@ export declare namespace Game {
         drawQuads(arg0?: any, arg1?: any, arg2?: any): any;
         drawRect(x: number, y: number, width: number, height: number): void;
         drawRoundRect(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): any;
-        drawRoundRectComplex(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any): any;
+        drawRoundRectComplex(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+          arg7?: any,
+        ): any;
         drawTriangles(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         endFill(): void;
         lineBitmapStyle(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
-        lineGradientStyle(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any): any;
-        lineStyle(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any): any;
+        lineGradientStyle(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+          arg7?: any,
+        ): any;
+        lineStyle(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+          arg7?: any,
+        ): any;
         lineTo(arg0?: any, arg1?: any): any;
         moveTo(arg0?: any, arg1?: any): any;
         overrideBlendMode(arg0?: any): any;
@@ -11117,20 +12708,15 @@ export declare namespace Game {
         uvtData: any;
         vertices: any;
       }
-      interface IBitmapDrawable extends HaxeObject {
-      }
+      interface IBitmapDrawable extends HaxeObject {}
       interface IDisplayObjectLoader extends HaxeObject {
         load: any;
         loadBytes: any;
       }
-      interface IGraphicsData extends HaxeObject {
-      }
-      interface IGraphicsFill extends HaxeObject {
-      }
-      interface IGraphicsPath extends HaxeObject {
-      }
-      interface IGraphicsStroke extends HaxeObject {
-      }
+      interface IGraphicsData extends HaxeObject {}
+      interface IGraphicsFill extends HaxeObject {}
+      interface IGraphicsPath extends HaxeObject {}
+      interface IGraphicsStroke extends HaxeObject {}
       interface InteractiveObject extends Game.openfl.display.DisplayObject {
         __tabEnabled: any;
         __tabIndex: any;
@@ -11623,7 +13209,16 @@ export declare namespace Game {
           persistence_max: any;
           stitch: any;
           stitch_threshold: any;
-          stitching(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any): any;
+          stitching(
+            arg0?: any,
+            arg1?: any,
+            arg2?: any,
+            arg3?: any,
+            arg4?: any,
+            arg5?: any,
+            arg6?: any,
+            arg7?: any,
+          ): any;
         }
         interface AssetManifestLoader extends HaxeObject {
           load(arg0?: any, arg1?: any, arg2?: any): any;
@@ -11633,48 +13228,27 @@ export declare namespace Game {
           load(arg0?: any, arg1?: any, arg2?: any): any;
           loadBytes(arg0?: any, arg1?: any, arg2?: any): any;
         }
-        interface CairoBitmap extends HaxeObject {
-        }
-        interface CairoBitmapData extends HaxeObject {
-        }
-        interface CairoDisplayObject extends HaxeObject {
-        }
-        interface CairoDisplayObjectContainer extends HaxeObject {
-        }
-        interface CairoGraphics extends HaxeObject {
-        }
-        interface CairoShape extends HaxeObject {
-        }
-        interface CairoSimpleButton extends HaxeObject {
-        }
-        interface CairoTextField extends HaxeObject {
-        }
-        interface CairoTilemap extends HaxeObject {
-        }
-        interface CanvasBitmap extends HaxeObject {
-        }
-        interface CanvasBitmapData extends HaxeObject {
-        }
-        interface CanvasDisplayObject extends HaxeObject {
-        }
-        interface CanvasDisplayObjectContainer extends HaxeObject {
-        }
-        interface CanvasGraphics extends HaxeObject {
-        }
-        interface CanvasShape extends HaxeObject {
-        }
-        interface CanvasSimpleButton extends HaxeObject {
-        }
-        interface CanvasTextField extends HaxeObject {
-        }
-        interface CanvasTilemap extends HaxeObject {
-        }
-        interface CanvasVideo extends HaxeObject {
-        }
-        interface Context3DBitmap extends HaxeObject {
-        }
-        interface Context3DBitmapData extends HaxeObject {
-        }
+        interface CairoBitmap extends HaxeObject {}
+        interface CairoBitmapData extends HaxeObject {}
+        interface CairoDisplayObject extends HaxeObject {}
+        interface CairoDisplayObjectContainer extends HaxeObject {}
+        interface CairoGraphics extends HaxeObject {}
+        interface CairoShape extends HaxeObject {}
+        interface CairoSimpleButton extends HaxeObject {}
+        interface CairoTextField extends HaxeObject {}
+        interface CairoTilemap extends HaxeObject {}
+        interface CanvasBitmap extends HaxeObject {}
+        interface CanvasBitmapData extends HaxeObject {}
+        interface CanvasDisplayObject extends HaxeObject {}
+        interface CanvasDisplayObjectContainer extends HaxeObject {}
+        interface CanvasGraphics extends HaxeObject {}
+        interface CanvasShape extends HaxeObject {}
+        interface CanvasSimpleButton extends HaxeObject {}
+        interface CanvasTextField extends HaxeObject {}
+        interface CanvasTilemap extends HaxeObject {}
+        interface CanvasVideo extends HaxeObject {}
+        interface Context3DBitmap extends HaxeObject {}
+        interface Context3DBitmapData extends HaxeObject {}
         interface Context3DBuffer extends HaxeObject {
           context3D: any;
           dataPerVertex: any;
@@ -11690,12 +13264,9 @@ export declare namespace Game {
           vertexBufferData: any;
           vertexCount: any;
         }
-        interface Context3DDisplayObject extends HaxeObject {
-        }
-        interface Context3DDisplayObjectContainer extends HaxeObject {
-        }
-        interface Context3DGraphics extends HaxeObject {
-        }
+        interface Context3DDisplayObject extends HaxeObject {}
+        interface Context3DDisplayObjectContainer extends HaxeObject {}
+        interface Context3DGraphics extends HaxeObject {}
         interface Context3DMaskShader extends Game.openfl.display.Shader {
           __glFragmentSource: any;
           __glVertexSource: any;
@@ -11705,38 +13276,34 @@ export declare namespace Game {
           openfl_Texture: any;
           openfl_TextureCoord: any;
         }
-        interface Context3DShape extends HaxeObject {
-        }
-        interface Context3DSimpleButton extends HaxeObject {
-        }
-        interface Context3DTextField extends HaxeObject {
-        }
-        interface Context3DTilemap extends HaxeObject {
-        }
-        interface Context3DVideo extends HaxeObject {
-        }
-        interface DOMBitmap extends HaxeObject {
-        }
-        interface DOMDisplayObject extends HaxeObject {
-        }
-        interface DOMDisplayObjectContainer extends HaxeObject {
-        }
-        interface DOMShape extends HaxeObject {
-        }
-        interface DOMSimpleButton extends HaxeObject {
-        }
-        interface DOMTextField extends HaxeObject {
-        }
-        interface DOMTilemap extends HaxeObject {
-        }
-        interface DOMVideo extends HaxeObject {
-        }
+        interface Context3DShape extends HaxeObject {}
+        interface Context3DSimpleButton extends HaxeObject {}
+        interface Context3DTextField extends HaxeObject {}
+        interface Context3DTilemap extends HaxeObject {}
+        interface Context3DVideo extends HaxeObject {}
+        interface DOMBitmap extends HaxeObject {}
+        interface DOMDisplayObject extends HaxeObject {}
+        interface DOMDisplayObjectContainer extends HaxeObject {}
+        interface DOMShape extends HaxeObject {}
+        interface DOMSimpleButton extends HaxeObject {}
+        interface DOMTextField extends HaxeObject {}
+        interface DOMTilemap extends HaxeObject {}
+        interface DOMVideo extends HaxeObject {}
         interface DrawCommandBuffer extends HaxeObject {
           append(arg0?: any): any;
           b: any;
           beginBitmapFill(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
           beginFill(arg0?: any, arg1?: any): any;
-          beginGradientFill(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any): any;
+          beginGradientFill(
+            arg0?: any,
+            arg1?: any,
+            arg2?: any,
+            arg3?: any,
+            arg4?: any,
+            arg5?: any,
+            arg6?: any,
+            arg7?: any,
+          ): any;
           beginShaderFill(arg0?: any): any;
           clear(): any;
           copy(): any;
@@ -11748,7 +13315,14 @@ export declare namespace Game {
           drawEllipse(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
           drawQuads(arg0?: any, arg1?: any, arg2?: any): any;
           drawRect(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
-          drawRoundRect(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): any;
+          drawRoundRect(
+            arg0?: any,
+            arg1?: any,
+            arg2?: any,
+            arg3?: any,
+            arg4?: any,
+            arg5?: any,
+          ): any;
           drawTriangles(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
           endFill(): any;
           f: any;
@@ -11757,8 +13331,26 @@ export declare namespace Game {
           i: any;
           ii: any;
           lineBitmapStyle(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
-          lineGradientStyle(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any): any;
-          lineStyle(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any): any;
+          lineGradientStyle(
+            arg0?: any,
+            arg1?: any,
+            arg2?: any,
+            arg3?: any,
+            arg4?: any,
+            arg5?: any,
+            arg6?: any,
+            arg7?: any,
+          ): any;
+          lineStyle(
+            arg0?: any,
+            arg1?: any,
+            arg2?: any,
+            arg3?: any,
+            arg4?: any,
+            arg5?: any,
+            arg6?: any,
+            arg7?: any,
+          ): any;
           lineTo(arg0?: any, arg1?: any): any;
           moveTo(arg0?: any, arg1?: any): any;
           o: any;
@@ -11812,12 +13404,9 @@ export declare namespace Game {
           skip(arg0?: any): any;
           tsPos: any;
         }
-        interface FlashRenderer extends HaxeObject {
-        }
-        interface FlashTilemap extends HaxeObject {
-        }
-        interface IDisplayObject extends HaxeObject {
-        }
+        interface FlashRenderer extends HaxeObject {}
+        interface FlashTilemap extends HaxeObject {}
+        interface IDisplayObject extends HaxeObject {}
         interface PerlinNoise extends Game.openfl.display._internal.AbstractNoise {
           base_factor: any;
           fill(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
@@ -11920,8 +13509,7 @@ export declare namespace Game {
           }
         }
         namespace _Context3DGraphics {
-          interface PolygonFunctions extends HaxeObject {
-          }
+          interface PolygonFunctions extends HaxeObject {}
         }
       }
     }
@@ -11941,8 +13529,23 @@ export declare namespace Game {
         __vertexConstants: any;
         backBufferHeight: any;
         backBufferWidth: any;
-        clear(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
-        configureBackBuffer(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): any;
+        clear(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
+        configureBackBuffer(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+        ): any;
         createCubeTexture(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         createIndexBuffer(arg0?: any, arg1?: any): any;
         createProgram(arg0?: any): any;
@@ -11968,7 +13571,13 @@ export declare namespace Game {
         setCulling(arg0?: any): any;
         setDepthTest(arg0?: any, arg1?: any): any;
         setProgram(arg0?: any): any;
-        setProgramConstantsFromByteArray(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
+        setProgramConstantsFromByteArray(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+        ): any;
         setProgramConstantsFromMatrix(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         setProgramConstantsFromVector(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         setRenderToBackBuffer(): any;
@@ -12046,8 +13655,7 @@ export declare namespace Game {
         uploadFromVector(arg0?: any, arg1?: any, arg2?: any): any;
       }
       namespace _internal {
-        interface AGALConverter extends HaxeObject {
-        }
+        interface AGALConverter extends HaxeObject {}
         interface ATFReader extends HaxeObject {
           atfFormat: any;
           cubeMap: any;
@@ -12252,10 +13860,20 @@ export declare namespace Game {
       }
       interface EventDispatcher extends HaxeObject {
         __targetDispatcher: any;
-        addEventListener<E extends Game.openfl.events.Event>(type: string, listener: (event: E) => void, useCapture?: boolean, priority?: number, useWeakReference?: boolean): void;
+        addEventListener<E extends Game.openfl.events.Event>(
+          type: string,
+          listener: (event: E) => void,
+          useCapture?: boolean,
+          priority?: number,
+          useWeakReference?: boolean,
+        ): void;
         dispatchEvent(event: Game.openfl.events.Event): boolean;
         hasEventListener(type: string): boolean;
-        removeEventListener<E extends Game.openfl.events.Event>(type: string, listener: (event: E) => void, useCapture?: boolean): void;
+        removeEventListener<E extends Game.openfl.events.Event>(
+          type: string,
+          listener: (event: E) => void,
+          useCapture?: boolean,
+        ): void;
         toString(): any;
         willTrigger(type: string): boolean;
       }
@@ -12286,10 +13904,20 @@ export declare namespace Game {
         toString(): any;
       }
       interface IEventDispatcher extends HaxeObject {
-        addEventListener: <E extends Game.openfl.events.Event>(type: string, listener: (event: E) => void, useCapture?: boolean, priority?: number, useWeakReference?: boolean) => void;
+        addEventListener: <E extends Game.openfl.events.Event>(
+          type: string,
+          listener: (event: E) => void,
+          useCapture?: boolean,
+          priority?: number,
+          useWeakReference?: boolean,
+        ) => void;
         dispatchEvent: (event: Game.openfl.events.Event) => boolean;
         hasEventListener: (type: string) => boolean;
-        removeEventListener: <E extends Game.openfl.events.Event>(type: string, listener: (event: E) => void, useCapture?: boolean) => void;
+        removeEventListener: <E extends Game.openfl.events.Event>(
+          type: string,
+          listener: (event: E) => void,
+          useCapture?: boolean,
+        ) => void;
         willTrigger: (type: string) => boolean;
       }
       interface IOErrorEvent extends Game.openfl.events.ErrorEvent {
@@ -12439,8 +14067,7 @@ export declare namespace Game {
       }
     }
     namespace external {
-      interface ExternalInterface extends HaxeObject {
-      }
+      interface ExternalInterface extends HaxeObject {}
     }
     namespace filters {
       interface BitmapFilter extends HaxeObject {
@@ -12581,7 +14208,13 @@ export declare namespace Game {
         copyRowFrom(arg0?: any, arg1?: any): any;
         copyRowTo(arg0?: any, arg1?: any): any;
         createBox(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
-        createGradientBox(width: number, height: number, rotation?: number, tx?: number, ty?: number): void;
+        createGradientBox(
+          width: number,
+          height: number,
+          rotation?: number,
+          tx?: number,
+          ty?: number,
+        ): void;
         d: number;
         deltaTransformPoint(arg0?: any): any;
         deltaTransformPointToOutput(arg0?: any, arg1?: any): any;
@@ -12772,10 +14405,17 @@ export declare namespace Game {
         get_length(): any;
         get_sampleRate(): any;
         isBuffering: any;
-        load(request: Game.openfl.net.URLRequest, context?: Game.openfl.media.SoundLoaderContext | null): void;
+        load(
+          request: Game.openfl.net.URLRequest,
+          context?: Game.openfl.media.SoundLoaderContext | null,
+        ): void;
         loadCompressedDataFromByteArray(arg0?: any, arg1?: any): any;
         loadPCMFromByteArray(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
-        play(startTime?: number, loops?: number, transform?: Game.openfl.media.SoundTransform | null): Game.openfl.media.SoundChannel | null;
+        play(
+          startTime?: number,
+          loops?: number,
+          transform?: Game.openfl.media.SoundTransform | null,
+        ): Game.openfl.media.SoundChannel | null;
         url: any;
       }
       interface SoundChannel extends Game.openfl.events.EventDispatcher {
@@ -12789,15 +14429,16 @@ export declare namespace Game {
         onSample(arg0?: any): any;
         rightPeak: any;
         set_position(value: number): number;
-        set_soundTransform(value: Game.openfl.media.SoundTransform | null): Game.openfl.media.SoundTransform | null;
+        set_soundTransform(
+          value: Game.openfl.media.SoundTransform | null,
+        ): Game.openfl.media.SoundTransform | null;
         stop(): void;
       }
       interface SoundLoaderContext extends HaxeObject {
         bufferTime: any;
         checkPolicyFile: any;
       }
-      interface SoundMixer extends HaxeObject {
-      }
+      interface SoundMixer extends HaxeObject {}
       interface SoundTransform extends HaxeObject {
         clone(): Game.openfl.media.SoundTransform;
         leftToLeft: number;
@@ -12913,8 +14554,7 @@ export declare namespace Game {
         userAgent: any;
         withCredentials: any;
       }
-      interface URLRequestDefaults extends HaxeObject {
-      }
+      interface URLRequestDefaults extends HaxeObject {}
       interface URLRequestHeader extends HaxeObject {
         name: any;
         value: any;
@@ -12926,8 +14566,7 @@ export declare namespace Game {
         hasDefinition(arg0?: any): any;
         parentDomain: any;
       }
-      interface Capabilities extends HaxeObject {
-      }
+      interface Capabilities extends HaxeObject {}
       interface LoaderContext extends HaxeObject {
         allowCodeImport: any;
         allowLoadBytesCodeExecution: any;
@@ -12935,12 +14574,9 @@ export declare namespace Game {
         checkPolicyFile: any;
         securityDomain: any;
       }
-      interface Security extends HaxeObject {
-      }
-      interface SecurityDomain extends HaxeObject {
-      }
-      interface System extends HaxeObject {
-      }
+      interface Security extends HaxeObject {}
+      interface SecurityDomain extends HaxeObject {}
+      interface System extends HaxeObject {}
     }
     namespace text {
       interface Font extends Game.lime.text.Font {
@@ -13146,8 +14782,7 @@ export declare namespace Game {
           glyph: any;
           offset: any;
         }
-        interface HTMLParser extends HaxeObject {
-        }
+        interface HTMLParser extends HaxeObject {}
         interface ShapeCache extends HaxeObject {
           __longWordMap: any;
           __shortWordMap: any;
@@ -13293,12 +14928,9 @@ export declare namespace Game {
         startCachingSamples(arg0?: any, arg1?: any): any;
         stopCachingSamples(): any;
       }
-      interface Keyboard extends HaxeObject {
-      }
-      interface Mouse extends HaxeObject {
-      }
-      interface Multitouch extends HaxeObject {
-      }
+      interface Keyboard extends HaxeObject {}
+      interface Mouse extends HaxeObject {}
+      interface Multitouch extends HaxeObject {}
     }
     namespace utils {
       interface AGALMiniAssembler extends HaxeObject {
@@ -13355,8 +14987,7 @@ export declare namespace Game {
         loadText(arg0?: any): any;
         unload(): any;
       }
-      interface Assets extends HaxeObject {
-      }
+      interface Assets extends HaxeObject {}
       interface ByteArrayData extends Game.haxe.io.Bytes {
         __allocated: any;
         __endian: any;
@@ -13544,8 +15175,7 @@ export declare namespace Game {
         }
       }
       namespace _internal {
-        interface Lib extends HaxeObject {
-        }
+        interface Lib extends HaxeObject {}
         interface TouchData extends HaxeObject {
           reset(): any;
           rollOutStack: any;
@@ -13563,8 +15193,7 @@ export declare namespace Game {
               readObject(): any;
               readWithCode(arg0?: any): any;
             }
-            interface AMFTools extends HaxeObject {
-            }
+            interface AMFTools extends HaxeObject {}
             interface AMFWriter extends HaxeObject {
               o: any;
               write(arg0?: any): any;
@@ -13618,8 +15247,7 @@ export declare namespace Game {
               readUTFBytes(arg0?: any): any;
               set_endian(arg0?: any): any;
             }
-            interface AMF3Tools extends HaxeObject {
-            }
+            interface AMF3Tools extends HaxeObject {}
             interface AMF3Writer extends HaxeObject {
               o: any;
               write(arg0?: any): any;
@@ -13641,7 +15269,16 @@ export declare namespace Game {
     interface BigDB extends HaxeObject {
       load(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
       loadKeys(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
-      loadRange(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any): any;
+      loadRange(
+        arg0?: any,
+        arg1?: any,
+        arg2?: any,
+        arg3?: any,
+        arg4?: any,
+        arg5?: any,
+        arg6?: any,
+        arg7?: any,
+      ): any;
       raw: any;
     }
     interface Client extends HaxeObject {
@@ -13654,13 +15291,20 @@ export declare namespace Game {
     interface Connection extends HaxeObject {
       addDisconnectHandler(handler: () => void): void;
       addMessageHandler(type: string, handler: (message: Game.playerio.Message) => void): void;
-      createMessage(type: string, ...values: (string | number | boolean | Uint8Array)[]): Game.playerio.Message;
+      createMessage(
+        type: string,
+        ...values: (string | number | boolean | Uint8Array)[]
+      ): Game.playerio.Message;
       disconnect(): void;
       disconnectHandlers: any;
       get_connected(): boolean;
       get_roomId(): string;
       joinedRoomId: string;
-      messageHandlers: { type: string; handler: (message: Game.playerio.Message) => void; cb: (message: import('./PlayerIOMessageSerializer').PlayerIOSDKMessage) => void }[];
+      messageHandlers: {
+        type: string;
+        handler: (message: Game.playerio.Message) => void;
+        cb: (message: import('./PlayerIOMessageSerializer').PlayerIOSDKMessage) => void;
+      }[];
       raw: import('./PlayerIOSDKConnection').PlayerIOSDKConnection;
       rawSend(message: import('./PlayerIOMessageSerializer').PlayerIOSDKMessage): void;
       removeDisconnectHandler(handler: () => void): void;
@@ -13691,24 +15335,52 @@ export declare namespace Game {
       type: string;
     }
     interface Multiplayer extends HaxeObject {
-      createJoinRoom(roomId: string | null, roomType: string, visible: boolean, roomData: Record<string, string | number | boolean | null>, joinData: Record<string, string | number | boolean | null>, success: (connection: Game.playerio.Connection) => void, failure: (error: Game.playerio.PlayerIOError) => void): void;
+      createJoinRoom(
+        roomId: string | null,
+        roomType: string,
+        visible: boolean,
+        roomData: Record<string, string | number | boolean | null>,
+        joinData: Record<string, string | number | boolean | null>,
+        success: (connection: Game.playerio.Connection) => void,
+        failure: (error: Game.playerio.PlayerIOError) => void,
+      ): void;
       get_developmentServer(): string | null;
-      joinRoom(roomId: string, joinData: Record<string, string | number | boolean | null>, success: (connection: Game.playerio.Connection) => void, failure: (error: Game.playerio.PlayerIOError) => void): void;
-      listRooms(roomType: string, criteria: Record<string, string | number | boolean | null> | null, limit: number, offset: number, success: (rooms: Game.playerio.RoomInfo[]) => void, failure: (error: Game.playerio.PlayerIOError) => void): void;
+      joinRoom(
+        roomId: string,
+        joinData: Record<string, string | number | boolean | null>,
+        success: (connection: Game.playerio.Connection) => void,
+        failure: (error: Game.playerio.PlayerIOError) => void,
+      ): void;
+      listRooms(
+        roomType: string,
+        criteria: Record<string, string | number | boolean | null> | null,
+        limit: number,
+        offset: number,
+        success: (rooms: Game.playerio.RoomInfo[]) => void,
+        failure: (error: Game.playerio.PlayerIOError) => void,
+      ): void;
       raw: import('./PlayerIOMultiplayer').PlayerIOMultiplayer;
       set_developmentServer(value: string | null): string | null;
     }
     interface PayVault extends HaxeObject {
       channel: any;
-      getBuyCoinsInfo(provider: string, info: Record<string, unknown>, success: (info: Record<string, unknown>) => void, failure: (error: Game.playerio.PlayerIOError) => void): void;
+      getBuyCoinsInfo(
+        provider: string,
+        info: Record<string, unknown>,
+        success: (info: Record<string, unknown>) => void,
+        failure: (error: Game.playerio.PlayerIOError) => void,
+      ): void;
       getBuyDirectInfo(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
       raw: import('./PlayerIOPayVault').PlayerIOPayVault;
-      usePaymentInfo(provider: string, info: Record<string, unknown>, success: (result: unknown) => void, failure: (error: Game.playerio.PlayerIOError) => void): void;
+      usePaymentInfo(
+        provider: string,
+        info: Record<string, unknown>,
+        success: (result: unknown) => void,
+        failure: (error: Game.playerio.PlayerIOError) => void,
+      ): void;
     }
-    interface PlayerIO extends HaxeObject {
-    }
-    interface PlayerIOConfig extends HaxeObject {
-    }
+    interface PlayerIO extends HaxeObject {}
+    interface PlayerIOConfig extends HaxeObject {}
     interface PlayerIOError extends HaxeObject {
       code: string | number;
       errorID: number;
@@ -13723,9 +15395,45 @@ export declare namespace Game {
       usernameError: string | null;
     }
     interface QuickConnect extends HaxeObject {
-      simpleConnect: { (stage: Game.openfl.display.Stage, gameId: string, usernameOrEmail: string, password: string, success: (client: Game.playerio.Client) => void, failure: (error: Game.playerio.PlayerIOError) => void): void; (stage: Game.openfl.display.Stage, gameId: string, usernameOrEmail: string, password: string, segments: string[], success: (client: Game.playerio.Client) => void, failure: (error: Game.playerio.PlayerIOError) => void): void; };
-      simpleRecoverPassword(gameId: string, email: string, success: () => void, failure: (error: Game.playerio.PlayerIOError) => void): void;
-      simpleRegister(stage: Game.openfl.display.Stage, gameId: string, usernameOrEmail: string, password: string, email: string, captchaKey: string | null, captchaValue: string | null, extraData: Record<string, string> | null, partnerId: string | null, segments: string[], success: (client: Game.playerio.Client) => void, failure: (error: Game.playerio.PlayerIORegistrationError) => void): void;
+      simpleConnect: {
+        (
+          stage: Game.openfl.display.Stage,
+          gameId: string,
+          usernameOrEmail: string,
+          password: string,
+          success: (client: Game.playerio.Client) => void,
+          failure: (error: Game.playerio.PlayerIOError) => void,
+        ): void;
+        (
+          stage: Game.openfl.display.Stage,
+          gameId: string,
+          usernameOrEmail: string,
+          password: string,
+          segments: string[],
+          success: (client: Game.playerio.Client) => void,
+          failure: (error: Game.playerio.PlayerIOError) => void,
+        ): void;
+      };
+      simpleRecoverPassword(
+        gameId: string,
+        email: string,
+        success: () => void,
+        failure: (error: Game.playerio.PlayerIOError) => void,
+      ): void;
+      simpleRegister(
+        stage: Game.openfl.display.Stage,
+        gameId: string,
+        usernameOrEmail: string,
+        password: string,
+        email: string,
+        captchaKey: string | null,
+        captchaValue: string | null,
+        extraData: Record<string, string> | null,
+        partnerId: string | null,
+        segments: string[],
+        success: (client: Game.playerio.Client) => void,
+        failure: (error: Game.playerio.PlayerIORegistrationError) => void,
+      ): void;
     }
     interface RoomInfo extends HaxeObject {
       data: Record<string, string | number | boolean | null>;
@@ -13734,8 +15442,7 @@ export declare namespace Game {
       roomType: any;
     }
     namespace sdk {
-      interface PlayerIOSdk extends HaxeObject {
-      }
+      interface PlayerIOSdk extends HaxeObject {}
     }
   }
   namespace sound {
@@ -13757,17 +15464,18 @@ export declare namespace Game {
       stopAllMusicExcept: any;
       stopMusic: any;
     }
-    interface Playlist extends HaxeObject {
-    }
-    interface SoundConst extends HaxeObject {
-    }
-    interface SoundLocator extends HaxeObject {
-    }
+    interface Playlist extends HaxeObject {}
+    interface SoundConst extends HaxeObject {}
+    interface SoundLocator extends HaxeObject {}
     interface SoundManager extends Game.openfl.display.Sprite {
       _client: any;
       _effectVolume: any;
       _musicVolume: number;
-      cacheSound(type: string, key: string, metadata: { type: string; fileName: string; volume: number }): void;
+      cacheSound(
+        type: string,
+        key: string,
+        metadata: { type: string; fileName: string; volume: number },
+      ): void;
       callbackQueue: { h: Record<string, Array<(sound: Game.sound.SoundObject | null) => void>> };
       currItem: any;
       effectObjects: { h: Record<string, Game.sound.SoundObject> };
@@ -13775,12 +15483,26 @@ export declare namespace Game {
       get_musicVolume(): number;
       get_percLoaded(): any;
       get_volume(): any;
-      getSoundObject(key: string | null, ready: (sound: Game.sound.SoundObject | null) => void, type?: string): void;
-      internalPlay(type: string, key: string, loop: boolean, resume: boolean, onLoad?: (channel: Game.openfl.media.SoundChannel | null) => void, onComplete?: () => void): void;
+      getSoundObject(
+        key: string | null,
+        ready: (sound: Game.sound.SoundObject | null) => void,
+        type?: string,
+      ): void;
+      internalPlay(
+        type: string,
+        key: string,
+        loop: boolean,
+        resume: boolean,
+        onLoad?: (channel: Game.openfl.media.SoundChannel | null) => void,
+        onComplete?: () => void,
+      ): void;
       load(arg0?: any): any;
       loadItems: any;
       loadOne(arg0?: any): any;
-      loadSoundFromFS(fileName: string, ready: (sound: Game.sound.SoundObject | null) => void): void;
+      loadSoundFromFS(
+        fileName: string,
+        ready: (sound: Game.sound.SoundObject | null) => void,
+      ): void;
       loadSoundFromUrl(url: string, ready: (sound: Game.sound.SoundObject | null) => void): void;
       musicObjects: { h: Record<string, Game.sound.SoundObject> };
       onIOError(arg0?: any): any;
@@ -13788,7 +15510,14 @@ export declare namespace Game {
       onLoadProgress(arg0?: any): any;
       percentageLoaded: any;
       play(arg0?: any, arg1?: any, arg2?: any): any;
-      playMusic(key: string, loop?: boolean, resume?: boolean, onLoad?: (channel: Game.openfl.media.SoundChannel | null) => void, onComplete?: () => void, fade?: boolean): void;
+      playMusic(
+        key: string,
+        loop?: boolean,
+        resume?: boolean,
+        onLoad?: (channel: Game.openfl.media.SoundChannel | null) => void,
+        onComplete?: () => void,
+        fade?: boolean,
+      ): void;
       preCacheSound(key: string, ready?: () => void, type?: string): void;
       set_client(arg0?: any): any;
       set_effectVolume(volume: number): number;
@@ -13874,8 +15603,7 @@ export declare namespace Game {
         set_timeScale(arg0?: any): any;
         tween(arg0?: any, arg1?: any, arg2?: any): any;
       }
-      interface Transitions extends HaxeObject {
-      }
+      interface Transitions extends HaxeObject {}
       interface Tween extends Game.starling.events.EventDispatcher {
         advanceTime(arg0?: any): any;
         animate(arg0?: any, arg1?: any): any;
@@ -14140,7 +15868,34 @@ export declare namespace Game {
         set_useHandCursor(arg0?: any): any;
         set_width(arg0?: any): any;
       }
-      interface ButtonState extends HaxeObject {
+      interface ButtonState extends HaxeObject {}
+      interface Canvas extends Game.starling.display.DisplayObjectContainer {
+        __currentPath: any;
+        __fillAlpha: any;
+        __fillColor: any;
+        __polygons: any;
+        beginFill(arg0?: any, arg1?: any): any;
+        clear(): any;
+        closeCurrentPathIfNeeded(): any;
+        curveTo(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
+        dispose(): any;
+        drawCircle(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
+        drawEllipse(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
+        drawGraphicsData(arg0?: any): any;
+        drawPolygon(arg0?: any): any;
+        drawRectangle(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
+        drawRoundRectangle(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+        ): any;
+        endFill(): any;
+        hitTest(arg0?: any): any;
+        lineTo(arg0?: any, arg1?: any): any;
+        moveTo(arg0?: any, arg1?: any): any;
       }
       interface DisplayObject extends Game.starling.events.EventDispatcher {
         __alpha: any;
@@ -14201,7 +15956,10 @@ export declare namespace Game {
         get_x(): number;
         get_y(): number;
         getBounds(arg0?: any, arg1?: any): any;
-        getTransformationMatrix(targetSpace: Game.starling.display.DisplayObject | null, result?: Game.openfl.geom.Matrix | null): Game.openfl.geom.Matrix;
+        getTransformationMatrix(
+          targetSpace: Game.starling.display.DisplayObject | null,
+          result?: Game.openfl.geom.Matrix | null,
+        ): Game.openfl.geom.Matrix;
         getTransformationMatrix3D(arg0?: any, arg1?: any): any;
         globalToLocal(arg0?: any, arg1?: any): any;
         globalToLocal3D(arg0?: any, arg1?: any): any;
@@ -14215,9 +15973,13 @@ export declare namespace Game {
         render(arg0?: any): any;
         set_alpha(value: number): number;
         set_blendMode(value: string): string;
-        set_filter(filter: Game.starling.filters.FragmentFilter | null): Game.starling.filters.FragmentFilter | null;
+        set_filter(
+          filter: Game.starling.filters.FragmentFilter | null,
+        ): Game.starling.filters.FragmentFilter | null;
         set_height(value: number): number;
-        set_mask(mask: Game.starling.display.DisplayObject | null): Game.starling.display.DisplayObject | null;
+        set_mask(
+          mask: Game.starling.display.DisplayObject | null,
+        ): Game.starling.display.DisplayObject | null;
         set_maskInverted(arg0?: any): any;
         set_name(value: string): string;
         set_pivotX(value: number): number;
@@ -14268,7 +16030,9 @@ export declare namespace Game {
         set_scale9Grid(arg0?: any): any;
         set_scaleX(arg0?: any): any;
         set_scaleY(arg0?: any): any;
-        set_texture(texture: Game.starling.textures.Texture | null): Game.starling.textures.Texture | null;
+        set_texture(
+          texture: Game.starling.textures.Texture | null,
+        ): Game.starling.textures.Texture | null;
         set_tileGrid(arg0?: any): any;
       }
       interface Mesh extends Game.starling.display.DisplayObject {
@@ -14297,7 +16061,9 @@ export declare namespace Game {
         set_color(color: number): number;
         set_pixelSnapping(enabled: boolean): boolean;
         set_style(arg0?: any): any;
-        set_texture(texture: Game.starling.textures.Texture | null): Game.starling.textures.Texture | null;
+        set_texture(
+          texture: Game.starling.textures.Texture | null,
+        ): Game.starling.textures.Texture | null;
         set_textureRepeat(arg0?: any): any;
         set_textureSmoothing(smoothing: string): string;
         setIndexDataChanged(): any;
@@ -14309,8 +16075,22 @@ export declare namespace Game {
         setVertexPosition(index: number, x: number, y: number): void;
       }
       interface MeshBatch extends Game.starling.display.Mesh {
-        addMesh(mesh: Game.starling.display.Mesh, matrix?: Game.openfl.geom.Matrix | null, alpha?: number, subset?: Game.starling.utils.MeshSubset | null, ignoreTransformations?: boolean): void;
-        addMeshAt(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+        addMesh(
+          mesh: Game.starling.display.Mesh,
+          matrix?: Game.openfl.geom.Matrix | null,
+          alpha?: number,
+          subset?: Game.starling.utils.MeshSubset | null,
+          ignoreTransformations?: boolean,
+        ): void;
+        addMeshAt(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
         canAddMesh(mesh: Game.starling.display.Mesh, numVertices?: number): boolean;
         clear(): void;
         dispose(): void;
@@ -14375,8 +16155,7 @@ export declare namespace Game {
         onRelease(arg0?: any): any;
         remove(arg0?: any, arg1?: any): any;
       }
-      interface Sprite extends Game.starling.display.DisplayObjectContainer {
-      }
+      interface Sprite extends Game.starling.display.DisplayObjectContainer {}
       interface Stage extends Game.starling.display.DisplayObjectContainer {
         __cameraPosition: any;
         __color: any;
@@ -14432,14 +16211,10 @@ export declare namespace Game {
       }
     }
     namespace errors {
-      interface AbstractClassError extends Game.openfl.errors.Error {
-      }
-      interface AbstractMethodError extends Game.openfl.errors.Error {
-      }
-      interface MissingContextError extends Game.openfl.errors.Error {
-      }
-      interface NotSupportedError extends Game.openfl.errors.Error {
-      }
+      interface AbstractClassError extends Game.openfl.errors.Error {}
+      interface AbstractMethodError extends Game.openfl.errors.Error {}
+      interface MissingContextError extends Game.openfl.errors.Error {}
+      interface NotSupportedError extends Game.openfl.errors.Error {}
     }
     namespace events {
       interface EnterFrameEvent extends Game.starling.events.Event {
@@ -14519,7 +16294,10 @@ export declare namespace Game {
         get_target(): any;
         get_timestamp(): any;
         get_width(): any;
-        getLocation(target: Game.starling.display.DisplayObject, result?: Game.openfl.geom.Point | null): Game.openfl.geom.Point;
+        getLocation(
+          target: Game.starling.display.DisplayObject,
+          result?: Game.openfl.geom.Point | null,
+        ): Game.openfl.geom.Point;
         getMovement(arg0?: any, arg1?: any): any;
         getMovementSinceStart(arg0?: any, arg1?: any): any;
         getPreviousLocation(arg0?: any, arg1?: any): any;
@@ -14536,7 +16314,15 @@ export declare namespace Game {
         set_timestamp(arg0?: any): any;
         set_width(arg0?: any): any;
         toString(): any;
-        update(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+        update(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
         updateBubbleChain(): any;
       }
       interface TouchData extends HaxeObject {
@@ -14546,7 +16332,15 @@ export declare namespace Game {
         id: any;
         phase: any;
         pressure: any;
-        setTo(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+        setTo(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
         width: any;
       }
       interface TouchEvent extends Game.starling.events.Event {
@@ -14558,7 +16352,11 @@ export declare namespace Game {
         get_shiftKey(): any;
         get_timestamp(): any;
         get_touches(): any;
-        getTouch(target: Game.starling.display.DisplayObject, phase?: string | null, id?: number): Game.starling.events.Touch | null;
+        getTouch(
+          target: Game.starling.display.DisplayObject,
+          phase?: string | null,
+          id?: number,
+        ): Game.starling.events.Touch | null;
         getTouches(arg0?: any, arg1?: any, arg2?: any): any;
         interactsWith(arg0?: any): any;
         resetTo(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
@@ -14578,8 +16376,7 @@ export declare namespace Game {
         moveCenter(arg0?: any, arg1?: any): any;
         moveMarker(arg0?: any, arg1?: any, arg2?: any): any;
       }
-      interface TouchPhase extends HaxeObject {
-      }
+      interface TouchPhase extends HaxeObject {}
       interface TouchProcessor extends HaxeObject {
         __ctrlDown: any;
         __currentTouches: any;
@@ -14601,7 +16398,15 @@ export declare namespace Game {
         containsTouchWithID(arg0?: any, arg1?: any): any;
         createOrUpdateTouch(arg0?: any): any;
         dispose(): any;
-        enqueue(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+        enqueue(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
         enqueueMouseLeftStage(): any;
         get_discardSystemGestures(): any;
         get_multitapDistance(): any;
@@ -14616,7 +16421,15 @@ export declare namespace Game {
         onInterruption(arg0?: any): any;
         onKey(arg0?: any): any;
         processTouches(arg0?: any, arg1?: any, arg2?: any): any;
-        queue_unshift(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+        queue_unshift(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
         set_discardSystemGestures(arg0?: any): any;
         set_multitapDistance(arg0?: any): any;
         set_multitapTime(arg0?: any): any;
@@ -14679,7 +16492,28 @@ export declare namespace Game {
         adjustHue(arg0?: any): any;
         adjustSaturation(arg0?: any): any;
         concat(arg0?: any): any;
-        concatValues(m0: number, m1: number, m2: number, m3: number, m4: number, m5: number, m6: number, m7: number, m8: number, m9: number, m10: number, m11: number, m12: number, m13: number, m14: number, m15: number, m16: number, m17: number, m18: number, m19: number): void;
+        concatValues(
+          m0: number,
+          m1: number,
+          m2: number,
+          m3: number,
+          m4: number,
+          m5: number,
+          m6: number,
+          m7: number,
+          m8: number,
+          m9: number,
+          m10: number,
+          m11: number,
+          m12: number,
+          m13: number,
+          m14: number,
+          m15: number,
+          m16: number,
+          m17: number,
+          m18: number,
+          m19: number,
+        ): void;
         createEffect(): any;
         get_colorEffect(): any;
         get_matrix(): any;
@@ -14726,8 +16560,7 @@ export declare namespace Game {
         x: any;
         y: any;
       }
-      interface CompositeMode extends HaxeObject {
-      }
+      interface CompositeMode extends HaxeObject {}
       interface DropShadowFilter extends Game.starling.filters.FragmentFilter {
         _angle: any;
         _blurFilter: any;
@@ -15227,7 +17060,15 @@ export declare namespace Game {
         set_projectionMatrix3D(arg0?: any): any;
         set_renderTarget(arg0?: any): any;
         setModelviewMatricesToIdentity(): any;
-        setProjectionMatrix(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+        setProjectionMatrix(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
         setProjectionMatrixChanged(): any;
         setRenderTarget(arg0?: any, arg1?: any, arg2?: any): any;
         transformModelviewMatrix(arg0?: any): any;
@@ -15247,8 +17088,23 @@ export declare namespace Game {
         clear(): any;
         clone(): any;
         colorize(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
-        copyAttributeTo(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): any;
-        copyAttributeTo_internal(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any): any;
+        copyAttributeTo(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+        ): any;
+        copyAttributeTo_internal(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+          arg6?: any,
+        ): any;
         copyTo(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
         createVertexBuffer(arg0?: any, arg1?: any): any;
         get_format(): any;
@@ -15264,7 +17120,14 @@ export declare namespace Game {
         getAlpha(arg0?: any, arg1?: any): any;
         getAttribute(arg0?: any): any;
         getBounds(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
-        getBoundsProjected(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): any;
+        getBoundsProjected(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+        ): any;
         getColor(arg0?: any, arg1?: any): any;
         getFloat(arg0?: any, arg1?: any): any;
         getFormat(arg0?: any): any;
@@ -15488,7 +17351,14 @@ export declare namespace Game {
         clearMeshBatch(arg0?: any): any;
         createSprite(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
         dispose(): any;
-        fillMeshBatch(batch: Game.starling.display.MeshBatch, width: number, height: number, text: string, format: Game.starling.text.TextFormat, options?: Game.starling.text.TextOptions | null): void;
+        fillMeshBatch(
+          batch: Game.starling.display.MeshBatch,
+          width: number,
+          height: number,
+          text: string,
+          format: Game.starling.text.TextFormat,
+          options?: Game.starling.text.TextOptions | null,
+        ): void;
         get_baseline(): number;
         get_distanceFieldSpread(): any;
         get_lineHeight(): number;
@@ -15515,16 +17385,14 @@ export declare namespace Game {
         set_smoothing(arg0?: any): any;
         set_type(arg0?: any): any;
       }
-      interface BitmapFontType extends HaxeObject {
-      }
+      interface BitmapFontType extends HaxeObject {}
       interface ITextCompositor extends HaxeObject {
         clearMeshBatch: any;
         dispose: any;
         fillMeshBatch: any;
         getDefaultMeshStyle: any;
       }
-      interface MiniBitmapFont extends HaxeObject {
-      }
+      interface MiniBitmapFont extends HaxeObject {}
       interface TextField extends Game.starling.display.DisplayObjectContainer {
         _border: any;
         _compositor: any;
@@ -15576,8 +17444,7 @@ export declare namespace Game {
         updateBorder(): any;
         updateText(): any;
       }
-      interface TextFieldAutoSize extends HaxeObject {
-      }
+      interface TextFieldAutoSize extends HaxeObject {}
       interface TextFormat extends Game.starling.events.EventDispatcher {
         __color: any;
         __font: any;
@@ -15718,7 +17585,10 @@ export declare namespace Game {
         setDataUploaded(): any;
         uploadAtfData(arg0?: any, arg1?: any, arg2?: any): any;
         uploadBitmap(arg0?: any, arg1?: any): any;
-        uploadBitmapData(data: Game.openfl.display.BitmapData, onReady?: ((texture: Game.starling.textures.ConcreteTexture) => void) | null): void;
+        uploadBitmapData(
+          data: Game.openfl.display.BitmapData,
+          onReady?: ((texture: Game.starling.textures.ConcreteTexture) => void) | null,
+        ): void;
       }
       interface ConcreteVideoTexture extends Game.starling.textures.ConcreteTexture {
         _disposed: any;
@@ -15835,12 +17705,10 @@ export declare namespace Game {
         set_premultipliedAlpha(arg0?: any): any;
         set_scale(arg0?: any): any;
       }
-      interface TextureSmoothing extends HaxeObject {
-      }
+      interface TextureSmoothing extends HaxeObject {}
     }
     namespace utils {
-      interface Align extends HaxeObject {
-      }
+      interface Align extends HaxeObject {}
       interface AssetManager extends Game.starling.events.EventDispatcher {
         __atlases: any;
         __bitmapFonts: any;
@@ -15904,7 +17772,14 @@ export declare namespace Game {
         log(arg0?: any): any;
         playSound(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         prependCallback(arg0?: any, arg1?: any): any;
-        processRawAsset(arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): any;
+        processRawAsset(
+          arg0?: any,
+          arg1?: any,
+          arg2?: any,
+          arg3?: any,
+          arg4?: any,
+          arg5?: any,
+        ): any;
         purge(): any;
         purgeQueue(): any;
         removeBitmapFont(arg0?: any, arg1?: any): any;
@@ -15951,18 +17826,12 @@ export declare namespace Game {
         set_state(arg0?: any): any;
         set_useHandCursor(arg0?: any): any;
       }
-      interface Color extends HaxeObject {
-      }
-      interface Earcut extends HaxeObject {
-      }
-      interface Execute extends HaxeObject {
-      }
-      interface MathUtil extends HaxeObject {
-      }
-      interface MatrixUtil extends HaxeObject {
-      }
-      interface Max extends HaxeObject {
-      }
+      interface Color extends HaxeObject {}
+      interface Earcut extends HaxeObject {}
+      interface Execute extends HaxeObject {}
+      interface MathUtil extends HaxeObject {}
+      interface MatrixUtil extends HaxeObject {}
+      interface Max extends HaxeObject {}
       interface MeshSubset extends HaxeObject {
         indexID: any;
         numIndices: any;
@@ -15970,8 +17839,7 @@ export declare namespace Game {
         setTo(arg0?: any, arg1?: any, arg2?: any, arg3?: any): any;
         vertexID: any;
       }
-      interface MeshUtil extends HaxeObject {
-      }
+      interface MeshUtil extends HaxeObject {}
       interface Node extends HaxeObject {
         i: any;
         next: any;
@@ -16002,18 +17870,12 @@ export declare namespace Game {
         setToSymmetric(arg0?: any, arg1?: any): any;
         setToUniform(arg0?: any): any;
       }
-      interface Pool extends HaxeObject {
-      }
-      interface RectangleUtil extends HaxeObject {
-      }
-      interface RenderUtil extends HaxeObject {
-      }
-      interface ScaleMode extends HaxeObject {
-      }
-      interface StringUtil extends HaxeObject {
-      }
-      interface SystemUtil extends HaxeObject {
-      }
+      interface Pool extends HaxeObject {}
+      interface RectangleUtil extends HaxeObject {}
+      interface RenderUtil extends HaxeObject {}
+      interface ScaleMode extends HaxeObject {}
+      interface StringUtil extends HaxeObject {}
+      interface SystemUtil extends HaxeObject {}
     }
   }
   namespace startSetup {
@@ -16028,6 +17890,23 @@ export declare namespace Game {
       get_timeStart: any;
       set_joinName: any;
       set_timeStart: any;
+    }
+    interface MobileShipSelect extends Game.starling.display.Sprite {
+      card(arg0?: any, arg1?: any, arg2?: any): any;
+      cards: any;
+      detail: any;
+      dispose(): any;
+      fillDetail(): any;
+      go(): any;
+      launch: any;
+      layout(arg0?: any, arg1?: any): any;
+      onLaunch: any;
+      order: any;
+      screenHeight: any;
+      screenWidth: any;
+      selected: any;
+      shown: any;
+      touches: any;
     }
     interface PickButton extends Game.starling.display.Sprite {
       bgr: any;
@@ -16048,13 +17927,25 @@ export declare namespace Game {
       _split: any;
       _timer: any;
       _timeStart: any;
-      addAnimatedText(text: string, duration: number, pageReadTime: number, x?: number, y?: number, id?: string, size?: number, color?: number, glowColor?: number, fadeOutDelay?: number): void;
+      addAnimatedText(
+        text: string,
+        duration: number,
+        pageReadTime: number,
+        x?: number,
+        y?: number,
+        id?: string,
+        size?: number,
+        color?: number,
+        glowColor?: number,
+        fadeOutDelay?: number,
+      ): void;
       addShips(): any;
       changeSkin(skin: string, button: Game.startSetup.PickButton): void;
       confirmButton: any;
       dataManager: any;
       description: Game.core.hud.components.Text | null;
       fillShipsArray(arg0?: any): any;
+      fitScreen(): any;
       freezeSpace: any;
       get_getStage(): any;
       get_progressText(): any;
@@ -16068,7 +17959,12 @@ export declare namespace Game {
       isRunning: boolean;
       logBook: any;
       logBookRead(arg0?: any): any;
+      mobileLaunch(arg0?: any): any;
+      mobileSelect: any;
+      onAddedFit(arg0?: any): any;
       onAnimationFinished(arg0?: any): any;
+      onRemovedFit(arg0?: any): any;
+      onResizeFit(arg0?: any): any;
       pickShipButton1: any;
       pickShipButton2: any;
       pickShipButton3: any;
@@ -16085,6 +17981,7 @@ export declare namespace Game {
       shakeTween1: any;
       shakeTween2: any;
       ships: any;
+      showMobileSelect(): any;
       skinStats: any;
       skipWakeUpCaptain: any;
       sleepCaptain(): any;
@@ -16100,8 +17997,7 @@ export declare namespace Game {
       timeAdjust: any;
       wakeUpCaptain(): any;
     }
-    interface StartSetupLocator extends HaxeObject {
-    }
+    interface StartSetupLocator extends HaxeObject {}
     interface StartShipBaseStats extends Game.starling.display.Sprite {
       addStat(arg0?: any, arg1?: any, arg2?: any): any;
       addWeapon(arg0?: any): any;
@@ -16128,10 +18024,8 @@ export declare namespace Game {
       removeEventListener: any;
       set_client: any;
     }
-    interface TextureConst extends HaxeObject {
-    }
-    interface TextureLocator extends HaxeObject {
-    }
+    interface TextureConst extends HaxeObject {}
+    interface TextureLocator extends HaxeObject {}
     interface TextureManager extends Game.starling.display.Sprite {
       _client: any;
       activeTarget: any;
@@ -16144,9 +18038,14 @@ export declare namespace Game {
       dataManager: any;
       disposeCustomTextures(): void;
       get_percLoaded(): number;
-      getTextureAtlas(name: string): Game.starling.textures.TextureAtlas | Game.starling.textures.Texture | null;
+      getTextureAtlas(
+        name: string,
+      ): Game.starling.textures.TextureAtlas | Game.starling.textures.Texture | null;
       getTextureByKey(arg0?: any, arg1?: any): any;
-      getTextureByTextureName(texture: string, atlas: string): Game.starling.textures.Texture | null;
+      getTextureByTextureName(
+        texture: string,
+        atlas: string,
+      ): Game.starling.textures.Texture | null;
       getTextureGUIByKey(arg0?: any): any;
       getTextureGUIByTextureName(name: string): Game.starling.textures.Texture | null;
       getTextureMainByKey(arg0?: any): any;
@@ -16173,20 +18072,16 @@ export declare namespace Game {
   }
 }
 export interface GameClasses {
-  "__ASSET__OPENFL__ui_russo_one_ttf": HaxeClass<Game.__ASSET__OPENFL__ui_russo_one_ttf> & {
-  };
-  "__ASSET__ui_russo_one_ttf": HaxeClass<Game.__ASSET__ui_russo_one_ttf> & {
-  };
-  "ApplicationMain": HaxeClass<Game.ApplicationMain> & {
+  __ASSET__OPENFL__ui_russo_one_ttf: HaxeClass<Game.__ASSET__OPENFL__ui_russo_one_ttf> & {};
+  __ASSET__ui_russo_one_ttf: HaxeClass<Game.__ASSET__ui_russo_one_ttf> & {};
+  ApplicationMain: HaxeClass<Game.ApplicationMain> & {
     create: (arg0?: any) => any;
     main: () => any;
     start: (arg0?: any) => any;
   };
-  "Array": HaxeClass<Game.Array> & {
-  };
-  "as3hx._Compat.FlashRegExpExecResult": HaxeClass<Game.as3hx._Compat.FlashRegExpExecResult> & {
-  };
-  "as3hx.Compat": HaxeClass<Game.as3hx.Compat> & {
+  Array: HaxeClass<Game.Array> & {};
+  'as3hx._Compat.FlashRegExpExecResult': HaxeClass<Game.as3hx._Compat.FlashRegExpExecResult> & {};
+  'as3hx.Compat': HaxeClass<Game.as3hx.Compat> & {
     _parseInt: (arg0?: any, arg1?: any) => any;
     arraySplice: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     clearInterval: (arg0?: any) => any;
@@ -16201,9 +18096,8 @@ export interface GameClasses {
     toFixed: (arg0?: any, arg1?: any) => any;
     typeof: (arg0?: any) => any;
   };
-  "as3hx.FlashRegExpAdapter": HaxeClass<Game.as3hx.FlashRegExpAdapter> & {
-  };
-  "bootstrap.SteamBridge": HaxeClass<Game.bootstrap.SteamBridge> & {
+  'as3hx.FlashRegExpAdapter': HaxeClass<Game.as3hx.FlashRegExpAdapter> & {};
+  'bootstrap.SteamBridge': HaxeClass<Game.bootstrap.SteamBridge> & {
     available: () => any;
     bridge: () => any;
     callPromise: (arg0?: any, arg1?: any, arg2?: any) => any;
@@ -16219,9 +18113,8 @@ export interface GameClasses {
     SUPPORTED_BRIDGE_VERSION: number;
     toggleFullscreen: () => any;
   };
-  "BuyButtonBitmap": HaxeClass<Game.BuyButtonBitmap> & {
-  };
-  "camerafocus.events.CameraFocusEvent": HaxeClass<Game.camerafocus.events.CameraFocusEvent> & {
+  BuyButtonBitmap: HaxeClass<Game.BuyButtonBitmap> & {};
+  'camerafocus.events.CameraFocusEvent': HaxeClass<Game.camerafocus.events.CameraFocusEvent> & {
     HIT_BOUNDARY: string;
     SHAKE_FINISHED: string;
     SHAKE_STARTED: string;
@@ -16230,18 +18123,17 @@ export interface GameClasses {
     ZOOM_FINISHED: string;
     ZOOM_STARTED: string;
   };
-  "camerafocus.StarlingCameraFocus": HaxeClass<Game.camerafocus.StarlingCameraFocus> & {
+  'camerafocus.StarlingCameraFocus': HaxeClass<Game.camerafocus.StarlingCameraFocus> & {
     fx: (arg0?: any) => any;
     fy: (arg0?: any) => any;
   };
-  "clock.Clock": HaxeClass<Game.clock.Clock> & {
+  'clock.Clock': HaxeClass<Game.clock.Clock> & {
     CLOCK_READY: string;
     MAX_SLEW_RATE: number;
     SNAP_THRESHOLD_MS: number;
   };
-  "clock.TimeDelta": HaxeClass<Game.clock.TimeDelta> & {
-  };
-  "com.adobe.crypto.MD5": HaxeClass<Game.com.adobe.crypto.MD5> & {
+  'clock.TimeDelta': HaxeClass<Game.clock.TimeDelta> & {};
+  'com.adobe.crypto.MD5': HaxeClass<Game.com.adobe.crypto.MD5> & {
     createBlocks: (arg0?: any) => any;
     digest: any;
     f: (arg0?: any, arg1?: any, arg2?: any) => any;
@@ -16255,25 +18147,30 @@ export interface GameClasses {
     hh: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
     i: (arg0?: any, arg1?: any, arg2?: any) => any;
     ii: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
-    transform: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+    transform: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
   };
-  "com.adobe.serialization.json.JSON": HaxeClass<Game.com.adobe.serialization.json.JSON> & {
+  'com.adobe.serialization.json.JSON': HaxeClass<Game.com.adobe.serialization.json.JSON> & {
     decode: (arg0?: any, arg1?: any) => any;
     encode: (arg0?: any) => any;
   };
-  "com.adobe.serialization.json.JSONDecoder": HaxeClass<Game.com.adobe.serialization.json.JSONDecoder> & {
-  };
-  "com.adobe.serialization.json.JSONEncoder": HaxeClass<Game.com.adobe.serialization.json.JSONEncoder> & {
-  };
-  "com.adobe.serialization.json.JSONParseError": HaxeClass<Game.com.adobe.serialization.json.JSONParseError> & {
-  };
-  "com.adobe.serialization.json.JSONToken": HaxeClass<Game.com.adobe.serialization.json.JSONToken> & {
+  'com.adobe.serialization.json.JSONDecoder': HaxeClass<Game.com.adobe.serialization.json.JSONDecoder> & {};
+  'com.adobe.serialization.json.JSONEncoder': HaxeClass<Game.com.adobe.serialization.json.JSONEncoder> & {};
+  'com.adobe.serialization.json.JSONParseError': HaxeClass<Game.com.adobe.serialization.json.JSONParseError> & {};
+  'com.adobe.serialization.json.JSONToken': HaxeClass<Game.com.adobe.serialization.json.JSONToken> & {
     create: (arg0?: any, arg1?: any) => any;
     token: any;
   };
-  "com.adobe.serialization.json.JSONTokenizer": HaxeClass<Game.com.adobe.serialization.json.JSONTokenizer> & {
-  };
-  "com.adobe.serialization.json.JSONTokenType": HaxeClass<Game.com.adobe.serialization.json.JSONTokenType> & {
+  'com.adobe.serialization.json.JSONTokenizer': HaxeClass<Game.com.adobe.serialization.json.JSONTokenizer> & {};
+  'com.adobe.serialization.json.JSONTokenType': HaxeClass<Game.com.adobe.serialization.json.JSONTokenType> & {
     COLON: number;
     COMMA: number;
     FALSE: number;
@@ -16288,7 +18185,7 @@ export interface GameClasses {
     TRUE: number;
     UNKNOWN: number;
   };
-  "com.adobe.utils.DateUTCExt": HaxeClass<Game.com.adobe.utils.DateUTCExt> & {
+  'com.adobe.utils.DateUTCExt': HaxeClass<Game.com.adobe.utils.DateUTCExt> & {
     getUTCDate: (arg0?: any) => any;
     getUTCDay: (arg0?: any) => any;
     getUTCFullYear: (arg0?: any) => any;
@@ -16298,9 +18195,17 @@ export interface GameClasses {
     getUTCMonth: (arg0?: any) => any;
     getUTCSeconds: (arg0?: any) => any;
   };
-  "com.adobe.utils.DateUtil": HaxeClass<Game.com.adobe.utils.DateUtil> & {
+  'com.adobe.utils.DateUtil': HaxeClass<Game.com.adobe.utils.DateUtil> & {
     compareDates: (arg0?: any, arg1?: any) => any;
-    dateUTC: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
+    dateUTC: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
     dayNamesLong: any;
     dayNamesShort: any;
     getAMPM: (arg0?: any) => any;
@@ -16325,13 +18230,13 @@ export interface GameClasses {
     toRFC822: (arg0?: any) => any;
     toW3CDTF: (arg0?: any, arg1?: any) => any;
   };
-  "com.adobe.utils.IntUtil": HaxeClass<Game.com.adobe.utils.IntUtil> & {
+  'com.adobe.utils.IntUtil': HaxeClass<Game.com.adobe.utils.IntUtil> & {
     hexChars: string;
     rol: (arg0?: any, arg1?: any) => any;
     ror: (arg0?: any, arg1?: any) => any;
     toHex: (arg0?: any, arg1?: any) => any;
   };
-  "com.adobe.utils.StringUtil": HaxeClass<Game.com.adobe.utils.StringUtil> & {
+  'com.adobe.utils.StringUtil': HaxeClass<Game.com.adobe.utils.StringUtil> & {
     beginsWith: (arg0?: any, arg1?: any) => any;
     endsWith: (arg0?: any, arg1?: any) => any;
     ltrim: (arg0?: any) => any;
@@ -16342,49 +18247,62 @@ export interface GameClasses {
     stringsAreEqual: (arg0?: any, arg1?: any, arg2?: any) => any;
     trim: (arg0?: any) => any;
   };
-  "com.greensock.easing.Back": HaxeClass<Game.com.greensock.easing.Back> & {
+  'com.greensock.easing.Back': HaxeClass<Game.com.greensock.easing.Back> & {
     easeOut: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     OVERSHOOT: number;
   };
-  "com.greensock.easing.Circ": HaxeClass<Game.com.greensock.easing.Circ> & {
+  'com.greensock.easing.Circ': HaxeClass<Game.com.greensock.easing.Circ> & {
     easeIn: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     easeInOut: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     easeOut: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
   };
-  "com.greensock.easing.Elastic": HaxeClass<Game.com.greensock.easing.Elastic> & {
+  'com.greensock.easing.Elastic': HaxeClass<Game.com.greensock.easing.Elastic> & {
     AMPLITUDE: number;
     easeInOut: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     PERIOD: number;
     SHIFT: any;
   };
-  "com.greensock.easing.Expo": HaxeClass<Game.com.greensock.easing.Expo> & {
+  'com.greensock.easing.Expo': HaxeClass<Game.com.greensock.easing.Expo> & {
     easeInOut: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
   };
-  "com.greensock.easing.Power1": HaxeClass<Game.com.greensock.easing.Power1> & {
+  'com.greensock.easing.Power1': HaxeClass<Game.com.greensock.easing.Power1> & {
     easeOut: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
   };
-  "com.greensock.easing.Sine": HaxeClass<Game.com.greensock.easing.Sine> & {
+  'com.greensock.easing.Sine': HaxeClass<Game.com.greensock.easing.Sine> & {
     easeInOut: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
   };
-  "com.greensock.plugins.RemoveTintPlugin": HaxeClass<Game.com.greensock.plugins.RemoveTintPlugin> & {
-  };
-  "com.greensock.PropTween": HaxeClass<Game.com.greensock.PropTween> & {
-  };
-  "com.greensock.StarlingTweenHost": HaxeClass<Game.com.greensock.StarlingTweenHost> & {
+  'com.greensock.plugins.RemoveTintPlugin': HaxeClass<Game.com.greensock.plugins.RemoveTintPlugin> & {};
+  'com.greensock.PropTween': HaxeClass<Game.com.greensock.PropTween> & {};
+  'com.greensock.StarlingTweenHost': HaxeClass<Game.com.greensock.StarlingTweenHost> & {
     ensure: () => any;
     glowBlurAlias: (arg0?: any, arg1?: any) => any;
     pump: any;
     registered: boolean;
   };
-  "com.greensock.TweenMax": HaxeClass<Game.com.greensock.TweenMax> & {
+  'com.greensock.TweenMax': HaxeClass<Game.com.greensock.TweenMax> & {
     addPropertyAlias: (arg0?: any) => any;
     advance: (arg0?: any) => any;
     aliases: any;
     call: (arg0?: any, arg1?: any) => any;
     create: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
-    delayedCall:  <Args extends unknown[]>(delay: number, callback: (...params: Args) => unknown, params?: Args, useFrames?: boolean) => Game.com.greensock.TweenMax;
+    delayedCall: <Args extends unknown[]>(
+      delay: number,
+      callback: (...params: Args) => unknown,
+      params?: Args,
+      useFrames?: boolean,
+    ) => Game.com.greensock.TweenMax;
     ensureHost: () => any;
-    from: (target: object, duration: number, options: { alpha?: number; scaleX?: number; scaleY?: number; rotation?: number; paused?: boolean }) => Game.com.greensock.TweenMax;
+    from: (
+      target: object,
+      duration: number,
+      options: {
+        alpha?: number;
+        scaleX?: number;
+        scaleY?: number;
+        rotation?: number;
+        paused?: boolean;
+      },
+    ) => Game.com.greensock.TweenMax;
     fromTo: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     getTweensOf: (arg0?: any, arg1?: any) => any;
     isNumeric: (arg0?: any) => any;
@@ -16396,21 +18314,29 @@ export interface GameClasses {
     MODE_FROM_TO: number;
     MODE_TO: number;
     RESERVED: any;
-    to:  <T extends object>(target: T, duration: number, options: Partial<{ [K in keyof T as T[K] extends number ? K : never]: number }> & { volume?: number; alpha?: number; onUpdate?: () => void; onComplete?: () => void }) => Game.com.greensock.TweenMax;
+    to: <T extends object>(
+      target: T,
+      duration: number,
+      options: Partial<{ [K in keyof T as T[K] extends number ? K : never]: number }> & {
+        volume?: number;
+        alpha?: number;
+        onUpdate?: () => void;
+        onComplete?: () => void;
+      },
+    ) => Game.com.greensock.TweenMax;
     toFloat: (arg0?: any) => any;
     warn: (arg0?: any) => any;
     warned: any;
   };
-  "com.greensock.TweenPump": HaxeClass<Game.com.greensock.TweenPump> & {
-  };
-  "config.AssetVersion": HaxeClass<Game.config.AssetVersion> & {
+  'com.greensock.TweenPump': HaxeClass<Game.com.greensock.TweenPump> & {};
+  'config.AssetVersion': HaxeClass<Game.config.AssetVersion> & {
     url: (arg0?: any) => any;
     VALUE: string;
   };
-  "config.GameRooms": HaxeClass<Game.config.GameRooms> & {
+  'config.GameRooms': HaxeClass<Game.config.GameRooms> & {
     applyPlayerIOConfig: () => any;
   };
-  "core.artifact.Artifact": HaxeClass<Game.core.artifact.Artifact> & {
+  'core.artifact.Artifact': HaxeClass<Game.core.artifact.Artifact> & {
     currentTypeOrder: any;
     MAX_UPGRADES: number;
     orderHighestLevel: (arg0?: any, arg1?: any) => any;
@@ -16505,16 +18431,20 @@ export interface GameClasses {
     TYPE_VEIL_OF_YHGVIS: string;
     TYPE_VELOCITY_CORE: string;
   };
-  "core.artifact.ArtifactBox": HaxeClass<Game.core.artifact.ArtifactBox> & {
-  };
-  "core.artifact.ArtifactCargoBox": HaxeClass<Game.core.artifact.ArtifactCargoBox> & {
+  'core.artifact.ArtifactBox': HaxeClass<Game.core.artifact.ArtifactBox> & {};
+  'core.artifact.ArtifactCargoBox': HaxeClass<Game.core.artifact.ArtifactCargoBox> & {
     COLOR_ACTIVE: number;
     COLOR_SELECTED_RECYCLE: number;
     COLOR_SELECTED_UPGRADE: number;
   };
-  "core.artifact.ArtifactFactory": HaxeClass<Game.core.artifact.ArtifactFactory> & {
+  'core.artifact.ArtifactFactory': HaxeClass<Game.core.artifact.ArtifactFactory> & {
     attach: (arg0?: any) => any;
-    createArtifact: (id: string, game: Game.core.scene.Game, player: Game.core.player.Player, callback: (artifact: Game.core.artifact.Artifact | null) => void) => void;
+    createArtifact: (
+      id: string,
+      game: Game.core.scene.Game,
+      player: Game.core.player.Player,
+      callback: (artifact: Game.core.artifact.Artifact | null) => void,
+    ) => void;
     createArtifactFromSkin: (arg0?: any) => any;
     createArtifacts: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     game: any;
@@ -16525,20 +18455,18 @@ export interface GameClasses {
     request: (arg0?: any, arg1?: any, arg2?: any) => any;
     send: (arg0?: any, arg1?: any) => any;
   };
-  "core.artifact.ArtifactOverview": HaxeClass<Game.core.artifact.ArtifactOverview> & {
-    artifactsLoaded: boolean;
-    claimingCrewKeys: any;
+  'core.artifact.ArtifactOverview': HaxeClass<Game.core.artifact.ArtifactOverview> & {
+    get_claimingCrewKeys: () => any;
     MAX_RECYCLE: number;
     textureManager: any;
   };
-  "core.artifact.ArtifactSorting": HaxeClass<Game.core.artifact.ArtifactSorting> & {
-  };
-  "core.artifact.ArtifactStat": HaxeClass<Game.core.artifact.ArtifactStat> & {
+  'core.artifact.ArtifactSorting': HaxeClass<Game.core.artifact.ArtifactSorting> & {};
+  'core.artifact.ArtifactStat': HaxeClass<Game.core.artifact.ArtifactStat> & {
     isUniqueType: (arg0?: any) => any;
     parseTextFromStatType: (type: string, value: number, unique?: boolean) => string;
     parseTextFromStatTypeShort: (arg0?: any, arg1?: any) => any;
   };
-  "core.artifact.ArtifactStatModifiers": HaxeClass<Game.core.artifact.ArtifactStatModifiers> & {
+  'core.artifact.ArtifactStatModifiers': HaxeClass<Game.core.artifact.ArtifactStatModifiers> & {
     AllAdd: number;
     AllMulti: number;
     AllResist: number;
@@ -16570,32 +18498,35 @@ export interface GameClasses {
     ShieldVamp: number;
     Speed: number;
   };
-  "core.boss.Boss": HaxeClass<Game.core.boss.Boss> & {
-  };
-  "core.boss.BossComponent": HaxeClass<Game.core.boss.BossComponent> & {
-  };
-  "core.boss.BossFactory": HaxeClass<Game.core.boss.BossFactory> & {
+  'core.boss.Boss': HaxeClass<Game.core.boss.Boss> & {};
+  'core.boss.BossComponent': HaxeClass<Game.core.boss.BossComponent> & {};
+  'core.boss.BossFactory': HaxeClass<Game.core.boss.BossFactory> & {
     addBossComponents: (arg0?: any, arg1?: any, arg2?: any) => any;
     addSpawners: (arg0?: any, arg1?: any, arg2?: any) => any;
     addTurrets: (arg0?: any, arg1?: any, arg2?: any) => any;
     compareFunction: (arg0?: any, arg1?: any) => any;
     createBoss: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
-    createBossComponent: (definition: object, boss: Game.core.boss.Boss, game: Game.core.scene.Game) => void;
+    createBossComponent: (
+      definition: object,
+      boss: Game.core.boss.Boss,
+      game: Game.core.scene.Game,
+    ) => void;
     createSpawner: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     createTurret: (arg0?: any, arg1?: any, arg2?: any) => any;
     getTriggers: (arg0?: any, arg1?: any) => any;
     sortComponents: (arg0?: any, arg1?: any) => any;
   };
-  "core.boss.BossManager": HaxeClass<Game.core.boss.BossManager> & {
-  };
-  "core.boss.Trigger": HaxeClass<Game.core.boss.Trigger> & {
-  };
-  "core.boss.Waypoint": HaxeClass<Game.core.boss.Waypoint> & {
-  };
-  "core.clan.ClanApplicationCheck": HaxeClass<Game.core.clan.ClanApplicationCheck> & {
-  };
-  "core.clan.ClanClient": HaxeClass<Game.core.clan.ClanClient> & {
-    brief: (game: Game.core.scene.Game, clanId: string, playerId: string, callback: (clan: import('./ClanIdentity').ClanBrief) => void) => void;
+  'core.boss.BossManager': HaxeClass<Game.core.boss.BossManager> & {};
+  'core.boss.Trigger': HaxeClass<Game.core.boss.Trigger> & {};
+  'core.boss.Waypoint': HaxeClass<Game.core.boss.Waypoint> & {};
+  'core.clan.ClanApplicationCheck': HaxeClass<Game.core.clan.ClanApplicationCheck> & {};
+  'core.clan.ClanClient': HaxeClass<Game.core.clan.ClanClient> & {
+    brief: (
+      game: Game.core.scene.Game,
+      clanId: string,
+      playerId: string,
+      callback: (clan: import('./ClanIdentity').ClanBrief) => void,
+    ) => void;
     briefs: any;
     briefWaiting: any;
     busy: boolean;
@@ -16614,14 +18545,19 @@ export interface GameClasses {
     view: (arg0?: any, arg1?: any, arg2?: any) => any;
     waiting: any;
   };
-  "core.clan.PlayerClanLogo": HaxeClass<Game.core.clan.PlayerClanLogo, [game: Game.core.scene.Game, player: Game.core.player.Player, callback?: (success?: boolean) => void]> & {
-  };
-  "core.controlZones.ControlZone": HaxeClass<Game.core.controlZones.ControlZone> & {
-  };
-  "core.controlZones.ControlZoneManager": HaxeClass<Game.core.controlZones.ControlZoneManager> & {
+  'core.clan.PlayerClanLogo': HaxeClass<
+    Game.core.clan.PlayerClanLogo,
+    [
+      game: Game.core.scene.Game,
+      player: Game.core.player.Player,
+      callback?: (success?: boolean) => void,
+    ]
+  > & {};
+  'core.controlZones.ControlZone': HaxeClass<Game.core.controlZones.ControlZone> & {};
+  'core.controlZones.ControlZoneManager': HaxeClass<Game.core.controlZones.ControlZoneManager> & {
     claimData: any;
   };
-  "core.credits.CreditManager": HaxeClass<Game.core.credits.CreditManager> & {
+  'core.credits.CreditManager': HaxeClass<Game.core.credits.CreditManager> & {
     artifactCosts: any;
     COST_MEDIUM: number;
     COST_SMALL: number;
@@ -16661,11 +18597,9 @@ export interface GameClasses {
     TYPE_MISSION: string;
     TYPE_PVP: string;
   };
-  "core.credits.Sale": HaxeClass<Game.core.credits.Sale> & {
-  };
-  "core.credits.SaleEvent": HaxeClass<Game.core.credits.SaleEvent> & {
-  };
-  "core.credits.SalesManager": HaxeClass<Game.core.credits.SalesManager> & {
+  'core.credits.Sale': HaxeClass<Game.core.credits.Sale> & {};
+  'core.credits.SaleEvent': HaxeClass<Game.core.credits.SaleEvent> & {};
+  'core.credits.SalesManager': HaxeClass<Game.core.credits.SalesManager> & {
     eventList: any;
     isSalePeriod: () => any;
     TYPE_FLUX: string;
@@ -16673,33 +18607,26 @@ export interface GameClasses {
     TYPE_PACKAGE: string;
     TYPE_SPECIAL_SKIN: string;
   };
-  "core.deathLine.DeathLine": HaxeClass<Game.core.deathLine.DeathLine> & {
-  };
-  "core.deathLine.DeathLineManager": HaxeClass<Game.core.deathLine.DeathLineManager> & {
-  };
-  "core.drops.Drop": HaxeClass<Game.core.drops.Drop> & {
-  };
-  "core.drops.DropBase": HaxeClass<Game.core.drops.DropBase> & {
-  };
-  "core.drops.DropFactory": HaxeClass<Game.core.drops.DropFactory> & {
+  'core.deathLine.DeathLine': HaxeClass<Game.core.deathLine.DeathLine> & {};
+  'core.deathLine.DeathLineManager': HaxeClass<Game.core.deathLine.DeathLineManager> & {};
+  'core.drops.Drop': HaxeClass<Game.core.drops.Drop> & {};
+  'core.drops.DropBase': HaxeClass<Game.core.drops.DropBase> & {};
+  'core.drops.DropFactory': HaxeClass<Game.core.drops.DropFactory> & {
     createDrop: (arg0?: any, arg1?: any) => any;
     createDropFromCargo: (arg0?: any, arg1?: any) => any;
     setDropProps: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "core.drops.DropItem": HaxeClass<Game.core.drops.DropItem> & {
-  };
-  "core.drops.DropManager": HaxeClass<Game.core.drops.DropManager> & {
+  'core.drops.DropItem': HaxeClass<Game.core.drops.DropItem> & {};
+  'core.drops.DropManager': HaxeClass<Game.core.drops.DropManager> & {
     ATTEMPTS_TO_TIMEOUT: number;
     PICKUPINTERVAL: number;
   };
-  "core.drops.PickUpMsg": HaxeClass<Game.core.drops.PickUpMsg> & {
-  };
-  "core.engine.Engine": HaxeClass<Game.core.engine.Engine> & {
-  };
-  "core.engine.EngineFactory": HaxeClass<Game.core.engine.EngineFactory> & {
+  'core.drops.PickUpMsg': HaxeClass<Game.core.drops.PickUpMsg> & {};
+  'core.engine.Engine': HaxeClass<Game.core.engine.Engine> & {};
+  'core.engine.EngineFactory': HaxeClass<Game.core.engine.EngineFactory> & {
     create: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "core.error.ErrorReport": HaxeClass<Game.core.error.ErrorReport> & {
+  'core.error.ErrorReport': HaxeClass<Game.core.error.ErrorReport> & {
     buffer: any;
     deliver: (arg0?: any) => any;
     firstLine: (arg0?: any) => any;
@@ -16725,25 +18652,23 @@ export interface GameClasses {
     stackOf: (arg0?: any) => any;
     withEnvironment: (arg0?: any) => any;
   };
-  "core.friend.Friend": HaxeClass<Game.core.friend.Friend> & {
-  };
-  "core.friend.FriendManager": HaxeClass<Game.core.friend.FriendManager> & {
+  'core.friend.Friend': HaxeClass<Game.core.friend.Friend> & {};
+  'core.friend.FriendManager': HaxeClass<Game.core.friend.FriendManager> & {
     ONLINE_FRIENDS_TIMEOUT_MS: number;
   };
-  "core.GameObject": HaxeClass<Game.core.GameObject> & {
-  };
-  "core.group.Group": HaxeClass<Game.core.group.Group, [game: Game.core.scene.Game, id: string]> & {
-  };
-  "core.group.GroupManager": HaxeClass<Game.core.group.GroupManager> & {
-  };
-  "core.hud.components.BeamLine": HaxeClass<Game.core.hud.components.BeamLine> & {
-  };
-  "core.hud.components.BossHealth": HaxeClass<Game.core.hud.components.BossHealth> & {
+  'core.GameObject': HaxeClass<Game.core.GameObject> & {};
+  'core.group.Group': HaxeClass<
+    Game.core.group.Group,
+    [game: Game.core.scene.Game, id: string]
+  > & {};
+  'core.group.GroupManager': HaxeClass<Game.core.group.GroupManager> & {};
+  'core.hud.components.BeamLine': HaxeClass<Game.core.hud.components.BeamLine> & {};
+  'core.hud.components.BossHealth': HaxeClass<Game.core.hud.components.BossHealth> & {
     BOSS_DISPLAY_RANGE: number;
     BOSS_HIDE_RANGE: number;
     HP_WIDTH: number;
   };
-  "core.hud.components.Box": HaxeClass<Game.core.hud.components.Box> & {
+  'core.hud.components.Box': HaxeClass<Game.core.hud.components.Box> & {
     BUTTON_SCALE_9_GRID: any;
     buyTexture: any;
     highlightTexture: any;
@@ -16756,7 +18681,7 @@ export interface GameClasses {
     STYLE_NORMAL: string;
     themeLoaded: boolean;
   };
-  "core.hud.components.Button": HaxeClass<Game.core.hud.components.Button> & {
+  'core.hud.components.Button': HaxeClass<Game.core.hud.components.Button> & {
     BUTTON_SCALE_9_GRID: any;
     highlightTexture: any;
     loadTheme: () => any;
@@ -16771,12 +18696,11 @@ export interface GameClasses {
     themeLoaded: boolean;
     warningTexture: any;
   };
-  "core.hud.components.ButtonCargo": HaxeClass<Game.core.hud.components.ButtonCargo> & {
+  'core.hud.components.ButtonCargo': HaxeClass<Game.core.hud.components.ButtonCargo> & {
     serverSaysCargoIsFull: boolean;
   };
-  "core.hud.components.ButtonClan": HaxeClass<Game.core.hud.components.ButtonClan> & {
-  };
-  "core.hud.components.ButtonExpandableHud": HaxeClass<Game.core.hud.components.ButtonExpandableHud> & {
+  'core.hud.components.ButtonClan': HaxeClass<Game.core.hud.components.ButtonClan> & {};
+  'core.hud.components.ButtonExpandableHud': HaxeClass<Game.core.hud.components.ButtonExpandableHud> & {
     bgrLeftTexture: any;
     bgrMidTexture: any;
     bgrRightTexture: any;
@@ -16784,7 +18708,7 @@ export interface GameClasses {
     hoverMidTexture: any;
     hoverRightTexture: any;
   };
-  "core.hud.components.ButtonHud": HaxeClass<Game.core.hud.components.ButtonHud> & {
+  'core.hud.components.ButtonHud': HaxeClass<Game.core.hud.components.ButtonHud> & {
     TYPE_ARTIFACTS: string;
     TYPE_CARGO: string;
     TYPE_ENCOUNTERS: string;
@@ -16802,41 +18726,31 @@ export interface GameClasses {
     TYPE_SHIP: string;
     TYPE_SHOP_BG: string;
   };
-  "core.hud.components.ButtonMissions": HaxeClass<Game.core.hud.components.ButtonMissions> & {
-  };
-  "core.hud.components.ButtonNewMission": HaxeClass<Game.core.hud.components.ButtonNewMission> & {
-  };
-  "core.hud.components.ButtonPlayers": HaxeClass<Game.core.hud.components.ButtonPlayers> & {
-  };
-  "core.hud.components.ButtonPvP": HaxeClass<Game.core.hud.components.ButtonPvP> & {
-  };
-  "core.hud.components.ButtonPvPMenu": HaxeClass<Game.core.hud.components.ButtonPvPMenu> & {
-  };
-  "core.hud.components.ButtonPvPQuickMatch": HaxeClass<Game.core.hud.components.ButtonPvPQuickMatch> & {
-  };
-  "core.hud.components.ButtonQueue": HaxeClass<Game.core.hud.components.ButtonQueue> & {
-  };
-  "core.hud.components.BuyFluxButton": HaxeClass<Game.core.hud.components.BuyFluxButton> & {
-  };
-  "core.hud.components.cargo.Cargo": HaxeClass<Game.core.hud.components.cargo.Cargo> & {
+  'core.hud.components.ButtonMissions': HaxeClass<Game.core.hud.components.ButtonMissions> & {};
+  'core.hud.components.ButtonNewMission': HaxeClass<Game.core.hud.components.ButtonNewMission> & {};
+  'core.hud.components.ButtonPlayers': HaxeClass<Game.core.hud.components.ButtonPlayers> & {};
+  'core.hud.components.ButtonPvP': HaxeClass<Game.core.hud.components.ButtonPvP> & {};
+  'core.hud.components.ButtonPvPMenu': HaxeClass<Game.core.hud.components.ButtonPvPMenu> & {};
+  'core.hud.components.ButtonPvPQuickMatch': HaxeClass<Game.core.hud.components.ButtonPvPQuickMatch> & {};
+  'core.hud.components.ButtonQueue': HaxeClass<Game.core.hud.components.ButtonQueue> & {};
+  'core.hud.components.BuyFluxButton': HaxeClass<Game.core.hud.components.BuyFluxButton> & {};
+  'core.hud.components.cargo.Cargo': HaxeClass<Game.core.hud.components.cargo.Cargo> & {
+    get_upgradeCosts: () => any;
     TYPE_DATA_ITEM: string;
     TYPE_MINERAL: string;
     TYPE_SPACE_JUNK: string;
-    upgradeCosts: any;
   };
-  "core.hud.components.cargo.CargoItem": HaxeClass<Game.core.hud.components.cargo.CargoItem> & {
+  'core.hud.components.cargo.CargoItem': HaxeClass<Game.core.hud.components.cargo.CargoItem> & {
     STYLE_CARGO: string;
     STYLE_HUD: string;
   };
-  "core.hud.components.chat.ChatAdvanced": HaxeClass<Game.core.hud.components.chat.ChatAdvanced> & {
-  };
-  "core.hud.components.chat.ChatInputText": HaxeClass<Game.core.hud.components.chat.ChatInputText> & {
+  'core.hud.components.chat.ChatAdvanced': HaxeClass<Game.core.hud.components.chat.ChatAdvanced> & {};
+  'core.hud.components.chat.ChatInputText': HaxeClass<Game.core.hud.components.chat.ChatInputText> & {
     SPAM_TIME_LIMIT: number;
     SPAM_TIME_LIMIT_GLOBAL: number;
   };
-  "core.hud.components.chat.ChatSimple": HaxeClass<Game.core.hud.components.chat.ChatSimple> & {
-  };
-  "core.hud.components.chat.MessageLog": HaxeClass<Game.core.hud.components.chat.MessageLog> & {
+  'core.hud.components.chat.ChatSimple': HaxeClass<Game.core.hud.components.chat.ChatSimple> & {};
+  'core.hud.components.chat.MessageLog': HaxeClass<Game.core.hud.components.chat.MessageLog> & {
     colorCoding: (text: string) => string;
     colorRights: (rights: string, text: string) => string;
     extendedMaxLines: number;
@@ -16844,55 +18758,48 @@ export interface GameClasses {
     profanities: Record<string, unknown> | null;
     textQueue: import('./ChatMessage').ChatMessage[];
     write: (text: string, type?: string) => void;
-    writeChatMsg: (channel: string, text: string, playerId?: string | null, playerName?: string | null, extra?: string, supporter?: boolean) => void;
-    writeDeathNote: (victim: Game.core.player.Player, killer: string | null, cause: string | null) => void;
+    writeChatMsg: (
+      channel: string,
+      text: string,
+      playerId?: string | null,
+      playerName?: string | null,
+      extra?: string,
+      supporter?: boolean,
+    ) => void;
+    writeDeathNote: (
+      victim: Game.core.player.Player,
+      killer: string | null,
+      cause: string | null,
+    ) => void;
     writeSysInfo: (arg0?: any) => any;
   };
-  "core.hud.components.chat.PlayerChatOptions": HaxeClass<Game.core.hud.components.chat.PlayerChatOptions> & {
-  };
-  "core.hud.components.credits.BuyFlux": HaxeClass<Game.core.hud.components.credits.BuyFlux> & {
-  };
-  "core.hud.components.credits.CreditBaseItem": HaxeClass<Game.core.hud.components.credits.CreditBaseItem> & {
-  };
-  "core.hud.components.credits.CreditBeginnerPackage": HaxeClass<Game.core.hud.components.credits.CreditBeginnerPackage> & {
-  };
-  "core.hud.components.credits.CreditCargoProtection": HaxeClass<Game.core.hud.components.credits.CreditCargoProtection> & {
-  };
-  "core.hud.components.credits.CreditDayItem": HaxeClass<Game.core.hud.components.credits.CreditDayItem> & {
-    expiryDateFrom: (arg0?: any, arg1?: any) => any;
+  'core.hud.components.chat.PlayerChatOptions': HaxeClass<Game.core.hud.components.chat.PlayerChatOptions> & {};
+  'core.hud.components.credits.BuyFlux': HaxeClass<Game.core.hud.components.credits.BuyFlux> & {};
+  'core.hud.components.credits.CreditBaseItem': HaxeClass<Game.core.hud.components.credits.CreditBaseItem> & {};
+  'core.hud.components.credits.CreditBeginnerPackage': HaxeClass<Game.core.hud.components.credits.CreditBeginnerPackage> & {};
+  'core.hud.components.credits.CreditCargoProtection': HaxeClass<Game.core.hud.components.credits.CreditCargoProtection> & {};
+  'core.hud.components.credits.CreditDayItem': HaxeClass<Game.core.hud.components.credits.CreditDayItem> & {
     PRICE_1_DAY: number;
     PRICE_3_DAY: number;
     PRICE_7_DAY: number;
   };
-  "core.hud.components.credits.CreditExpBoost": HaxeClass<Game.core.hud.components.credits.CreditExpBoost> & {
-  };
-  "core.hud.components.credits.CreditLabel": HaxeClass<Game.core.hud.components.credits.CreditLabel> & {
-  };
-  "core.hud.components.credits.CreditMegaPackage": HaxeClass<Game.core.hud.components.credits.CreditMegaPackage> & {
-  };
-  "core.hud.components.credits.CreditPackageItem": HaxeClass<Game.core.hud.components.credits.CreditPackageItem> & {
-  };
-  "core.hud.components.credits.CreditPods": HaxeClass<Game.core.hud.components.credits.CreditPods> & {
-  };
-  "core.hud.components.credits.CreditPowerPackage": HaxeClass<Game.core.hud.components.credits.CreditPowerPackage> & {
-  };
-  "core.hud.components.credits.CreditSupporterItem": HaxeClass<Game.core.hud.components.credits.CreditSupporterItem> & {
-  };
-  "core.hud.components.credits.CreditTractorBeam": HaxeClass<Game.core.hud.components.credits.CreditTractorBeam> & {
-  };
-  "core.hud.components.credits.CreditXpProtection": HaxeClass<Game.core.hud.components.credits.CreditXpProtection> & {
-  };
-  "core.hud.components.credits.ICreditItem": HaxeClass<Game.core.hud.components.credits.ICreditItem> & {
-  };
-  "core.hud.components.credits.Redeem": HaxeClass<Game.core.hud.components.credits.Redeem> & {
-  };
-  "core.hud.components.credits.RedeemSuccess": HaxeClass<Game.core.hud.components.credits.RedeemSuccess> & {
-  };
-  "core.hud.components.CrewBuySlot": HaxeClass<Game.core.hud.components.CrewBuySlot> & {
+  'core.hud.components.credits.CreditExpBoost': HaxeClass<Game.core.hud.components.credits.CreditExpBoost> & {};
+  'core.hud.components.credits.CreditLabel': HaxeClass<Game.core.hud.components.credits.CreditLabel> & {};
+  'core.hud.components.credits.CreditMegaPackage': HaxeClass<Game.core.hud.components.credits.CreditMegaPackage> & {};
+  'core.hud.components.credits.CreditPackageItem': HaxeClass<Game.core.hud.components.credits.CreditPackageItem> & {};
+  'core.hud.components.credits.CreditPods': HaxeClass<Game.core.hud.components.credits.CreditPods> & {};
+  'core.hud.components.credits.CreditPowerPackage': HaxeClass<Game.core.hud.components.credits.CreditPowerPackage> & {};
+  'core.hud.components.credits.CreditSupporterItem': HaxeClass<Game.core.hud.components.credits.CreditSupporterItem> & {};
+  'core.hud.components.credits.CreditTractorBeam': HaxeClass<Game.core.hud.components.credits.CreditTractorBeam> & {};
+  'core.hud.components.credits.CreditXpProtection': HaxeClass<Game.core.hud.components.credits.CreditXpProtection> & {};
+  'core.hud.components.credits.ICreditItem': HaxeClass<Game.core.hud.components.credits.ICreditItem> & {};
+  'core.hud.components.credits.Redeem': HaxeClass<Game.core.hud.components.credits.Redeem> & {};
+  'core.hud.components.credits.RedeemSuccess': HaxeClass<Game.core.hud.components.credits.RedeemSuccess> & {};
+  'core.hud.components.CrewBuySlot': HaxeClass<Game.core.hud.components.CrewBuySlot> & {
     HEIGHT: number;
     WIDTH: number;
   };
-  "core.hud.components.CrewDetails": HaxeClass<Game.core.hud.components.CrewDetails> & {
+  'core.hud.components.CrewDetails': HaxeClass<Game.core.hud.components.CrewDetails> & {
     HEIGHT: number;
     IMAGES_SKILLS: any;
     IMAGES_SPECIALS: any;
@@ -16905,13 +18812,13 @@ export interface GameClasses {
     textY2: number;
     WIDTH: number;
   };
-  "core.hud.components.CrewDisplayBox": HaxeClass<Game.core.hud.components.CrewDisplayBox> & {
+  'core.hud.components.CrewDisplayBox': HaxeClass<Game.core.hud.components.CrewDisplayBox> & {
     HEIGHT: number;
     IMAGES_SKILLS: any;
     IMAGES_SPECIALS: any;
     WIDTH: number;
   };
-  "core.hud.components.CrewDisplayBoxNew": HaxeClass<Game.core.hud.components.CrewDisplayBoxNew> & {
+  'core.hud.components.CrewDisplayBoxNew': HaxeClass<Game.core.hud.components.CrewDisplayBoxNew> & {
     HEIGHT: number;
     MODE_CANTINA: number;
     MODE_SHIP: number;
@@ -16922,50 +18829,51 @@ export interface GameClasses {
     textY2: number;
     WIDTH: number;
   };
-  "core.hud.components.dialogs.CreditBuyBox": HaxeClass<Game.core.hud.components.dialogs.CreditBuyBox, [game: Game.core.scene.Game, cost: number, caption: string]> & {
-  };
-  "core.hud.components.dialogs.CreditGainBox": HaxeClass<Game.core.hud.components.dialogs.CreditGainBox> & {
-  };
-  "core.hud.components.dialogs.CrewDialogBox": HaxeClass<Game.core.hud.components.dialogs.CrewDialogBox> & {
-  };
-  "core.hud.components.dialogs.CrewJoinOffer": HaxeClass<Game.core.hud.components.dialogs.CrewJoinOffer> & {
+  'core.hud.components.dialogs.CreditBuyBox': HaxeClass<
+    Game.core.hud.components.dialogs.CreditBuyBox,
+    [game: Game.core.scene.Game, cost: number, caption: string]
+  > & {};
+  'core.hud.components.dialogs.CreditGainBox': HaxeClass<Game.core.hud.components.dialogs.CreditGainBox> & {};
+  'core.hud.components.dialogs.CrewDialogBox': HaxeClass<Game.core.hud.components.dialogs.CrewDialogBox> & {};
+  'core.hud.components.dialogs.CrewJoinOffer': HaxeClass<Game.core.hud.components.dialogs.CrewJoinOffer> & {
     HEIGHT: number;
     WIDTH: number;
   };
-  "core.hud.components.dialogs.DailyRewardChild": HaxeClass<Game.core.hud.components.dialogs.DailyRewardChild> & {
+  'core.hud.components.dialogs.DailyRewardChild': HaxeClass<Game.core.hud.components.dialogs.DailyRewardChild> & {
     boxWidth: number;
   };
-  "core.hud.components.dialogs.DailyRewardMessage": HaxeClass<Game.core.hud.components.dialogs.DailyRewardMessage> & {
+  'core.hud.components.dialogs.DailyRewardMessage': HaxeClass<Game.core.hud.components.dialogs.DailyRewardMessage> & {
     DAILY_REWARD_FLUX: any;
     DAILY_REWARD_PODS: any;
   };
-  "core.hud.components.dialogs.LootPopupConfirmMessage": HaxeClass<Game.core.hud.components.dialogs.LootPopupConfirmMessage> & {
-  };
-  "core.hud.components.dialogs.LootPopupMessage": HaxeClass<Game.core.hud.components.dialogs.LootPopupMessage> & {
-  };
-  "core.hud.components.dialogs.PopupBuyMessage": HaxeClass<Game.core.hud.components.dialogs.PopupBuyMessage> & {
+  'core.hud.components.dialogs.LootPopupConfirmMessage': HaxeClass<Game.core.hud.components.dialogs.LootPopupConfirmMessage> & {};
+  'core.hud.components.dialogs.LootPopupMessage': HaxeClass<Game.core.hud.components.dialogs.LootPopupMessage> & {};
+  'core.hud.components.dialogs.PopupBuyMessage': HaxeClass<Game.core.hud.components.dialogs.PopupBuyMessage> & {
     BOUGHT_WITH_FLUX: string;
   };
-  "core.hud.components.dialogs.PopupConfirmMessage": HaxeClass<Game.core.hud.components.dialogs.PopupConfirmMessage, [confirmText?: string, cancelText?: string, style?: string]> & {
-  };
-  "core.hud.components.dialogs.PopupEvent": HaxeClass<Game.core.hud.components.dialogs.PopupEvent> & {
+  'core.hud.components.dialogs.PopupConfirmMessage': HaxeClass<
+    Game.core.hud.components.dialogs.PopupConfirmMessage,
+    [confirmText?: string, cancelText?: string, style?: string]
+  > & {};
+  'core.hud.components.dialogs.PopupEvent': HaxeClass<Game.core.hud.components.dialogs.PopupEvent> & {
     ACCEPT: string;
     CLOSE: string;
   };
-  "core.hud.components.dialogs.PopupInputMessage": HaxeClass<Game.core.hud.components.dialogs.PopupInputMessage> & {
-  };
-  "core.hud.components.dialogs.PopupMessage": HaxeClass<Game.core.hud.components.dialogs.PopupMessage, [buttonText?: string]> & {
-  };
-  "core.hud.components.dialogs.QueuePopupMessage": HaxeClass<Game.core.hud.components.dialogs.QueuePopupMessage, [type: string]> & {
-  };
-  "core.hud.components.dialogs.TOSPopup": HaxeClass<Game.core.hud.components.dialogs.TOSPopup> & {
-  };
-  "core.hud.components.Experience": HaxeClass<Game.core.hud.components.Experience> & {
-  };
-  "core.hud.components.explore.ExploreArea": HaxeClass<Game.core.hud.components.explore.ExploreArea> & {
+  'core.hud.components.dialogs.PopupInputMessage': HaxeClass<Game.core.hud.components.dialogs.PopupInputMessage> & {};
+  'core.hud.components.dialogs.PopupMessage': HaxeClass<
+    Game.core.hud.components.dialogs.PopupMessage,
+    [buttonText?: string]
+  > & {};
+  'core.hud.components.dialogs.QueuePopupMessage': HaxeClass<
+    Game.core.hud.components.dialogs.QueuePopupMessage,
+    [type: string]
+  > & {};
+  'core.hud.components.dialogs.TOSPopup': HaxeClass<Game.core.hud.components.dialogs.TOSPopup> & {};
+  'core.hud.components.Experience': HaxeClass<Game.core.hud.components.Experience> & {};
+  'core.hud.components.explore.ExploreArea': HaxeClass<Game.core.hud.components.explore.ExploreArea> & {
     COLOR: number;
   };
-  "core.hud.components.explore.ExploreMap": HaxeClass<Game.core.hud.components.explore.ExploreMap> & {
+  'core.hud.components.explore.ExploreMap': HaxeClass<Game.core.hud.components.explore.ExploreMap> & {
     directions: any;
     FINAL_X_SIZE: number;
     FINAL_Y_SIZE: number;
@@ -16975,59 +18883,45 @@ export interface GameClasses {
     X_SIZE: number;
     Y_SIZE: number;
   };
-  "core.hud.components.explore.ExploreMapArea": HaxeClass<Game.core.hud.components.explore.ExploreMapArea> & {
+  'core.hud.components.explore.ExploreMapArea': HaxeClass<Game.core.hud.components.explore.ExploreMapArea> & {
     ALPHA_COMPLETE: number;
     ALPHA_START: number;
   };
-  "core.hud.components.explore.ExploreProgressBar": HaxeClass<Game.core.hud.components.explore.ExploreProgressBar> & {
+  'core.hud.components.explore.ExploreProgressBar': HaxeClass<Game.core.hud.components.explore.ExploreProgressBar> & {
     COLOR: number;
   };
-  "core.hud.components.FadeScreen": HaxeClass<Game.core.hud.components.FadeScreen> & {
-  };
-  "core.hud.components.friends.FriendDisplayBox": HaxeClass<Game.core.hud.components.friends.FriendDisplayBox> & {
-  };
-  "core.hud.components.FullScreenButton": HaxeClass<Game.core.hud.components.FullScreenButton> & {
-  };
-  "core.hud.components.GradientBox": HaxeClass<Game.core.hud.components.GradientBox> & {
-  };
-  "core.hud.components.Hangar": HaxeClass<Game.core.hud.components.Hangar> & {
-  };
-  "core.hud.components.hangar.SkinItem": HaxeClass<Game.core.hud.components.hangar.SkinItem> & {
+  'core.hud.components.FadeScreen': HaxeClass<Game.core.hud.components.FadeScreen> & {};
+  'core.hud.components.friends.FriendDisplayBox': HaxeClass<Game.core.hud.components.friends.FriendDisplayBox> & {};
+  'core.hud.components.FullScreenButton': HaxeClass<Game.core.hud.components.FullScreenButton> & {};
+  'core.hud.components.GradientBox': HaxeClass<Game.core.hud.components.GradientBox> & {};
+  'core.hud.components.Hangar': HaxeClass<Game.core.hud.components.Hangar> & {};
+  'core.hud.components.hangar.SkinItem': HaxeClass<Game.core.hud.components.hangar.SkinItem> & {
     MODE_BUY: number;
     MODE_PREVIEW: number;
     MODE_SPINNER: number;
     MODE_SWITCH: number;
   };
-  "core.hud.components.hangar.SkinItemBaseStats": HaxeClass<Game.core.hud.components.hangar.SkinItemBaseStats> & {
-  };
-  "core.hud.components.HealthAndShield": HaxeClass<Game.core.hud.components.HealthAndShield> & {
+  'core.hud.components.hangar.SkinItemBaseStats': HaxeClass<Game.core.hud.components.hangar.SkinItemBaseStats> & {};
+  'core.hud.components.HealthAndShield': HaxeClass<Game.core.hud.components.HealthAndShield> & {
     HP_WIDTH: number;
     SHIELD_WIDTH: number;
   };
-  "core.hud.components.hotkeys.Abilities": HaxeClass<Game.core.hud.components.hotkeys.Abilities> & {
-  };
-  "core.hud.components.hotkeys.AbilityHotkey": HaxeClass<Game.core.hud.components.hotkeys.AbilityHotkey> & {
-  };
-  "core.hud.components.hotkeys.WeaponHotkey": HaxeClass<Game.core.hud.components.hotkeys.WeaponHotkey> & {
-  };
-  "core.hud.components.hotkeys.WeaponHotkeys": HaxeClass<Game.core.hud.components.hotkeys.WeaponHotkeys> & {
-  };
-  "core.hud.components.HudTimer": HaxeClass<Game.core.hud.components.HudTimer> & {
-  };
-  "core.hud.components.ImageButton": HaxeClass<Game.core.hud.components.ImageButton> & {
-  };
-  "core.hud.components.InputText": HaxeClass<Game.core.hud.components.InputText> & {
+  'core.hud.components.hotkeys.Abilities': HaxeClass<Game.core.hud.components.hotkeys.Abilities> & {};
+  'core.hud.components.hotkeys.AbilityHotkey': HaxeClass<Game.core.hud.components.hotkeys.AbilityHotkey> & {};
+  'core.hud.components.hotkeys.WeaponHotkey': HaxeClass<Game.core.hud.components.hotkeys.WeaponHotkey> & {};
+  'core.hud.components.hotkeys.WeaponHotkeys': HaxeClass<Game.core.hud.components.hotkeys.WeaponHotkeys> & {};
+  'core.hud.components.HudTimer': HaxeClass<Game.core.hud.components.HudTimer> & {};
+  'core.hud.components.ImageButton': HaxeClass<Game.core.hud.components.ImageButton> & {};
+  'core.hud.components.InputText': HaxeClass<Game.core.hud.components.InputText> & {
     textFormat: any;
   };
-  "core.hud.components.InteractiveImage": HaxeClass<Game.core.hud.components.InteractiveImage> & {
-  };
-  "core.hud.components.Line": HaxeClass<Game.core.hud.components.Line> & {
-  };
-  "core.hud.components.LoginButton": HaxeClass<Game.core.hud.components.LoginButton> & {
+  'core.hud.components.InteractiveImage': HaxeClass<Game.core.hud.components.InteractiveImage> & {};
+  'core.hud.components.Line': HaxeClass<Game.core.hud.components.Line> & {};
+  'core.hud.components.LoginButton': HaxeClass<Game.core.hud.components.LoginButton> & {
     BUTTON_HEIGHT: number;
     BUTTON_WIDTH: number;
   };
-  "core.hud.components.LoginInput": HaxeClass<Game.core.hud.components.LoginInput> & {
+  'core.hud.components.LoginInput': HaxeClass<Game.core.hud.components.LoginInput> & {
     BORDER_ACTIVE_COLOR: number;
     BORDER_COLOR: number;
     errorFormat: any;
@@ -17041,59 +18935,43 @@ export interface GameClasses {
     setFrameColor: (arg0?: any, arg1?: any) => any;
     textColor: number;
   };
-  "core.hud.components.LootItem": HaxeClass<Game.core.hud.components.LootItem> & {
-  };
-  "core.hud.components.map.Map": HaxeClass<Game.core.hud.components.map.Map> & {
+  'core.hud.components.LootItem': HaxeClass<Game.core.hud.components.LootItem> & {};
+  'core.hud.components.map.Map': HaxeClass<Game.core.hud.components.map.Map> & {
     CORNER: any;
     HEIGHT: any;
     PADDING: any;
     SCALE: any;
     WIDTH: any;
   };
-  "core.hud.components.map.MapBodyBase": HaxeClass<Game.core.hud.components.map.MapBodyBase> & {
-  };
-  "core.hud.components.map.MapBoss": HaxeClass<Game.core.hud.components.map.MapBoss> & {
-  };
-  "core.hud.components.map.MapDeathLine": HaxeClass<Game.core.hud.components.map.MapDeathLine> & {
-  };
-  "core.hud.components.map.MapEliteArea": HaxeClass<Game.core.hud.components.map.MapEliteArea> & {
-  };
-  "core.hud.components.map.MapHidden": HaxeClass<Game.core.hud.components.map.MapHidden> & {
-  };
-  "core.hud.components.map.MapKilled": HaxeClass<Game.core.hud.components.map.MapKilled> & {
-  };
-  "core.hud.components.map.MapPlanet": HaxeClass<Game.core.hud.components.map.MapPlanet> & {
-  };
-  "core.hud.components.map.MapPlayer": HaxeClass<Game.core.hud.components.map.MapPlayer> & {
-  };
-  "core.hud.components.map.MapPvpZone": HaxeClass<Game.core.hud.components.map.MapPvpZone> & {
-  };
-  "core.hud.components.map.MapSpawner": HaxeClass<Game.core.hud.components.map.MapSpawner> & {
-  };
-  "core.hud.components.map.MapStation": HaxeClass<Game.core.hud.components.map.MapStation> & {
-  };
-  "core.hud.components.map.MapSun": HaxeClass<Game.core.hud.components.map.MapSun> & {
-  };
-  "core.hud.components.NativeImageButton": HaxeClass<Game.core.hud.components.NativeImageButton> & {
-  };
-  "core.hud.components.playerList.GroupListItem": HaxeClass<Game.core.hud.components.playerList.GroupListItem> & {
-  };
-  "core.hud.components.playerList.PlayerList": HaxeClass<Game.core.hud.components.playerList.PlayerList> & {
+  'core.hud.components.map.MapBodyBase': HaxeClass<Game.core.hud.components.map.MapBodyBase> & {};
+  'core.hud.components.map.MapBoss': HaxeClass<Game.core.hud.components.map.MapBoss> & {};
+  'core.hud.components.map.MapDeathLine': HaxeClass<Game.core.hud.components.map.MapDeathLine> & {};
+  'core.hud.components.map.MapEliteArea': HaxeClass<Game.core.hud.components.map.MapEliteArea> & {};
+  'core.hud.components.map.MapHidden': HaxeClass<Game.core.hud.components.map.MapHidden> & {};
+  'core.hud.components.map.MapKilled': HaxeClass<Game.core.hud.components.map.MapKilled> & {};
+  'core.hud.components.map.MapPlanet': HaxeClass<Game.core.hud.components.map.MapPlanet> & {};
+  'core.hud.components.map.MapPlayer': HaxeClass<Game.core.hud.components.map.MapPlayer> & {};
+  'core.hud.components.map.MapPvpZone': HaxeClass<Game.core.hud.components.map.MapPvpZone> & {};
+  'core.hud.components.map.MapSpawner': HaxeClass<Game.core.hud.components.map.MapSpawner> & {};
+  'core.hud.components.map.MapStation': HaxeClass<Game.core.hud.components.map.MapStation> & {};
+  'core.hud.components.map.MapSun': HaxeClass<Game.core.hud.components.map.MapSun> & {};
+  'core.hud.components.NativeImageButton': HaxeClass<Game.core.hud.components.NativeImageButton> & {};
+  'core.hud.components.playerList.GroupListItem': HaxeClass<Game.core.hud.components.playerList.GroupListItem> & {};
+  'core.hud.components.playerList.PlayerList': HaxeClass<Game.core.hud.components.playerList.PlayerList> & {
     GROUP_MARGIN: number;
     HEIGHT: number;
     PADDING: number;
     WIDTH: number;
   };
-  "core.hud.components.playerList.PlayerListItem": HaxeClass<Game.core.hud.components.playerList.PlayerListItem> & {
-  };
-  "core.hud.components.PodButton": HaxeClass<Game.core.hud.components.PodButton> & {
+  'core.hud.components.playerList.PlayerListItem': HaxeClass<Game.core.hud.components.playerList.PlayerListItem> & {};
+  'core.hud.components.PodButton': HaxeClass<Game.core.hud.components.PodButton> & {
     BUTTON_SCALE_9_GRID: any;
     highlightTexture: any;
     normalTexture: any;
     positiveTexture: any;
     warningTexture: any;
   };
-  "core.hud.components.Position": HaxeClass<Game.core.hud.components.Position> & {
+  'core.hud.components.Position': HaxeClass<Game.core.hud.components.Position> & {
     BOTTOM: string;
     BOTTOM_LEFT: string;
     BOTTOM_RIGHT: string;
@@ -17106,18 +18984,16 @@ export interface GameClasses {
     TOP_LEFT: string;
     TOP_RIGHT: string;
   };
-  "core.hud.components.PowerBar": HaxeClass<Game.core.hud.components.PowerBar> & {
+  'core.hud.components.PowerBar': HaxeClass<Game.core.hud.components.PowerBar> & {
     HEAT_WIDTH: number;
     SMOOTHER_STEPS: number;
   };
-  "core.hud.components.PriceCommodities": HaxeClass<Game.core.hud.components.PriceCommodities> & {
+  'core.hud.components.PriceCommodities': HaxeClass<Game.core.hud.components.PriceCommodities> & {
     THRESHHOLD: number;
   };
-  "core.hud.components.pvp.DominationManager": HaxeClass<Game.core.hud.components.pvp.DominationManager> & {
-  };
-  "core.hud.components.pvp.DominationZone": HaxeClass<Game.core.hud.components.pvp.DominationZone> & {
-  };
-  "core.hud.components.pvp.PvpManager": HaxeClass<Game.core.hud.components.pvp.PvpManager> & {
+  'core.hud.components.pvp.DominationManager': HaxeClass<Game.core.hud.components.pvp.DominationManager> & {};
+  'core.hud.components.pvp.DominationZone': HaxeClass<Game.core.hud.components.pvp.DominationZone> & {};
+  'core.hud.components.pvp.PvpManager': HaxeClass<Game.core.hud.components.pvp.PvpManager> & {
     compareFunction: (arg0?: any, arg1?: any) => any;
     ITEM_DOMINATION_ZONE: string;
     ITEM_HEALTH: string;
@@ -17133,27 +19009,22 @@ export interface GameClasses {
     MATCH_STARTING: number;
     MATCH_WARMUP: number;
   };
-  "core.hud.components.pvp.PvpQueueScreen": HaxeClass<Game.core.hud.components.pvp.PvpQueueScreen> & {
-  };
-  "core.hud.components.pvp.PvpScoreHolder": HaxeClass<Game.core.hud.components.pvp.PvpScoreHolder> & {
-  };
-  "core.hud.components.pvp.PvpScoreScreen": HaxeClass<Game.core.hud.components.pvp.PvpScoreScreen> & {
-  };
-  "core.hud.components.pvp.PvpScreen": HaxeClass<Game.core.hud.components.pvp.PvpScreen> & {
+  'core.hud.components.pvp.PvpQueueScreen': HaxeClass<Game.core.hud.components.pvp.PvpQueueScreen> & {};
+  'core.hud.components.pvp.PvpScoreHolder': HaxeClass<Game.core.hud.components.pvp.PvpScoreHolder> & {};
+  'core.hud.components.pvp.PvpScoreScreen': HaxeClass<Game.core.hud.components.pvp.PvpScoreScreen> & {};
+  'core.hud.components.pvp.PvpScreen': HaxeClass<Game.core.hud.components.pvp.PvpScreen> & {
     HEIGHT: number;
     WIDTH: number;
   };
-  "core.hud.components.pvp.TeamSafeZone": HaxeClass<Game.core.hud.components.pvp.TeamSafeZone> & {
-  };
-  "core.hud.components.PvPIcon": HaxeClass<Game.core.hud.components.PvPIcon> & {
-  };
-  "core.hud.components.radar.Blip": HaxeClass<Game.core.hud.components.radar.Blip> & {
+  'core.hud.components.pvp.TeamSafeZone': HaxeClass<Game.core.hud.components.pvp.TeamSafeZone> & {};
+  'core.hud.components.PvPIcon': HaxeClass<Game.core.hud.components.PvPIcon> & {};
+  'core.hud.components.radar.Blip': HaxeClass<Game.core.hud.components.radar.Blip> & {
     blipFrame: (arg0?: any) => any;
     blipScale: number;
     minibossesColors: any;
     radarRadius: number;
   };
-  "core.hud.components.radar.Compas": HaxeClass<Game.core.hud.components.radar.Compas> & {
+  'core.hud.components.radar.Compas': HaxeClass<Game.core.hud.components.radar.Compas> & {
     HEIGHT: number;
     HINT_COLOR: number;
     KILL_SPAWNERS_BODIES: any;
@@ -17162,35 +19033,26 @@ export interface GameClasses {
     MISSION_HINT_INTERVAL: number;
     WIDTH: number;
   };
-  "core.hud.components.radar.Radar": HaxeClass<Game.core.hud.components.radar.Radar> & {
+  'core.hud.components.radar.Radar': HaxeClass<Game.core.hud.components.radar.Radar> & {
     innerDetectionRadius: number;
     outerDetectionRadius: number;
   };
-  "core.hud.components.radar.TargetArrow": HaxeClass<Game.core.hud.components.radar.TargetArrow> & {
-  };
-  "core.hud.components.ResourceBox": HaxeClass<Game.core.hud.components.ResourceBox> & {
-  };
-  "core.hud.components.SaleSpinner": HaxeClass<Game.core.hud.components.SaleSpinner> & {
-  };
-  "core.hud.components.SaleSticker": HaxeClass<Game.core.hud.components.SaleSticker> & {
-  };
-  "core.hud.components.SaleTimer": HaxeClass<Game.core.hud.components.SaleTimer> & {
-  };
-  "core.hud.components.ScaleImage": HaxeClass<Game.core.hud.components.ScaleImage> & {
-  };
-  "core.hud.components.ScreenTextField": HaxeClass<Game.core.hud.components.ScreenTextField> & {
+  'core.hud.components.radar.TargetArrow': HaxeClass<Game.core.hud.components.radar.TargetArrow> & {};
+  'core.hud.components.ResourceBox': HaxeClass<Game.core.hud.components.ResourceBox> & {};
+  'core.hud.components.SaleSpinner': HaxeClass<Game.core.hud.components.SaleSpinner> & {};
+  'core.hud.components.SaleSticker': HaxeClass<Game.core.hud.components.SaleSticker> & {};
+  'core.hud.components.SaleTimer': HaxeClass<Game.core.hud.components.SaleTimer> & {};
+  'core.hud.components.ScaleImage': HaxeClass<Game.core.hud.components.ScaleImage> & {};
+  'core.hud.components.ScreenTextField': HaxeClass<Game.core.hud.components.ScreenTextField> & {
     ANIMATION_FINISHED: string;
     BEFORE_FADE_OUT: string;
     PAGE_FINISHED: string;
     PARAGRAPH_FINISHED: string;
   };
-  "core.hud.components.SettingsKeybind": HaxeClass<Game.core.hud.components.SettingsKeybind> & {
-  };
-  "core.hud.components.shipMenu.ArtifactSelector": HaxeClass<Game.core.hud.components.shipMenu.ArtifactSelector> & {
-  };
-  "core.hud.components.shipMenu.CrewSelector": HaxeClass<Game.core.hud.components.shipMenu.CrewSelector> & {
-  };
-  "core.hud.components.shipMenu.MenuSelectIcon": HaxeClass<Game.core.hud.components.shipMenu.MenuSelectIcon> & {
+  'core.hud.components.SettingsKeybind': HaxeClass<Game.core.hud.components.SettingsKeybind> & {};
+  'core.hud.components.shipMenu.ArtifactSelector': HaxeClass<Game.core.hud.components.shipMenu.ArtifactSelector> & {};
+  'core.hud.components.shipMenu.CrewSelector': HaxeClass<Game.core.hud.components.shipMenu.CrewSelector> & {};
+  'core.hud.components.shipMenu.MenuSelectIcon': HaxeClass<Game.core.hud.components.shipMenu.MenuSelectIcon> & {
     BITMAP_ARTIFACT: string;
     BITMAP_CREW: string;
     BITMAP_FRIEND: string;
@@ -17198,22 +19060,19 @@ export interface GameClasses {
     HEIGHT: number;
     WIDTH: number;
   };
-  "core.hud.components.shipMenu.WeaponSelector": HaxeClass<Game.core.hud.components.shipMenu.WeaponSelector> & {
-  };
-  "core.hud.components.ShopIcons": HaxeClass<Game.core.hud.components.ShopIcons> & {
-  };
-  "core.hud.components.ShopItemBar": HaxeClass<Game.core.hud.components.ShopItemBar> & {
+  'core.hud.components.shipMenu.WeaponSelector': HaxeClass<Game.core.hud.components.shipMenu.WeaponSelector> & {};
+  'core.hud.components.ShopIcons': HaxeClass<Game.core.hud.components.ShopIcons> & {};
+  'core.hud.components.ShopItemBar': HaxeClass<Game.core.hud.components.ShopItemBar> & {
     SPECIAL_WEAPON_BLOOD_CLAW: string;
     SPECIAL_WEAPON_SPORE: string;
     SPECIAL_WEAPON_X27S: string;
   };
-  "core.hud.components.ShopItemBarStats": HaxeClass<Game.core.hud.components.ShopItemBarStats> & {
+  'core.hud.components.ShopItemBarStats': HaxeClass<Game.core.hud.components.ShopItemBarStats> & {
     BAR_HEIGHT: number;
     BAR_WIDTH: number;
   };
-  "core.hud.components.starMap.Node": HaxeClass<Game.core.hud.components.starMap.Node> & {
-  };
-  "core.hud.components.starMap.SolarSystem": HaxeClass<Game.core.hud.components.starMap.SolarSystem> & {
+  'core.hud.components.starMap.Node': HaxeClass<Game.core.hud.components.starMap.Node> & {};
+  'core.hud.components.starMap.SolarSystem': HaxeClass<Game.core.hud.components.starMap.SolarSystem> & {
     EDITOR_TYPE_DEBUG: string;
     EDITOR_TYPE_INSTANCE: string;
     EDITOR_TYPE_PVP: string;
@@ -17223,18 +19082,15 @@ export interface GameClasses {
     EDITOR_TYPE_REGULAR: string;
     START_SYSTEM: string;
   };
-  "core.hud.components.starMap.StarMap": HaxeClass<Game.core.hud.components.starMap.StarMap> & {
+  'core.hud.components.starMap.StarMap': HaxeClass<Game.core.hud.components.starMap.StarMap> & {
     friendsInSelectedSystem: any;
     PADDING: number;
     selectedSolarSystem: any;
   };
-  "core.hud.components.starMap.TransitButton": HaxeClass<Game.core.hud.components.starMap.TransitButton> & {
-  };
-  "core.hud.components.starMap.WarpPath": HaxeClass<Game.core.hud.components.starMap.WarpPath> & {
-  };
-  "core.hud.components.starMap.WarpToFriendRow": HaxeClass<Game.core.hud.components.starMap.WarpToFriendRow> & {
-  };
-  "core.hud.components.Style": HaxeClass<Game.core.hud.components.Style> & {
+  'core.hud.components.starMap.TransitButton': HaxeClass<Game.core.hud.components.starMap.TransitButton> & {};
+  'core.hud.components.starMap.WarpPath': HaxeClass<Game.core.hud.components.starMap.WarpPath> & {};
+  'core.hud.components.starMap.WarpToFriendRow': HaxeClass<Game.core.hud.components.starMap.WarpToFriendRow> & {};
+  'core.hud.components.Style': HaxeClass<Game.core.hud.components.Style> & {
     COLOR_BYLINE: number;
     COLOR_CREW: number;
     COLOR_DARK_GREEN: number;
@@ -17260,9 +19116,8 @@ export interface GameClasses {
     COLOR_VALID: number;
     COLOR_YELLOW: number;
   };
-  "core.hud.components.techTree.EliteTechBar": HaxeClass<Game.core.hud.components.techTree.EliteTechBar> & {
-  };
-  "core.hud.components.techTree.EliteTechIcon": HaxeClass<Game.core.hud.components.techTree.EliteTechIcon> & {
+  'core.hud.components.techTree.EliteTechBar': HaxeClass<Game.core.hud.components.techTree.EliteTechBar> & {};
+  'core.hud.components.techTree.EliteTechIcon': HaxeClass<Game.core.hud.components.techTree.EliteTechIcon> & {
     ICON_PADDING: number;
     ICON_WIDTH: number;
     STATE_CANT_BE_UPGRADED: string;
@@ -17272,11 +19127,9 @@ export interface GameClasses {
     STATE_SELECTED: string;
     STATE_UPGRADABLE: string;
   };
-  "core.hud.components.techTree.EliteTechPopupMenu": HaxeClass<Game.core.hud.components.techTree.EliteTechPopupMenu> & {
-  };
-  "core.hud.components.techTree.TechBar": HaxeClass<Game.core.hud.components.techTree.TechBar> & {
-  };
-  "core.hud.components.techTree.TechLevelIcon": HaxeClass<Game.core.hud.components.techTree.TechLevelIcon> & {
+  'core.hud.components.techTree.EliteTechPopupMenu': HaxeClass<Game.core.hud.components.techTree.EliteTechPopupMenu> & {};
+  'core.hud.components.techTree.TechBar': HaxeClass<Game.core.hud.components.techTree.TechBar> & {};
+  'core.hud.components.techTree.TechLevelIcon': HaxeClass<Game.core.hud.components.techTree.TechLevelIcon> & {
     ICON_PADDING: number;
     ICON_WIDTH: number;
     STATE_CAN_BE_UPGRADED: string;
@@ -17286,12 +19139,15 @@ export interface GameClasses {
     STATE_SKIN_LOCKED: string;
     STATE_UPGRADED: string;
   };
-  "core.hud.components.techTree.TechTree": HaxeClass<Game.core.hud.components.techTree.TechTree> & {
+  'core.hud.components.techTree.TechTree': HaxeClass<Game.core.hud.components.techTree.TechTree> & {
     getRequiredLevel: (arg0?: any) => any;
     hasRequiredLevel: (upgrade: number, playerLevel: number) => boolean;
     UPGRADE_LEVEL_REQUIREMENTS: any;
   };
-  "core.hud.components.Text": HaxeClass<Game.core.hud.components.Text, [x?: number, y?: number, wordWrap?: boolean, font?: string]> & {
+  'core.hud.components.Text': HaxeClass<
+    Game.core.hud.components.Text,
+    [x?: number, y?: number, wordWrap?: boolean, font?: string]
+  > & {
     BACKGROUND_COLOR: number;
     GLOW_COLOR: number;
     H_ALIGN_CENTER: number;
@@ -17302,11 +19158,22 @@ export interface GameClasses {
     V_ALIGN_MIDDLE: number;
     V_ALIGN_TOP: number;
   };
-  "core.hud.components.TextBitmap": HaxeClass<Game.core.hud.components.TextBitmap, [x?: number, y?: number, text?: string, size?: number]> & {
-  };
-  "core.hud.components.TextBitmapNumberAnimation": HaxeClass<Game.core.hud.components.TextBitmapNumberAnimation> & {
-  };
-  "core.hud.components.ToolTip": HaxeClass<Game.core.hud.components.ToolTip, [game: Game.core.scene.SceneBase, target: Game.starling.display.DisplayObject, text: string | null, images?: import('./TooltipImage').TooltipImage[] | null, type?: string, maxWidth?: number]> & {
+  'core.hud.components.TextBitmap': HaxeClass<
+    Game.core.hud.components.TextBitmap,
+    [x?: number, y?: number, text?: string, size?: number]
+  > & {};
+  'core.hud.components.TextBitmapNumberAnimation': HaxeClass<Game.core.hud.components.TextBitmapNumberAnimation> & {};
+  'core.hud.components.ToolTip': HaxeClass<
+    Game.core.hud.components.ToolTip,
+    [
+      game: Game.core.scene.SceneBase,
+      target: Game.starling.display.DisplayObject,
+      text: string | null,
+      images?: import('./TooltipImage').TooltipImage[] | null,
+      type?: string,
+      maxWidth?: number,
+    ]
+  > & {
     disposeAll: () => void;
     disposeType: (type?: string) => void;
     g: Game.core.scene.SceneBase | null;
@@ -17318,44 +19185,57 @@ export interface GameClasses {
     watching: boolean;
     watchPointer: () => void;
   };
-  "core.hud.components.TopPvPPlayersList": HaxeClass<Game.core.hud.components.TopPvPPlayersList> & {
+  'core.hud.components.TopPvPPlayersList': HaxeClass<Game.core.hud.components.TopPvPPlayersList> & {
     topPvpPlayersList: any;
   };
-  "core.hud.components.UberStats": HaxeClass<Game.core.hud.components.UberStats> & {
-  };
-  "core.hud.components.ui.CheckBox": HaxeClass<Game.core.hud.components.ui.CheckBox> & {
+  'core.hud.components.UberStats': HaxeClass<Game.core.hud.components.UberStats> & {};
+  'core.hud.components.ui.CheckBox': HaxeClass<Game.core.hud.components.ui.CheckBox> & {
     SIZE: number;
   };
-  "core.hud.components.ui.DomOverlay": HaxeClass<Game.core.hud.components.ui.DomOverlay> & {
+  'core.hud.components.ui.DomOverlay': HaxeClass<Game.core.hud.components.ui.DomOverlay> & {
     canvas: () => any;
     canvasOverride: any;
     container: any;
     createElement: () => any;
     ensureContainer: () => any;
+    form: any;
     fullscreenListening: boolean;
     globalRect: (display: Game.starling.display.DisplayObject) => Game.openfl.geom.Rectangle;
+    guardFieldPress: (arg0?: any) => any;
     hostElement: () => any;
     isShown: (arg0?: any) => any;
+    loginForm: () => any;
     onFullscreenChange: (arg0?: any) => any;
-    place: (element: HTMLElement | null, bounds: { x: number; y: number; width: number; height: number }, visible: boolean) => void;
+    pageMode: () => any;
+    place: (
+      element: HTMLElement | null,
+      bounds: { x: number; y: number; width: number; height: number },
+      visible: boolean,
+    ) => void;
     removeElement: (arg0?: any) => any;
-    toCss: (bounds: { x: number; y: number; width: number; height: number }) => { x: number; y: number; width: number; height: number };
+    submitLoginForm: () => any;
+    toCss: (bounds: { x: number; y: number; width: number; height: number }) => {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
+    visibleRect: (arg0?: any, arg1?: any) => any;
   };
-  "core.hud.components.ui.ItemList": HaxeClass<Game.core.hud.components.ui.ItemList> & {
+  'core.hud.components.ui.ItemList': HaxeClass<Game.core.hud.components.ui.ItemList> & {
     PLAIN_PADDING: number;
     STYLE_PLAIN: string;
     STYLE_SHOP: string;
   };
-  "core.hud.components.ui.ItemRow": HaxeClass<Game.core.hud.components.ui.ItemRow> & {
+  'core.hud.components.ui.ItemRow': HaxeClass<Game.core.hud.components.ui.ItemRow> & {
     readIcon: (arg0?: any) => any;
     readLabel: (arg0?: any, arg1?: any) => any;
   };
-  "core.hud.components.ui.NineSlice": HaxeClass<Game.core.hud.components.ui.NineSlice> & {
-  };
-  "core.hud.components.ui.PickList": HaxeClass<Game.core.hud.components.ui.PickList> & {
+  'core.hud.components.ui.NineSlice': HaxeClass<Game.core.hud.components.ui.NineSlice> & {};
+  'core.hud.components.ui.PickList': HaxeClass<Game.core.hud.components.ui.PickList> & {
     POPUP_MAX_HEIGHT: number;
   };
-  "core.hud.components.ui.PressButton": HaxeClass<Game.core.hud.components.ui.PressButton> & {
+  'core.hud.components.ui.PressButton': HaxeClass<Game.core.hud.components.ui.PressButton> & {
     AEON_PADDING: number;
     capitalise: (arg0?: any) => any;
     DRAG_THRESHOLD: number;
@@ -17367,7 +19247,7 @@ export interface GameClasses {
     LOOK_SHOP: string;
     LOOK_TAB: string;
   };
-  "core.hud.components.ui.ScrollBox": HaxeClass<Game.core.hud.components.ui.ScrollBox> & {
+  'core.hud.components.ui.ScrollBox': HaxeClass<Game.core.hud.components.ui.ScrollBox> & {
     SCROLL_BAR_MIN_THUMB: number;
     SCROLL_BAR_WIDTH: number;
     STACK_HORIZONTAL: string;
@@ -17377,17 +19257,20 @@ export interface GameClasses {
     WHEEL_NOTCH_PIXELS: number;
     WHEEL_STEP: number;
   };
-  "core.hud.components.ui.Slider": HaxeClass<Game.core.hud.components.ui.Slider> & {
+  'core.hud.components.ui.Slider': HaxeClass<Game.core.hud.components.ui.Slider> & {
     DEFAULT_LENGTH: number;
     THUMB_SIZE: number;
     TOUCH_HEIGHT: number;
     TRACK_HEIGHT: number;
   };
-  "core.hud.components.ui.TabBar": HaxeClass<Game.core.hud.components.ui.TabBar> & {
+  'core.hud.components.ui.TabBar': HaxeClass<Game.core.hud.components.ui.TabBar> & {
     STYLE_CHAT: string;
     TAB_PADDING: number;
   };
-  "core.hud.components.ui.TextEntry": HaxeClass<Game.core.hud.components.ui.TextEntry, [styleName?: string]> & {
+  'core.hud.components.ui.TextEntry': HaxeClass<
+    Game.core.hud.components.ui.TextEntry,
+    [styleName?: string]
+  > & {
     CHAT_MAX_CHARS: number;
     ENTER: string;
     FOCUS_IN: string;
@@ -17395,14 +19278,15 @@ export interface GameClasses {
     STYLE_CHAT: string;
     STYLE_INPUT: string;
     STYLE_PLAIN: string;
+    submitLoginForm: () => any;
   };
-  "core.hud.components.ui.ToggleButton": HaxeClass<Game.core.hud.components.ui.ToggleButton> & {
+  'core.hud.components.ui.ToggleButton': HaxeClass<Game.core.hud.components.ui.ToggleButton> & {
     MEASURE_WIDTH: number;
     SETUP_PADDING: number;
     TAB_LABEL_SIZE: number;
     TEXT_GUTTER: number;
   };
-  "core.hud.components.ui.UiLook": HaxeClass<Game.core.hud.components.ui.UiLook> & {
+  'core.hud.components.ui.UiLook': HaxeClass<Game.core.hud.components.ui.UiLook> & {
     ACTIVE_SETUP_PNG: string;
     activeSetupTexture: any;
     AEON_PNG: string;
@@ -17450,7 +19334,7 @@ export interface GameClasses {
     solid: (arg0?: any) => any;
     subTextures: any;
   };
-  "core.hud.components.ui.WrapText": HaxeClass<Game.core.hud.components.ui.WrapText> & {
+  'core.hud.components.ui.WrapText': HaxeClass<Game.core.hud.components.ui.WrapText> & {
     measureField: any;
     NATIVE_GUTTER: number;
     STYLE_CHAT: string;
@@ -17464,30 +19348,26 @@ export interface GameClasses {
     VERDANA_LINE_CORRECTION: number;
     VERDANA_TOP_CORRECTION: number;
   };
-  "core.hud.components.WarpGateFriendLocationSelector": HaxeClass<Game.core.hud.components.WarpGateFriendLocationSelector> & {
-  };
-  "core.hud.components.WarpToFriendRow": HaxeClass<Game.core.hud.components.WarpToFriendRow> & {
-  };
-  "core.hud.Hud": HaxeClass<Game.core.hud.Hud> & {
-  };
-  "core.hud.MenuHud": HaxeClass<Game.core.hud.MenuHud> & {
-  };
-  "core.login.ConnectEvent": HaxeClass<Game.core.login.ConnectEvent> & {
+  'core.hud.components.WarpGateFriendLocationSelector': HaxeClass<Game.core.hud.components.WarpGateFriendLocationSelector> & {};
+  'core.hud.components.WarpToFriendRow': HaxeClass<Game.core.hud.components.WarpToFriendRow> & {};
+  'core.hud.Hud': HaxeClass<Game.core.hud.Hud> & {};
+  'core.hud.MenuHud': HaxeClass<Game.core.hud.MenuHud> & {};
+  'core.login.ConnectEvent': HaxeClass<Game.core.login.ConnectEvent> & {
     FB_CONNECT: string;
     SIMPLE_CONNECT: string;
     STATUS_UPDATE: string;
   };
-  "core.login.ConnectStatus": HaxeClass<Game.core.login.ConnectStatus, []> & {
-  };
-  "core.login.RecoverDialog": HaxeClass<Game.core.login.RecoverDialog, [login: Game.Login]> & {
-  };
-  "core.login.RegisterDialog2": HaxeClass<Game.core.login.RegisterDialog2> & {
-  };
-  "core.login.ServiceRoomPreview": HaxeClass<Game.core.login.ServiceRoomPreview> & {
+  'core.login.ConnectStatus': HaxeClass<Game.core.login.ConnectStatus, []> & {};
+  'core.login.RecoverDialog': HaxeClass<Game.core.login.RecoverDialog, [login: Game.Login]> & {};
+  'core.login.RegisterDialog2': HaxeClass<Game.core.login.RegisterDialog2> & {};
+  'core.login.ServiceRoomPreview': HaxeClass<Game.core.login.ServiceRoomPreview> & {
     roomNames: any;
     WIDTH: number;
   };
-  "core.login.ServiceRoomSelector": HaxeClass<Game.core.login.ServiceRoomSelector, [rooms: Game.playerio.RoomInfo[], select: (roomId: string) => void]> & {
+  'core.login.ServiceRoomSelector': HaxeClass<
+    Game.core.login.ServiceRoomSelector,
+    [rooms: Game.playerio.RoomInfo[], select: (roomId: string) => void]
+  > & {
     FULL: number;
     isSupporter: boolean;
     NEW_ROOM_THRESHOLD: number;
@@ -17495,16 +19375,15 @@ export interface GameClasses {
     playerLevel: number;
     totalFree: any;
   };
-  "core.login.Username": HaxeClass<Game.core.login.Username> & {
+  'core.login.Username': HaxeClass<Game.core.login.Username> & {
     BANNED: any;
     isBanned: (arg0?: any) => any;
     MAX: number;
     MIN: number;
     RESTRICT: string;
   };
-  "core.missions.DailyManager": HaxeClass<Game.core.missions.DailyManager> & {
-  };
-  "core.parallax.ParallaxManager": HaxeClass<Game.core.parallax.ParallaxManager> & {
+  'core.missions.DailyManager': HaxeClass<Game.core.missions.DailyManager> & {};
+  'core.parallax.ParallaxManager': HaxeClass<Game.core.parallax.ParallaxManager> & {
     MAX_PASSED_TIME: number;
     MIN_BACKGROUND_SCALE: number;
     MINI_DUSTS: number;
@@ -17513,7 +19392,7 @@ export interface GameClasses {
     SIZE: number;
     STARS: number;
   };
-  "core.particle.CollectiveMeshBatch": HaxeClass<Game.core.particle.CollectiveMeshBatch> & {
+  'core.particle.CollectiveMeshBatch': HaxeClass<Game.core.particle.CollectiveMeshBatch> & {
     AllMeshesAreUpdated: () => void;
     Create: (arg0?: any) => any;
     disposeAll: () => void;
@@ -17521,11 +19400,11 @@ export interface GameClasses {
     meshBatches: Game.core.particle.CollectiveMeshBatch[];
     normalBatch: Game.core.particle.CollectiveMeshBatch | null;
   };
-  "core.particle.EffectConst": HaxeClass<Game.core.particle.EffectConst> & {
+  'core.particle.EffectConst': HaxeClass<Game.core.particle.EffectConst> & {
     EXPLOSION_MECH_SPAWNER: string;
     EXPLOSION_ORGANIC_SPAWNER: string;
   };
-  "core.particle.Emitter": HaxeClass<Game.core.particle.Emitter> & {
+  'core.particle.Emitter': HaxeClass<Game.core.particle.Emitter> & {
     IS_HIGH_GRAPHICS: boolean;
     POOL_SIZE_MAX: number;
     POOL_SIZE_MIN: number;
@@ -17534,26 +19413,46 @@ export interface GameClasses {
     setHighGraphics: () => void;
     setLowGraphics: () => any;
   };
-  "core.particle.EmitterFactory": HaxeClass<Game.core.particle.EmitterFactory> & {
-    create: (key: string, game: Game.core.scene.Game, x?: number, y?: number, target?: Game.core.GameObject | null, play?: boolean, addToRenderList?: boolean, multipleAllowed?: boolean, canvasTarget?: Game.starling.display.Sprite | null, retainUntilKilled?: boolean) => Game.core.particle.Emitter[] | null;
+  'core.particle.EmitterFactory': HaxeClass<Game.core.particle.EmitterFactory> & {
+    create: (
+      key: string,
+      game: Game.core.scene.Game,
+      x?: number,
+      y?: number,
+      target?: Game.core.GameObject | null,
+      play?: boolean,
+      addToRenderList?: boolean,
+      multipleAllowed?: boolean,
+      canvasTarget?: Game.starling.display.Sprite | null,
+      retainUntilKilled?: boolean,
+    ) => Game.core.particle.Emitter[] | null;
     createRareType: (arg0?: any, arg1?: any, arg2?: any) => any;
-    resolveTexture: (definition: import('./EffectSequence').EffectEmitter, target?: Game.core.GameObject | null) => Game.starling.textures.Texture | null;
+    resolveTexture: (
+      definition: import('./EffectSequence').EffectEmitter,
+      target?: Game.core.GameObject | null,
+    ) => Game.starling.textures.Texture | null;
   };
-  "core.particle.EmitterManager": HaxeClass<Game.core.particle.EmitterManager> & {
-  };
-  "core.particle.Particle": HaxeClass<Game.core.particle.Particle, []> & {
-  };
-  "core.player.CrewMember": HaxeClass<Game.core.player.CrewMember> & {
+  'core.particle.EmitterManager': HaxeClass<Game.core.particle.EmitterManager> & {};
+  'core.particle.Particle': HaxeClass<Game.core.particle.Particle, []> & {};
+  'core.player.CrewMember': HaxeClass<Game.core.player.CrewMember> & {
     getRank: (arg0?: any) => any;
     RANKS: any;
   };
-  "core.player.EliteTechs": HaxeClass<Game.core.player.EliteTechs> & {
+  'core.player.EliteTechs': HaxeClass<Game.core.player.EliteTechs> & {
     addEliteTechs: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     addWeaponEliteTechs: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     COST_INCREASE: number;
     COST_SUM: number;
     createEliteTechBar: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
-    debuffTechText: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
+    debuffTechText: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
     ELITE_TECHS: any;
     ELITE_TECHS_NAME: any;
     FLUX_COST_SUM: number;
@@ -17576,19 +19475,13 @@ export interface GameClasses {
     WEAPON_ELITE_TECHS: any;
     WEAPON_ELITE_TECHS_NAME: any;
   };
-  "core.player.EliteTechSkill": HaxeClass<Game.core.player.EliteTechSkill> & {
-  };
-  "core.player.Explore": HaxeClass<Game.core.player.Explore> & {
-  };
-  "core.player.FleetObj": HaxeClass<Game.core.player.FleetObj> & {
-  };
-  "core.player.Invite": HaxeClass<Game.core.player.Invite> & {
-  };
-  "core.player.LandedBody": HaxeClass<Game.core.player.LandedBody> & {
-  };
-  "core.player.Mission": HaxeClass<Game.core.player.Mission> & {
-  };
-  "core.player.Player": HaxeClass<Game.core.player.Player> & {
+  'core.player.EliteTechSkill': HaxeClass<Game.core.player.EliteTechSkill> & {};
+  'core.player.Explore': HaxeClass<Game.core.player.Explore> & {};
+  'core.player.FleetObj': HaxeClass<Game.core.player.FleetObj> & {};
+  'core.player.Invite': HaxeClass<Game.core.player.Invite> & {};
+  'core.player.LandedBody': HaxeClass<Game.core.player.LandedBody> & {};
+  'core.player.Mission': HaxeClass<Game.core.player.Mission> & {};
+  'core.player.Player': HaxeClass<Game.core.player.Player> & {
     ARTIFACT_CAPACITY: any;
     EXPBOOSTBONUS_MISSION: number;
     friends: Game.core.friend.Friend[] | null;
@@ -17597,6 +19490,7 @@ export interface GameClasses {
     MAX_ZOOM: number;
     MIN_ZOOM: number;
     onlineFriends: Game.core.friend.Friend[] | null;
+    PHONE_ZOOM: number;
     RESPAWN_TIME: number;
     RESPAWN_TIME_PVP: number;
     savedZoom: any;
@@ -17611,34 +19505,37 @@ export interface GameClasses {
     SLOT_WEAPON_COST_TYPE: string;
     SLOT_WEAPON_UNLOCK_COST: any;
     SUPPORTER_ICON_ASCII: string;
+    TABLET_ZOOM: number;
     WEAPON_SCOPED_STATS: any;
   };
-  "core.player.PlayerManager": HaxeClass<Game.core.player.PlayerManager> & {
+  'core.player.PlayerManager': HaxeClass<Game.core.player.PlayerManager> & {
     banMinutes: number;
     isAllChannels: boolean;
   };
-  "core.player.TechSkill": HaxeClass<Game.core.player.TechSkill> & {
-  };
-  "core.pools.BeamLinePool": HaxeClass<Game.core.pools.BeamLinePool> & {
-  };
-  "core.pools.LinePool": HaxeClass<Game.core.pools.LinePool> & {
-  };
-  "core.pools.RibbonTrailPool": HaxeClass<Game.core.pools.RibbonTrailPool> & {
+  'core.player.TechSkill': HaxeClass<Game.core.player.TechSkill> & {};
+  'core.pools.BeamLinePool': HaxeClass<Game.core.pools.BeamLinePool> & {};
+  'core.pools.LinePool': HaxeClass<Game.core.pools.LinePool> & {};
+  'core.pools.RibbonTrailPool': HaxeClass<Game.core.pools.RibbonTrailPool> & {
     LIMIT: number;
   };
-  "core.projectile.Projectile": HaxeClass<Game.core.projectile.Projectile> & {
+  'core.projectile.Projectile': HaxeClass<Game.core.projectile.Projectile> & {
     DT: number;
     DTxDT_HALF: any;
   };
-  "core.projectile.ProjectileFactory": HaxeClass<Game.core.projectile.ProjectileFactory> & {
-    create: (key: string, game: Game.core.scene.Game, owner: Game.core.unit.Unit | null, weapon: Game.core.weapon.Weapon | null, heading?: Game.movement.Heading | null) => Game.core.projectile.Projectile | null;
+  'core.projectile.ProjectileFactory': HaxeClass<Game.core.projectile.ProjectileFactory> & {
+    create: (
+      key: string,
+      game: Game.core.scene.Game,
+      owner: Game.core.unit.Unit | null,
+      weapon: Game.core.weapon.Weapon | null,
+      heading?: Game.movement.Heading | null,
+    ) => Game.core.projectile.Projectile | null;
   };
-  "core.projectile.ProjectileManager": HaxeClass<Game.core.projectile.ProjectileManager> & {
-  };
-  "core.queue.QueueInfoHolder": HaxeClass<Game.core.queue.QueueInfoHolder> & {
+  'core.projectile.ProjectileManager': HaxeClass<Game.core.projectile.ProjectileManager> & {};
+  'core.queue.QueueInfoHolder': HaxeClass<Game.core.queue.QueueInfoHolder> & {
     TIMELIMIT: number;
   };
-  "core.queue.QueueManager": HaxeClass<Game.core.queue.QueueManager> & {
+  'core.queue.QueueManager': HaxeClass<Game.core.queue.QueueManager> & {
     TYPE_INSTANCE: string;
     TYPE_PVP: string;
     TYPE_PVP_ARENA: string;
@@ -17647,7 +19544,7 @@ export interface GameClasses {
     TYPE_PVP_DOMINATION: string;
     TYPE_PVP_RANDOM: string;
   };
-  "core.scene.Game": HaxeClass<Game.core.scene.Game> & {
+  'core.scene.Game': HaxeClass<Game.core.scene.Game> & {
     assets: any;
     DEFENSEBONUS: number;
     DMGBONUS: number;
@@ -17667,10 +19564,10 @@ export interface GameClasses {
     trackEvent: (category: string, action: string, label: string, value: number) => void;
     trackPageView: (arg0?: any) => any;
   };
-  "core.scene.SceneBase": HaxeClass<Game.core.scene.SceneBase> & {
+  'core.scene.SceneBase': HaxeClass<Game.core.scene.SceneBase> & {
     settings: Game.data.Settings | null;
   };
-  "core.ship.EnemyShip": HaxeClass<Game.core.ship.EnemyShip> & {
+  'core.ship.EnemyShip': HaxeClass<Game.core.ship.EnemyShip> & {
     LEFT: number;
     RARE_TYPE_ATTACKER: number;
     RARE_TYPE_DEFENDER: number;
@@ -17681,11 +19578,9 @@ export interface GameClasses {
     RARE_TYPE_UNIQUE: number;
     RIGHT: number;
   };
-  "core.ship.PlayerShip": HaxeClass<Game.core.ship.PlayerShip> & {
-  };
-  "core.ship.Ship": HaxeClass<Game.core.ship.Ship> & {
-  };
-  "core.ship.ShipFactory": HaxeClass<Game.core.ship.ShipFactory> & {
+  'core.ship.PlayerShip': HaxeClass<Game.core.ship.PlayerShip> & {};
+  'core.ship.Ship': HaxeClass<Game.core.ship.Ship> & {};
+  'core.ship.ShipFactory': HaxeClass<Game.core.ship.ShipFactory> & {
     addArmorTechToShip: (arg0?: any, arg1?: any) => any;
     addEngineTechToShip: (arg0?: any, arg1?: any) => any;
     addLevelBonusToShip: (arg0?: any, arg1?: any, arg2?: any) => any;
@@ -17693,20 +19588,32 @@ export interface GameClasses {
     addPowerTechToShip: (arg0?: any, arg1?: any) => any;
     addShieldTechToShip: (arg0?: any, arg1?: any) => any;
     createBody: (arg0?: any, arg1?: any, arg2?: any) => any;
-    createEnemy: (game: Game.core.scene.Game, key: string, rareType?: number) => Game.core.ship.EnemyShip | null;
+    createEnemy: (
+      game: Game.core.scene.Game,
+      key: string,
+      rareType?: number,
+    ) => Game.core.ship.EnemyShip | null;
     CreateEnemyShipExtraWeapon: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     CreateEnemyShipWeapon: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
-    createPlayer: (game: Game.core.scene.Game, player: Game.core.player.Player, ship: Game.core.ship.PlayerShip, weapons: Game.core.weapon.Weapon[]) => Game.core.ship.PlayerShip;
-    createPlayerShipColorMatrixFilter: (paint: { shipHue: number; shipBrightness: number; shipSaturation: number; shipContrast: number }) => Game.starling.filters.ColorMatrixFilter | null;
+    createPlayer: (
+      game: Game.core.scene.Game,
+      player: Game.core.player.Player,
+      ship: Game.core.ship.PlayerShip,
+      weapons: Game.core.weapon.Weapon[],
+    ) => Game.core.ship.PlayerShip;
+    createPlayerShipColorMatrixFilter: (paint: {
+      shipHue: number;
+      shipBrightness: number;
+      shipSaturation: number;
+      shipContrast: number;
+    }) => Game.starling.filters.ColorMatrixFilter | null;
     CreatePlayerShipWeapon: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    createShipColorFilter: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
   };
-  "core.ship.ShipManager": HaxeClass<Game.core.ship.ShipManager> & {
-  };
-  "core.ship.ShipSync": HaxeClass<Game.core.ship.ShipSync> & {
-  };
-  "core.ship.WeaponRange": HaxeClass<Game.core.ship.WeaponRange> & {
-  };
-  "core.solarSystem.Area": HaxeClass<Game.core.solarSystem.Area> & {
+  'core.ship.ShipManager': HaxeClass<Game.core.ship.ShipManager> & {};
+  'core.ship.ShipSync': HaxeClass<Game.core.ship.ShipSync> & {};
+  'core.ship.WeaponRange': HaxeClass<Game.core.ship.WeaponRange> & {};
+  'core.solarSystem.Area': HaxeClass<Game.core.solarSystem.Area> & {
     COLORTYPE: any;
     COLORTYPEFILL: any;
     COLORTYPESTR: any;
@@ -17731,7 +19638,7 @@ export interface GameClasses {
     TOTALSKILLTYPES: number;
     TOTALSPECIALTYPES: number;
   };
-  "core.solarSystem.Body": HaxeClass<Game.core.solarSystem.Body> & {
+  'core.solarSystem.Body': HaxeClass<Game.core.solarSystem.Body> & {
     COLOR_CANTINA: number;
     COLOR_CLAN: number;
     COLOR_LORE: number;
@@ -17785,157 +19692,121 @@ export interface GameClasses {
     TYPE_WARP_GATE: string;
     TYPE_WEAPONS_FACTORY: string;
   };
-  "core.solarSystem.BodyFactory": HaxeClass<Game.core.solarSystem.BodyFactory> & {
+  'core.solarSystem.BodyFactory': HaxeClass<Game.core.solarSystem.BodyFactory> & {
     addUpgradeStation: (arg0?: any) => any;
     createBodies: (arg0?: any, arg1?: any) => any;
     createSolarSystem: (arg0?: any, arg1?: any) => any;
   };
-  "core.solarSystem.BodyHeading": HaxeClass<Game.core.solarSystem.BodyHeading> & {
-  };
-  "core.solarSystem.BodyManager": HaxeClass<Game.core.solarSystem.BodyManager> & {
+  'core.solarSystem.BodyHeading': HaxeClass<Game.core.solarSystem.BodyHeading> & {};
+  'core.solarSystem.BodyManager': HaxeClass<Game.core.solarSystem.BodyManager> & {
     MAX_ORBIT_DIFF: number;
   };
-  "core.spawner.OrganicSpawner": HaxeClass<Game.core.spawner.OrganicSpawner> & {
+  'core.spawner.OrganicSpawner': HaxeClass<Game.core.spawner.OrganicSpawner> & {
     NR_OF_INACTIVE_FRAMES: number;
   };
-  "core.spawner.Spawner": HaxeClass<Game.core.spawner.Spawner> & {
+  'core.spawner.Spawner': HaxeClass<Game.core.spawner.Spawner> & {
     TYPE_ABSTRACT: string;
     TYPE_MECH: string;
     TYPE_ORGANIC: string;
   };
-  "core.spawner.SpawnFactory": HaxeClass<Game.core.spawner.SpawnFactory> & {
+  'core.spawner.SpawnFactory': HaxeClass<Game.core.spawner.SpawnFactory> & {
     createSpawner: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
   };
-  "core.spawner.SpawnManager": HaxeClass<Game.core.spawner.SpawnManager> & {
-  };
-  "core.states.aistates.AIBoss": HaxeClass<Game.core.states.aistates.AIBoss> & {
-  };
-  "core.states.aistates.AIChase": HaxeClass<Game.core.states.aistates.AIChase> & {
-  };
-  "core.states.aistates.AIExit": HaxeClass<Game.core.states.aistates.AIExit> & {
-  };
-  "core.states.aistates.AIFlee": HaxeClass<Game.core.states.aistates.AIFlee> & {
-  };
-  "core.states.aistates.AIFollow": HaxeClass<Game.core.states.aistates.AIFollow> & {
-  };
-  "core.states.aistates.AIIdle": HaxeClass<Game.core.states.aistates.AIIdle> & {
-  };
-  "core.states.aistates.AIKamikaze": HaxeClass<Game.core.states.aistates.AIKamikaze> & {
-  };
-  "core.states.aistates.AIMelee": HaxeClass<Game.core.states.aistates.AIMelee> & {
-  };
-  "core.states.aistates.AIObserve": HaxeClass<Game.core.states.aistates.AIObserve> & {
-  };
-  "core.states.aistates.AIOrbit": HaxeClass<Game.core.states.aistates.AIOrbit> & {
+  'core.spawner.SpawnManager': HaxeClass<Game.core.spawner.SpawnManager> & {};
+  'core.states.aistates.AIBoss': HaxeClass<Game.core.states.aistates.AIBoss> & {};
+  'core.states.aistates.AIChase': HaxeClass<Game.core.states.aistates.AIChase> & {};
+  'core.states.aistates.AIExit': HaxeClass<Game.core.states.aistates.AIExit> & {};
+  'core.states.aistates.AIFlee': HaxeClass<Game.core.states.aistates.AIFlee> & {};
+  'core.states.aistates.AIFollow': HaxeClass<Game.core.states.aistates.AIFollow> & {};
+  'core.states.aistates.AIIdle': HaxeClass<Game.core.states.aistates.AIIdle> & {};
+  'core.states.aistates.AIKamikaze': HaxeClass<Game.core.states.aistates.AIKamikaze> & {};
+  'core.states.aistates.AIMelee': HaxeClass<Game.core.states.aistates.AIMelee> & {};
+  'core.states.aistates.AIObserve': HaxeClass<Game.core.states.aistates.AIObserve> & {};
+  'core.states.aistates.AIOrbit': HaxeClass<Game.core.states.aistates.AIOrbit> & {
     HALF_PI: any;
     rephase: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     TICK_LENGTH_MS: number;
     TICK_LENGTH_W: number;
   };
-  "core.states.aistates.AIResurect": HaxeClass<Game.core.states.aistates.AIResurect> & {
-  };
-  "core.states.aistates.AIReturnOrbit": HaxeClass<Game.core.states.aistates.AIReturnOrbit> & {
-  };
-  "core.states.aistates.AIStateFactory": HaxeClass<Game.core.states.aistates.AIStateFactory> & {
+  'core.states.aistates.AIResurect': HaxeClass<Game.core.states.aistates.AIResurect> & {};
+  'core.states.aistates.AIReturnOrbit': HaxeClass<Game.core.states.aistates.AIReturnOrbit> & {};
+  'core.states.aistates.AIStateFactory': HaxeClass<Game.core.states.aistates.AIStateFactory> & {
     BLASTWAVE: string;
     BOOMERANG: string;
     BOUNCING: string;
     BULLET: string;
     CLUSTER: string;
-    createProjectileAI: (settings: import('./ProjectileAISettings').ProjectileAISettings, game: Game.core.scene.Game, projectile: Game.core.projectile.Projectile) => Game.core.states.IState | null;
+    createProjectileAI: (
+      settings: import('./ProjectileAISettings').ProjectileAISettings,
+      game: Game.core.scene.Game,
+      projectile: Game.core.projectile.Projectile,
+    ) => Game.core.states.IState | null;
     HOMING_MISSILE: string;
     INSTANT: string;
     INSTANTSPLITTING: string;
     MINE: string;
     TARGETPAINT: string;
   };
-  "core.states.aistates.AITeleport": HaxeClass<Game.core.states.aistates.AITeleport> & {
-  };
-  "core.states.aistates.AITeleportEntry": HaxeClass<Game.core.states.aistates.AITeleportEntry> & {
-  };
-  "core.states.aistates.AITeleportExit": HaxeClass<Game.core.states.aistates.AITeleportExit> & {
-  };
-  "core.states.aistates.AITurret": HaxeClass<Game.core.states.aistates.AITurret> & {
-  };
-  "core.states.aistates.Blastwave": HaxeClass<Game.core.states.aistates.Blastwave> & {
-  };
-  "core.states.aistates.Boomerang": HaxeClass<Game.core.states.aistates.Boomerang> & {
-  };
-  "core.states.aistates.Bouncing": HaxeClass<Game.core.states.aistates.Bouncing> & {
-  };
-  "core.states.aistates.Cluster": HaxeClass<Game.core.states.aistates.Cluster> & {
-  };
-  "core.states.aistates.Instant": HaxeClass<Game.core.states.aistates.Instant> & {
-  };
-  "core.states.aistates.InstantSplitting": HaxeClass<Game.core.states.aistates.InstantSplitting> & {
-  };
-  "core.states.aistates.Mine": HaxeClass<Game.core.states.aistates.Mine> & {
-  };
-  "core.states.aistates.Missile": HaxeClass<Game.core.states.aistates.Missile> & {
-  };
-  "core.states.aistates.MissileStuck": HaxeClass<Game.core.states.aistates.MissileStuck> & {
-  };
-  "core.states.aistates.ProjectileBullet": HaxeClass<Game.core.states.aistates.ProjectileBullet> & {
-  };
-  "core.states.aistates.ProjectileStuck": HaxeClass<Game.core.states.aistates.ProjectileStuck> & {
-  };
-  "core.states.DisplayState": HaxeClass<Game.core.states.DisplayState> & {
-  };
-  "core.states.DisplayStateMachine": HaxeClass<Game.core.states.DisplayStateMachine> & {
-  };
-  "core.states.exploreStates.ControlTime": HaxeClass<Game.core.states.exploreStates.ControlTime> & {
-  };
-  "core.states.exploreStates.ControlZoneState": HaxeClass<Game.core.states.exploreStates.ControlZoneState> & {
+  'core.states.aistates.AITeleport': HaxeClass<Game.core.states.aistates.AITeleport> & {};
+  'core.states.aistates.AITeleportEntry': HaxeClass<Game.core.states.aistates.AITeleportEntry> & {};
+  'core.states.aistates.AITeleportExit': HaxeClass<Game.core.states.aistates.AITeleportExit> & {};
+  'core.states.aistates.AITurret': HaxeClass<Game.core.states.aistates.AITurret> & {};
+  'core.states.aistates.Blastwave': HaxeClass<Game.core.states.aistates.Blastwave> & {};
+  'core.states.aistates.Boomerang': HaxeClass<Game.core.states.aistates.Boomerang> & {};
+  'core.states.aistates.Bouncing': HaxeClass<Game.core.states.aistates.Bouncing> & {};
+  'core.states.aistates.Cluster': HaxeClass<Game.core.states.aistates.Cluster> & {};
+  'core.states.aistates.Instant': HaxeClass<Game.core.states.aistates.Instant> & {};
+  'core.states.aistates.InstantSplitting': HaxeClass<Game.core.states.aistates.InstantSplitting> & {};
+  'core.states.aistates.Mine': HaxeClass<Game.core.states.aistates.Mine> & {};
+  'core.states.aistates.Missile': HaxeClass<Game.core.states.aistates.Missile> & {};
+  'core.states.aistates.MissileStuck': HaxeClass<Game.core.states.aistates.MissileStuck> & {};
+  'core.states.aistates.ProjectileBullet': HaxeClass<Game.core.states.aistates.ProjectileBullet> & {};
+  'core.states.aistates.ProjectileStuck': HaxeClass<Game.core.states.aistates.ProjectileStuck> & {};
+  'core.states.DisplayState': HaxeClass<Game.core.states.DisplayState> & {};
+  'core.states.DisplayStateMachine': HaxeClass<Game.core.states.DisplayStateMachine> & {};
+  'core.states.exploreStates.ControlTime': HaxeClass<Game.core.states.exploreStates.ControlTime> & {};
+  'core.states.exploreStates.ControlZoneState': HaxeClass<Game.core.states.exploreStates.ControlZoneState> & {
     COLOR: number;
   };
-  "core.states.exploreStates.ExploreState": HaxeClass<Game.core.states.exploreStates.ExploreState> & {
+  'core.states.exploreStates.ExploreState': HaxeClass<Game.core.states.exploreStates.ExploreState> & {
     COLOR: number;
   };
-  "core.states.exploreStates.ReportState": HaxeClass<Game.core.states.exploreStates.ReportState> & {
-  };
-  "core.states.exploreStates.SelectTeamState": HaxeClass<Game.core.states.exploreStates.SelectTeamState> & {
+  'core.states.exploreStates.ReportState': HaxeClass<Game.core.states.exploreStates.ReportState> & {};
+  'core.states.exploreStates.SelectTeamState': HaxeClass<Game.core.states.exploreStates.SelectTeamState> & {
     PADDING: number;
     WIDTH: number;
   };
-  "core.states.GameStateMachine": HaxeClass<Game.core.states.GameStateMachine> & {
+  'core.states.GameStateMachine': HaxeClass<Game.core.states.GameStateMachine> & {};
+  'core.states.gameStates.ClanState': HaxeClass<Game.core.states.gameStates.ClanState> & {
+    getMemberRankName: (
+      clan: import('./ClanIdentity').ClanRecord,
+      playerId: string,
+    ) => string | null;
   };
-  "core.states.gameStates.ClanState": HaxeClass<Game.core.states.gameStates.ClanState> & {
-    getMemberRankName: (clan: import('./ClanIdentity').ClanRecord, playerId: string) => string | null;
-  };
-  "core.states.gameStates.GameState": HaxeClass<Game.core.states.gameStates.GameState> & {
-  };
-  "core.states.gameStates.GoWarpState": HaxeClass<Game.core.states.gameStates.GoWarpState> & {
+  'core.states.gameStates.GameState': HaxeClass<Game.core.states.gameStates.GameState> & {};
+  'core.states.gameStates.GoWarpState': HaxeClass<Game.core.states.gameStates.GoWarpState> & {
     roomName: (arg0?: any) => any;
   };
-  "core.states.gameStates.IntroState": HaxeClass<Game.core.states.gameStates.IntroState> & {
+  'core.states.gameStates.IntroState': HaxeClass<Game.core.states.gameStates.IntroState> & {
+    current: any;
   };
-  "core.states.gameStates.LandedCantina": HaxeClass<Game.core.states.gameStates.LandedCantina> & {
+  'core.states.gameStates.LandedCantina': HaxeClass<Game.core.states.gameStates.LandedCantina> & {
     WIDTH: number;
   };
-  "core.states.gameStates.LandedExplore": HaxeClass<Game.core.states.gameStates.LandedExplore> & {
-  };
-  "core.states.gameStates.LandedHangar": HaxeClass<Game.core.states.gameStates.LandedHangar> & {
-  };
-  "core.states.gameStates.LandedLore": HaxeClass<Game.core.states.gameStates.LandedLore> & {
-  };
-  "core.states.gameStates.LandedPaintShop": HaxeClass<Game.core.states.gameStates.LandedPaintShop> & {
-  };
-  "core.states.gameStates.LandedPiratebay": HaxeClass<Game.core.states.gameStates.LandedPiratebay> & {
-  };
-  "core.states.gameStates.LandedRecycle": HaxeClass<Game.core.states.gameStates.LandedRecycle> & {
-  };
-  "core.states.gameStates.LandedState": HaxeClass<Game.core.states.gameStates.LandedState> & {
+  'core.states.gameStates.LandedExplore': HaxeClass<Game.core.states.gameStates.LandedExplore> & {};
+  'core.states.gameStates.LandedHangar': HaxeClass<Game.core.states.gameStates.LandedHangar> & {};
+  'core.states.gameStates.LandedLore': HaxeClass<Game.core.states.gameStates.LandedLore> & {};
+  'core.states.gameStates.LandedPaintShop': HaxeClass<Game.core.states.gameStates.LandedPaintShop> & {};
+  'core.states.gameStates.LandedPiratebay': HaxeClass<Game.core.states.gameStates.LandedPiratebay> & {};
+  'core.states.gameStates.LandedRecycle': HaxeClass<Game.core.states.gameStates.LandedRecycle> & {};
+  'core.states.gameStates.LandedState': HaxeClass<Game.core.states.gameStates.LandedState> & {
     STATION_TAB_PADDING: number;
   };
-  "core.states.gameStates.LandedUpgrade": HaxeClass<Game.core.states.gameStates.LandedUpgrade> & {
-  };
-  "core.states.gameStates.LandedWarpGate": HaxeClass<Game.core.states.gameStates.LandedWarpGate> & {
-  };
-  "core.states.gameStates.LandedWeaponFactory": HaxeClass<Game.core.states.gameStates.LandedWeaponFactory> & {
-  };
-  "core.states.gameStates.LeaderBoardState2": HaxeClass<Game.core.states.gameStates.LeaderBoardState2> & {
+  'core.states.gameStates.LandedUpgrade': HaxeClass<Game.core.states.gameStates.LandedUpgrade> & {};
+  'core.states.gameStates.LandedWarpGate': HaxeClass<Game.core.states.gameStates.LandedWarpGate> & {};
+  'core.states.gameStates.LandedWeaponFactory': HaxeClass<Game.core.states.gameStates.LandedWeaponFactory> & {};
+  'core.states.gameStates.LeaderBoardState2': HaxeClass<Game.core.states.gameStates.LeaderBoardState2> & {
     drawnFor: any;
-    readClans: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     START_HEIGHT: number;
     START_WIDTH: number;
     SURVIVOR_FIELD: string;
@@ -17948,11 +19819,9 @@ export interface GameClasses {
     topSurvivorContainer: any;
     topSurvivorList: any;
   };
-  "core.states.gameStates.MapState": HaxeClass<Game.core.states.gameStates.MapState> & {
-  };
-  "core.states.gameStates.MenuState": HaxeClass<Game.core.states.gameStates.MenuState> & {
-  };
-  "core.states.gameStates.missions.Daily": HaxeClass<Game.core.states.gameStates.missions.Daily> & {
+  'core.states.gameStates.MapState': HaxeClass<Game.core.states.gameStates.MapState> & {};
+  'core.states.gameStates.MenuState': HaxeClass<Game.core.states.gameStates.MenuState> & {};
+  'core.states.gameStates.missions.Daily': HaxeClass<Game.core.states.gameStates.missions.Daily> & {
     STATUS_CLAIMED: number;
     STATUS_COMPLETED: number;
     STATUS_ONGOING: number;
@@ -17966,63 +19835,59 @@ export interface GameClasses {
     TYPE_SURVIVAL: string;
     TYPE_UPGRADE_TECH: string;
   };
-  "core.states.gameStates.missions.DailyList": HaxeClass<Game.core.states.gameStates.missions.DailyList> & {
-  };
-  "core.states.gameStates.missions.DailyReward": HaxeClass<Game.core.states.gameStates.missions.DailyReward> & {
+  'core.states.gameStates.missions.DailyList': HaxeClass<Game.core.states.gameStates.missions.DailyList> & {};
+  'core.states.gameStates.missions.DailyReward': HaxeClass<Game.core.states.gameStates.missions.DailyReward> & {
     textureManager: any;
   };
-  "core.states.gameStates.missions.DailyView": HaxeClass<Game.core.states.gameStates.missions.DailyView> & {
-  };
-  "core.states.gameStates.missions.MissionsDaily": HaxeClass<Game.core.states.gameStates.missions.MissionsDaily> & {
-  };
-  "core.states.gameStates.missions.MissionsList": HaxeClass<Game.core.states.gameStates.missions.MissionsList> & {
+  'core.states.gameStates.missions.DailyView': HaxeClass<Game.core.states.gameStates.missions.DailyView> & {};
+  'core.states.gameStates.missions.MissionsDaily': HaxeClass<Game.core.states.gameStates.missions.MissionsDaily> & {};
+  'core.states.gameStates.missions.MissionsList': HaxeClass<Game.core.states.gameStates.missions.MissionsList> & {
     instance: any;
     reload: () => any;
   };
-  "core.states.gameStates.missions.MissionsState": HaxeClass<Game.core.states.gameStates.missions.MissionsState> & {
+  'core.states.gameStates.missions.MissionsState': HaxeClass<Game.core.states.gameStates.missions.MissionsState> & {};
+  'core.states.gameStates.missions.MissionsStory': HaxeClass<Game.core.states.gameStates.missions.MissionsStory> & {};
+  'core.states.gameStates.missions.MissionsTimed': HaxeClass<Game.core.states.gameStates.missions.MissionsTimed> & {};
+  'core.states.gameStates.missions.MissionView': HaxeClass<Game.core.states.gameStates.missions.MissionView> & {
+    fixText: (
+      game: Game.core.scene.Game,
+      definition: import('./MissionDefinition').MissionDefinition,
+      text: string,
+    ) => string;
   };
-  "core.states.gameStates.missions.MissionsStory": HaxeClass<Game.core.states.gameStates.missions.MissionsStory> & {
-  };
-  "core.states.gameStates.missions.MissionsTimed": HaxeClass<Game.core.states.gameStates.missions.MissionsTimed> & {
-  };
-  "core.states.gameStates.missions.MissionView": HaxeClass<Game.core.states.gameStates.missions.MissionView> & {
-    fixText: (game: Game.core.scene.Game, definition: import('./MissionDefinition').MissionDefinition, text: string) => string;
-  };
-  "core.states.gameStates.missions.Statusbar": HaxeClass<Game.core.states.gameStates.missions.Statusbar> & {
-  };
-  "core.states.gameStates.PlayerListState": HaxeClass<Game.core.states.gameStates.PlayerListState> & {
-  };
-  "core.states.gameStates.PlayState": HaxeClass<Game.core.states.gameStates.PlayState> & {
+  'core.states.gameStates.missions.Statusbar': HaxeClass<Game.core.states.gameStates.missions.Statusbar> & {};
+  'core.states.gameStates.PlayerListState': HaxeClass<Game.core.states.gameStates.PlayerListState> & {};
+  'core.states.gameStates.PlayState': HaxeClass<Game.core.states.gameStates.PlayState> & {
     autoCruise: boolean;
+    isAutoCruise: () => any;
     MOUSE_AIM_SEND_INTERVAL: number;
     mouseBlocked: boolean;
     mouseIntegrator: any;
     oldMouseX: any;
     oldMouseY: any;
+    STEER_START_MIN: number;
+    STEER_START_TICKS: number;
+    STEER_STOP_TICKS: number;
   };
-  "core.states.gameStates.Pod": HaxeClass<Game.core.states.gameStates.Pod> & {
-  };
-  "core.states.gameStates.PodState": HaxeClass<Game.core.states.gameStates.PodState> & {
-  };
-  "core.states.gameStates.PvpScreenState": HaxeClass<Game.core.states.gameStates.PvpScreenState> & {
-  };
-  "core.states.gameStates.RoamingState": HaxeClass<Game.core.states.gameStates.RoamingState, [game: Game.core.scene.Game]> & {
-  };
-  "core.states.gameStates.SettingsBindings": HaxeClass<Game.core.states.gameStates.SettingsBindings> & {
-  };
-  "core.states.gameStates.SettingsChat": HaxeClass<Game.core.states.gameStates.SettingsChat> & {
+  'core.states.gameStates.Pod': HaxeClass<Game.core.states.gameStates.Pod> & {};
+  'core.states.gameStates.PodState': HaxeClass<Game.core.states.gameStates.PodState> & {};
+  'core.states.gameStates.PvpScreenState': HaxeClass<Game.core.states.gameStates.PvpScreenState> & {};
+  'core.states.gameStates.RoamingState': HaxeClass<
+    Game.core.states.gameStates.RoamingState,
+    [game: Game.core.scene.Game]
+  > & {};
+  'core.states.gameStates.SettingsBindings': HaxeClass<Game.core.states.gameStates.SettingsBindings> & {};
+  'core.states.gameStates.SettingsChat': HaxeClass<Game.core.states.gameStates.SettingsChat> & {
     LABEL_HEIGHT: number;
     labelFormat: any;
   };
-  "core.states.gameStates.SettingsGeneral": HaxeClass<Game.core.states.gameStates.SettingsGeneral> & {
+  'core.states.gameStates.SettingsGeneral': HaxeClass<Game.core.states.gameStates.SettingsGeneral> & {
     START_HEIGHT: number;
     START_WIDTH: number;
   };
-  "core.states.gameStates.SettingsState": HaxeClass<Game.core.states.gameStates.SettingsState> & {
-  };
-  "core.states.gameStates.Shop": HaxeClass<Game.core.states.gameStates.Shop> & {
-  };
-  "core.states.gameStates.ShopState": HaxeClass<Game.core.states.gameStates.ShopState> & {
+  'core.states.gameStates.SettingsState': HaxeClass<Game.core.states.gameStates.SettingsState> & {};
+  'core.states.gameStates.Shop': HaxeClass<Game.core.states.gameStates.Shop> & {};
+  'core.states.gameStates.ShopState': HaxeClass<Game.core.states.gameStates.ShopState> & {
     STATE_BEGINNER_PACKAGE: string;
     STATE_CARGO_PROTECTION: string;
     STATE_MEGA_PACKAGE: string;
@@ -18033,65 +19898,49 @@ export interface GameClasses {
     STATE_XP_BOOST: string;
     STATE_XP_PROTECTION: string;
   };
-  "core.states.gameStates.WarpJumpState": HaxeClass<Game.core.states.gameStates.WarpJumpState, [game: Game.core.scene.Game, destination: string, roomId?: string, systemType?: string]> & {
-  };
-  "core.states.IDisplayState": HaxeClass<Game.core.states.IDisplayState> & {
-  };
-  "core.states.IGameState": HaxeClass<Game.core.states.IGameState> & {
-  };
-  "core.states.ISceneState": HaxeClass<Game.core.states.ISceneState> & {
-  };
-  "core.states.IState": HaxeClass<Game.core.states.IState> & {
-  };
-  "core.states.menuStates.ArtifactState2": HaxeClass<Game.core.states.menuStates.ArtifactState2> & {
-  };
-  "core.states.menuStates.CargoState": HaxeClass<Game.core.states.menuStates.CargoState> & {
-  };
-  "core.states.menuStates.ChangeWeaponState": HaxeClass<Game.core.states.menuStates.ChangeWeaponState> & {
+  'core.states.gameStates.WarpJumpState': HaxeClass<
+    Game.core.states.gameStates.WarpJumpState,
+    [game: Game.core.scene.Game, destination: string, roomId?: string, systemType?: string]
+  > & {};
+  'core.states.IDisplayState': HaxeClass<Game.core.states.IDisplayState> & {};
+  'core.states.IGameState': HaxeClass<Game.core.states.IGameState> & {};
+  'core.states.ISceneState': HaxeClass<Game.core.states.ISceneState> & {};
+  'core.states.IState': HaxeClass<Game.core.states.IState> & {};
+  'core.states.menuStates.ArtifactState2': HaxeClass<Game.core.states.menuStates.ArtifactState2> & {};
+  'core.states.menuStates.CargoState': HaxeClass<Game.core.states.menuStates.CargoState> & {};
+  'core.states.menuStates.ChangeWeaponState': HaxeClass<Game.core.states.menuStates.ChangeWeaponState> & {
     TAP_SLOP: number;
   };
-  "core.states.menuStates.CrewState": HaxeClass<Game.core.states.menuStates.CrewState> & {
+  'core.states.menuStates.CrewState': HaxeClass<Game.core.states.menuStates.CrewState> & {
     PADDING: number;
     WIDTH: number;
   };
-  "core.states.menuStates.CrewStateNew": HaxeClass<Game.core.states.menuStates.CrewStateNew> & {
+  'core.states.menuStates.CrewStateNew': HaxeClass<Game.core.states.menuStates.CrewStateNew> & {
     WIDTH: number;
   };
-  "core.states.menuStates.EncounterState": HaxeClass<Game.core.states.menuStates.EncounterState> & {
-    displayName: (arg0?: any) => any;
-    formatNumber: (arg0?: any) => any;
+  'core.states.menuStates.EncounterState': HaxeClass<Game.core.states.menuStates.EncounterState> & {
     PADDING: number;
     WIDTH: number;
   };
-  "core.states.menuStates.FleetState": HaxeClass<Game.core.states.menuStates.FleetState> & {
-  };
-  "core.states.menuStates.HomeState": HaxeClass<Game.core.states.menuStates.HomeState> & {
+  'core.states.menuStates.FleetState': HaxeClass<Game.core.states.menuStates.FleetState> & {};
+  'core.states.menuStates.HomeState': HaxeClass<Game.core.states.menuStates.HomeState> & {
     addStat: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
   };
-  "core.states.menuStates.UpgradesState": HaxeClass<Game.core.states.menuStates.UpgradesState> & {
-  };
-  "core.states.player.Killed": HaxeClass<Game.core.states.player.Killed> & {
+  'core.states.menuStates.UpgradesState': HaxeClass<Game.core.states.menuStates.UpgradesState> & {};
+  'core.states.player.Killed': HaxeClass<Game.core.states.player.Killed> & {
     killedPosition: any;
     killedSystem: any;
     killedTime: any;
   };
-  "core.states.player.Landed": HaxeClass<Game.core.states.player.Landed> & {
-  };
-  "core.states.player.Roaming": HaxeClass<Game.core.states.player.Roaming> & {
-  };
-  "core.states.SceneStateMachine": HaxeClass<Game.core.states.SceneStateMachine> & {
-  };
-  "core.states.ship.Intro": HaxeClass<Game.core.states.ship.Intro> & {
-  };
-  "core.states.ship.LandedShip": HaxeClass<Game.core.states.ship.LandedShip> & {
-  };
-  "core.states.ship.Roaming": HaxeClass<Game.core.states.ship.Roaming> & {
-  };
-  "core.states.ship.WarpJump": HaxeClass<Game.core.states.ship.WarpJump> & {
-  };
-  "core.states.StateMachine": HaxeClass<Game.core.states.StateMachine> & {
-  };
-  "core.sync.Converger": HaxeClass<Game.core.sync.Converger> & {
+  'core.states.player.Landed': HaxeClass<Game.core.states.player.Landed> & {};
+  'core.states.player.Roaming': HaxeClass<Game.core.states.player.Roaming> & {};
+  'core.states.SceneStateMachine': HaxeClass<Game.core.states.SceneStateMachine> & {};
+  'core.states.ship.Intro': HaxeClass<Game.core.states.ship.Intro> & {};
+  'core.states.ship.LandedShip': HaxeClass<Game.core.states.ship.LandedShip> & {};
+  'core.states.ship.Roaming': HaxeClass<Game.core.states.ship.Roaming> & {};
+  'core.states.ship.WarpJump': HaxeClass<Game.core.states.ship.WarpJump> & {};
+  'core.states.StateMachine': HaxeClass<Game.core.states.StateMachine> & {};
+  'core.sync.Converger': HaxeClass<Game.core.sync.Converger> & {
     BLEND_MAX_MS: number;
     BLEND_MIN_MS: number;
     CATCHUP_THRESHOLD_MS: number;
@@ -18101,7 +19950,7 @@ export interface GameClasses {
     PI_DIVIDED_BY_8: any;
     VEL_BLEND_MS: number;
   };
-  "core.sync.MessagePackHandler": HaxeClass<Game.core.sync.MessagePackHandler> & {
+  'core.sync.MessagePackHandler': HaxeClass<Game.core.sync.MessagePackHandler> & {
     AI_STATE_CHANGED: string;
     AI_TELEPORT: string;
     BEAM_PICKUP: string;
@@ -18127,41 +19976,36 @@ export interface GameClasses {
     TURRET_FIRE: string;
     TURRET_KILLED: string;
   };
-  "core.text.TextHandler": HaxeClass<Game.core.text.TextHandler> & {
+  'core.text.TextHandler': HaxeClass<Game.core.text.TextHandler> & {
     MAX_PASSED_TIME: number;
     REFERENCE_FPS: number;
   };
-  "core.text.TextManager": HaxeClass<Game.core.text.TextManager> & {
-  };
-  "core.text.TextParticle": HaxeClass<Game.core.text.TextParticle, [id: number, game: Game.core.scene.Game]> & {
-  };
-  "core.turret.Turret": HaxeClass<Game.core.turret.Turret> & {
-  };
-  "core.turret.TurretFactory": HaxeClass<Game.core.turret.TurretFactory> & {
+  'core.text.TextManager': HaxeClass<Game.core.text.TextManager> & {};
+  'core.text.TextParticle': HaxeClass<
+    Game.core.text.TextParticle,
+    [id: number, game: Game.core.scene.Game]
+  > & {};
+  'core.turret.Turret': HaxeClass<Game.core.turret.Turret> & {};
+  'core.turret.TurretFactory': HaxeClass<Game.core.turret.TurretFactory> & {
     createTurret: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
   };
-  "core.turret.TurretManager": HaxeClass<Game.core.turret.TurretManager> & {
-  };
-  "core.tutorial.Tutorial": HaxeClass<Game.core.tutorial.Tutorial> & {
+  'core.turret.TurretManager': HaxeClass<Game.core.turret.TurretManager> & {};
+  'core.tutorial.Tutorial': HaxeClass<Game.core.tutorial.Tutorial> & {
     add: (arg0?: any) => any;
     clear: () => any;
     dialogs: any;
     remove: (arg0?: any) => any;
   };
-  "core.unit.Unit": HaxeClass<Game.core.unit.Unit> & {
+  'core.unit.Unit': HaxeClass<Game.core.unit.Unit> & {
     HP_MAXWIDTH: number;
     HP_MAXWIDTH_PVP: number;
     HP_MINWIDTH: number;
   };
-  "core.unit.UnitManager": HaxeClass<Game.core.unit.UnitManager> & {
-  };
-  "core.weapon.Beam": HaxeClass<Game.core.weapon.Beam> & {
-  };
-  "core.weapon.Blaster": HaxeClass<Game.core.weapon.Blaster> & {
-  };
-  "core.weapon.Cloak": HaxeClass<Game.core.weapon.Cloak> & {
-  };
-  "core.weapon.Damage": HaxeClass<Game.core.weapon.Damage> & {
+  'core.unit.UnitManager': HaxeClass<Game.core.unit.UnitManager> & {};
+  'core.weapon.Beam': HaxeClass<Game.core.weapon.Beam> & {};
+  'core.weapon.Blaster': HaxeClass<Game.core.weapon.Blaster> & {};
+  'core.weapon.Cloak': HaxeClass<Game.core.weapon.Cloak> & {};
+  'core.weapon.Damage': HaxeClass<Game.core.weapon.Damage> & {
     ALL: number;
     CORROSIVE: number;
     CORROSIVEKINNETIC: number;
@@ -18180,7 +20024,7 @@ export interface GameClasses {
     TYPE: any;
     TYPE_HTML: any;
   };
-  "core.weapon.Debuff": HaxeClass<Game.core.weapon.Debuff> & {
+  'core.weapon.Debuff': HaxeClass<Game.core.weapon.Debuff> & {
     BOMB: number;
     BURN: number;
     debuffText: (arg0?: any, arg1?: any, arg2?: any) => any;
@@ -18196,44 +20040,34 @@ export interface GameClasses {
     SLOW_DOWN: number;
     TOTALTYPES: number;
   };
-  "core.weapon.Heat": HaxeClass<Game.core.weapon.Heat> & {
+  'core.weapon.Heat': HaxeClass<Game.core.weapon.Heat> & {
     LOCKOUT_TIME: number;
     MAX: number;
     REGEN: number;
   };
-  "core.weapon.Instant": HaxeClass<Game.core.weapon.Instant> & {
-  };
-  "core.weapon.PetSpawner": HaxeClass<Game.core.weapon.PetSpawner> & {
-  };
-  "core.weapon.ProjectileGun": HaxeClass<Game.core.weapon.ProjectileGun> & {
-  };
-  "core.weapon.SmartGun": HaxeClass<Game.core.weapon.SmartGun> & {
-  };
-  "core.weapon.Teleport": HaxeClass<Game.core.weapon.Teleport> & {
-  };
-  "core.weapon.Weapon": HaxeClass<Game.core.weapon.Weapon> & {
+  'core.weapon.Instant': HaxeClass<Game.core.weapon.Instant> & {};
+  'core.weapon.PetSpawner': HaxeClass<Game.core.weapon.PetSpawner> & {};
+  'core.weapon.ProjectileGun': HaxeClass<Game.core.weapon.ProjectileGun> & {};
+  'core.weapon.SmartGun': HaxeClass<Game.core.weapon.SmartGun> & {};
+  'core.weapon.Teleport': HaxeClass<Game.core.weapon.Teleport> & {};
+  'core.weapon.Weapon': HaxeClass<Game.core.weapon.Weapon> & {
     TYPE_ANTIPROJECTILE: number;
     TYPE_FLEE: number;
   };
-  "core.weapon.WeaponDataHolder": HaxeClass<Game.core.weapon.WeaponDataHolder> & {
-  };
-  "core.weapon.WeaponDebuff": HaxeClass<Game.core.weapon.WeaponDebuff> & {
-  };
-  "core.weapon.WeaponFactory": HaxeClass<Game.core.weapon.WeaponFactory> & {
+  'core.weapon.WeaponDataHolder': HaxeClass<Game.core.weapon.WeaponDataHolder> & {};
+  'core.weapon.WeaponDebuff': HaxeClass<Game.core.weapon.WeaponDebuff> & {};
+  'core.weapon.WeaponFactory': HaxeClass<Game.core.weapon.WeaponFactory> & {
     create: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
   };
-  "core.weapon.WeaponManager": HaxeClass<Game.core.weapon.WeaponManager> & {
-  };
-  "data.DataLocator": HaxeClass<Game.data.DataLocator> & {
+  'core.weapon.WeaponManager': HaxeClass<Game.core.weapon.WeaponManager> & {};
+  'data.DataLocator': HaxeClass<Game.data.DataLocator> & {
     getService: () => Game.data.IDataManager;
     register: (arg0?: any) => any;
     service: any;
   };
-  "data.DataManager": HaxeClass<Game.data.DataManager> & {
-  };
-  "data.IDataManager": HaxeClass<Game.data.IDataManager> & {
-  };
-  "data.KeyBinds": HaxeClass<Game.data.KeyBinds> & {
+  'data.DataManager': HaxeClass<Game.data.DataManager> & {};
+  'data.IDataManager': HaxeClass<Game.data.IDataManager> & {};
+  'data.KeyBinds': HaxeClass<Game.data.KeyBinds> & {
     ARTIFACTS: number;
     AUTO_FORWARD: number;
     BOOST: number;
@@ -18266,9 +20100,8 @@ export interface GameClasses {
     ZOOM_IN: number;
     ZOOM_OUT: number;
   };
-  "data.Settings": HaxeClass<Game.data.Settings> & {
-  };
-  "data.Table": HaxeClass<Game.data.Table> & {
+  'data.Settings': HaxeClass<Game.data.Settings> & {};
+  'data.Table': HaxeClass<Game.data.Table> & {
     ARTIFACTS: string;
     BASICTECHS: string;
     BODIES: string;
@@ -18301,16 +20134,14 @@ export interface GameClasses {
     WARP_PATHS: string;
     WEAPONS: string;
   };
-  "Date": HaxeClass<Game.Date> & {
-  };
-  "debug.Console": HaxeClass<Game.debug.Console> & {
+  Date: HaxeClass<Game.Date> & {};
+  'debug.Console': HaxeClass<Game.debug.Console> & {
     text: string;
     tf: any;
     write: () => any;
   };
-  "DocumentClass": HaxeClass<Game.DocumentClass> & {
-  };
-  "EmbeddedAssets": HaxeClass<Game.EmbeddedAssets> & {
+  DocumentClass: HaxeClass<Game.DocumentClass> & {};
+  EmbeddedAssets: HaxeClass<Game.EmbeddedAssets> & {
     ASTROFLUX_WIDE: string;
     bitmapClasses: any;
     bitmapData: (arg0?: any) => any;
@@ -18336,9 +20167,8 @@ export interface GameClasses {
     TEXT_INPUT_BACKGROUND: string;
     UI_LIBRARY: string;
   };
-  "EReg": HaxeClass<Game.EReg> & {
-  };
-  "extensions.PixelHitArea": HaxeClass<Game.extensions.PixelHitArea> & {
+  EReg: HaxeClass<Game.EReg> & {};
+  'extensions.PixelHitArea': HaxeClass<Game.extensions.PixelHitArea> & {
     disposeAll: () => any;
     disposeHitArea: (arg0?: any) => any;
     getDebugInfo: () => any;
@@ -18347,22 +20177,371 @@ export interface GameClasses {
     id: any;
     registerHitArea: (arg0?: any, arg1?: any) => any;
   };
-  "extensions.PixelImageTouch": HaxeClass<Game.extensions.PixelImageTouch> & {
-  };
-  "extensions.RibbonSegment": HaxeClass<Game.extensions.RibbonSegment> & {
+  'extensions.PixelImageTouch': HaxeClass<Game.extensions.PixelImageTouch> & {};
+  'extensions.RibbonSegment': HaxeClass<Game.extensions.RibbonSegment> & {
     sHelperMatrix: any;
     sHelperPoint: any;
   };
-  "extensions.RibbonTrail": HaxeClass<Game.extensions.RibbonTrail> & {
+  'extensions.RibbonTrail': HaxeClass<Game.extensions.RibbonTrail> & {
     sMapTexCoords: any;
     sRenderAlpha: any;
   };
-  "generics.ArrayCompat": HaxeClass<Game.generics.ArrayCompat> & {
+  'game.ArtifactActions': HaxeClass<Game.game.ArtifactActions> & {
+    applyUpgradeResult: (arg0?: any, arg1?: any) => any;
+    buyInstantUpgrade: (arg0?: any, arg1?: any, arg2?: any) => any;
+    buySetup: (arg0?: any, arg1?: any, arg2?: any) => any;
+    canAutoRecycle: (arg0?: any, arg1?: any) => any;
+    canChangeHere: (arg0?: any) => any;
+    canRecycle: (arg0?: any, arg1?: any) => any;
+    capacityCost: (arg0?: any) => any;
+    capacityQuestion: (arg0?: any) => any;
+    changeSetup: (arg0?: any, arg1?: any, arg2?: any) => any;
+    claimingCrewKeys: any;
+    claimUpgrade: (arg0?: any, arg1?: any, arg2?: any) => any;
+    crewCanUpgrade: (arg0?: any) => any;
+    equipProblem: (arg0?: any, arg1?: any) => any;
+    infoText: (arg0?: any, arg1?: any) => any;
+    instantUpgradeCost: (arg0?: any, arg1?: any) => any;
+    load: (arg0?: any, arg1?: any, arg2?: any) => any;
+    loaded: boolean;
+    MAX_RECYCLE: number;
+    recycle: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    reveal: (arg0?: any, arg1?: any) => any;
+    SAFE_ZONE_TEXT: string;
+    setupCost: () => any;
+    sort: (arg0?: any, arg1?: any) => any;
+    startUpgrade: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    statTotals: (arg0?: any) => any;
+    summaryText: (arg0?: any) => any;
+    updateLoaded: (arg0?: any, arg1?: any, arg2?: any) => any;
+    upgradeCapacity: (arg0?: any, arg1?: any, arg2?: any) => any;
+    upgradeDuration: (arg0?: any) => any;
+    upgradeProblem: (arg0?: any) => any;
+    upgradeQuestion: (arg0?: any) => any;
+    waiting: any;
+    waitingGame: any;
+  };
+  'game.CargoActions': HaxeClass<Game.game.CargoActions> & {
+    boughtWithFlux: (arg0?: any, arg1?: any) => any;
+    canUpgrade: (arg0?: any) => any;
+    COMPRESSOR_NAMES: any;
+    eject: (arg0?: any) => any;
+    EJECT_QUESTION: string;
+    fluxCost: (arg0?: any) => any;
+    UPGRADE_COSTS: any;
+    UPGRADE_SOUND: string;
+    upgradeWithResources: (arg0?: any, arg1?: any, arg2?: any) => any;
+  };
+  'game.ClanActions': HaxeClass<Game.game.ClanActions> & {
+    accept: (arg0?: any, arg1?: any, arg2?: any) => any;
+    applicationCount: (arg0?: any) => any;
+    apply: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    call: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    canAcceptApplications: (arg0?: any, arg1?: any) => any;
+    canChangeSettings: (arg0?: any, arg1?: any) => any;
+    canManage: (arg0?: any, arg1?: any, arg2?: any) => any;
+    canPromote: (arg0?: any, arg1?: any) => any;
+    create: (arg0?: any, arg1?: any) => any;
+    createCost: () => any;
+    decline: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    deleteClan: (arg0?: any, arg1?: any) => any;
+    isLeader: (arg0?: any, arg1?: any) => any;
+    kick: (arg0?: any, arg1?: any, arg2?: any) => any;
+    LEADER: number;
+    leave: (arg0?: any, arg1?: any) => any;
+    memberRank: (arg0?: any, arg1?: any) => any;
+    NEW_MEMBER: number;
+    OFFICER: number;
+    playerClan: (arg0?: any, arg1?: any, arg2?: any) => any;
+    rankName: (arg0?: any, arg1?: any) => any;
+    saveSettings: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
+    setRank: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+  };
+  'game.CrewActions': HaxeClass<Game.game.CrewActions> & {
+    buyInstantTraining: (arg0?: any, arg1?: any, arg2?: any) => any;
+    canDismiss: (arg0?: any, arg1?: any) => any;
+    completeTraining: (arg0?: any, arg1?: any, arg2?: any) => any;
+    dismiss: (arg0?: any, arg1?: any) => any;
+    dismissedText: (arg0?: any) => any;
+    dismissQuestion: (arg0?: any) => any;
+    hire: (arg0?: any, arg1?: any, arg2?: any) => any;
+    hireCost: () => any;
+    hireQuestion: (arg0?: any) => any;
+    instantTrainingCost: () => any;
+    isSpecialVisible: (arg0?: any, arg1?: any) => any;
+    raiseSkill: (arg0?: any, arg1?: any, arg2?: any) => any;
+    raiseSpecial: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    requestCantina: (arg0?: any, arg1?: any) => any;
+    SKILL_ICONS: any;
+    SKILLS: any;
+    SPECIAL_ICONS: any;
+    SPECIAL_SKILL_LEVEL: number;
+    specialRequirement: (arg0?: any) => any;
+    startTraining: (arg0?: any, arg1?: any, arg2?: any) => any;
+    status: (arg0?: any) => any;
+    trainingDoneText: (arg0?: any, arg1?: any) => any;
+    trainingQuestion: (arg0?: any) => any;
+  };
+  'game.EncounterInfo': HaxeClass<Game.game.EncounterInfo> & {
+    absorb: (arg0?: any, arg1?: any) => any;
+    baseName: (arg0?: any) => any;
+    displayName: (arg0?: any) => any;
+    formatNumber: (arg0?: any) => any;
+    frameRate: (arg0?: any) => any;
+    HIDDEN: any;
+    list: (arg0?: any) => any;
+    load: (arg0?: any, arg1?: any) => any;
+    percent: (arg0?: any) => any;
+    percentText: (arg0?: any, arg1?: any) => any;
+    sections: (arg0?: any, arg1?: any) => any;
+    textures: (arg0?: any) => any;
+    tooltip: (arg0?: any) => any;
+    type: (arg0?: any) => any;
+  };
+  'game.ExploreLogic': HaxeClass<Game.game.ExploreLogic> & {
+    adjustTime: (arg0?: any, arg1?: any, arg2?: any) => any;
+    areas: (arg0?: any) => any;
+    buyInstant: (arg0?: any, arg1?: any, arg2?: any) => any;
+    canJoin: (arg0?: any, arg1?: any) => any;
+    chanceText: (arg0?: any, arg1?: any) => any;
+    claim: (arg0?: any, arg1?: any, arg2?: any) => any;
+    crewChance: (arg0?: any, arg1?: any) => any;
+    crewTime: (arg0?: any, arg1?: any) => any;
+    formatSeconds: (arg0?: any) => any;
+    instantCost: (arg0?: any) => any;
+    markLanded: (arg0?: any, arg1?: any) => any;
+    progress: (arg0?: any, arg1?: any) => any;
+    start: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    state: (arg0?: any, arg1?: any) => any;
+    teamChance: (arg0?: any, arg1?: any) => any;
+    teamSeconds: (arg0?: any) => any;
+    totalEvents: (arg0?: any) => any;
+  };
+  'game.LeaderboardData': HaxeClass<Game.game.LeaderboardData> & {
+    readClans: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    requestClans: (arg0?: any, arg1?: any) => any;
+    requestPlayers: (arg0?: any, arg1?: any, arg2?: any) => any;
+    SURVIVOR_FIELD: string;
+  };
+  'game.MissionActions': HaxeClass<Game.game.MissionActions> & {
+    artifactRewardLabel: (arg0?: any) => any;
+    artifactRewardText: (arg0?: any) => any;
+    claimDaily: (arg0?: any, arg1?: any, arg2?: any) => any;
+    collect: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    dailyRewardAmount: (arg0?: any, arg1?: any) => any;
+    dailyRewards: (arg0?: any) => any;
+    description: (arg0?: any, arg1?: any, arg2?: any) => any;
+    markViewed: (arg0?: any, arg1?: any) => any;
+    missionType: (arg0?: any) => any;
+    progress: (arg0?: any, arg1?: any) => any;
+    reward: (arg0?: any, arg1?: any) => any;
+    shownXp: (arg0?: any) => any;
+    skip: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+  };
+  'game.MissionBriefs': HaxeClass<Game.game.MissionBriefs> & {
+    desktopText: (arg0?: any) => any;
+    FIRST: any;
+    pending: any;
+  };
+  'game.PlanetInfo': HaxeClass<Game.game.PlanetInfo> & {
+    read: (arg0?: any, arg1?: any) => any;
+    tooltip: (arg0?: any) => any;
+  };
+  'game.PlayerStats': HaxeClass<Game.game.PlayerStats> & {
+    exploredPercent: (arg0?: any) => any;
+  };
+  'game.PodActions': HaxeClass<Game.game.PodActions> & {
+    buy: (arg0?: any, arg1?: any, arg2?: any) => any;
+    cost: (arg0?: any) => any;
+    loot: (arg0?: any) => any;
+    open: (arg0?: any, arg1?: any) => any;
+    qualityColor: (arg0?: any) => any;
+    requestCount: (arg0?: any, arg1?: any) => any;
+    takeArtifact: (arg0?: any, arg1?: any, arg2?: any) => any;
+  };
+  'game.Purchases': HaxeClass<Game.game.Purchases> & {
+    activeUntil: (arg0?: any, arg1?: any) => any;
+    applyPackage: (arg0?: any, arg1?: any, arg2?: any) => any;
+    BEGINNER: any;
+    buyDays: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    CARGO_PROTECTION: any;
+    claimPackage: (arg0?: any, arg1?: any, arg2?: any) => any;
+    DAY_BUNDLES: any;
+    expiryDateFrom: (arg0?: any, arg1?: any) => any;
+    FLUX_BUNDLES: any;
+    fluxPaypalUrl: (arg0?: any, arg1?: any, arg2?: any) => any;
+    fluxSaleMultiplier: (arg0?: any) => any;
+    MEGA: any;
+    packagePrice: (arg0?: any, arg1?: any) => any;
+    packageThanks: (arg0?: any, arg1?: any, arg2?: any) => any;
+    payFlux: (arg0?: any, arg1?: any, arg2?: any) => any;
+    payPackage: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    POWER: any;
+    redeemPod: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    SUPPORTER: any;
+    TRACTOR_BEAM: any;
+    XP_BOOST: any;
+    XP_PROTECTION: any;
+  };
+  'game.PvpActions': HaxeClass<Game.game.PvpActions> & {
+    accept: (arg0?: any, arg1?: any, arg2?: any) => any;
+    blockReason: (arg0?: any, arg1?: any, arg2?: any) => any;
+    isDomination: (arg0?: any) => any;
+    join: (arg0?: any, arg1?: any, arg2?: any) => any;
+    killDeathRatio: (arg0?: any) => any;
+    leave: (arg0?: any, arg1?: any, arg2?: any) => any;
+    leaveMatch: (arg0?: any) => any;
+    leavingCostsRating: (arg0?: any) => any;
+    press: (arg0?: any, arg1?: any, arg2?: any) => any;
+    QUEUES: any;
+    scoreHeaders: (arg0?: any) => any;
+    scoreLine: (arg0?: any, arg1?: any, arg2?: any) => any;
+    state: (arg0?: any) => any;
+  };
+  'game.SaleList': HaxeClass<Game.game.SaleList> & {
+    canOpen: (arg0?: any) => any;
+    firstIndex: (arg0?: any, arg1?: any) => any;
+    isShip: (arg0?: any) => any;
+    list: (arg0?: any) => any;
+    packageItem: (arg0?: any) => any;
+    skin: (arg0?: any, arg1?: any) => any;
+    sticker: (arg0?: any) => any;
+    timeLeft: (arg0?: any, arg1?: any) => any;
+    title: (arg0?: any, arg1?: any) => any;
+  };
+  'game.ShipActions': HaxeClass<Game.game.ShipActions> & {
+    buySkin: (arg0?: any, arg1?: any, arg2?: any) => any;
+    canSwitchShip: (arg0?: any) => any;
+    changeName: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    fleetByLastUsed: (arg0?: any) => any;
+    hangarSkins: (arg0?: any, arg1?: any) => any;
+    nameChangeCost: (arg0?: any) => any;
+    setSkinPrices: (arg0?: any, arg1?: any) => any;
+    setWeapon: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    skinPrice: (arg0?: any) => any;
+    useShip: (arg0?: any, arg1?: any) => any;
+  };
+  'game.SlotUnlock': HaxeClass<Game.game.SlotUnlock> & {
+    ARTIFACT: string;
+    boughtWithFlux: (arg0?: any, arg1?: any, arg2?: any) => any;
+    buyWithFlux: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    canBuyWithResources: (arg0?: any, arg1?: any) => any;
+    CREW: string;
+    EMPTY: number;
+    FILLED: number;
+    fluxCost: (arg0?: any, arg1?: any) => any;
+    fluxQuestion: (arg0?: any) => any;
+    fluxRpc: (arg0?: any) => any;
+    LOCKED: number;
+    resourceCost: (arg0?: any, arg1?: any) => any;
+    resourceType: (arg0?: any) => any;
+    slots: (arg0?: any, arg1?: any) => any;
+    SLOTS: number;
+    title: (arg0?: any) => any;
+    UNLOCKABLE: number;
+    unlockedSlots: (arg0?: any, arg1?: any) => any;
+    unlockWithResources: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    WEAPON: string;
+  };
+  'game.SocialActions': HaxeClass<Game.game.SocialActions> & {
+    canTeleport: (arg0?: any, arg1?: any) => any;
+    ignore: (arg0?: any, arg1?: any, arg2?: any) => any;
+    teleport: (arg0?: any, arg1?: any, arg2?: any) => any;
+    teleportCost: () => any;
+    teleportQuestion: (arg0?: any) => any;
+    whisperPrefix: (arg0?: any) => any;
+  };
+  'game.StationActions': HaxeClass<Game.game.StationActions> & {
+    applyRecycle: (arg0?: any, arg1?: any, arg2?: any) => any;
+    BLOOD_CLAW: string;
+    buyPaintJob: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
+    buyWeapon: (arg0?: any, arg1?: any, arg2?: any) => any;
+    buyWeaponWithFlux: (arg0?: any, arg1?: any, arg2?: any) => any;
+    canAffordWeapon: (arg0?: any, arg1?: any) => any;
+    hasWeaponInFleet: (arg0?: any, arg1?: any) => any;
+    ownsWeapon: (arg0?: any, arg1?: any) => any;
+    paintCost: () => any;
+    recycleJunk: (arg0?: any, arg1?: any, arg2?: any) => any;
+    recycleSelected: (arg0?: any) => any;
+    setRecycleSelected: (arg0?: any, arg1?: any) => any;
+    shopWeapons: (arg0?: any, arg1?: any, arg2?: any) => any;
+    SPORE: string;
+    troonPrice: (arg0?: any) => any;
+    usesFreePaintJob: (arg0?: any) => any;
+    weaponFluxCost: (arg0?: any) => any;
+    X27S: string;
+  };
+  'game.TechActions': HaxeClass<Game.game.TechActions> & {
+    buyResetPackage: (arg0?: any, arg1?: any) => any;
+    eliteBought: (arg0?: any, arg1?: any, arg2?: any) => any;
+    eliteCosts: (arg0?: any, arg1?: any, arg2?: any) => any;
+    eliteLevel: (arg0?: any, arg1?: any) => any;
+    eliteMaxAffordable: (arg0?: any, arg1?: any, arg2?: any) => any;
+    eliteMineral2: (arg0?: any, arg1?: any) => any;
+    eliteOptions: (arg0?: any, arg1?: any) => any;
+    hasRequiredLevel: (arg0?: any, arg1?: any) => any;
+    LEVEL_REQUIREMENTS: any;
+    levelBought: (arg0?: any, arg1?: any, arg2?: any) => any;
+    levelFluxCost: (arg0?: any) => any;
+    levelMinerals: (arg0?: any, arg1?: any) => any;
+    mineral1Cost: (arg0?: any, arg1?: any) => any;
+    mineral2Cost: (arg0?: any, arg1?: any) => any;
+    requestRefund: (arg0?: any, arg1?: any) => any;
+    requiredLevel: (arg0?: any) => any;
+    reset: (arg0?: any, arg1?: any) => any;
+    resetCost: (arg0?: any) => any;
+    selectElite: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    sendElite: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    sendLevel: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+  };
+  'game.TechInfo': HaxeClass<Game.game.TechInfo> & {
+    $name: (arg0?: any) => any;
+    eliteDescription: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    iconTextureName: (arg0?: any, arg1?: any) => any;
+    item: (arg0?: any) => any;
+    levelDescription: (arg0?: any, arg1?: any) => any;
+    MAX_LEVEL: number;
+    panelDescription: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+  };
+  'game.WarpPlanner': HaxeClass<Game.game.WarpPlanner> & {
+    buyPath: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    DESTROYED: string;
+    DEV_TEXT: string;
+    devBlocked: (arg0?: any, arg1?: any, arg2?: any) => any;
+    exploredPercent: (arg0?: any, arg1?: any) => any;
+    isBought: (arg0?: any, arg1?: any, arg2?: any) => any;
+    isDiscovered: (arg0?: any, arg1?: any) => any;
+    pathBetween: (arg0?: any, arg1?: any, arg2?: any) => any;
+    pathFluxCost: (arg0?: any) => any;
+    paths: () => any;
+    pvpLvlCap: (arg0?: any) => any;
+    route: (arg0?: any, arg1?: any, arg2?: any) => any;
+    SURVIVAL: string;
+    systems: () => any;
+    warpJump: (arg0?: any, arg1?: any, arg2?: any) => any;
+  };
+  'generics.ArrayCompat': HaxeClass<Game.generics.ArrayCompat> & {
     DESCENDING: number;
     NUMERIC: number;
     sortOn: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "generics.Color": HaxeClass<Game.generics.Color> & {
+  'generics.Color': HaxeClass<Game.generics.Color> & {
     adjustBrightness: (arg0?: any) => any;
     adjustColor: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     adjustContrast: (arg0?: any) => any;
@@ -18388,7 +20567,7 @@ export interface GameClasses {
     RGBtoHSV: (arg0?: any, arg1?: any, arg2?: any) => any;
     tintColor: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "generics.GUID": HaxeClass<Game.generics.GUID> & {
+  'generics.GUID': HaxeClass<Game.generics.GUID> & {
     binb2hex: (arg0?: any) => any;
     calculate: (arg0?: any) => any;
     core_sha1: (arg0?: any, arg1?: any) => any;
@@ -18401,9 +20580,8 @@ export interface GameClasses {
     sha1_kt: (arg0?: any) => any;
     str2binb: (arg0?: any) => any;
   };
-  "generics.List": HaxeClass<Game.generics.List> & {
-  };
-  "generics.Localize": HaxeClass<Game.generics.Localize> & {
+  'generics.List': HaxeClass<Game.generics.List> & {};
+  'generics.Localize': HaxeClass<Game.generics.Localize> & {
     activateLanguageSelection: boolean;
     cacheLanguageData: () => void;
     langObj: Record<string, Record<string, string>> | null;
@@ -18413,17 +20591,16 @@ export interface GameClasses {
     setLocale: (locale?: string | null) => void;
     t: (text: string | null) => string;
   };
-  "generics.ObjUtils": HaxeClass<Game.generics.ObjUtils> & {
+  'generics.ObjUtils': HaxeClass<Game.generics.ObjUtils> & {
     ToVector: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "generics.PaymentWindow": HaxeClass<Game.generics.PaymentWindow> & {
+  'generics.PaymentWindow': HaxeClass<Game.generics.PaymentWindow> & {
     close: (arg0?: any) => any;
     navigate: (arg0?: any, arg1?: any) => any;
     open: () => any;
   };
-  "generics.Random": HaxeClass<Game.generics.Random, [seed: number]> & {
-  };
-  "generics.Util": HaxeClass<Game.generics.Util> & {
+  'generics.Random': HaxeClass<Game.generics.Random, [seed: number]> & {};
+  'generics.Util': HaxeClass<Game.generics.Util> & {
     angleDifference: (arg0?: any, arg1?: any) => any;
     clampDegrees: (arg0?: any) => any;
     clampRadians: (angle: number) => number;
@@ -18434,7 +20611,16 @@ export interface GameClasses {
     getFormattedTime: (arg0?: any) => any;
     getRotationEaseAmount: (arg0?: any, arg1?: any) => any;
     intersectLineAndRect: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
-    intersectLines: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+    intersectLines: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
     isAngleBetween: (arg0?: any, arg1?: any, arg2?: any) => any;
     lerpAngle: (arg0?: any, arg1?: any, arg2?: any) => any;
     Math2PI: any;
@@ -18443,37 +20629,36 @@ export interface GameClasses {
     toPrecision: (arg0?: any, arg1?: any) => any;
     trimUsername: (arg0?: any) => any;
   };
-  "GetFluxNowButtonBitmap": HaxeClass<Game.GetFluxNowButtonBitmap> & {
-  };
-  "haxe._Int64.___Int64": HaxeClass<Game.haxe._Int64.___Int64> & {
-  };
-  "haxe._Unserializer.DefaultResolver": HaxeClass<Game.haxe._Unserializer.DefaultResolver> & {
-  };
-  "haxe._Unserializer.NullResolver": HaxeClass<Game.haxe._Unserializer.NullResolver> & {
+  GetFluxNowButtonBitmap: HaxeClass<Game.GetFluxNowButtonBitmap> & {};
+  'haxe._Int64.___Int64': HaxeClass<Game.haxe._Int64.___Int64> & {};
+  'haxe._Unserializer.DefaultResolver': HaxeClass<Game.haxe._Unserializer.DefaultResolver> & {};
+  'haxe._Unserializer.NullResolver': HaxeClass<Game.haxe._Unserializer.NullResolver> & {
     instance: any;
   };
-  "haxe.crypto.Adler32": HaxeClass<Game.haxe.crypto.Adler32> & {
+  'haxe.crypto.Adler32': HaxeClass<Game.haxe.crypto.Adler32> & {
     read: (arg0?: any) => any;
   };
-  "haxe.crypto.Base64": HaxeClass<Game.haxe.crypto.Base64> & {
+  'haxe.crypto.Base64': HaxeClass<Game.haxe.crypto.Base64> & {
     BYTES: any;
     CHARS: string;
     decode: (arg0?: any, arg1?: any) => any;
   };
-  "haxe.crypto.BaseCode": HaxeClass<Game.haxe.crypto.BaseCode> & {
-  };
-  "haxe.ds._List.ListIterator": HaxeClass<Game.haxe.ds._List.ListIterator> & {
-  };
-  "haxe.ds._List.ListNode": HaxeClass<Game.haxe.ds._List.ListNode> & {
-  };
-  "haxe.ds._StringMap.StringMapKeyIterator": HaxeClass<Game.haxe.ds._StringMap.StringMapKeyIterator> & {
-  };
-  "haxe.ds._StringMap.StringMapKeyValueIterator": HaxeClass<Game.haxe.ds._StringMap.StringMapKeyValueIterator> & {
-  };
-  "haxe.ds._StringMap.StringMapValueIterator": HaxeClass<Game.haxe.ds._StringMap.StringMapValueIterator> & {
-  };
-  "haxe.ds.ArraySort": HaxeClass<Game.haxe.ds.ArraySort> & {
-    doMerge: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
+  'haxe.crypto.BaseCode': HaxeClass<Game.haxe.crypto.BaseCode> & {};
+  'haxe.ds._List.ListIterator': HaxeClass<Game.haxe.ds._List.ListIterator> & {};
+  'haxe.ds._List.ListNode': HaxeClass<Game.haxe.ds._List.ListNode> & {};
+  'haxe.ds._StringMap.StringMapKeyIterator': HaxeClass<Game.haxe.ds._StringMap.StringMapKeyIterator> & {};
+  'haxe.ds._StringMap.StringMapKeyValueIterator': HaxeClass<Game.haxe.ds._StringMap.StringMapKeyValueIterator> & {};
+  'haxe.ds._StringMap.StringMapValueIterator': HaxeClass<Game.haxe.ds._StringMap.StringMapValueIterator> & {};
+  'haxe.ds.ArraySort': HaxeClass<Game.haxe.ds.ArraySort> & {
+    doMerge: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
     gcd: (arg0?: any, arg1?: any) => any;
     lower: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     rec: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
@@ -18482,45 +20667,33 @@ export interface GameClasses {
     swap: (arg0?: any, arg1?: any, arg2?: any) => any;
     upper: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
   };
-  "haxe.ds.BalancedTree": HaxeClass<Game.haxe.ds.BalancedTree> & {
+  'haxe.ds.BalancedTree': HaxeClass<Game.haxe.ds.BalancedTree> & {
     iteratorLoop: (arg0?: any, arg1?: any) => any;
   };
-  "haxe.ds.EnumValueMap": HaxeClass<Game.haxe.ds.EnumValueMap> & {
-  };
-  "haxe.ds.IntMap": HaxeClass<Game.haxe.ds.IntMap> & {
-  };
-  "haxe.ds.List": HaxeClass<Game.haxe.ds.List> & {
-  };
-  "haxe.ds.ObjectMap": HaxeClass<Game.haxe.ds.ObjectMap> & {
-  };
-  "haxe.ds.StringMap": HaxeClass<Game.haxe.ds.StringMap> & {
+  'haxe.ds.EnumValueMap': HaxeClass<Game.haxe.ds.EnumValueMap> & {};
+  'haxe.ds.IntMap': HaxeClass<Game.haxe.ds.IntMap> & {};
+  'haxe.ds.List': HaxeClass<Game.haxe.ds.List> & {};
+  'haxe.ds.ObjectMap': HaxeClass<Game.haxe.ds.ObjectMap> & {};
+  'haxe.ds.StringMap': HaxeClass<Game.haxe.ds.StringMap> & {
     stringify: (arg0?: any) => any;
   };
-  "haxe.ds.TreeNode": HaxeClass<Game.haxe.ds.TreeNode> & {
-  };
-  "haxe.Exception": HaxeClass<Game.haxe.Exception> & {
+  'haxe.ds.TreeNode': HaxeClass<Game.haxe.ds.TreeNode> & {};
+  'haxe.Exception': HaxeClass<Game.haxe.Exception> & {
     caught: (arg0?: any) => any;
     thrown: (arg0?: any) => any;
   };
-  "haxe.exceptions.NotImplementedException": HaxeClass<Game.haxe.exceptions.NotImplementedException> & {
-  };
-  "haxe.exceptions.PosException": HaxeClass<Game.haxe.exceptions.PosException> & {
-  };
-  "haxe.IMap": HaxeClass<Game.haxe.IMap> & {
-  };
-  "haxe.io.Bytes": HaxeClass<Game.haxe.io.Bytes> & {
+  'haxe.exceptions.NotImplementedException': HaxeClass<Game.haxe.exceptions.NotImplementedException> & {};
+  'haxe.exceptions.PosException': HaxeClass<Game.haxe.exceptions.PosException> & {};
+  'haxe.IMap': HaxeClass<Game.haxe.IMap> & {};
+  'haxe.io.Bytes': HaxeClass<Game.haxe.io.Bytes> & {
     ofData: (arg0?: any) => any;
     ofString: (arg0?: any, arg1?: any) => any;
   };
-  "haxe.io.BytesBuffer": HaxeClass<Game.haxe.io.BytesBuffer> & {
-  };
-  "haxe.io.BytesInput": HaxeClass<Game.haxe.io.BytesInput> & {
-  };
-  "haxe.io.BytesOutput": HaxeClass<Game.haxe.io.BytesOutput> & {
-  };
-  "haxe.io.Eof": HaxeClass<Game.haxe.io.Eof> & {
-  };
-  "haxe.io.FPHelper": HaxeClass<Game.haxe.io.FPHelper> & {
+  'haxe.io.BytesBuffer': HaxeClass<Game.haxe.io.BytesBuffer> & {};
+  'haxe.io.BytesInput': HaxeClass<Game.haxe.io.BytesInput> & {};
+  'haxe.io.BytesOutput': HaxeClass<Game.haxe.io.BytesOutput> & {};
+  'haxe.io.Eof': HaxeClass<Game.haxe.io.Eof> & {};
+  'haxe.io.FPHelper': HaxeClass<Game.haxe.io.FPHelper> & {
     doubleToI64: (arg0?: any) => any;
     floatToI32: (arg0?: any) => any;
     helper: any;
@@ -18528,28 +20701,21 @@ export interface GameClasses {
     i64tmp: any;
     i64ToDouble: (arg0?: any, arg1?: any) => any;
   };
-  "haxe.io.Input": HaxeClass<Game.haxe.io.Input> & {
-  };
-  "haxe.io.Output": HaxeClass<Game.haxe.io.Output> & {
-  };
-  "haxe.io.Path": HaxeClass<Game.haxe.io.Path> & {
+  'haxe.io.Input': HaxeClass<Game.haxe.io.Input> & {};
+  'haxe.io.Output': HaxeClass<Game.haxe.io.Output> & {};
+  'haxe.io.Path': HaxeClass<Game.haxe.io.Path> & {
     directory: (arg0?: any) => any;
   };
-  "haxe.iterators.ArrayIterator": HaxeClass<Game.haxe.iterators.ArrayIterator> & {
-  };
-  "haxe.iterators.MapKeyValueIterator": HaxeClass<Game.haxe.iterators.MapKeyValueIterator> & {
-  };
-  "haxe.lang.Iterable": HaxeClass<Game.haxe.lang.Iterable> & {
-  };
-  "haxe.lang.Iterator": HaxeClass<Game.haxe.lang.Iterator> & {
-  };
-  "haxe.Log": HaxeClass<Game.haxe.Log> & {
+  'haxe.iterators.ArrayIterator': HaxeClass<Game.haxe.iterators.ArrayIterator> & {};
+  'haxe.iterators.MapKeyValueIterator': HaxeClass<Game.haxe.iterators.MapKeyValueIterator> & {};
+  'haxe.lang.Iterable': HaxeClass<Game.haxe.lang.Iterable> & {};
+  'haxe.lang.Iterator': HaxeClass<Game.haxe.lang.Iterator> & {};
+  'haxe.Log': HaxeClass<Game.haxe.Log> & {
     formatOutput: (arg0?: any, arg1?: any) => any;
     trace: (arg0?: any, arg1?: any) => any;
   };
-  "haxe.macro.Error": HaxeClass<Game.haxe.macro.Error> & {
-  };
-  "haxe.NativeStackTrace": HaxeClass<Game.haxe.NativeStackTrace> & {
+  'haxe.macro.Error': HaxeClass<Game.haxe.macro.Error> & {};
+  'haxe.NativeStackTrace': HaxeClass<Game.haxe.NativeStackTrace> & {
     callStack: () => any;
     exceptionStack: () => any;
     lastError: any;
@@ -18560,42 +20726,38 @@ export interface GameClasses {
     toHaxe: (arg0?: any, arg1?: any) => any;
     tryHaxeStack: (arg0?: any) => any;
   };
-  "haxe.Serializer": HaxeClass<Game.haxe.Serializer> & {
+  'haxe.Serializer': HaxeClass<Game.haxe.Serializer> & {
     BASE64: string;
     BASE64_CODES: any;
     run: (arg0?: any) => any;
     USE_CACHE: boolean;
     USE_ENUM_INDEX: boolean;
   };
-  "haxe.Timer": HaxeClass<Game.haxe.Timer> & {
+  'haxe.Timer': HaxeClass<Game.haxe.Timer> & {
     delay: (arg0?: any, arg1?: any) => any;
     measure: (arg0?: any, arg1?: any) => any;
     stamp: () => any;
   };
-  "haxe.Unserializer": HaxeClass<Game.haxe.Unserializer> & {
+  'haxe.Unserializer': HaxeClass<Game.haxe.Unserializer> & {
     BASE64: string;
     CODES: any;
     DEFAULT_RESOLVER: any;
     initCodes: () => any;
     run: (arg0?: any) => any;
   };
-  "haxe.ValueException": HaxeClass<Game.haxe.ValueException> & {
-  };
-  "haxe.xml.Parser": HaxeClass<Game.haxe.xml.Parser> & {
+  'haxe.ValueException': HaxeClass<Game.haxe.ValueException> & {};
+  'haxe.xml.Parser': HaxeClass<Game.haxe.xml.Parser> & {
     doParse: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     escapes: any;
     parse: (arg0?: any, arg1?: any) => any;
   };
-  "haxe.xml.Printer": HaxeClass<Game.haxe.xml.Printer> & {
+  'haxe.xml.Printer': HaxeClass<Game.haxe.xml.Printer> & {
     print: (arg0?: any, arg1?: any) => any;
   };
-  "haxe.xml.XmlParserException": HaxeClass<Game.haxe.xml.XmlParserException> & {
-  };
-  "haxe.zip._InflateImpl.Window": HaxeClass<Game.haxe.zip._InflateImpl.Window> & {
-  };
-  "haxe.zip.HuffTools": HaxeClass<Game.haxe.zip.HuffTools> & {
-  };
-  "haxe.zip.InflateImpl": HaxeClass<Game.haxe.zip.InflateImpl> & {
+  'haxe.xml.XmlParserException': HaxeClass<Game.haxe.xml.XmlParserException> & {};
+  'haxe.zip._InflateImpl.Window': HaxeClass<Game.haxe.zip._InflateImpl.Window> & {};
+  'haxe.zip.HuffTools': HaxeClass<Game.haxe.zip.HuffTools> & {};
+  'haxe.zip.InflateImpl': HaxeClass<Game.haxe.zip.InflateImpl> & {
     CODE_LENGTHS_POS: any;
     DIST_BASE_VAL_TBL: any;
     DIST_EXTRA_BITS_TBL: any;
@@ -18603,35 +20765,269 @@ export interface GameClasses {
     LEN_BASE_VAL_TBL: any;
     LEN_EXTRA_BITS_TBL: any;
   };
-  "haxe.zip.Reader": HaxeClass<Game.haxe.zip.Reader> & {
+  'haxe.zip.Reader': HaxeClass<Game.haxe.zip.Reader> & {
     readZip: (arg0?: any) => any;
   };
-  "HxOverrides": HaxeClass<Game.HxOverrides> & {
+  HxOverrides: HaxeClass<Game.HxOverrides> & {
     cca: (arg0?: any, arg1?: any) => any;
     now: any;
     remove: (arg0?: any, arg1?: any) => any;
     strDate: (arg0?: any) => any;
     substr: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "io.IInput": HaxeClass<Game.io.IInput> & {
+  'io._TouchControls.TouchButton': HaxeClass<Game.io._TouchControls.TouchButton> & {
+    ABILITY: number;
+    BRAKE: number;
+    CRUISE: number;
+    FIRE: number;
+    KIND_NAMES: any;
+    LAND: number;
+    SETTINGS: number;
+    WEAPON: number;
   };
-  "io.InputLocator": HaxeClass<Game.io.InputLocator> & {
+  'io.Device': HaxeClass<Game.io.Device> & {
+    addChangeListener: (arg0?: any) => any;
+    DESKTOP: string;
+    forced: boolean;
+    formFactor: any;
+    hasTouch: any;
+    init: () => any;
+    initialized: boolean;
+    isTextField: (arg0?: any) => any;
+    lastMouseX: any;
+    lastMouseY: any;
+    listeners: any;
+    mediaMatches: (arg0?: any) => any;
+    MOUSE_MOVE_SWITCH_DISTANCE: number;
+    mouseMoved: any;
+    notify: () => any;
+    onKeyDown: (arg0?: any) => any;
+    onPointerDown: (arg0?: any) => any;
+    onPointerMove: (arg0?: any) => any;
+    onTouchStart: (arg0?: any) => any;
+    onViewportChange: (arg0?: any) => any;
+    parsePx: (arg0?: any) => any;
+    parseSafeOverride: (arg0?: any) => any;
+    PHONE: string;
+    PHONE_MAX_SHORT_SIDE: number;
+    queryParam: (arg0?: any) => any;
+    readSafeArea: () => any;
+    removeChangeListener: (arg0?: any) => any;
+    safeBottom: any;
+    safeLeft: any;
+    safeOverride: any;
+    safeProbe: any;
+    safeRight: any;
+    safeTop: any;
+    setLandscapeOnly: (arg0?: any) => any;
+    setTouchMode: (arg0?: any) => any;
+    snapshot: () => any;
+    TABLET: string;
+    touchMode: any;
+  };
+  'io.Fullscreen': HaxeClass<Game.io.Fullscreen> & {
+    arm: () => any;
+    armed: boolean;
+    available: () => any;
+    disarm: () => any;
+    enter: () => any;
+    exit: () => any;
+    isOn: () => any;
+    listen: () => any;
+    listening: boolean;
+    MAX_REFUSED: number;
+    onChange: (arg0?: any) => any;
+    onRefused: () => any;
+    onTap: (arg0?: any) => any;
+    refused: any;
+    request: () => any;
+    state: () => any;
+    toggle: () => any;
+    wanted: boolean;
+  };
+  'io.IInput': HaxeClass<Game.io.IInput> & {};
+  'io.InputLocator': HaxeClass<Game.io.InputLocator> & {
     getService: () => any;
     input: any;
     register: (arg0?: any) => any;
   };
-  "io.InputManager": HaxeClass<Game.io.InputManager> & {
+  'io.InputManager': HaxeClass<Game.io.InputManager> & {
     keyOf: (arg0?: any) => any;
     keysOf: (arg0?: any) => any;
   };
-  "joinRoom.IJoinRoomManager": HaxeClass<Game.joinRoom.IJoinRoomManager> & {
+  'io.OverlayFit': HaxeClass<Game.io.OverlayFit> & {
+    fit: (arg0?: any, arg1?: any, arg2?: any) => any;
+    FIT_GUTTER: number;
+    fitMenu: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    helper: any;
+    MARGIN: number;
+    natural: any;
+    scaleWithMenu: (arg0?: any, arg1?: any) => any;
+    update: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "joinRoom.JoinRoomLocator": HaxeClass<Game.joinRoom.JoinRoomLocator> & {
+  'io.TouchArt': HaxeClass<Game.io.TouchArt> & {
+    arrow: (arg0?: any, arg1?: any) => any;
+    bubble: (arg0?: any, arg1?: any) => any;
+    cache: any;
+    cog: (arg0?: any, arg1?: any) => any;
+    corners: (arg0?: any, arg1?: any) => any;
+    crosshair: (arg0?: any, arg1?: any) => any;
+    cutRect: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
+    cutRectLine: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    disc: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    disposeAll: () => any;
+    lock: (arg0?: any, arg1?: any) => any;
+    make: (arg0?: any, arg1?: any, arg2?: any) => any;
+    makeRect: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    menuLines: (arg0?: any, arg1?: any) => any;
+    pill: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
+    roundRect: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
+  };
+  'io.TouchControls': HaxeClass<Game.io.TouchControls> & {
+    ABILITY_ACTIONS: any;
+    ABILITY_ANGLES: any;
+    ABILITY_ARC: number;
+    ABILITY_ORDER: any;
+    ABILITY_RADIUS: number;
+    AUTO_FIRE_HOLD_MS: number;
+    BRAKE_ANGLE: number;
+    BRAKE_ARC: number;
+    BRAKE_RADIUS: number;
+    COLOR_FILL: number;
+    COLOR_HOT: number;
+    COLOR_LINE: number;
+    COLOR_TEXT: number;
+    current: any;
+    DOUBLE_TAP_MS: number;
+    DPAD_RADIUS: number;
+    FIRE_FROM_BOTTOM: number;
+    FIRE_FROM_RIGHT: number;
+    FIRE_LOCK_SLIDE: number;
+    FIRE_RADIUS: number;
+    HIT_EXTRA: number;
+    HUD_BAR: number;
+    LAND_HEIGHT: number;
+    LAND_WIDTH: number;
+    MOBILE_BOTTOM_MARGIN: number;
+    nowMs: () => any;
+    onButton: (arg0?: any) => any;
+    READY_FLASH_MS: number;
+    SHORT_TAP_MS: number;
+    SMALL_RADIUS: number;
+    STEER_ONLY_ZONE_TOP: number;
+    STEER_ONLY_ZONE_WIDTH: number;
+    STICK_ANGLE_STEP: number;
+    STICK_BASE_RADIUS: number;
+    STICK_DEAD: number;
+    STICK_KNOB_RADIUS: number;
+    STICK_THRUST_OFF: number;
+    STICK_THRUST_ON: number;
+    STICK_TRAVEL: number;
+    STICK_ZONE_WIDTH: number;
+    TABLET_LIFT: number;
+    TOP_BAND: number;
+    WEAPON_ANGLES: any;
+    WEAPON_ARC: number;
+    WEAPON_HOLD_MS: number;
+    WEAPON_RADIUS: number;
+  };
+  'io.TouchSettings': HaxeClass<Game.io.TouchSettings> & {
+    clamp: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    FIRE_AUTO: string;
+    FIRE_HOLD: string;
+    FIRE_TOGGLE: string;
+    fireMode: any;
+    layout: any;
+    LAYOUT_DPAD: string;
+    LAYOUT_STICK: string;
+    leftHanded: any;
+    load: () => any;
+    loaded: boolean;
+    opacity: any;
+    OPACITY_MAX: number;
+    OPACITY_MIN: number;
+    pick: (arg0?: any, arg1?: any, arg2?: any) => any;
+    save: () => any;
+    showChat: any;
+    size: any;
+    SIZE_MAX: number;
+    SIZE_MIN: number;
+    STICK_FIXED: string;
+    STICK_FLOATING: string;
+    stickMode: any;
+  };
+  'io.TouchSettingsPanel': HaxeClass<Game.io.TouchSettingsPanel> & {
+    BUTTON_HEIGHT: number;
+    COLOR_BUTTON: number;
+    COLOR_HOT: number;
+    COLOR_PANEL: number;
+    COLOR_SELECTED: number;
+    COLOR_TEXT: number;
+    GAP: number;
+    LABEL_WIDTH: number;
+    PADDING: number;
+    ROW_HEIGHT: number;
+  };
+  'io.VirtualInput': HaxeClass<Game.io.VirtualInput> & {
+    down: any;
+    isDown: (arg0?: any) => any;
+    isPressed: (arg0?: any) => any;
+    isWeaponTapOnly: (arg0?: any) => any;
+    press: (arg0?: any) => any;
+    pressed: any;
+    release: (arg0?: any) => any;
+    releaseAll: () => any;
+    releaseAtReset: any;
+    reset: () => any;
+    respawnPressed: boolean;
+    set: (arg0?: any, arg1?: any) => any;
+    setWeaponFireHeld: (arg0?: any, arg1?: any) => any;
+    steerAngle: any;
+    steering: boolean;
+    tap: (arg0?: any) => any;
+    weaponFireHeld: any;
+  };
+  'joinRoom.IJoinRoomManager': HaxeClass<Game.joinRoom.IJoinRoomManager> & {};
+  'joinRoom.JoinRoomLocator': HaxeClass<Game.joinRoom.JoinRoomLocator> & {
     getService: () => Game.joinRoom.JoinRoomManager | null;
     register: (manager: Game.joinRoom.JoinRoomManager) => void;
     service: any;
   };
-  "joinRoom.JoinRoomManager": HaxeClass<Game.joinRoom.JoinRoomManager, [client: Game.playerio.Client, stage: Game.starling.display.Stage, joinData: Record<string, string | number | boolean | null>, login: Game.Login]> & {
+  'joinRoom.JoinRoomManager': HaxeClass<
+    Game.joinRoom.JoinRoomManager,
+    [
+      client: Game.playerio.Client,
+      stage: Game.starling.display.Stage,
+      joinData: Record<string, string | number | boolean | null>,
+      login: Game.Login,
+    ]
+  > & {
     getServiceRoomID: (index: number) => string;
     isValidServiceRoomId: (id: string | null) => boolean;
     JOIN_RETRIES: number;
@@ -18640,7 +21036,7 @@ export interface GameClasses {
     SERVICE_ID: any;
     SERVICE_PING_MS: number;
   };
-  "joinRoom.Room": HaxeClass<Game.joinRoom.Room> & {
+  'joinRoom.Room': HaxeClass<Game.joinRoom.Room> & {
     SYSTEM_TYPE_ARENA: string;
     SYSTEM_TYPE_CLAN: string;
     SYSTEM_TYPE_DEATHMATCH: string;
@@ -18649,28 +21045,25 @@ export interface GameClasses {
     SYSTEM_TYPE_HOSTILE: string;
     SYSTEM_TYPE_SURVIVAL: string;
   };
-  "js.Boot": HaxeClass<Game.js.Boot> & {
+  'js.Boot': HaxeClass<Game.js.Boot> & {
     getClass: (arg0?: any) => any;
   };
-  "js.Browser": HaxeClass<Game.js.Browser> & {
+  'js.Browser': HaxeClass<Game.js.Browser> & {
     get_supported: () => any;
     getLocalStorage: () => any;
   };
-  "js.html._CanvasElement.CanvasUtil": HaxeClass<Game.js.html._CanvasElement.CanvasUtil> & {
+  'js.html._CanvasElement.CanvasUtil': HaxeClass<Game.js.html._CanvasElement.CanvasUtil> & {
     getContextWebGL: (arg0?: any, arg1?: any) => any;
   };
-  "Lambda": HaxeClass<Game.Lambda> & {
+  Lambda: HaxeClass<Game.Lambda> & {
     array: (arg0?: any) => any;
     count: (arg0?: any, arg1?: any) => any;
     indexOf: (arg0?: any, arg1?: any) => any;
   };
-  "lime._internal.backend.html5.GameDeviceData": HaxeClass<Game.lime._internal.backend.html5.GameDeviceData> & {
-  };
-  "lime._internal.backend.html5.HTML5Application": HaxeClass<Game.lime._internal.backend.html5.HTML5Application> & {
-  };
-  "lime._internal.backend.html5.HTML5AudioSource": HaxeClass<Game.lime._internal.backend.html5.HTML5AudioSource> & {
-  };
-  "lime._internal.backend.html5.HTML5HTTPRequest": HaxeClass<Game.lime._internal.backend.html5.HTML5HTTPRequest> & {
+  'lime._internal.backend.html5.GameDeviceData': HaxeClass<Game.lime._internal.backend.html5.GameDeviceData> & {};
+  'lime._internal.backend.html5.HTML5Application': HaxeClass<Game.lime._internal.backend.html5.HTML5Application> & {};
+  'lime._internal.backend.html5.HTML5AudioSource': HaxeClass<Game.lime._internal.backend.html5.HTML5AudioSource> & {};
+  'lime._internal.backend.html5.HTML5HTTPRequest': HaxeClass<Game.lime._internal.backend.html5.HTML5HTTPRequest> & {
     activeRequests: any;
     loadImage: (arg0?: any) => any;
     loadImageFromBytes: (arg0?: any, arg1?: any) => any;
@@ -18684,66 +21077,71 @@ export interface GameClasses {
     requestQueue: any;
     supportsImageProgress: any;
   };
-  "lime._internal.backend.html5.HTML5Thread": HaxeClass<Game.lime._internal.backend.html5.HTML5Thread> & {
+  'lime._internal.backend.html5.HTML5Thread': HaxeClass<Game.lime._internal.backend.html5.HTML5Thread> & {
     create: (arg0?: any) => any;
     current: () => any;
     equals: (arg0?: any, arg1?: any) => any;
     returnMessage: (arg0?: any, arg1?: any, arg2?: any) => any;
     zeroDelay: () => any;
   };
-  "lime._internal.backend.html5.HTML5Window": HaxeClass<Game.lime._internal.backend.html5.HTML5Window> & {
+  'lime._internal.backend.html5.HTML5Window': HaxeClass<Game.lime._internal.backend.html5.HTML5Window> & {
     dummyCharacter: string;
     textArea: any;
     textInput: any;
     windowID: any;
   };
-  "lime._internal.backend.native.NativeCFFI": HaxeClass<Game.lime._internal.backend.native.NativeCFFI> & {
-  };
-  "lime._internal.format.Base64": HaxeClass<Game.lime._internal.format.Base64> & {
+  'lime._internal.backend.native.NativeCFFI': HaxeClass<Game.lime._internal.backend.native.NativeCFFI> & {};
+  'lime._internal.format.Base64': HaxeClass<Game.lime._internal.format.Base64> & {
     decode: (arg0?: any) => any;
     DICTIONARY: any;
     encode: (arg0?: any) => any;
     EXTENDED_DICTIONARY: any;
   };
-  "lime._internal.format.BMP": HaxeClass<Game.lime._internal.format.BMP> & {
+  'lime._internal.format.BMP': HaxeClass<Game.lime._internal.format.BMP> & {
     encode: (arg0?: any, arg1?: any) => any;
   };
-  "lime._internal.format.Deflate": HaxeClass<Game.lime._internal.format.Deflate> & {
+  'lime._internal.format.Deflate': HaxeClass<Game.lime._internal.format.Deflate> & {
     compress: (arg0?: any) => any;
     decompress: (arg0?: any) => any;
   };
-  "lime._internal.format.GZip": HaxeClass<Game.lime._internal.format.GZip> & {
+  'lime._internal.format.GZip': HaxeClass<Game.lime._internal.format.GZip> & {
     compress: (arg0?: any) => any;
     decompress: (arg0?: any) => any;
   };
-  "lime._internal.format.JPEG": HaxeClass<Game.lime._internal.format.JPEG> & {
+  'lime._internal.format.JPEG': HaxeClass<Game.lime._internal.format.JPEG> & {
     decodeBytes: (arg0?: any, arg1?: any) => any;
     decodeFile: (arg0?: any, arg1?: any) => any;
     encode: (arg0?: any, arg1?: any) => any;
   };
-  "lime._internal.format.LZMA": HaxeClass<Game.lime._internal.format.LZMA> & {
+  'lime._internal.format.LZMA': HaxeClass<Game.lime._internal.format.LZMA> & {
     compress: (arg0?: any) => any;
     decompress: (arg0?: any) => any;
   };
-  "lime._internal.format.PNG": HaxeClass<Game.lime._internal.format.PNG> & {
+  'lime._internal.format.PNG': HaxeClass<Game.lime._internal.format.PNG> & {
     decodeBytes: (arg0?: any, arg1?: any) => any;
     decodeFile: (arg0?: any, arg1?: any) => any;
     encode: (arg0?: any) => any;
   };
-  "lime._internal.format.Zlib": HaxeClass<Game.lime._internal.format.Zlib> & {
+  'lime._internal.format.Zlib': HaxeClass<Game.lime._internal.format.Zlib> & {
     compress: (arg0?: any) => any;
     decompress: (arg0?: any) => any;
   };
-  "lime._internal.graphics._ImageDataUtil.ImageDataView": HaxeClass<Game.lime._internal.graphics._ImageDataUtil.ImageDataView> & {
-  };
-  "lime._internal.graphics.BlurStack": HaxeClass<Game.lime._internal.graphics.BlurStack> & {
-  };
-  "lime._internal.graphics.ImageCanvasUtil": HaxeClass<Game.lime._internal.graphics.ImageCanvasUtil> & {
+  'lime._internal.graphics._ImageDataUtil.ImageDataView': HaxeClass<Game.lime._internal.graphics._ImageDataUtil.ImageDataView> & {};
+  'lime._internal.graphics.BlurStack': HaxeClass<Game.lime._internal.graphics.BlurStack> & {};
+  'lime._internal.graphics.ImageCanvasUtil': HaxeClass<Game.lime._internal.graphics.ImageCanvasUtil> & {
     colorTransform: (arg0?: any, arg1?: any, arg2?: any) => any;
     convertToCanvas: (arg0?: any, arg1?: any) => any;
     convertToData: (arg0?: any, arg1?: any) => any;
     copyChannel: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
-    copyPixels: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
+    copyPixels: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
     createCanvas: (arg0?: any, arg1?: any, arg2?: any) => any;
     createImageData: (arg0?: any) => any;
     fillRect: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
@@ -18751,7 +21149,16 @@ export interface GameClasses {
     getPixel: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     getPixel32: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     getPixels: (arg0?: any, arg1?: any, arg2?: any) => any;
-    merge: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+    merge: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
     resize: (arg0?: any, arg1?: any, arg2?: any) => any;
     scroll: (arg0?: any, arg1?: any, arg2?: any) => any;
     setPixel: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
@@ -18759,15 +21166,41 @@ export interface GameClasses {
     setPixels: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     sync: (arg0?: any, arg1?: any) => any;
   };
-  "lime._internal.graphics.ImageDataUtil": HaxeClass<Game.lime._internal.graphics.ImageDataUtil> & {
+  'lime._internal.graphics.ImageDataUtil': HaxeClass<Game.lime._internal.graphics.ImageDataUtil> & {
     bilinear: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
     colorTransform: (arg0?: any, arg1?: any, arg2?: any) => any;
     copyChannel: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
-    copyPixels: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
-    displaceMap: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
+    copyPixels: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
+    displaceMap: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
     fillRect: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     floodFill: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
-    gaussianBlur: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any) => any;
+    gaussianBlur: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+    ) => any;
     getColorBoundsRect: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     getPixel: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     getPixel32: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
@@ -18775,7 +21208,16 @@ export interface GameClasses {
     lerp: (arg0?: any, arg1?: any, arg2?: any) => any;
     lerp4f: (arg0?: any, arg1?: any, arg2?: any) => any;
     lerpRGBA: (arg0?: any, arg1?: any, arg2?: any) => any;
-    merge: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+    merge: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
     multiplyAlpha: (arg0?: any) => any;
     resize: (arg0?: any, arg1?: any, arg2?: any) => any;
     resizeBuffer: (arg0?: any, arg1?: any, arg2?: any) => any;
@@ -18783,91 +21225,78 @@ export interface GameClasses {
     setPixel: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     setPixel32: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     setPixels: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
-    threshold: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any) => any;
+    threshold: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+    ) => any;
     unmultiplyAlpha: (arg0?: any) => any;
   };
-  "lime._internal.graphics.StackBlur": HaxeClass<Game.lime._internal.graphics.StackBlur> & {
-    blur: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
+  'lime._internal.graphics.StackBlur': HaxeClass<Game.lime._internal.graphics.StackBlur> & {
+    blur: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
     MUL_TABLE: any;
     SHG_TABLE: any;
   };
-  "lime._internal.macros.AssetsMacro": HaxeClass<Game.lime._internal.macros.AssetsMacro> & {
-  };
-  "lime.app._Event_Dynamic_Void": HaxeClass<Game.lime.app._Event_Dynamic_Void> & {
-  };
-  "lime.app._Event_Float_Float_Float_Void": HaxeClass<Game.lime.app._Event_Float_Float_Float_Void> & {
-  };
-  "lime.app._Event_Float_Float_Int_Void": HaxeClass<Game.lime.app._Event_Float_Float_Int_Void> & {
-  };
-  "lime.app._Event_Float_Float_lime_ui_MouseButton_Void": HaxeClass<Game.lime.app._Event_Float_Float_lime_ui_MouseButton_Void> & {
-  };
-  "lime.app._Event_Float_Float_lime_ui_MouseWheelMode_Void": HaxeClass<Game.lime.app._Event_Float_Float_lime_ui_MouseWheelMode_Void> & {
-  };
-  "lime.app._Event_Float_Float_Void": HaxeClass<Game.lime.app._Event_Float_Float_Void> & {
-  };
-  "lime.app._Event_haxe_Exception_Void": HaxeClass<Game.lime.app._Event_haxe_Exception_Void> & {
-  };
-  "lime.app._Event_Int_Float_Void": HaxeClass<Game.lime.app._Event_Int_Float_Void> & {
-  };
-  "lime.app._Event_Int_Int_Void": HaxeClass<Game.lime.app._Event_Int_Int_Void> & {
-  };
-  "lime.app._Event_Int_lime_system_Orientation_Void": HaxeClass<Game.lime.app._Event_Int_lime_system_Orientation_Void> & {
-  };
-  "lime.app._Event_Int_lime_ui_JoystickHatPosition_Void": HaxeClass<Game.lime.app._Event_Int_lime_ui_JoystickHatPosition_Void> & {
-  };
-  "lime.app._Event_Int_Void": HaxeClass<Game.lime.app._Event_Int_Void> & {
-  };
-  "lime.app._Event_lime_graphics_RenderContext_Void": HaxeClass<Game.lime.app._Event_lime_graphics_RenderContext_Void> & {
-  };
-  "lime.app._Event_lime_system_Orientation_Void": HaxeClass<Game.lime.app._Event_lime_system_Orientation_Void> & {
-  };
-  "lime.app._Event_lime_system_State_Void": HaxeClass<Game.lime.app._Event_lime_system_State_Void> & {
-  };
-  "lime.app._Event_lime_ui_Gamepad_Void": HaxeClass<Game.lime.app._Event_lime_ui_Gamepad_Void> & {
-  };
-  "lime.app._Event_lime_ui_GamepadAxis_Float_Void": HaxeClass<Game.lime.app._Event_lime_ui_GamepadAxis_Float_Void> & {
-  };
-  "lime.app._Event_lime_ui_GamepadButton_Void": HaxeClass<Game.lime.app._Event_lime_ui_GamepadButton_Void> & {
-  };
-  "lime.app._Event_lime_ui_Joystick_Void": HaxeClass<Game.lime.app._Event_lime_ui_Joystick_Void> & {
-  };
-  "lime.app._Event_lime_ui_KeyCode_lime_ui_KeyModifier_Void": HaxeClass<Game.lime.app._Event_lime_ui_KeyCode_lime_ui_KeyModifier_Void> & {
-  };
-  "lime.app._Event_lime_ui_Touch_Void": HaxeClass<Game.lime.app._Event_lime_ui_Touch_Void> & {
-  };
-  "lime.app._Event_lime_ui_Window_Void": HaxeClass<Game.lime.app._Event_lime_ui_Window_Void> & {
-  };
-  "lime.app._Event_ofEvents_T_Void": HaxeClass<Game.lime.app._Event_ofEvents_T_Void> & {
-  };
-  "lime.app._Event_String_Int_Int_Void": HaxeClass<Game.lime.app._Event_String_Int_Int_Void> & {
-  };
-  "lime.app._Event_String_Void": HaxeClass<Game.lime.app._Event_String_Void> & {
-  };
-  "lime.app._Event_Void_Void": HaxeClass<Game.lime.app._Event_Void_Void> & {
-  };
-  "lime.app.Application": HaxeClass<Game.lime.app.Application> & {
+  'lime._internal.macros.AssetsMacro': HaxeClass<Game.lime._internal.macros.AssetsMacro> & {};
+  'lime.app._Event_Dynamic_Void': HaxeClass<Game.lime.app._Event_Dynamic_Void> & {};
+  'lime.app._Event_Float_Float_Float_Void': HaxeClass<Game.lime.app._Event_Float_Float_Float_Void> & {};
+  'lime.app._Event_Float_Float_Int_Void': HaxeClass<Game.lime.app._Event_Float_Float_Int_Void> & {};
+  'lime.app._Event_Float_Float_lime_ui_MouseButton_Void': HaxeClass<Game.lime.app._Event_Float_Float_lime_ui_MouseButton_Void> & {};
+  'lime.app._Event_Float_Float_lime_ui_MouseWheelMode_Void': HaxeClass<Game.lime.app._Event_Float_Float_lime_ui_MouseWheelMode_Void> & {};
+  'lime.app._Event_Float_Float_Void': HaxeClass<Game.lime.app._Event_Float_Float_Void> & {};
+  'lime.app._Event_haxe_Exception_Void': HaxeClass<Game.lime.app._Event_haxe_Exception_Void> & {};
+  'lime.app._Event_Int_Float_Void': HaxeClass<Game.lime.app._Event_Int_Float_Void> & {};
+  'lime.app._Event_Int_Int_Void': HaxeClass<Game.lime.app._Event_Int_Int_Void> & {};
+  'lime.app._Event_Int_lime_system_Orientation_Void': HaxeClass<Game.lime.app._Event_Int_lime_system_Orientation_Void> & {};
+  'lime.app._Event_Int_lime_ui_JoystickHatPosition_Void': HaxeClass<Game.lime.app._Event_Int_lime_ui_JoystickHatPosition_Void> & {};
+  'lime.app._Event_Int_Void': HaxeClass<Game.lime.app._Event_Int_Void> & {};
+  'lime.app._Event_lime_graphics_RenderContext_Void': HaxeClass<Game.lime.app._Event_lime_graphics_RenderContext_Void> & {};
+  'lime.app._Event_lime_system_Orientation_Void': HaxeClass<Game.lime.app._Event_lime_system_Orientation_Void> & {};
+  'lime.app._Event_lime_system_State_Void': HaxeClass<Game.lime.app._Event_lime_system_State_Void> & {};
+  'lime.app._Event_lime_ui_Gamepad_Void': HaxeClass<Game.lime.app._Event_lime_ui_Gamepad_Void> & {};
+  'lime.app._Event_lime_ui_GamepadAxis_Float_Void': HaxeClass<Game.lime.app._Event_lime_ui_GamepadAxis_Float_Void> & {};
+  'lime.app._Event_lime_ui_GamepadButton_Void': HaxeClass<Game.lime.app._Event_lime_ui_GamepadButton_Void> & {};
+  'lime.app._Event_lime_ui_Joystick_Void': HaxeClass<Game.lime.app._Event_lime_ui_Joystick_Void> & {};
+  'lime.app._Event_lime_ui_KeyCode_lime_ui_KeyModifier_Void': HaxeClass<Game.lime.app._Event_lime_ui_KeyCode_lime_ui_KeyModifier_Void> & {};
+  'lime.app._Event_lime_ui_Touch_Void': HaxeClass<Game.lime.app._Event_lime_ui_Touch_Void> & {};
+  'lime.app._Event_lime_ui_Window_Void': HaxeClass<Game.lime.app._Event_lime_ui_Window_Void> & {};
+  'lime.app._Event_ofEvents_T_Void': HaxeClass<Game.lime.app._Event_ofEvents_T_Void> & {};
+  'lime.app._Event_String_Int_Int_Void': HaxeClass<Game.lime.app._Event_String_Int_Int_Void> & {};
+  'lime.app._Event_String_Void': HaxeClass<Game.lime.app._Event_String_Void> & {};
+  'lime.app._Event_Void_Void': HaxeClass<Game.lime.app._Event_Void_Void> & {};
+  'lime.app.Application': HaxeClass<Game.lime.app.Application> & {
     current: any;
   };
-  "lime.app.Event": HaxeClass<Game.lime.app.Event> & {
-  };
-  "lime.app.Future": HaxeClass<Game.lime.app.Future> & {
+  'lime.app.Event': HaxeClass<Game.lime.app.Event> & {};
+  'lime.app.Future': HaxeClass<Game.lime.app.Future> & {
     ofEvents: (arg0?: any, arg1?: any, arg2?: any) => any;
     withError: (arg0?: any) => any;
     withValue: (arg0?: any) => any;
   };
-  "lime.app.IModule": HaxeClass<Game.lime.app.IModule> & {
-  };
-  "lime.app.Module": HaxeClass<Game.lime.app.Module> & {
-  };
-  "lime.app.Promise": HaxeClass<Game.lime.app.Promise> & {
-  };
-  "lime.graphics.cairo.Cairo": HaxeClass<Game.lime.graphics.cairo.Cairo> & {
+  'lime.app.IModule': HaxeClass<Game.lime.app.IModule> & {};
+  'lime.app.Module': HaxeClass<Game.lime.app.Module> & {};
+  'lime.app.Promise': HaxeClass<Game.lime.app.Promise> & {};
+  'lime.graphics.cairo.Cairo': HaxeClass<Game.lime.graphics.cairo.Cairo> & {
     get_version: () => any;
     get_versionString: () => any;
   };
-  "lime.graphics.cairo.CairoGlyph": HaxeClass<Game.lime.graphics.cairo.CairoGlyph> & {
-  };
-  "lime.graphics.Image": HaxeClass<Game.lime.graphics.Image> & {
+  'lime.graphics.cairo.CairoGlyph': HaxeClass<Game.lime.graphics.cairo.CairoGlyph> & {};
+  'lime.graphics.Image': HaxeClass<Game.lime.graphics.Image> & {
     fromBase64: (arg0?: any, arg1?: any) => any;
     fromBitmapData: (arg0?: any) => any;
     fromBytes: (arg0?: any) => any;
@@ -18878,11 +21307,9 @@ export interface GameClasses {
     loadFromBytes: (arg0?: any) => any;
     loadFromFile: (arg0?: any) => any;
   };
-  "lime.graphics.ImageBuffer": HaxeClass<Game.lime.graphics.ImageBuffer> & {
-  };
-  "lime.graphics.opengl.ext.KHR_debug": HaxeClass<Game.lime.graphics.opengl.ext.KHR_debug> & {
-  };
-  "lime.graphics.opengl.GL": HaxeClass<Game.lime.graphics.opengl.GL> & {
+  'lime.graphics.ImageBuffer': HaxeClass<Game.lime.graphics.ImageBuffer> & {};
+  'lime.graphics.opengl.ext.KHR_debug': HaxeClass<Game.lime.graphics.opengl.ext.KHR_debug> & {};
+  'lime.graphics.opengl.GL': HaxeClass<Game.lime.graphics.opengl.GL> & {
     ACTIVE_ATTRIBUTES: number;
     ACTIVE_TEXTURE: number;
     ACTIVE_UNIFORM_BLOCKS: number;
@@ -18927,7 +21354,18 @@ export interface GameClasses {
     blendEquationSeparate: (arg0?: any, arg1?: any) => any;
     blendFunc: (arg0?: any, arg1?: any) => any;
     blendFuncSeparate: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
-    blitFramebuffer: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any) => any;
+    blitFramebuffer: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+    ) => any;
     BLUE_BITS: number;
     BOOL: number;
     BOOL_VEC2: number;
@@ -18976,10 +21414,55 @@ export interface GameClasses {
     COMPILE_STATUS: number;
     compileShader: (arg0?: any) => any;
     COMPRESSED_TEXTURE_FORMATS: number;
-    compressedTexImage2DWEBGL: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any) => any;
-    compressedTexImage3DWEBGL: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any) => any;
-    compressedTexSubImage2DWEBGL: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any) => any;
-    compressedTexSubImage3DWEBGL: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any, arg10?: any, arg11?: any) => any;
+    compressedTexImage2DWEBGL: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+    ) => any;
+    compressedTexImage3DWEBGL: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+    ) => any;
+    compressedTexSubImage2DWEBGL: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+    ) => any;
+    compressedTexSubImage3DWEBGL: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+      arg10?: any,
+      arg11?: any,
+    ) => any;
     CONDITION_SATISFIED: number;
     CONSTANT_ALPHA: number;
     CONSTANT_COLOR: number;
@@ -18989,9 +21472,37 @@ export interface GameClasses {
     COPY_READ_BUFFER_BINDING: number;
     COPY_WRITE_BUFFER: number;
     COPY_WRITE_BUFFER_BINDING: number;
-    copyTexImage2D: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
-    copyTexSubImage2D: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
-    copyTexSubImage3D: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any) => any;
+    copyTexImage2D: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
+    copyTexSubImage2D: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
+    copyTexSubImage3D: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+    ) => any;
     createBuffer: () => any;
     createFramebuffer: () => any;
     createProgram: () => any;
@@ -19071,7 +21582,14 @@ export interface GameClasses {
     drawBuffers: (arg0?: any) => any;
     drawElements: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     drawElementsInstanced: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
-    drawRangeElements: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    drawRangeElements: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+    ) => any;
     DST_ALPHA: number;
     DST_COLOR: number;
     DYNAMIC_COPY: number;
@@ -19203,7 +21721,14 @@ export interface GameClasses {
     INVALID_OPERATION: number;
     INVALID_VALUE: number;
     invalidateFramebuffer: (arg0?: any, arg1?: any) => any;
-    invalidateSubFramebuffer: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    invalidateSubFramebuffer: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+    ) => any;
     INVERT: number;
     isBuffer: (arg0?: any) => any;
     isContextLost: () => any;
@@ -19331,7 +21856,16 @@ export interface GameClasses {
     READ_FRAMEBUFFER: number;
     READ_FRAMEBUFFER_BINDING: number;
     readBuffer: (arg0?: any) => any;
-    readPixelsWEBGL: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+    readPixelsWEBGL: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
     RED: number;
     RED_BITS: number;
     RED_INTEGER: number;
@@ -19348,7 +21882,13 @@ export interface GameClasses {
     RENDERBUFFER_STENCIL_SIZE: number;
     RENDERBUFFER_WIDTH: number;
     renderbufferStorage: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
-    renderbufferStorageMultisample: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    renderbufferStorageMultisample: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+    ) => any;
     RENDERER: number;
     REPEAT: number;
     REPLACE: number;
@@ -19469,14 +22009,61 @@ export interface GameClasses {
     SYNC_FLUSH_COMMANDS_BIT: number;
     SYNC_GPU_COMMANDS_COMPLETE: number;
     SYNC_STATUS: number;
-    texImage2DWEBGL: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any) => any;
-    texImage3DWEBGL: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any, arg10?: any) => any;
+    texImage2DWEBGL: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+    ) => any;
+    texImage3DWEBGL: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+      arg10?: any,
+    ) => any;
     texParameterf: (arg0?: any, arg1?: any, arg2?: any) => any;
     texParameteri: (arg0?: any, arg1?: any, arg2?: any) => any;
     texStorage2D: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     texStorage3D: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
-    texSubImage2DWEBGL: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any) => any;
-    texSubImage3DWEBGL: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any, arg10?: any, arg11?: any) => any;
+    texSubImage2DWEBGL: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+    ) => any;
+    texSubImage3DWEBGL: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+      arg10?: any,
+      arg11?: any,
+    ) => any;
     TEXTURE: number;
     TEXTURE_2D: number;
     TEXTURE_2D_ARRAY: number;
@@ -19673,25 +22260,29 @@ export interface GameClasses {
     vertexAttribI4uiv: (arg0?: any, arg1?: any) => any;
     vertexAttribI4uivWEBGL: (arg0?: any, arg1?: any) => any;
     vertexAttribIPointer: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
-    vertexAttribPointer: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    vertexAttribPointer: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+    ) => any;
     viewport: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     VIEWPORT: number;
     WAIT_FAILED: number;
     waitSync: (arg0?: any, arg1?: any, arg2?: any) => any;
     ZERO: number;
   };
-  "lime.graphics.RenderContext": HaxeClass<Game.lime.graphics.RenderContext> & {
-  };
-  "lime.math.CairoMatrix3": HaxeClass<Game.lime.math.CairoMatrix3> & {
-  };
-  "lime.math.Rectangle": HaxeClass<Game.lime.math.Rectangle> & {
-  };
-  "lime.math.Vector2": HaxeClass<Game.lime.math.Vector2> & {
+  'lime.graphics.RenderContext': HaxeClass<Game.lime.graphics.RenderContext> & {};
+  'lime.math.CairoMatrix3': HaxeClass<Game.lime.math.CairoMatrix3> & {};
+  'lime.math.Rectangle': HaxeClass<Game.lime.math.Rectangle> & {};
+  'lime.math.Vector2': HaxeClass<Game.lime.math.Vector2> & {
     distance: (arg0?: any, arg1?: any) => any;
     interpolate: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     polar: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "lime.math.Vector4": HaxeClass<Game.lime.math.Vector4> & {
+  'lime.math.Vector4': HaxeClass<Game.lime.math.Vector4> & {
     angleBetween: (arg0?: any, arg1?: any) => any;
     distance: (arg0?: any, arg1?: any) => any;
     distanceSquared: (arg0?: any, arg1?: any) => any;
@@ -19699,7 +22290,7 @@ export interface GameClasses {
     get_Y_AXIS: () => any;
     get_Z_AXIS: () => any;
   };
-  "lime.media.AudioBuffer": HaxeClass<Game.lime.media.AudioBuffer> & {
+  'lime.media.AudioBuffer': HaxeClass<Game.lime.media.AudioBuffer> & {
     fromBase64: (arg0?: any) => any;
     fromBytes: (arg0?: any) => any;
     fromFile: (arg0?: any) => any;
@@ -19708,22 +22299,18 @@ export interface GameClasses {
     loadFromFile: (arg0?: any) => any;
     loadFromFiles: (arg0?: any) => any;
   };
-  "lime.media.AudioContext": HaxeClass<Game.lime.media.AudioContext> & {
-  };
-  "lime.media.AudioManager": HaxeClass<Game.lime.media.AudioManager> & {
+  'lime.media.AudioContext': HaxeClass<Game.lime.media.AudioContext> & {};
+  'lime.media.AudioManager': HaxeClass<Game.lime.media.AudioManager> & {
     context: any;
     init: (arg0?: any) => any;
     resume: () => any;
     shutdown: () => any;
     suspend: () => any;
   };
-  "lime.media.AudioSource": HaxeClass<Game.lime.media.AudioSource> & {
-  };
-  "lime.media.FlashAudioContext": HaxeClass<Game.lime.media.FlashAudioContext> & {
-  };
-  "lime.media.HTML5AudioContext": HaxeClass<Game.lime.media.HTML5AudioContext> & {
-  };
-  "lime.media.openal.AL": HaxeClass<Game.lime.media.openal.AL> & {
+  'lime.media.AudioSource': HaxeClass<Game.lime.media.AudioSource> & {};
+  'lime.media.FlashAudioContext': HaxeClass<Game.lime.media.FlashAudioContext> & {};
+  'lime.media.HTML5AudioContext': HaxeClass<Game.lime.media.HTML5AudioContext> & {};
+  'lime.media.openal.AL': HaxeClass<Game.lime.media.openal.AL> & {
     AIR_ABSORPTION_FACTOR: number;
     AUTOWAH_ATTACK_TIME: number;
     AUTOWAH_PEAK_GAIN: number;
@@ -20020,7 +22607,7 @@ export interface GameClasses {
     VOCAL_MORPHER_RATE: number;
     VOCAL_MORPHER_WAVEFORM: number;
   };
-  "lime.media.openal.ALC": HaxeClass<Game.lime.media.openal.ALC> & {
+  'lime.media.openal.ALC': HaxeClass<Game.lime.media.openal.ALC> & {
     ALL_ATTRIBUTES: number;
     ALL_DEVICES_SPECIFIER: number;
     ATTRIBUTES_SIZE: number;
@@ -20058,57 +22645,40 @@ export interface GameClasses {
     SYNC: number;
     TRUE: number;
   };
-  "lime.media.OpenALAudioContext": HaxeClass<Game.lime.media.OpenALAudioContext> & {
-  };
-  "lime.media.vorbis.VorbisComment": HaxeClass<Game.lime.media.vorbis.VorbisComment> & {
-  };
-  "lime.media.vorbis.VorbisFile": HaxeClass<Game.lime.media.vorbis.VorbisFile> & {
+  'lime.media.OpenALAudioContext': HaxeClass<Game.lime.media.OpenALAudioContext> & {};
+  'lime.media.vorbis.VorbisComment': HaxeClass<Game.lime.media.vorbis.VorbisComment> & {};
+  'lime.media.vorbis.VorbisFile': HaxeClass<Game.lime.media.vorbis.VorbisFile> & {
     fromBytes: (arg0?: any) => any;
     fromFile: (arg0?: any) => any;
   };
-  "lime.media.vorbis.VorbisInfo": HaxeClass<Game.lime.media.vorbis.VorbisInfo> & {
-  };
-  "lime.net._HTTPRequest_Bytes": HaxeClass<Game.lime.net._HTTPRequest_Bytes> & {
-  };
-  "lime.net._HTTPRequest_lime_text_Font": HaxeClass<Game.lime.net._HTTPRequest_lime_text_Font> & {
-  };
-  "lime.net._HTTPRequest_lime_utils_Bytes": HaxeClass<Game.lime.net._HTTPRequest_lime_utils_Bytes> & {
-  };
-  "lime.net._HTTPRequest_openfl_utils_ByteArray": HaxeClass<Game.lime.net._HTTPRequest_openfl_utils_ByteArray> & {
-  };
-  "lime.net._HTTPRequest_String": HaxeClass<Game.lime.net._HTTPRequest_String> & {
-  };
-  "lime.net._HTTPRequest.AbstractHTTPRequest": HaxeClass<Game.lime.net._HTTPRequest.AbstractHTTPRequest> & {
-  };
-  "lime.net._HTTPRequestErrorResponse": HaxeClass<Game.lime.net._HTTPRequestErrorResponse> & {
-  };
-  "lime.net._IHTTPRequest": HaxeClass<Game.lime.net._IHTTPRequest> & {
-  };
-  "lime.net.HTTPRequest": HaxeClass<Game.lime.net.HTTPRequest> & {
-  };
-  "lime.net.HTTPRequestHeader": HaxeClass<Game.lime.net.HTTPRequestHeader> & {
-  };
-  "lime.system._ThreadPool.JobArray": HaxeClass<Game.lime.system._ThreadPool.JobArray> & {
-  };
-  "lime.system._ThreadPool.JobArrayIterator": HaxeClass<Game.lime.system._ThreadPool.JobArrayIterator> & {
-  };
-  "lime.system.CFFI": HaxeClass<Game.lime.system.CFFI> & {
+  'lime.media.vorbis.VorbisInfo': HaxeClass<Game.lime.media.vorbis.VorbisInfo> & {};
+  'lime.net._HTTPRequest_Bytes': HaxeClass<Game.lime.net._HTTPRequest_Bytes> & {};
+  'lime.net._HTTPRequest_lime_text_Font': HaxeClass<Game.lime.net._HTTPRequest_lime_text_Font> & {};
+  'lime.net._HTTPRequest_lime_utils_Bytes': HaxeClass<Game.lime.net._HTTPRequest_lime_utils_Bytes> & {};
+  'lime.net._HTTPRequest_openfl_utils_ByteArray': HaxeClass<Game.lime.net._HTTPRequest_openfl_utils_ByteArray> & {};
+  'lime.net._HTTPRequest_String': HaxeClass<Game.lime.net._HTTPRequest_String> & {};
+  'lime.net._HTTPRequest.AbstractHTTPRequest': HaxeClass<Game.lime.net._HTTPRequest.AbstractHTTPRequest> & {};
+  'lime.net._HTTPRequestErrorResponse': HaxeClass<Game.lime.net._HTTPRequestErrorResponse> & {};
+  'lime.net._IHTTPRequest': HaxeClass<Game.lime.net._IHTTPRequest> & {};
+  'lime.net.HTTPRequest': HaxeClass<Game.lime.net.HTTPRequest> & {};
+  'lime.net.HTTPRequestHeader': HaxeClass<Game.lime.net.HTTPRequestHeader> & {};
+  'lime.system._ThreadPool.JobArray': HaxeClass<Game.lime.system._ThreadPool.JobArray> & {};
+  'lime.system._ThreadPool.JobArrayIterator': HaxeClass<Game.lime.system._ThreadPool.JobArrayIterator> & {};
+  'lime.system.CFFI': HaxeClass<Game.lime.system.CFFI> & {
     available: boolean;
     enabled: boolean;
     load: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     stringValue: (arg0?: any) => any;
   };
-  "lime.system.Clipboard": HaxeClass<Game.lime.system.Clipboard> & {
+  'lime.system.Clipboard': HaxeClass<Game.lime.system.Clipboard> & {
     _text: any;
     get_text: () => any;
     onUpdate: any;
     set_text: (arg0?: any) => any;
   };
-  "lime.system.Display": HaxeClass<Game.lime.system.Display> & {
-  };
-  "lime.system.DisplayMode": HaxeClass<Game.lime.system.DisplayMode> & {
-  };
-  "lime.system.JNI": HaxeClass<Game.lime.system.JNI> & {
+  'lime.system.Display': HaxeClass<Game.lime.system.Display> & {};
+  'lime.system.DisplayMode': HaxeClass<Game.lime.system.DisplayMode> & {};
+  'lime.system.JNI': HaxeClass<Game.lime.system.JNI> & {
     alreadyCreated: any;
     callMember: (arg0?: any, arg1?: any, arg2?: any) => any;
     callStatic: (arg0?: any, arg1?: any) => any;
@@ -20123,29 +22693,24 @@ export interface GameClasses {
     postUICallback: (arg0?: any) => any;
     transformClassName: (arg0?: any) => any;
   };
-  "lime.system.JNIMemberField": HaxeClass<Game.lime.system.JNIMemberField> & {
-  };
-  "lime.system.JNIMethod": HaxeClass<Game.lime.system.JNIMethod> & {
-  };
-  "lime.system.JNISafety": HaxeClass<Game.lime.system.JNISafety> & {
-  };
-  "lime.system.JNISafetyTools": HaxeClass<Game.lime.system.JNISafetyTools> & {
+  'lime.system.JNIMemberField': HaxeClass<Game.lime.system.JNIMemberField> & {};
+  'lime.system.JNIMethod': HaxeClass<Game.lime.system.JNIMethod> & {};
+  'lime.system.JNISafety': HaxeClass<Game.lime.system.JNISafety> & {};
+  'lime.system.JNISafetyTools': HaxeClass<Game.lime.system.JNISafetyTools> & {
     onMainThread: () => any;
   };
-  "lime.system.JNIStaticField": HaxeClass<Game.lime.system.JNIStaticField> & {
-  };
-  "lime.system.JobData": HaxeClass<Game.lime.system.JobData> & {
+  'lime.system.JNIStaticField': HaxeClass<Game.lime.system.JNIStaticField> & {};
+  'lime.system.JobData': HaxeClass<Game.lime.system.JobData> & {
     nextID: any;
   };
-  "lime.system.JSAsync": HaxeClass<Game.lime.system.JSAsync> & {
-  };
-  "lime.system.Sensor": HaxeClass<Game.lime.system.Sensor> & {
+  'lime.system.JSAsync': HaxeClass<Game.lime.system.JSAsync> & {};
+  'lime.system.Sensor': HaxeClass<Game.lime.system.Sensor> & {
     getSensors: (arg0?: any) => any;
     registerSensor: (arg0?: any, arg1?: any) => any;
     sensorByID: any;
     sensors: any;
   };
-  "lime.system.System": HaxeClass<Game.lime.system.System> & {
+  'lime.system.System': HaxeClass<Game.lime.system.System> & {
     embed: any;
     exit: (arg0?: any) => any;
     get_allowScreenTimeout: () => any;
@@ -20169,63 +22734,53 @@ export interface GameClasses {
     openURL: (arg0?: any, arg1?: any) => any;
     set_allowScreenTimeout: (arg0?: any) => any;
   };
-  "lime.system.ThreadPool": HaxeClass<Game.lime.system.ThreadPool> & {
+  'lime.system.ThreadPool': HaxeClass<Game.lime.system.ThreadPool> & {
     isMainThread: () => any;
     timestamp: () => any;
     workLoad: number;
   };
-  "lime.system.Tls": HaxeClass<Game.lime.system.Tls> & {
-  };
-  "lime.system.WorkOutput": HaxeClass<Game.lime.system.WorkOutput> & {
-  };
-  "lime.text.Font": HaxeClass<Game.lime.text.Font> & {
+  'lime.system.Tls': HaxeClass<Game.lime.system.Tls> & {};
+  'lime.system.WorkOutput': HaxeClass<Game.lime.system.WorkOutput> & {};
+  'lime.text.Font': HaxeClass<Game.lime.text.Font> & {
     fromBytes: (arg0?: any) => any;
     fromFile: (arg0?: any) => any;
     loadFromBytes: (arg0?: any) => any;
     loadFromFile: (arg0?: any) => any;
     loadFromName: (arg0?: any) => any;
   };
-  "lime.text.GlyphMetrics": HaxeClass<Game.lime.text.GlyphMetrics> & {
-  };
-  "lime.text.harfbuzz.HB": HaxeClass<Game.lime.text.harfbuzz.HB> & {
+  'lime.text.GlyphMetrics': HaxeClass<Game.lime.text.GlyphMetrics> & {};
+  'lime.text.harfbuzz.HB': HaxeClass<Game.lime.text.harfbuzz.HB> & {
     shape: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "lime.text.harfbuzz.HBFeature": HaxeClass<Game.lime.text.harfbuzz.HBFeature> & {
-  };
-  "lime.text.harfbuzz.HBGlyphInfo": HaxeClass<Game.lime.text.harfbuzz.HBGlyphInfo> & {
-  };
-  "lime.text.harfbuzz.HBGlyphPosition": HaxeClass<Game.lime.text.harfbuzz.HBGlyphPosition> & {
-  };
-  "lime.text.harfbuzz.HBSegmentProperties": HaxeClass<Game.lime.text.harfbuzz.HBSegmentProperties> & {
-  };
-  "lime.ui.Gamepad": HaxeClass<Game.lime.ui.Gamepad> & {
+  'lime.text.harfbuzz.HBFeature': HaxeClass<Game.lime.text.harfbuzz.HBFeature> & {};
+  'lime.text.harfbuzz.HBGlyphInfo': HaxeClass<Game.lime.text.harfbuzz.HBGlyphInfo> & {};
+  'lime.text.harfbuzz.HBGlyphPosition': HaxeClass<Game.lime.text.harfbuzz.HBGlyphPosition> & {};
+  'lime.text.harfbuzz.HBSegmentProperties': HaxeClass<Game.lime.text.harfbuzz.HBSegmentProperties> & {};
+  'lime.ui.Gamepad': HaxeClass<Game.lime.ui.Gamepad> & {
     addMappings: (arg0?: any) => any;
     devices: any;
     onConnect: any;
   };
-  "lime.ui.Joystick": HaxeClass<Game.lime.ui.Joystick> & {
+  'lime.ui.Joystick': HaxeClass<Game.lime.ui.Joystick> & {
     devices: any;
     onConnect: any;
   };
-  "lime.ui.Touch": HaxeClass<Game.lime.ui.Touch> & {
+  'lime.ui.Touch': HaxeClass<Game.lime.ui.Touch> & {
     onCancel: any;
     onEnd: any;
     onMove: any;
     onStart: any;
   };
-  "lime.ui.Window": HaxeClass<Game.lime.ui.Window> & {
-  };
-  "lime.utils._Assets.LibrarySymbol": HaxeClass<Game.lime.utils._Assets.LibrarySymbol> & {
-  };
-  "lime.utils.AssetBundle": HaxeClass<Game.lime.utils.AssetBundle> & {
+  'lime.ui.Window': HaxeClass<Game.lime.ui.Window> & {};
+  'lime.utils._Assets.LibrarySymbol': HaxeClass<Game.lime.utils._Assets.LibrarySymbol> & {};
+  'lime.utils.AssetBundle': HaxeClass<Game.lime.utils.AssetBundle> & {
     fromBytes: (arg0?: any) => any;
     fromFile: (arg0?: any) => any;
     loadFromBytes: (arg0?: any) => any;
     loadFromFile: (arg0?: any) => any;
   };
-  "lime.utils.AssetCache": HaxeClass<Game.lime.utils.AssetCache> & {
-  };
-  "lime.utils.AssetLibrary": HaxeClass<Game.lime.utils.AssetLibrary> & {
+  'lime.utils.AssetCache': HaxeClass<Game.lime.utils.AssetCache> & {};
+  'lime.utils.AssetLibrary': HaxeClass<Game.lime.utils.AssetLibrary> & {
     fromBundle: (arg0?: any) => any;
     fromBytes: (arg0?: any, arg1?: any) => any;
     fromFile: (arg0?: any, arg1?: any) => any;
@@ -20234,14 +22789,14 @@ export interface GameClasses {
     loadFromFile: (arg0?: any, arg1?: any) => any;
     loadFromManifest: (arg0?: any) => any;
   };
-  "lime.utils.AssetManifest": HaxeClass<Game.lime.utils.AssetManifest> & {
+  'lime.utils.AssetManifest': HaxeClass<Game.lime.utils.AssetManifest> & {
     fromBytes: (arg0?: any, arg1?: any) => any;
     fromFile: (arg0?: any, arg1?: any) => any;
     loadFromBytes: (arg0?: any, arg1?: any) => any;
     loadFromFile: (arg0?: any, arg1?: any) => any;
     parse: (arg0?: any, arg1?: any) => any;
   };
-  "lime.utils.Assets": HaxeClass<Game.lime.utils.Assets> & {
+  'lime.utils.Assets': HaxeClass<Game.lime.utils.Assets> & {
     bundlePaths: any;
     cache: any;
     exists: (arg0?: any, arg1?: any) => any;
@@ -20273,9 +22828,8 @@ export interface GameClasses {
     removeLibrary: (arg0?: any, arg1?: any) => any;
     unloadLibrary: (arg0?: any) => any;
   };
-  "lime.utils.BytePointerData": HaxeClass<Game.lime.utils.BytePointerData> & {
-  };
-  "lime.utils.Log": HaxeClass<Game.lime.utils.Log> & {
+  'lime.utils.BytePointerData': HaxeClass<Game.lime.utils.BytePointerData> & {};
+  'lime.utils.Log': HaxeClass<Game.lime.utils.Log> & {
     debug: (arg0?: any, arg1?: any) => any;
     error: (arg0?: any, arg1?: any) => any;
     info: (arg0?: any, arg1?: any) => any;
@@ -20286,13 +22840,10 @@ export interface GameClasses {
     verbose: (arg0?: any, arg1?: any) => any;
     warn: (arg0?: any, arg1?: any) => any;
   };
-  "lime.utils.ObjectPool": HaxeClass<Game.lime.utils.ObjectPool> & {
-  };
-  "lime.utils.Preloader": HaxeClass<Game.lime.utils.Preloader> & {
-  };
-  "LoadingBar": HaxeClass<Game.LoadingBar, [x: number, y: number]> & {
-  };
-  "Login": HaxeClass<Game.Login, []> & {
+  'lime.utils.ObjectPool': HaxeClass<Game.lime.utils.ObjectPool> & {};
+  'lime.utils.Preloader': HaxeClass<Game.lime.utils.Preloader> & {};
+  LoadingBar: HaxeClass<Game.LoadingBar, [x: number, y: number]> & {};
+  Login: HaxeClass<Game.Login, []> & {
     ALLOW_CUSTOM_ROTATION_SPEED: boolean;
     ALLOW_MOUSE_AIM: boolean;
     client: Game.playerio.Client | null;
@@ -20311,6 +22862,7 @@ export interface GameClasses {
     MENU_WIDTH: number;
     pageIsHttps: () => any;
     partnerId: string | null;
+    portraitLogoTop: (arg0?: any) => any;
     SERVER_ROOM_TYPE: string;
     SERVICE_ROOM_TYPE: string;
     setDevServer: (client: Game.playerio.Client) => void;
@@ -20324,17 +22876,332 @@ export interface GameClasses {
     TERMS_OF_SERVICE_VERSION: number;
     useSecure: any;
   };
-  "Main": HaxeClass<Game.Main> & {
-  };
-  "ManifestResources": HaxeClass<Game.ManifestResources> & {
+  Main: HaxeClass<Game.Main> & {};
+  ManifestResources: HaxeClass<Game.ManifestResources> & {
     init: (arg0?: any) => any;
     preloadLibraries: any;
     preloadLibraryNames: any;
     rootPath: any;
   };
-  "Math": HaxeClass<Game.Math> & {
+  Math: HaxeClass<Game.Math> & {};
+  'mobile.hud._MobileHud.StatBar': HaxeClass<Game.mobile.hud._MobileHud.StatBar> & {};
+  'mobile.hud._MobileMenu.MenuTile': HaxeClass<Game.mobile.hud._MobileMenu.MenuTile> & {};
+  'mobile.hud.MobileHud': HaxeClass<Game.mobile.hud.MobileHud> & {
+    CARD_WIDTH: number;
+    CHAT_PANEL_ALPHA: number;
+    CHAT_PANEL_WIDTH: number;
+    COLOR_BADGE: number;
+    COLOR_HOT: number;
+    COLOR_HULL: number;
+    COLOR_HULL_LOW: number;
+    COLOR_HULL_MID: number;
+    COLOR_LINE: number;
+    COLOR_PANEL: number;
+    COLOR_POWER: number;
+    COLOR_POWER_LOW: number;
+    COLOR_SHIELD: number;
+    COLOR_TEXT: number;
+    COLOR_XP_BOOST: number;
+    current: any;
+    FADE_MS: number;
+    MARGIN: number;
+    MENU_BUTTON_SIZE: number;
+    MINIMAP_SIZE: number;
+    MISSION_BUTTON_HEIGHT: number;
+    MISSION_BUTTON_WIDTH: number;
+    PAD: number;
+    TEXT_BLUE: number;
+    TEXT_HULL: number;
+    TEXT_HULL_LOW: number;
+    TEXT_HULL_MID: number;
+    TOP_SIDE_INSET_SHARE: number;
   };
-  "movement.Command": HaxeClass<Game.movement.Command> & {
+  'mobile.hud.MobileMenu': HaxeClass<Game.mobile.hud.MobileMenu> & {
+    artifactLimit: (arg0?: any) => any;
+    attention: (arg0?: any) => any;
+    COLOR_BADGE: number;
+    COLOR_HOT: number;
+    COLOR_LINE: number;
+    COLOR_PANEL: number;
+    COLOR_TEXT: number;
+    COLOR_TILE: number;
+    fullscreenAvailable: () => any;
+    GAP: number;
+    HEADER: number;
+    missionBadge: (arg0?: any) => any;
+    PAD: number;
+    saleOn: (arg0?: any) => any;
+    TILE_HEIGHT: number;
+    TILE_WIDTH: number;
+  };
+  'mobile.MobileOverlay': HaxeClass<Game.mobile.MobileOverlay> & {
+    closeOpen: () => any;
+    isOpen: () => any;
+    openOne: any;
+    show: (arg0?: any, arg1?: any) => any;
+  };
+  'mobile.MobileScreens': HaxeClass<Game.mobile.MobileScreens> & {
+    ARTIFACTS: string;
+    BUY_FLUX: string;
+    CARGO: string;
+    CHAT: string;
+    CLAN: string;
+    create: (arg0?: any, arg1?: any) => any;
+    CREW: string;
+    desktopState: (arg0?: any, arg1?: any) => any;
+    ENCOUNTERS: string;
+    LEADERBOARD: string;
+    MAP: string;
+    menuOrder: (arg0?: any) => any;
+    MISSIONS: string;
+    mobileScreen: (arg0?: any) => any;
+    open: (arg0?: any, arg1?: any) => any;
+    openControls: (arg0?: any) => any;
+    openDesktopBuyFlux: (arg0?: any) => any;
+    openShop: (arg0?: any, arg1?: any) => any;
+    PLAYERS: string;
+    PODS: string;
+    PVP: string;
+    SETTINGS: string;
+    SHIP: string;
+    SHOP: string;
+    station: (arg0?: any, arg1?: any) => any;
+    tagged: (arg0?: any, arg1?: any) => any;
+  };
+  'mobile.MobileScreenState': HaxeClass<Game.mobile.MobileScreenState> & {
+    current: any;
+    steeringAllowed: () => any;
+  };
+  'mobile.MScreenHost': HaxeClass<Game.mobile.MScreenHost> & {
+    current: any;
+  };
+  'mobile.screens._MobileMap.BodyMarker': HaxeClass<Game.mobile.screens._MobileMap.BodyMarker> & {
+    create: (arg0?: any, arg1?: any) => any;
+    tex: (arg0?: any) => any;
+  };
+  'mobile.screens.MobileArtifacts': HaxeClass<Game.mobile.screens.MobileArtifacts> & {};
+  'mobile.screens.MobileBuyFlux': HaxeClass<Game.mobile.screens.MobileBuyFlux> & {};
+  'mobile.screens.MobileCargo': HaxeClass<Game.mobile.screens.MobileCargo> & {};
+  'mobile.screens.MobileChat': HaxeClass<Game.mobile.screens.MobileChat> & {
+    CHANNELS: any;
+    open: (arg0?: any, arg1?: any) => any;
+  };
+  'mobile.screens.MobileClan': HaxeClass<Game.mobile.screens.MobileClan> & {
+    clanLogo: (arg0?: any, arg1?: any, arg2?: any) => any;
+  };
+  'mobile.screens.MobileCrew': HaxeClass<Game.mobile.screens.MobileCrew> & {
+    at: (arg0?: any, arg1?: any, arg2?: any) => any;
+  };
+  'mobile.screens.MobileEncounters': HaxeClass<Game.mobile.screens.MobileEncounters> & {};
+  'mobile.screens.MobileFleet': HaxeClass<Game.mobile.screens.MobileFleet> & {
+    at: (arg0?: any, arg1?: any, arg2?: any) => any;
+  };
+  'mobile.screens.MobileLeaderboard': HaxeClass<Game.mobile.screens.MobileLeaderboard> & {
+    lastTab: any;
+    logo: (arg0?: any, arg1?: any) => any;
+    nextSeason: () => any;
+    players: any;
+    power: any;
+    pvp: any;
+    survivor: any;
+  };
+  'mobile.screens.MobileMap': HaxeClass<Game.mobile.screens.MobileMap> & {
+    HIT_RADIUS: number;
+    texture: (arg0?: any) => any;
+  };
+  'mobile.screens.MobileMissionBrief': HaxeClass<Game.mobile.screens.MobileMissionBrief> & {};
+  'mobile.screens.MobileMissions': HaxeClass<Game.mobile.screens.MobileMissions> & {
+    DAILY: number;
+    guiTexture: (arg0?: any, arg1?: any) => any;
+    mainTexture: (arg0?: any) => any;
+    STORY: number;
+    stripTags: (arg0?: any) => any;
+    TIMED: number;
+    titleOf: (arg0?: any) => any;
+  };
+  'mobile.screens.MobilePlayers': HaxeClass<Game.mobile.screens.MobilePlayers> & {
+    lastTab: any;
+  };
+  'mobile.screens.MobilePods': HaxeClass<Game.mobile.screens.MobilePods> & {};
+  'mobile.screens.MobilePvp': HaxeClass<Game.mobile.screens.MobilePvp> & {
+    cells: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    kindOf: (arg0?: any) => any;
+  };
+  'mobile.screens.MobileSale': HaxeClass<Game.mobile.screens.MobileSale> & {
+    stickerArt: (arg0?: any, arg1?: any) => any;
+  };
+  'mobile.screens.MobileSettings': HaxeClass<Game.mobile.screens.MobileSettings> & {
+    CHAT: number;
+    CONTROLS: number;
+    GENERAL: number;
+  };
+  'mobile.screens.MobileShip': HaxeClass<Game.mobile.screens.MobileShip> & {
+    at: (arg0?: any, arg1?: any, arg2?: any) => any;
+    KIND_NAMES: string;
+    lastTab: any;
+  };
+  'mobile.screens.MobileShop': HaxeClass<Game.mobile.screens.MobileShop> & {
+    activeUntil: (arg0?: any, arg1?: any) => any;
+    defaultState: (arg0?: any) => any;
+    fillPackage: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
+    idOf: (arg0?: any) => any;
+    itemHeader: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    text: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+  };
+  'mobile.screens.MobileUpgrades': HaxeClass<Game.mobile.screens.MobileUpgrades> & {
+    buildRow: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    fillTech: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    legend: (arg0?: any, arg1?: any, arg2?: any) => any;
+    legendText: () => any;
+  };
+  'mobile.screens.MobileWeapons': HaxeClass<Game.mobile.screens.MobileWeapons> & {};
+  'mobile.screens.ShipArt': HaxeClass<Game.mobile.screens.ShipArt> & {
+    appendHeading: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    appendText: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    details: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    image: (arg0?: any, arg1?: any, arg2?: any) => any;
+  };
+  'mobile.screens.SlotDialogs': HaxeClass<Game.mobile.screens.SlotDialogs> & {
+    unlock: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+  };
+  'mobile.station.MobileCantina': HaxeClass<Game.mobile.station.MobileCantina> & {};
+  'mobile.station.MobileExplore': HaxeClass<Game.mobile.station.MobileExplore> & {};
+  'mobile.station.MobileExploreTeam': HaxeClass<Game.mobile.station.MobileExploreTeam> & {};
+  'mobile.station.MobileHangar': HaxeClass<Game.mobile.station.MobileHangar> & {
+    fillSkin: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+  };
+  'mobile.station.MobileLore': HaxeClass<Game.mobile.station.MobileLore> & {};
+  'mobile.station.MobilePaintShop': HaxeClass<Game.mobile.station.MobilePaintShop> & {};
+  'mobile.station.MobileRecycle': HaxeClass<Game.mobile.station.MobileRecycle> & {};
+  'mobile.station.MobileStation': HaxeClass<Game.mobile.station.MobileStation> & {};
+  'mobile.station.MobileStationState': HaxeClass<Game.mobile.station.MobileStationState> & {};
+  'mobile.station.MobileUpgradeStation': HaxeClass<Game.mobile.station.MobileUpgradeStation> & {};
+  'mobile.station.MobileWarpGate': HaxeClass<Game.mobile.station.MobileWarpGate> & {};
+  'mobile.station.MobileWeaponShop': HaxeClass<Game.mobile.station.MobileWeaponShop> & {};
+  'mobile.ui.MBar': HaxeClass<Game.mobile.ui.MBar> & {};
+  'mobile.ui.MButton': HaxeClass<Game.mobile.ui.MButton> & {
+    DANGER: number;
+    GHOST: number;
+    PRIMARY: number;
+    SECONDARY: number;
+    textColor: (arg0?: any) => any;
+  };
+  'mobile.ui.MBuyDialog': HaxeClass<Game.mobile.ui.MBuyDialog> & {};
+  'mobile.ui.MCanvas': HaxeClass<Game.mobile.ui.MCanvas> & {};
+  'mobile.ui.MChoiceRow': HaxeClass<Game.mobile.ui.MChoiceRow> & {};
+  'mobile.ui.MCost': HaxeClass<Game.mobile.ui.MCost> & {};
+  'mobile.ui.MDialog': HaxeClass<Game.mobile.ui.MDialog> & {
+    confirm: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
+    MAX_WIDTH: number;
+    message: (arg0?: any, arg1?: any) => any;
+  };
+  'mobile.ui.MNativeTap': HaxeClass<Game.mobile.ui.MNativeTap> & {
+    attach: (arg0?: any, arg1?: any, arg2?: any) => any;
+    inside: (arg0?: any, arg1?: any, arg2?: any) => any;
+  };
+  'mobile.ui.MRating': HaxeClass<Game.mobile.ui.MRating> & {
+    HEIGHT: number;
+  };
+  'mobile.ui.MRow': HaxeClass<Game.mobile.ui.MRow> & {
+    stack: (arg0?: any, arg1?: any, arg2?: any) => any;
+  };
+  'mobile.ui.MScreen': HaxeClass<Game.mobile.ui.MScreen> & {
+    centre: (arg0?: any) => any;
+    measureField: any;
+    segments: (arg0?: any, arg1?: any) => any;
+    titleWidth: (arg0?: any) => any;
+  };
+  'mobile.ui.MScroll': HaxeClass<Game.mobile.ui.MScroll> & {
+    FRICTION: number;
+    MIN_SPEED: number;
+    SPRING: number;
+  };
+  'mobile.ui.MShapes': HaxeClass<Game.mobile.ui.MShapes> & {
+    placeLine: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    ring: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+  };
+  'mobile.ui.MSheet': HaxeClass<Game.mobile.ui.MSheet> & {
+    WIDTH_SHARE: number;
+  };
+  'mobile.ui.MSliderRow': HaxeClass<Game.mobile.ui.MSliderRow> & {};
+  'mobile.ui.MSlotStrip': HaxeClass<Game.mobile.ui.MSlotStrip> & {
+    EMPTY: number;
+    FILLED: number;
+    LOCKED: number;
+    UNLOCKABLE: number;
+  };
+  'mobile.ui.MSplit': HaxeClass<Game.mobile.ui.MSplit> & {};
+  'mobile.ui.MStat': HaxeClass<Game.mobile.ui.MStat> & {
+    grid: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+  };
+  'mobile.ui.MTabs': HaxeClass<Game.mobile.ui.MTabs> & {};
+  'mobile.ui.MTextField': HaxeClass<Game.mobile.ui.MTextField> & {};
+  'mobile.ui.MTheme': HaxeClass<Game.mobile.ui.MTheme> & {
+    BAD: number;
+    BADGE: number;
+    BG: number;
+    BLUE: number;
+    BODY: number;
+    box: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
+    BUTTON: number;
+    CAPTION: number;
+    FONT: string;
+    FONT_TEXT: string;
+    GAP: number;
+    GOOD: number;
+    HEADER: number;
+    HEADING: number;
+    HOT: number;
+    label: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    LINE: number;
+    ORANGE: number;
+    PAD: number;
+    panel: (arg0?: any, arg1?: any, arg2?: any) => any;
+    PANEL: number;
+    PANEL_RAISED: number;
+    panelCut: (arg0?: any, arg1?: any) => any;
+    panelOutline: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    paragraph: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+    px: (arg0?: any) => any;
+    RADIUS: number;
+    ROW: number;
+    scale: () => any;
+    selectedPanel: (arg0?: any, arg1?: any) => any;
+    TEXT: number;
+    TEXT_DIM: number;
+    TITLE: number;
+  };
+  'mobile.ui.MTile': HaxeClass<Game.mobile.ui.MTile> & {
+    fitSprite: (arg0?: any, arg1?: any) => any;
+    grid: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+  };
+  'mobile.ui.MToggleRow': HaxeClass<Game.mobile.ui.MToggleRow> & {};
+  'mobile.ui.MTouch': HaxeClass<Game.mobile.ui.MTouch> & {
+    find: (arg0?: any, arg1?: any, arg2?: any) => any;
+    LONG_PRESS_MS: number;
+    registered: any;
+    SLOP: number;
+    tap: (arg0?: any, arg1?: any, arg2?: any) => any;
+    tapAndHold: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
+  };
+  'movement.Command': HaxeClass<Game.movement.Command> & {
     CMD_ACCELERATE: number;
     CMD_BOOST: number;
     CMD_CONVERTSHIELD: number;
@@ -20345,101 +23212,127 @@ export interface GameClasses {
     CMD_ROTATELEFT: number;
     CMD_ROTATERIGHT: number;
   };
-  "movement.CommandManager": HaxeClass<Game.movement.CommandManager> & {
+  'movement.CommandManager': HaxeClass<Game.movement.CommandManager> & {
+    SEND_BURST: number;
+    SEND_RATE: number;
   };
-  "movement.Heading": HaxeClass<Game.movement.Heading, []> & {
+  'movement.Heading': HaxeClass<Game.movement.Heading, []> & {
     NR_OF_VARS: number;
   };
-  "openfl._Vector.BoolVector": HaxeClass<Game.openfl._Vector.BoolVector> & {
-  };
-  "openfl._Vector.FloatVector": HaxeClass<Game.openfl._Vector.FloatVector> & {
-  };
-  "openfl._Vector.FunctionVector": HaxeClass<Game.openfl._Vector.FunctionVector> & {
-  };
-  "openfl._Vector.IntVector": HaxeClass<Game.openfl._Vector.IntVector> & {
-  };
-  "openfl._Vector.IVector": HaxeClass<Game.openfl._Vector.IVector> & {
-  };
-  "openfl._Vector.ObjectVector": HaxeClass<Game.openfl._Vector.ObjectVector> & {
-  };
-  "openfl.display._internal._CairoGraphics.Scale9GridBounds": HaxeClass<Game.openfl.display._internal._CairoGraphics.Scale9GridBounds> & {
-  };
-  "openfl.display._internal._CanvasGraphics.Scale9GridBounds": HaxeClass<Game.openfl.display._internal._CanvasGraphics.Scale9GridBounds> & {
-  };
-  "openfl.display._internal._Context3DGraphics.PolygonFunctions": HaxeClass<Game.openfl.display._internal._Context3DGraphics.PolygonFunctions> & {
-    buildEllipseVerticesAndIndices: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
-    buildRoundRectVerticesAndIndices: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any) => any;
+  'openfl._Vector.BoolVector': HaxeClass<Game.openfl._Vector.BoolVector> & {};
+  'openfl._Vector.FloatVector': HaxeClass<Game.openfl._Vector.FloatVector> & {};
+  'openfl._Vector.FunctionVector': HaxeClass<Game.openfl._Vector.FunctionVector> & {};
+  'openfl._Vector.IntVector': HaxeClass<Game.openfl._Vector.IntVector> & {};
+  'openfl._Vector.IVector': HaxeClass<Game.openfl._Vector.IVector> & {};
+  'openfl._Vector.ObjectVector': HaxeClass<Game.openfl._Vector.ObjectVector> & {};
+  'openfl.display._internal._CairoGraphics.Scale9GridBounds': HaxeClass<Game.openfl.display._internal._CairoGraphics.Scale9GridBounds> & {};
+  'openfl.display._internal._CanvasGraphics.Scale9GridBounds': HaxeClass<Game.openfl.display._internal._CanvasGraphics.Scale9GridBounds> & {};
+  'openfl.display._internal._Context3DGraphics.PolygonFunctions': HaxeClass<Game.openfl.display._internal._Context3DGraphics.PolygonFunctions> & {
+    buildEllipseVerticesAndIndices: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
+    buildRoundRectVerticesAndIndices: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+    ) => any;
     getEllipseNumVertices: (arg0?: any, arg1?: any) => any;
     getRoundRectNumVertices: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.AbstractNoise": HaxeClass<Game.openfl.display._internal.AbstractNoise> & {
-  };
-  "openfl.display._internal.AssetManifestLoader": HaxeClass<Game.openfl.display._internal.AssetManifestLoader> & {
-  };
-  "openfl.display._internal.BitmapDataLoader": HaxeClass<Game.openfl.display._internal.BitmapDataLoader> & {
-  };
-  "openfl.display._internal.CairoBitmap": HaxeClass<Game.openfl.display._internal.CairoBitmap> & {
+  'openfl.display._internal.AbstractNoise': HaxeClass<Game.openfl.display._internal.AbstractNoise> & {};
+  'openfl.display._internal.AssetManifestLoader': HaxeClass<Game.openfl.display._internal.AssetManifestLoader> & {};
+  'openfl.display._internal.BitmapDataLoader': HaxeClass<Game.openfl.display._internal.BitmapDataLoader> & {};
+  'openfl.display._internal.CairoBitmap': HaxeClass<Game.openfl.display._internal.CairoBitmap> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CairoBitmapData": HaxeClass<Game.openfl.display._internal.CairoBitmapData> & {
+  'openfl.display._internal.CairoBitmapData': HaxeClass<Game.openfl.display._internal.CairoBitmapData> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CairoDisplayObject": HaxeClass<Game.openfl.display._internal.CairoDisplayObject> & {
+  'openfl.display._internal.CairoDisplayObject': HaxeClass<Game.openfl.display._internal.CairoDisplayObject> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CairoDisplayObjectContainer": HaxeClass<Game.openfl.display._internal.CairoDisplayObjectContainer> & {
+  'openfl.display._internal.CairoDisplayObjectContainer': HaxeClass<Game.openfl.display._internal.CairoDisplayObjectContainer> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CairoGraphics": HaxeClass<Game.openfl.display._internal.CairoGraphics> & {
+  'openfl.display._internal.CairoGraphics': HaxeClass<Game.openfl.display._internal.CairoGraphics> & {
     hitTest: (arg0?: any, arg1?: any, arg2?: any) => any;
     render: (arg0?: any, arg1?: any) => any;
     renderMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CairoShape": HaxeClass<Game.openfl.display._internal.CairoShape> & {
+  'openfl.display._internal.CairoShape': HaxeClass<Game.openfl.display._internal.CairoShape> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CairoSimpleButton": HaxeClass<Game.openfl.display._internal.CairoSimpleButton> & {
+  'openfl.display._internal.CairoSimpleButton': HaxeClass<Game.openfl.display._internal.CairoSimpleButton> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CairoTextField": HaxeClass<Game.openfl.display._internal.CairoTextField> & {
+  'openfl.display._internal.CairoTextField': HaxeClass<Game.openfl.display._internal.CairoTextField> & {
     render: (arg0?: any, arg1?: any, arg2?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CairoTilemap": HaxeClass<Game.openfl.display._internal.CairoTilemap> & {
+  'openfl.display._internal.CairoTilemap': HaxeClass<Game.openfl.display._internal.CairoTilemap> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
-    renderTileContainer: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any, arg10?: any, arg11?: any, arg12?: any, arg13?: any) => any;
+    renderTileContainer: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+      arg10?: any,
+      arg11?: any,
+      arg12?: any,
+      arg13?: any,
+    ) => any;
   };
-  "openfl.display._internal.CanvasBitmap": HaxeClass<Game.openfl.display._internal.CanvasBitmap> & {
+  'openfl.display._internal.CanvasBitmap': HaxeClass<Game.openfl.display._internal.CanvasBitmap> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CanvasBitmapData": HaxeClass<Game.openfl.display._internal.CanvasBitmapData> & {
+  'openfl.display._internal.CanvasBitmapData': HaxeClass<Game.openfl.display._internal.CanvasBitmapData> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CanvasDisplayObject": HaxeClass<Game.openfl.display._internal.CanvasDisplayObject> & {
+  'openfl.display._internal.CanvasDisplayObject': HaxeClass<Game.openfl.display._internal.CanvasDisplayObject> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CanvasDisplayObjectContainer": HaxeClass<Game.openfl.display._internal.CanvasDisplayObjectContainer> & {
+  'openfl.display._internal.CanvasDisplayObjectContainer': HaxeClass<Game.openfl.display._internal.CanvasDisplayObjectContainer> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CanvasGraphics": HaxeClass<Game.openfl.display._internal.CanvasGraphics> & {
+  'openfl.display._internal.CanvasGraphics': HaxeClass<Game.openfl.display._internal.CanvasGraphics> & {
     allowSmoothing: any;
     applyScale9GridScaledX: (arg0?: any) => any;
     applyScale9GridScaledY: (arg0?: any) => any;
@@ -20453,9 +23346,30 @@ export interface GameClasses {
     closePath: (arg0?: any) => any;
     context: any;
     createBitmapFill: (arg0?: any, arg1?: any, arg2?: any) => any;
-    createGradientPattern: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+    createGradientPattern: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
     createTempPatternCanvas: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
-    drawRoundRect: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any, arg10?: any) => any;
+    drawRoundRect: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+      arg10?: any,
+    ) => any;
     endFill: () => any;
     endStroke: () => any;
     fillCommands: any;
@@ -20486,57 +23400,70 @@ export interface GameClasses {
     windingRule: string;
     worldAlpha: any;
   };
-  "openfl.display._internal.CanvasShape": HaxeClass<Game.openfl.display._internal.CanvasShape> & {
+  'openfl.display._internal.CanvasShape': HaxeClass<Game.openfl.display._internal.CanvasShape> & {
     render: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CanvasSimpleButton": HaxeClass<Game.openfl.display._internal.CanvasSimpleButton> & {
+  'openfl.display._internal.CanvasSimpleButton': HaxeClass<Game.openfl.display._internal.CanvasSimpleButton> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CanvasTextField": HaxeClass<Game.openfl.display._internal.CanvasTextField> & {
+  'openfl.display._internal.CanvasTextField': HaxeClass<Game.openfl.display._internal.CanvasTextField> & {
     clearRect: any;
     context: any;
     render: (arg0?: any, arg1?: any, arg2?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.CanvasTilemap": HaxeClass<Game.openfl.display._internal.CanvasTilemap> & {
+  'openfl.display._internal.CanvasTilemap': HaxeClass<Game.openfl.display._internal.CanvasTilemap> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
-    renderTileContainer: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any, arg10?: any, arg11?: any) => any;
+    renderTileContainer: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+      arg10?: any,
+      arg11?: any,
+    ) => any;
   };
-  "openfl.display._internal.CanvasVideo": HaxeClass<Game.openfl.display._internal.CanvasVideo> & {
+  'openfl.display._internal.CanvasVideo': HaxeClass<Game.openfl.display._internal.CanvasVideo> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.Context3DBitmap": HaxeClass<Game.openfl.display._internal.Context3DBitmap> & {
+  'openfl.display._internal.Context3DBitmap': HaxeClass<Game.openfl.display._internal.Context3DBitmap> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
     renderMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.Context3DBitmapData": HaxeClass<Game.openfl.display._internal.Context3DBitmapData> & {
+  'openfl.display._internal.Context3DBitmapData': HaxeClass<Game.openfl.display._internal.Context3DBitmapData> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.Context3DBuffer": HaxeClass<Game.openfl.display._internal.Context3DBuffer> & {
+  'openfl.display._internal.Context3DBuffer': HaxeClass<Game.openfl.display._internal.Context3DBuffer> & {
     MAX_INDEX_BUFFER_LENGTH: number;
     MAX_QUAD_INDEX_BUFFER_LENGTH: number;
     MAX_QUADS_PER_INDEX_BUFFER: number;
   };
-  "openfl.display._internal.Context3DDisplayObject": HaxeClass<Game.openfl.display._internal.Context3DDisplayObject> & {
+  'openfl.display._internal.Context3DDisplayObject': HaxeClass<Game.openfl.display._internal.Context3DDisplayObject> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
     renderMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.Context3DDisplayObjectContainer": HaxeClass<Game.openfl.display._internal.Context3DDisplayObjectContainer> & {
+  'openfl.display._internal.Context3DDisplayObjectContainer': HaxeClass<Game.openfl.display._internal.Context3DDisplayObjectContainer> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.Context3DGraphics": HaxeClass<Game.openfl.display._internal.Context3DGraphics> & {
+  'openfl.display._internal.Context3DGraphics': HaxeClass<Game.openfl.display._internal.Context3DGraphics> & {
     blankBitmapData: any;
     buildBuffer: (arg0?: any, arg1?: any) => any;
     isCompatible: (arg0?: any) => any;
@@ -20553,27 +23480,41 @@ export interface GameClasses {
     tempVerticesVector: any;
     toScale9Position: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
   };
-  "openfl.display._internal.Context3DMaskShader": HaxeClass<Game.openfl.display._internal.Context3DMaskShader> & {
+  'openfl.display._internal.Context3DMaskShader': HaxeClass<Game.openfl.display._internal.Context3DMaskShader> & {
     opaqueBitmapData: any;
   };
-  "openfl.display._internal.Context3DShape": HaxeClass<Game.openfl.display._internal.Context3DShape> & {
+  'openfl.display._internal.Context3DShape': HaxeClass<Game.openfl.display._internal.Context3DShape> & {
     render: (arg0?: any, arg1?: any) => any;
     renderMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.Context3DSimpleButton": HaxeClass<Game.openfl.display._internal.Context3DSimpleButton> & {
+  'openfl.display._internal.Context3DSimpleButton': HaxeClass<Game.openfl.display._internal.Context3DSimpleButton> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.Context3DTextField": HaxeClass<Game.openfl.display._internal.Context3DTextField> & {
+  'openfl.display._internal.Context3DTextField': HaxeClass<Game.openfl.display._internal.Context3DTextField> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
     renderMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.Context3DTilemap": HaxeClass<Game.openfl.display._internal.Context3DTilemap> & {
+  'openfl.display._internal.Context3DTilemap': HaxeClass<Game.openfl.display._internal.Context3DTilemap> & {
     bufferPosition: any;
     buildBuffer: (arg0?: any, arg1?: any) => any;
-    buildBufferTileContainer: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any, arg10?: any, arg11?: any, arg12?: any) => any;
+    buildBufferTileContainer: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+      arg10?: any,
+      arg11?: any,
+      arg12?: any,
+    ) => any;
     cacheColorTransform: any;
     context: any;
     currentBitmapData: any;
@@ -20590,18 +23531,28 @@ export interface GameClasses {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
     renderMask: (arg0?: any, arg1?: any) => any;
-    renderTileContainer: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any) => any;
+    renderTileContainer: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+    ) => any;
     resizeBuffer: (arg0?: any, arg1?: any) => any;
     vertexBufferData: any;
     vertexDataPosition: any;
   };
-  "openfl.display._internal.Context3DVideo": HaxeClass<Game.openfl.display._internal.Context3DVideo> & {
+  'openfl.display._internal.Context3DVideo': HaxeClass<Game.openfl.display._internal.Context3DVideo> & {
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableMask: (arg0?: any, arg1?: any) => any;
     renderMask: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.DOMBitmap": HaxeClass<Game.openfl.display._internal.DOMBitmap> & {
+  'openfl.display._internal.DOMBitmap': HaxeClass<Game.openfl.display._internal.DOMBitmap> & {
     clear: (arg0?: any, arg1?: any) => any;
     render: (arg0?: any, arg1?: any) => any;
     renderCanvas: (arg0?: any, arg1?: any) => any;
@@ -20609,276 +23560,227 @@ export interface GameClasses {
     renderDrawableClear: (arg0?: any, arg1?: any) => any;
     renderImage: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.DOMDisplayObject": HaxeClass<Game.openfl.display._internal.DOMDisplayObject> & {
+  'openfl.display._internal.DOMDisplayObject': HaxeClass<Game.openfl.display._internal.DOMDisplayObject> & {
     clear: (arg0?: any, arg1?: any) => any;
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableClear: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.DOMDisplayObjectContainer": HaxeClass<Game.openfl.display._internal.DOMDisplayObjectContainer> & {
+  'openfl.display._internal.DOMDisplayObjectContainer': HaxeClass<Game.openfl.display._internal.DOMDisplayObjectContainer> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableClear: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.DOMShape": HaxeClass<Game.openfl.display._internal.DOMShape> & {
+  'openfl.display._internal.DOMShape': HaxeClass<Game.openfl.display._internal.DOMShape> & {
     clear: (arg0?: any, arg1?: any) => any;
     render: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.DOMSimpleButton": HaxeClass<Game.openfl.display._internal.DOMSimpleButton> & {
+  'openfl.display._internal.DOMSimpleButton': HaxeClass<Game.openfl.display._internal.DOMSimpleButton> & {
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableClear: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.DOMTextField": HaxeClass<Game.openfl.display._internal.DOMTextField> & {
+  'openfl.display._internal.DOMTextField': HaxeClass<Game.openfl.display._internal.DOMTextField> & {
     clear: (arg0?: any, arg1?: any) => any;
     measureText: (arg0?: any) => any;
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableClear: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.DOMTilemap": HaxeClass<Game.openfl.display._internal.DOMTilemap> & {
+  'openfl.display._internal.DOMTilemap': HaxeClass<Game.openfl.display._internal.DOMTilemap> & {
     clear: (arg0?: any, arg1?: any) => any;
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableClear: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.DOMVideo": HaxeClass<Game.openfl.display._internal.DOMVideo> & {
+  'openfl.display._internal.DOMVideo': HaxeClass<Game.openfl.display._internal.DOMVideo> & {
     clear: (arg0?: any, arg1?: any) => any;
     render: (arg0?: any, arg1?: any) => any;
     renderDrawable: (arg0?: any, arg1?: any) => any;
     renderDrawableClear: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display._internal.DrawCommandBuffer": HaxeClass<Game.openfl.display._internal.DrawCommandBuffer> & {
+  'openfl.display._internal.DrawCommandBuffer': HaxeClass<Game.openfl.display._internal.DrawCommandBuffer> & {
     empty: any;
   };
-  "openfl.display._internal.DrawCommandReader": HaxeClass<Game.openfl.display._internal.DrawCommandReader> & {
-  };
-  "openfl.display._internal.FlashRenderer": HaxeClass<Game.openfl.display._internal.FlashRenderer> & {
+  'openfl.display._internal.DrawCommandReader': HaxeClass<Game.openfl.display._internal.DrawCommandReader> & {};
+  'openfl.display._internal.FlashRenderer': HaxeClass<Game.openfl.display._internal.FlashRenderer> & {
     instances: any;
     register: (arg0?: any) => any;
     render: (arg0?: any) => any;
   };
-  "openfl.display._internal.FlashTilemap": HaxeClass<Game.openfl.display._internal.FlashTilemap> & {
+  'openfl.display._internal.FlashTilemap': HaxeClass<Game.openfl.display._internal.FlashTilemap> & {
     alphaColorTransform: any;
     bitmap: any;
     destPoint: any;
     render: (arg0?: any) => any;
-    renderTileContainer: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any, arg10?: any, arg11?: any) => any;
+    renderTileContainer: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+      arg8?: any,
+      arg9?: any,
+      arg10?: any,
+      arg11?: any,
+    ) => any;
     sourceRect: any;
   };
-  "openfl.display._internal.IDisplayObject": HaxeClass<Game.openfl.display._internal.IDisplayObject> & {
-  };
-  "openfl.display._internal.PerlinNoise": HaxeClass<Game.openfl.display._internal.PerlinNoise> & {
+  'openfl.display._internal.IDisplayObject': HaxeClass<Game.openfl.display._internal.IDisplayObject> & {};
+  'openfl.display._internal.PerlinNoise': HaxeClass<Game.openfl.display._internal.PerlinNoise> & {
     P: any;
   };
-  "openfl.display._internal.SamplerState": HaxeClass<Game.openfl.display._internal.SamplerState> & {
-  };
-  "openfl.display._internal.ScriptLoader": HaxeClass<Game.openfl.display._internal.ScriptLoader> & {
-  };
-  "openfl.display._internal.ShaderBuffer": HaxeClass<Game.openfl.display._internal.ShaderBuffer> & {
-  };
-  "openfl.display.Application": HaxeClass<Game.openfl.display.Application> & {
-  };
-  "openfl.display.Bitmap": HaxeClass<Game.openfl.display.Bitmap> & {
-  };
-  "openfl.display.BitmapData": HaxeClass<Game.openfl.display.BitmapData, [width: number, height: number, transparent?: boolean, fillColor?: number]> & {
+  'openfl.display._internal.SamplerState': HaxeClass<Game.openfl.display._internal.SamplerState> & {};
+  'openfl.display._internal.ScriptLoader': HaxeClass<Game.openfl.display._internal.ScriptLoader> & {};
+  'openfl.display._internal.ShaderBuffer': HaxeClass<Game.openfl.display._internal.ShaderBuffer> & {};
+  'openfl.display.Application': HaxeClass<Game.openfl.display.Application> & {};
+  'openfl.display.Bitmap': HaxeClass<Game.openfl.display.Bitmap> & {};
+  'openfl.display.BitmapData': HaxeClass<
+    Game.openfl.display.BitmapData,
+    [width: number, height: number, transparent?: boolean, fillColor?: number]
+  > & {
     fromBase64: (arg0?: any, arg1?: any) => any;
     fromBytes: (arg0?: any, arg1?: any) => any;
-    fromCanvas: (canvas: HTMLCanvasElement, transparent?: boolean) => Game.openfl.display.BitmapData | null;
+    fromCanvas: (
+      canvas: HTMLCanvasElement,
+      transparent?: boolean,
+    ) => Game.openfl.display.BitmapData | null;
     fromFile: (arg0?: any) => any;
     fromImage: (arg0?: any, arg1?: any) => any;
     fromTexture: (arg0?: any) => any;
-    loadFromBase64: (base64: string, mimeType: string) => import('./Future').Future<Game.openfl.display.BitmapData>;
+    loadFromBase64: (
+      base64: string,
+      mimeType: string,
+    ) => import('./Future').Future<Game.openfl.display.BitmapData>;
     loadFromBytes: (arg0?: any, arg1?: any) => any;
     loadFromFile: (arg0?: any) => any;
     VERTEX_BUFFER_STRIDE: number;
   };
-  "openfl.display.CairoRenderer": HaxeClass<Game.openfl.display.CairoRenderer> & {
-  };
-  "openfl.display.CanvasRenderer": HaxeClass<Game.openfl.display.CanvasRenderer> & {
-  };
-  "openfl.display.DefaultPreloader": HaxeClass<Game.openfl.display.DefaultPreloader> & {
-  };
-  "openfl.display.DisplayObject": HaxeClass<Game.openfl.display.DisplayObject> & {
-  };
-  "openfl.display.DisplayObjectContainer": HaxeClass<Game.openfl.display.DisplayObjectContainer> & {
-  };
-  "openfl.display.DisplayObjectRenderer": HaxeClass<Game.openfl.display.DisplayObjectRenderer> & {
-  };
-  "openfl.display.DisplayObjectShader": HaxeClass<Game.openfl.display.DisplayObjectShader> & {
-  };
-  "openfl.display.DOMElement": HaxeClass<Game.openfl.display.DOMElement> & {
-  };
-  "openfl.display.DOMRenderer": HaxeClass<Game.openfl.display.DOMRenderer> & {
-  };
-  "openfl.display.FrameLabel": HaxeClass<Game.openfl.display.FrameLabel> & {
-  };
-  "openfl.display.FrameScript": HaxeClass<Game.openfl.display.FrameScript> & {
-  };
-  "openfl.display.Graphics": HaxeClass<Game.openfl.display.Graphics> & {
+  'openfl.display.CairoRenderer': HaxeClass<Game.openfl.display.CairoRenderer> & {};
+  'openfl.display.CanvasRenderer': HaxeClass<Game.openfl.display.CanvasRenderer> & {};
+  'openfl.display.DefaultPreloader': HaxeClass<Game.openfl.display.DefaultPreloader> & {};
+  'openfl.display.DisplayObject': HaxeClass<Game.openfl.display.DisplayObject> & {};
+  'openfl.display.DisplayObjectContainer': HaxeClass<Game.openfl.display.DisplayObjectContainer> & {};
+  'openfl.display.DisplayObjectRenderer': HaxeClass<Game.openfl.display.DisplayObjectRenderer> & {};
+  'openfl.display.DisplayObjectShader': HaxeClass<Game.openfl.display.DisplayObjectShader> & {};
+  'openfl.display.DOMElement': HaxeClass<Game.openfl.display.DOMElement> & {};
+  'openfl.display.DOMRenderer': HaxeClass<Game.openfl.display.DOMRenderer> & {};
+  'openfl.display.FrameLabel': HaxeClass<Game.openfl.display.FrameLabel> & {};
+  'openfl.display.FrameScript': HaxeClass<Game.openfl.display.FrameScript> & {};
+  'openfl.display.Graphics': HaxeClass<Game.openfl.display.Graphics> & {
     maxTextureHeight: any;
     maxTextureWidth: any;
   };
-  "openfl.display.GraphicsBitmapFill": HaxeClass<Game.openfl.display.GraphicsBitmapFill> & {
-  };
-  "openfl.display.GraphicsEndFill": HaxeClass<Game.openfl.display.GraphicsEndFill> & {
-  };
-  "openfl.display.GraphicsGradientFill": HaxeClass<Game.openfl.display.GraphicsGradientFill> & {
-  };
-  "openfl.display.GraphicsPath": HaxeClass<Game.openfl.display.GraphicsPath> & {
+  'openfl.display.GraphicsBitmapFill': HaxeClass<Game.openfl.display.GraphicsBitmapFill> & {};
+  'openfl.display.GraphicsEndFill': HaxeClass<Game.openfl.display.GraphicsEndFill> & {};
+  'openfl.display.GraphicsGradientFill': HaxeClass<Game.openfl.display.GraphicsGradientFill> & {};
+  'openfl.display.GraphicsPath': HaxeClass<Game.openfl.display.GraphicsPath> & {
     SIN45: number;
     TAN22: number;
   };
-  "openfl.display.GraphicsQuadPath": HaxeClass<Game.openfl.display.GraphicsQuadPath> & {
-  };
-  "openfl.display.GraphicsShader": HaxeClass<Game.openfl.display.GraphicsShader> & {
-  };
-  "openfl.display.GraphicsShaderFill": HaxeClass<Game.openfl.display.GraphicsShaderFill> & {
-  };
-  "openfl.display.GraphicsSolidFill": HaxeClass<Game.openfl.display.GraphicsSolidFill> & {
-  };
-  "openfl.display.GraphicsStroke": HaxeClass<Game.openfl.display.GraphicsStroke> & {
-  };
-  "openfl.display.GraphicsTrianglePath": HaxeClass<Game.openfl.display.GraphicsTrianglePath> & {
-  };
-  "openfl.display.IBitmapDrawable": HaxeClass<Game.openfl.display.IBitmapDrawable> & {
-  };
-  "openfl.display.IDisplayObjectLoader": HaxeClass<Game.openfl.display.IDisplayObjectLoader> & {
-  };
-  "openfl.display.IGraphicsData": HaxeClass<Game.openfl.display.IGraphicsData> & {
-  };
-  "openfl.display.IGraphicsFill": HaxeClass<Game.openfl.display.IGraphicsFill> & {
-  };
-  "openfl.display.IGraphicsPath": HaxeClass<Game.openfl.display.IGraphicsPath> & {
-  };
-  "openfl.display.IGraphicsStroke": HaxeClass<Game.openfl.display.IGraphicsStroke> & {
-  };
-  "openfl.display.InteractiveObject": HaxeClass<Game.openfl.display.InteractiveObject> & {
-  };
-  "openfl.display.ITileContainer": HaxeClass<Game.openfl.display.ITileContainer> & {
-  };
-  "openfl.display.JPEGEncoderOptions": HaxeClass<Game.openfl.display.JPEGEncoderOptions> & {
-  };
-  "openfl.display.Loader": HaxeClass<Game.openfl.display.Loader, []> & {
+  'openfl.display.GraphicsQuadPath': HaxeClass<Game.openfl.display.GraphicsQuadPath> & {};
+  'openfl.display.GraphicsShader': HaxeClass<Game.openfl.display.GraphicsShader> & {};
+  'openfl.display.GraphicsShaderFill': HaxeClass<Game.openfl.display.GraphicsShaderFill> & {};
+  'openfl.display.GraphicsSolidFill': HaxeClass<Game.openfl.display.GraphicsSolidFill> & {};
+  'openfl.display.GraphicsStroke': HaxeClass<Game.openfl.display.GraphicsStroke> & {};
+  'openfl.display.GraphicsTrianglePath': HaxeClass<Game.openfl.display.GraphicsTrianglePath> & {};
+  'openfl.display.IBitmapDrawable': HaxeClass<Game.openfl.display.IBitmapDrawable> & {};
+  'openfl.display.IDisplayObjectLoader': HaxeClass<Game.openfl.display.IDisplayObjectLoader> & {};
+  'openfl.display.IGraphicsData': HaxeClass<Game.openfl.display.IGraphicsData> & {};
+  'openfl.display.IGraphicsFill': HaxeClass<Game.openfl.display.IGraphicsFill> & {};
+  'openfl.display.IGraphicsPath': HaxeClass<Game.openfl.display.IGraphicsPath> & {};
+  'openfl.display.IGraphicsStroke': HaxeClass<Game.openfl.display.IGraphicsStroke> & {};
+  'openfl.display.InteractiveObject': HaxeClass<Game.openfl.display.InteractiveObject> & {};
+  'openfl.display.ITileContainer': HaxeClass<Game.openfl.display.ITileContainer> & {};
+  'openfl.display.JPEGEncoderOptions': HaxeClass<Game.openfl.display.JPEGEncoderOptions> & {};
+  'openfl.display.Loader': HaxeClass<Game.openfl.display.Loader, []> & {
     registerLoader: (arg0?: any) => any;
   };
-  "openfl.display.LoaderInfo": HaxeClass<Game.openfl.display.LoaderInfo> & {
+  'openfl.display.LoaderInfo': HaxeClass<Game.openfl.display.LoaderInfo> & {
     create: (arg0?: any) => any;
   };
-  "openfl.display.MovieClip": HaxeClass<Game.openfl.display.MovieClip> & {
+  'openfl.display.MovieClip': HaxeClass<Game.openfl.display.MovieClip> & {
     fromTimeline: (arg0?: any) => any;
   };
-  "openfl.display.OpenGLRenderer": HaxeClass<Game.openfl.display.OpenGLRenderer> & {
-  };
-  "openfl.display.PNGEncoderOptions": HaxeClass<Game.openfl.display.PNGEncoderOptions> & {
-  };
-  "openfl.display.Preloader": HaxeClass<Game.openfl.display.Preloader> & {
-  };
-  "openfl.display.Scene": HaxeClass<Game.openfl.display.Scene> & {
-  };
-  "openfl.display.Shader": HaxeClass<Game.openfl.display.Shader> & {
-  };
-  "openfl.display.ShaderInput": HaxeClass<Game.openfl.display.ShaderInput> & {
-  };
-  "openfl.display.ShaderParameter": HaxeClass<Game.openfl.display.ShaderParameter> & {
-  };
-  "openfl.display.Shape": HaxeClass<Game.openfl.display.Shape, []> & {
-  };
-  "openfl.display.SimpleButton": HaxeClass<Game.openfl.display.SimpleButton> & {
-  };
-  "openfl.display.Sprite": HaxeClass<Game.openfl.display.Sprite> & {
+  'openfl.display.OpenGLRenderer': HaxeClass<Game.openfl.display.OpenGLRenderer> & {};
+  'openfl.display.PNGEncoderOptions': HaxeClass<Game.openfl.display.PNGEncoderOptions> & {};
+  'openfl.display.Preloader': HaxeClass<Game.openfl.display.Preloader> & {};
+  'openfl.display.Scene': HaxeClass<Game.openfl.display.Scene> & {};
+  'openfl.display.Shader': HaxeClass<Game.openfl.display.Shader> & {};
+  'openfl.display.ShaderInput': HaxeClass<Game.openfl.display.ShaderInput> & {};
+  'openfl.display.ShaderParameter': HaxeClass<Game.openfl.display.ShaderParameter> & {};
+  'openfl.display.Shape': HaxeClass<Game.openfl.display.Shape, []> & {};
+  'openfl.display.SimpleButton': HaxeClass<Game.openfl.display.SimpleButton> & {};
+  'openfl.display.Sprite': HaxeClass<Game.openfl.display.Sprite> & {
     fromTimeline: (arg0?: any) => any;
   };
-  "openfl.display.Stage": HaxeClass<Game.openfl.display.Stage> & {
+  'openfl.display.Stage': HaxeClass<Game.openfl.display.Stage> & {
     get_supportsOrientationChange: () => any;
   };
-  "openfl.display.Stage3D": HaxeClass<Game.openfl.display.Stage3D> & {
-  };
-  "openfl.display.Tile": HaxeClass<Game.openfl.display.Tile> & {
-  };
-  "openfl.display.TileContainer": HaxeClass<Game.openfl.display.TileContainer> & {
-  };
-  "openfl.display.TileData": HaxeClass<Game.openfl.display.TileData> & {
-  };
-  "openfl.display.Tilemap": HaxeClass<Game.openfl.display.Tilemap> & {
-  };
-  "openfl.display.Tileset": HaxeClass<Game.openfl.display.Tileset> & {
-  };
-  "openfl.display.Timeline": HaxeClass<Game.openfl.display.Timeline> & {
-  };
-  "openfl.display.Window": HaxeClass<Game.openfl.display.Window> & {
-  };
-  "openfl.display3D._internal._AGALConverter.DestRegister": HaxeClass<Game.openfl.display3D._internal._AGALConverter.DestRegister> & {
+  'openfl.display.Stage3D': HaxeClass<Game.openfl.display.Stage3D> & {};
+  'openfl.display.Tile': HaxeClass<Game.openfl.display.Tile> & {};
+  'openfl.display.TileContainer': HaxeClass<Game.openfl.display.TileContainer> & {};
+  'openfl.display.TileData': HaxeClass<Game.openfl.display.TileData> & {};
+  'openfl.display.Tilemap': HaxeClass<Game.openfl.display.Tilemap> & {};
+  'openfl.display.Tileset': HaxeClass<Game.openfl.display.Tileset> & {};
+  'openfl.display.Timeline': HaxeClass<Game.openfl.display.Timeline> & {};
+  'openfl.display.Window': HaxeClass<Game.openfl.display.Window> & {};
+  'openfl.display3D._internal._AGALConverter.DestRegister': HaxeClass<Game.openfl.display3D._internal._AGALConverter.DestRegister> & {
     parse: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display3D._internal._AGALConverter.RegisterMapEntry": HaxeClass<Game.openfl.display3D._internal._AGALConverter.RegisterMapEntry> & {
-  };
-  "openfl.display3D._internal._AGALConverter.SamplerRegister": HaxeClass<Game.openfl.display3D._internal._AGALConverter.SamplerRegister> & {
+  'openfl.display3D._internal._AGALConverter.RegisterMapEntry': HaxeClass<Game.openfl.display3D._internal._AGALConverter.RegisterMapEntry> & {};
+  'openfl.display3D._internal._AGALConverter.SamplerRegister': HaxeClass<Game.openfl.display3D._internal._AGALConverter.SamplerRegister> & {
     parse: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.display3D._internal._AGALConverter.SourceRegister": HaxeClass<Game.openfl.display3D._internal._AGALConverter.SourceRegister> & {
+  'openfl.display3D._internal._AGALConverter.SourceRegister': HaxeClass<Game.openfl.display3D._internal._AGALConverter.SourceRegister> & {
     parse: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "openfl.display3D._internal.AGALConverter": HaxeClass<Game.openfl.display3D._internal.AGALConverter> & {
+  'openfl.display3D._internal.AGALConverter': HaxeClass<Game.openfl.display3D._internal.AGALConverter> & {
     convertToGLSL: (arg0?: any, arg1?: any) => any;
     limitedProfile: any;
     prefixFromType: (arg0?: any, arg1?: any) => any;
     readUInt64: (arg0?: any) => any;
   };
-  "openfl.display3D._internal.ATFReader": HaxeClass<Game.openfl.display3D._internal.ATFReader> & {
-  };
-  "openfl.display3D._internal.Context3DState": HaxeClass<Game.openfl.display3D._internal.Context3DState> & {
-  };
-  "openfl.display3D._internal.RegisterMap": HaxeClass<Game.openfl.display3D._internal.RegisterMap> & {
-  };
-  "openfl.display3D.Context3D": HaxeClass<Game.openfl.display3D.Context3D> & {
+  'openfl.display3D._internal.ATFReader': HaxeClass<Game.openfl.display3D._internal.ATFReader> & {};
+  'openfl.display3D._internal.Context3DState': HaxeClass<Game.openfl.display3D._internal.Context3DState> & {};
+  'openfl.display3D._internal.RegisterMap': HaxeClass<Game.openfl.display3D._internal.RegisterMap> & {};
+  'openfl.display3D.Context3D': HaxeClass<Game.openfl.display3D.Context3D> & {
     supportsVideoTexture: boolean;
   };
-  "openfl.display3D.IndexBuffer3D": HaxeClass<Game.openfl.display3D.IndexBuffer3D> & {
-  };
-  "openfl.display3D.Program3D": HaxeClass<Game.openfl.display3D.Program3D> & {
-  };
-  "openfl.display3D.textures.CubeTexture": HaxeClass<Game.openfl.display3D.textures.CubeTexture> & {
-  };
-  "openfl.display3D.textures.RectangleTexture": HaxeClass<Game.openfl.display3D.textures.RectangleTexture> & {
-  };
-  "openfl.display3D.textures.Texture": HaxeClass<Game.openfl.display3D.textures.Texture> & {
-  };
-  "openfl.display3D.textures.TextureBase": HaxeClass<Game.openfl.display3D.textures.TextureBase> & {
-  };
-  "openfl.display3D.textures.VideoTexture": HaxeClass<Game.openfl.display3D.textures.VideoTexture> & {
-  };
-  "openfl.display3D.Uniform": HaxeClass<Game.openfl.display3D.Uniform> & {
-  };
-  "openfl.display3D.UniformMap": HaxeClass<Game.openfl.display3D.UniformMap> & {
-  };
-  "openfl.display3D.VertexBuffer3D": HaxeClass<Game.openfl.display3D.VertexBuffer3D> & {
-  };
-  "openfl.errors.ArgumentError": HaxeClass<Game.openfl.errors.ArgumentError> & {
-  };
-  "openfl.errors.EOFError": HaxeClass<Game.openfl.errors.EOFError> & {
-  };
-  "openfl.errors.Error": HaxeClass<Game.openfl.errors.Error> & {
+  'openfl.display3D.IndexBuffer3D': HaxeClass<Game.openfl.display3D.IndexBuffer3D> & {};
+  'openfl.display3D.Program3D': HaxeClass<Game.openfl.display3D.Program3D> & {};
+  'openfl.display3D.textures.CubeTexture': HaxeClass<Game.openfl.display3D.textures.CubeTexture> & {};
+  'openfl.display3D.textures.RectangleTexture': HaxeClass<Game.openfl.display3D.textures.RectangleTexture> & {};
+  'openfl.display3D.textures.Texture': HaxeClass<Game.openfl.display3D.textures.Texture> & {};
+  'openfl.display3D.textures.TextureBase': HaxeClass<Game.openfl.display3D.textures.TextureBase> & {};
+  'openfl.display3D.textures.VideoTexture': HaxeClass<Game.openfl.display3D.textures.VideoTexture> & {};
+  'openfl.display3D.Uniform': HaxeClass<Game.openfl.display3D.Uniform> & {};
+  'openfl.display3D.UniformMap': HaxeClass<Game.openfl.display3D.UniformMap> & {};
+  'openfl.display3D.VertexBuffer3D': HaxeClass<Game.openfl.display3D.VertexBuffer3D> & {};
+  'openfl.errors.ArgumentError': HaxeClass<Game.openfl.errors.ArgumentError> & {};
+  'openfl.errors.EOFError': HaxeClass<Game.openfl.errors.EOFError> & {};
+  'openfl.errors.Error': HaxeClass<Game.openfl.errors.Error> & {
     DEFAULT_TO_STRING: string;
   };
-  "openfl.errors.IllegalOperationError": HaxeClass<Game.openfl.errors.IllegalOperationError> & {
-  };
-  "openfl.errors.IOError": HaxeClass<Game.openfl.errors.IOError> & {
-  };
-  "openfl.errors.RangeError": HaxeClass<Game.openfl.errors.RangeError> & {
-  };
-  "openfl.errors.TypeError": HaxeClass<Game.openfl.errors.TypeError> & {
-  };
-  "openfl.events._EventDispatcher.DispatchIterator": HaxeClass<Game.openfl.events._EventDispatcher.DispatchIterator> & {
-  };
-  "openfl.events._EventDispatcher.Listener": HaxeClass<Game.openfl.events._EventDispatcher.Listener> & {
+  'openfl.errors.IllegalOperationError': HaxeClass<Game.openfl.errors.IllegalOperationError> & {};
+  'openfl.errors.IOError': HaxeClass<Game.openfl.errors.IOError> & {};
+  'openfl.errors.RangeError': HaxeClass<Game.openfl.errors.RangeError> & {};
+  'openfl.errors.TypeError': HaxeClass<Game.openfl.errors.TypeError> & {};
+  'openfl.events._EventDispatcher.DispatchIterator': HaxeClass<Game.openfl.events._EventDispatcher.DispatchIterator> & {};
+  'openfl.events._EventDispatcher.Listener': HaxeClass<Game.openfl.events._EventDispatcher.Listener> & {
     supportsWeakReference: any;
   };
-  "openfl.events.ActivityEvent": HaxeClass<Game.openfl.events.ActivityEvent> & {
+  'openfl.events.ActivityEvent': HaxeClass<Game.openfl.events.ActivityEvent> & {
     ACTIVITY: string;
   };
-  "openfl.events.ErrorEvent": HaxeClass<Game.openfl.events.ErrorEvent> & {
+  'openfl.events.ErrorEvent': HaxeClass<Game.openfl.events.ErrorEvent> & {
     ERROR: string;
   };
-  "openfl.events.Event": HaxeClass<Game.openfl.events.Event, [type: string, bubbles?: boolean, cancelable?: boolean]> & {
+  'openfl.events.Event': HaxeClass<
+    Game.openfl.events.Event,
+    [type: string, bubbles?: boolean, cancelable?: boolean]
+  > & {
     ACTIVATE: string;
     ADDED: string;
     ADDED_TO_STAGE: string;
@@ -20918,37 +23820,47 @@ export interface GameClasses {
     TEXTURE_READY: string;
     UNLOAD: string;
   };
-  "openfl.events.EventDispatcher": HaxeClass<Game.openfl.events.EventDispatcher, [target?: Pick<Game.openfl.events.IEventDispatcher, 'addEventListener' | 'removeEventListener' | 'dispatchEvent' | 'hasEventListener' | 'willTrigger'> | null]> & {
-  };
-  "openfl.events.FocusEvent": HaxeClass<Game.openfl.events.FocusEvent> & {
+  'openfl.events.EventDispatcher': HaxeClass<
+    Game.openfl.events.EventDispatcher,
+    [
+      target?: Pick<
+        Game.openfl.events.IEventDispatcher,
+        | 'addEventListener'
+        | 'removeEventListener'
+        | 'dispatchEvent'
+        | 'hasEventListener'
+        | 'willTrigger'
+      > | null,
+    ]
+  > & {};
+  'openfl.events.FocusEvent': HaxeClass<Game.openfl.events.FocusEvent> & {
     FOCUS_IN: string;
     FOCUS_OUT: string;
     KEY_FOCUS_CHANGE: string;
     MOUSE_FOCUS_CHANGE: string;
   };
-  "openfl.events.FullScreenEvent": HaxeClass<Game.openfl.events.FullScreenEvent> & {
+  'openfl.events.FullScreenEvent': HaxeClass<Game.openfl.events.FullScreenEvent> & {
     FULL_SCREEN: string;
     FULL_SCREEN_INTERACTIVE_ACCEPTED: string;
   };
-  "openfl.events.GameInputEvent": HaxeClass<Game.openfl.events.GameInputEvent> & {
+  'openfl.events.GameInputEvent': HaxeClass<Game.openfl.events.GameInputEvent> & {
     DEVICE_ADDED: string;
     DEVICE_REMOVED: string;
     DEVICE_UNUSABLE: string;
   };
-  "openfl.events.HTTPStatusEvent": HaxeClass<Game.openfl.events.HTTPStatusEvent> & {
+  'openfl.events.HTTPStatusEvent': HaxeClass<Game.openfl.events.HTTPStatusEvent> & {
     HTTP_RESPONSE_STATUS: string;
     HTTP_STATUS: string;
   };
-  "openfl.events.IEventDispatcher": HaxeClass<Game.openfl.events.IEventDispatcher> & {
-  };
-  "openfl.events.IOErrorEvent": HaxeClass<Game.openfl.events.IOErrorEvent> & {
+  'openfl.events.IEventDispatcher': HaxeClass<Game.openfl.events.IEventDispatcher> & {};
+  'openfl.events.IOErrorEvent': HaxeClass<Game.openfl.events.IOErrorEvent> & {
     IO_ERROR: string;
   };
-  "openfl.events.KeyboardEvent": HaxeClass<Game.openfl.events.KeyboardEvent> & {
+  'openfl.events.KeyboardEvent': HaxeClass<Game.openfl.events.KeyboardEvent> & {
     KEY_DOWN: string;
     KEY_UP: string;
   };
-  "openfl.events.MouseEvent": HaxeClass<Game.openfl.events.MouseEvent> & {
+  'openfl.events.MouseEvent': HaxeClass<Game.openfl.events.MouseEvent> & {
     CLICK: string;
     DOUBLE_CLICK: string;
     MIDDLE_CLICK: string;
@@ -20967,39 +23879,39 @@ export interface GameClasses {
     ROLL_OUT: string;
     ROLL_OVER: string;
   };
-  "openfl.events.NetStatusEvent": HaxeClass<Game.openfl.events.NetStatusEvent> & {
+  'openfl.events.NetStatusEvent': HaxeClass<Game.openfl.events.NetStatusEvent> & {
     NET_STATUS: string;
   };
-  "openfl.events.ProgressEvent": HaxeClass<Game.openfl.events.ProgressEvent> & {
+  'openfl.events.ProgressEvent': HaxeClass<Game.openfl.events.ProgressEvent> & {
     PROGRESS: string;
     SOCKET_DATA: string;
   };
-  "openfl.events.RenderEvent": HaxeClass<Game.openfl.events.RenderEvent> & {
+  'openfl.events.RenderEvent': HaxeClass<Game.openfl.events.RenderEvent> & {
     CLEAR_DOM: string;
     RENDER_CAIRO: string;
     RENDER_CANVAS: string;
     RENDER_DOM: string;
     RENDER_OPENGL: string;
   };
-  "openfl.events.SampleDataEvent": HaxeClass<Game.openfl.events.SampleDataEvent> & {
+  'openfl.events.SampleDataEvent': HaxeClass<Game.openfl.events.SampleDataEvent> & {
     SAMPLE_DATA: string;
   };
-  "openfl.events.SecurityErrorEvent": HaxeClass<Game.openfl.events.SecurityErrorEvent> & {
+  'openfl.events.SecurityErrorEvent': HaxeClass<Game.openfl.events.SecurityErrorEvent> & {
     SECURITY_ERROR: string;
   };
-  "openfl.events.StageOrientationEvent": HaxeClass<Game.openfl.events.StageOrientationEvent> & {
+  'openfl.events.StageOrientationEvent': HaxeClass<Game.openfl.events.StageOrientationEvent> & {
     ORIENTATION_CHANGE: string;
     ORIENTATION_CHANGING: string;
   };
-  "openfl.events.TextEvent": HaxeClass<Game.openfl.events.TextEvent> & {
+  'openfl.events.TextEvent': HaxeClass<Game.openfl.events.TextEvent> & {
     LINK: string;
     TEXT_INPUT: string;
   };
-  "openfl.events.TimerEvent": HaxeClass<Game.openfl.events.TimerEvent> & {
+  'openfl.events.TimerEvent': HaxeClass<Game.openfl.events.TimerEvent> & {
     TIMER: string;
     TIMER_COMPLETE: string;
   };
-  "openfl.events.TouchEvent": HaxeClass<Game.openfl.events.TouchEvent> & {
+  'openfl.events.TouchEvent': HaxeClass<Game.openfl.events.TouchEvent> & {
     TOUCH_BEGIN: string;
     TOUCH_END: string;
     TOUCH_MOVE: string;
@@ -21009,73 +23921,64 @@ export interface GameClasses {
     TOUCH_ROLL_OVER: string;
     TOUCH_TAP: string;
   };
-  "openfl.events.UncaughtErrorEvent": HaxeClass<Game.openfl.events.UncaughtErrorEvent> & {
+  'openfl.events.UncaughtErrorEvent': HaxeClass<Game.openfl.events.UncaughtErrorEvent> & {
     UNCAUGHT_ERROR: string;
   };
-  "openfl.events.UncaughtErrorEvents": HaxeClass<Game.openfl.events.UncaughtErrorEvents> & {
-  };
-  "openfl.external.ExternalInterface": HaxeClass<Game.openfl.external.ExternalInterface> & {
+  'openfl.events.UncaughtErrorEvents': HaxeClass<Game.openfl.events.UncaughtErrorEvents> & {};
+  'openfl.external.ExternalInterface': HaxeClass<Game.openfl.external.ExternalInterface> & {
     addCallback: (arg0?: any, arg1?: any) => any;
     available: boolean;
     call: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
     get_objectID: () => any;
     marshallExceptions: boolean;
   };
-  "openfl.filters._GlowFilter.BlurAlphaShader": HaxeClass<Game.openfl.filters._GlowFilter.BlurAlphaShader> & {
-  };
-  "openfl.filters._GlowFilter.CombineKnockoutShader": HaxeClass<Game.openfl.filters._GlowFilter.CombineKnockoutShader> & {
-  };
-  "openfl.filters._GlowFilter.CombineShader": HaxeClass<Game.openfl.filters._GlowFilter.CombineShader> & {
-  };
-  "openfl.filters._GlowFilter.InnerCombineKnockoutShader": HaxeClass<Game.openfl.filters._GlowFilter.InnerCombineKnockoutShader> & {
-  };
-  "openfl.filters._GlowFilter.InnerCombineShader": HaxeClass<Game.openfl.filters._GlowFilter.InnerCombineShader> & {
-  };
-  "openfl.filters._GlowFilter.InvertAlphaShader": HaxeClass<Game.openfl.filters._GlowFilter.InvertAlphaShader> & {
-  };
-  "openfl.filters.BitmapFilter": HaxeClass<Game.openfl.filters.BitmapFilter> & {
-  };
-  "openfl.filters.BitmapFilterShader": HaxeClass<Game.openfl.filters.BitmapFilterShader> & {
-  };
-  "openfl.filters.GlowFilter": HaxeClass<Game.openfl.filters.GlowFilter> & {
-  };
-  "openfl.filters.ShaderFilter": HaxeClass<Game.openfl.filters.ShaderFilter> & {
-  };
-  "openfl.geom.ColorTransform": HaxeClass<Game.openfl.geom.ColorTransform> & {
-  };
-  "openfl.geom.Matrix": HaxeClass<Game.openfl.geom.Matrix, [a?: number, b?: number, c?: number, d?: number, tx?: number, ty?: number]> & {
-  };
-  "openfl.geom.Matrix3D": HaxeClass<Game.openfl.geom.Matrix3D> & {
+  'openfl.filters._GlowFilter.BlurAlphaShader': HaxeClass<Game.openfl.filters._GlowFilter.BlurAlphaShader> & {};
+  'openfl.filters._GlowFilter.CombineKnockoutShader': HaxeClass<Game.openfl.filters._GlowFilter.CombineKnockoutShader> & {};
+  'openfl.filters._GlowFilter.CombineShader': HaxeClass<Game.openfl.filters._GlowFilter.CombineShader> & {};
+  'openfl.filters._GlowFilter.InnerCombineKnockoutShader': HaxeClass<Game.openfl.filters._GlowFilter.InnerCombineKnockoutShader> & {};
+  'openfl.filters._GlowFilter.InnerCombineShader': HaxeClass<Game.openfl.filters._GlowFilter.InnerCombineShader> & {};
+  'openfl.filters._GlowFilter.InvertAlphaShader': HaxeClass<Game.openfl.filters._GlowFilter.InvertAlphaShader> & {};
+  'openfl.filters.BitmapFilter': HaxeClass<Game.openfl.filters.BitmapFilter> & {};
+  'openfl.filters.BitmapFilterShader': HaxeClass<Game.openfl.filters.BitmapFilterShader> & {};
+  'openfl.filters.GlowFilter': HaxeClass<Game.openfl.filters.GlowFilter> & {};
+  'openfl.filters.ShaderFilter': HaxeClass<Game.openfl.filters.ShaderFilter> & {};
+  'openfl.geom.ColorTransform': HaxeClass<Game.openfl.geom.ColorTransform> & {};
+  'openfl.geom.Matrix': HaxeClass<
+    Game.openfl.geom.Matrix,
+    [a?: number, b?: number, c?: number, d?: number, tx?: number, ty?: number]
+  > & {};
+  'openfl.geom.Matrix3D': HaxeClass<Game.openfl.geom.Matrix3D> & {
     create2D: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     createABCD: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
     createOrtho: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
     interpolate: (arg0?: any, arg1?: any, arg2?: any) => any;
     interpolateToOutput: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
   };
-  "openfl.geom.Point": HaxeClass<Game.openfl.geom.Point> & {
+  'openfl.geom.Point': HaxeClass<Game.openfl.geom.Point> & {
     distance: (arg0?: any, arg1?: any) => any;
     interpolate: (arg0?: any, arg1?: any, arg2?: any) => any;
     interpolateToOutput: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     polar: (arg0?: any, arg1?: any) => any;
     polarToOutput: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "openfl.geom.Rectangle": HaxeClass<Game.openfl.geom.Rectangle, [x?: number, y?: number, width?: number, height?: number]> & {
-  };
-  "openfl.geom.Transform": HaxeClass<Game.openfl.geom.Transform> & {
-  };
-  "openfl.geom.Vector3D": HaxeClass<Game.openfl.geom.Vector3D> & {
+  'openfl.geom.Rectangle': HaxeClass<
+    Game.openfl.geom.Rectangle,
+    [x?: number, y?: number, width?: number, height?: number]
+  > & {};
+  'openfl.geom.Transform': HaxeClass<Game.openfl.geom.Transform> & {};
+  'openfl.geom.Vector3D': HaxeClass<Game.openfl.geom.Vector3D> & {
     angleBetween: (arg0?: any, arg1?: any) => any;
     distance: (arg0?: any, arg1?: any) => any;
     get_X_AXIS: () => any;
     get_Y_AXIS: () => any;
     get_Z_AXIS: () => any;
   };
-  "openfl.globalization.LocaleID": HaxeClass<Game.openfl.globalization.LocaleID> & {
+  'openfl.globalization.LocaleID': HaxeClass<Game.openfl.globalization.LocaleID> & {
     DEFAULT: string;
     normalizeRequestedLocaleIDName: (arg0?: any) => any;
     RTL_LANGUAGES: any;
   };
-  "openfl.Lib": HaxeClass<Game.openfl.Lib> & {
+  'openfl.Lib': HaxeClass<Game.openfl.Lib> & {
     as: (arg0?: any, arg1?: any) => any;
     attach: (arg0?: any) => any;
     clearInterval: (arg0?: any) => any;
@@ -21101,60 +24004,53 @@ export interface GameClasses {
     setTimeout: (arg0?: any, arg1?: any, arg2?: any) => any;
     trace: (arg0?: any) => any;
   };
-  "openfl.media.ID3Info": HaxeClass<Game.openfl.media.ID3Info> & {
-  };
-  "openfl.media.Sound": HaxeClass<Game.openfl.media.Sound> & {
+  'openfl.media.ID3Info': HaxeClass<Game.openfl.media.ID3Info> & {};
+  'openfl.media.Sound': HaxeClass<Game.openfl.media.Sound> & {
     fromAudioBuffer: (arg0?: any) => any;
     fromFile: (arg0?: any) => any;
     loadFromFile: (arg0?: any) => any;
     loadFromFiles: (arg0?: any) => any;
   };
-  "openfl.media.SoundChannel": HaxeClass<Game.openfl.media.SoundChannel> & {
-  };
-  "openfl.media.SoundLoaderContext": HaxeClass<Game.openfl.media.SoundLoaderContext> & {
-  };
-  "openfl.media.SoundMixer": HaxeClass<Game.openfl.media.SoundMixer> & {
+  'openfl.media.SoundChannel': HaxeClass<Game.openfl.media.SoundChannel> & {};
+  'openfl.media.SoundLoaderContext': HaxeClass<Game.openfl.media.SoundLoaderContext> & {};
+  'openfl.media.SoundMixer': HaxeClass<Game.openfl.media.SoundMixer> & {
     areSoundsInaccessible: () => any;
     get_soundTransform: () => any;
     MAX_ACTIVE_CHANNELS: number;
     set_soundTransform: (arg0?: any) => any;
     stopAll: () => any;
   };
-  "openfl.media.SoundTransform": HaxeClass<Game.openfl.media.SoundTransform> & {
-  };
-  "openfl.media.Video": HaxeClass<Game.openfl.media.Video> & {
+  'openfl.media.SoundTransform': HaxeClass<Game.openfl.media.SoundTransform> & {};
+  'openfl.media.Video': HaxeClass<Game.openfl.media.Video> & {
     VERTEX_BUFFER_STRIDE: number;
   };
-  "openfl.net.IDynamicPropertyOutput": HaxeClass<Game.openfl.net.IDynamicPropertyOutput> & {
-  };
-  "openfl.net.IDynamicPropertyWriter": HaxeClass<Game.openfl.net.IDynamicPropertyWriter> & {
-  };
-  "openfl.net.NetConnection": HaxeClass<Game.openfl.net.NetConnection> & {
+  'openfl.net.IDynamicPropertyOutput': HaxeClass<Game.openfl.net.IDynamicPropertyOutput> & {};
+  'openfl.net.IDynamicPropertyWriter': HaxeClass<Game.openfl.net.IDynamicPropertyWriter> & {};
+  'openfl.net.NetConnection': HaxeClass<Game.openfl.net.NetConnection> & {
     CONNECT_SUCCESS: string;
   };
-  "openfl.net.NetStream": HaxeClass<Game.openfl.net.NetStream> & {
-  };
-  "openfl.net.SharedObject": HaxeClass<Game.openfl.net.SharedObject> & {
+  'openfl.net.NetStream': HaxeClass<Game.openfl.net.NetStream> & {};
+  'openfl.net.SharedObject': HaxeClass<Game.openfl.net.SharedObject> & {
     application_onExit: (arg0?: any) => any;
     defaultObjectEncoding: number;
     getLocal: (arg0?: any, arg1?: any, arg2?: any) => any;
     getRemote: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
   };
-  "openfl.net.URLLoader": HaxeClass<Game.openfl.net.URLLoader, [request?: Game.openfl.net.URLRequest | null]> & {
-  };
-  "openfl.net.URLRequest": HaxeClass<Game.openfl.net.URLRequest, [url?: string]> & {
-  };
-  "openfl.net.URLRequestDefaults": HaxeClass<Game.openfl.net.URLRequestDefaults> & {
+  'openfl.net.URLLoader': HaxeClass<
+    Game.openfl.net.URLLoader,
+    [request?: Game.openfl.net.URLRequest | null]
+  > & {};
+  'openfl.net.URLRequest': HaxeClass<Game.openfl.net.URLRequest, [url?: string]> & {};
+  'openfl.net.URLRequestDefaults': HaxeClass<Game.openfl.net.URLRequestDefaults> & {
     followRedirects: boolean;
     idleTimeout: number;
     manageCookies: boolean;
   };
-  "openfl.net.URLRequestHeader": HaxeClass<Game.openfl.net.URLRequestHeader> & {
-  };
-  "openfl.system.ApplicationDomain": HaxeClass<Game.openfl.system.ApplicationDomain> & {
+  'openfl.net.URLRequestHeader': HaxeClass<Game.openfl.net.URLRequestHeader> & {};
+  'openfl.system.ApplicationDomain': HaxeClass<Game.openfl.system.ApplicationDomain> & {
     currentDomain: any;
   };
-  "openfl.system.Capabilities": HaxeClass<Game.openfl.system.Capabilities> & {
+  'openfl.system.Capabilities': HaxeClass<Game.openfl.system.Capabilities> & {
     avHardwareDisable: boolean;
     get_cpuArchitecture: () => any;
     get_language: () => any;
@@ -21190,9 +24086,11 @@ export interface GameClasses {
     supports64BitProcesses: boolean;
     touchscreenType: number;
   };
-  "openfl.system.LoaderContext": HaxeClass<Game.openfl.system.LoaderContext, [checkPolicyFile?: boolean]> & {
-  };
-  "openfl.system.Security": HaxeClass<Game.openfl.system.Security> & {
+  'openfl.system.LoaderContext': HaxeClass<
+    Game.openfl.system.LoaderContext,
+    [checkPolicyFile?: boolean]
+  > & {};
+  'openfl.system.Security': HaxeClass<Game.openfl.system.Security> & {
     allowDomain: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     allowInsecureDomain: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     loadPolicyFile: (arg0?: any) => any;
@@ -21201,10 +24099,10 @@ export interface GameClasses {
     LOCAL_WITH_NETWORK: string;
     REMOTE: string;
   };
-  "openfl.system.SecurityDomain": HaxeClass<Game.openfl.system.SecurityDomain> & {
+  'openfl.system.SecurityDomain': HaxeClass<Game.openfl.system.SecurityDomain> & {
     currentDomain: any;
   };
-  "openfl.system.System": HaxeClass<Game.openfl.system.System> & {
+  'openfl.system.System': HaxeClass<Game.openfl.system.System> & {
     disposeXML: (arg0?: any) => any;
     exit: (arg0?: any) => any;
     gc: () => any;
@@ -21216,21 +24114,17 @@ export interface GameClasses {
     setClipboard: (arg0?: any) => any;
     useCodePage: boolean;
   };
-  "openfl.text._internal._TextEngine.DefaultFontSet": HaxeClass<Game.openfl.text._internal._TextEngine.DefaultFontSet> & {
-  };
-  "openfl.text._internal.CacheMeasurement": HaxeClass<Game.openfl.text._internal.CacheMeasurement> & {
-  };
-  "openfl.text._internal.CSSParser": HaxeClass<Game.openfl.text._internal.CSSParser> & {
-  };
-  "openfl.text._internal.GlyphPosition": HaxeClass<Game.openfl.text._internal.GlyphPosition> & {
-  };
-  "openfl.text._internal.HTMLParser": HaxeClass<Game.openfl.text._internal.HTMLParser> & {
+  'openfl.text._internal._TextEngine.DefaultFontSet': HaxeClass<Game.openfl.text._internal._TextEngine.DefaultFontSet> & {};
+  'openfl.text._internal.CacheMeasurement': HaxeClass<Game.openfl.text._internal.CacheMeasurement> & {};
+  'openfl.text._internal.CSSParser': HaxeClass<Game.openfl.text._internal.CSSParser> & {};
+  'openfl.text._internal.GlyphPosition': HaxeClass<Game.openfl.text._internal.GlyphPosition> & {};
+  'openfl.text._internal.HTMLParser': HaxeClass<Game.openfl.text._internal.HTMLParser> & {
     parse: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
   };
-  "openfl.text._internal.ShapeCache": HaxeClass<Game.openfl.text._internal.ShapeCache> & {
+  'openfl.text._internal.ShapeCache': HaxeClass<Game.openfl.text._internal.ShapeCache> & {
     hashFunction: (arg0?: any) => any;
   };
-  "openfl.text._internal.TextEngine": HaxeClass<Game.openfl.text._internal.TextEngine> & {
+  'openfl.text._internal.TextEngine': HaxeClass<Game.openfl.text._internal.TextEngine> & {
     findFont: (arg0?: any) => any;
     findFontVariant: (arg0?: any) => any;
     getDefaultFont: (arg0?: any, arg1?: any, arg2?: any) => any;
@@ -21243,9 +24137,8 @@ export interface GameClasses {
     UTF8_SPACE: number;
     UTF8_TAB: number;
   };
-  "openfl.text._internal.TextFormatRange": HaxeClass<Game.openfl.text._internal.TextFormatRange> & {
-  };
-  "openfl.text._internal.TextLayout": HaxeClass<Game.openfl.text._internal.TextLayout> & {
+  'openfl.text._internal.TextFormatRange': HaxeClass<Game.openfl.text._internal.TextFormatRange> & {};
+  'openfl.text._internal.TextLayout': HaxeClass<Game.openfl.text._internal.TextLayout> & {
     FT_LOAD_BITMAP_METRICS_ONLY: number;
     FT_LOAD_COLOR: number;
     FT_LOAD_COMPUTE_METRICS: number;
@@ -21267,9 +24160,8 @@ export interface GameClasses {
     FT_LOAD_TARGET_NORMAL: number;
     FT_LOAD_VERTICAL_LAYOUT: number;
   };
-  "openfl.text._internal.TextLayoutGroup": HaxeClass<Game.openfl.text._internal.TextLayoutGroup> & {
-  };
-  "openfl.text.Font": HaxeClass<Game.openfl.text.Font> & {
+  'openfl.text._internal.TextLayoutGroup': HaxeClass<Game.openfl.text._internal.TextLayoutGroup> & {};
+  'openfl.text.Font': HaxeClass<Game.openfl.text.Font> & {
     enumerateFonts: (arg0?: any) => any;
     fromBytes: (arg0?: any) => any;
     fromFile: (arg0?: any) => any;
@@ -21278,25 +24170,37 @@ export interface GameClasses {
     loadFromName: (arg0?: any) => any;
     registerFont: (arg0?: any) => any;
   };
-  "openfl.text.StyleSheet": HaxeClass<Game.openfl.text.StyleSheet> & {
-  };
-  "openfl.text.TextField": HaxeClass<Game.openfl.text.TextField> & {
-  };
-  "openfl.text.TextFormat": HaxeClass<Game.openfl.text.TextFormat, [font?: string | null, size?: number | null, color?: number | null, bold?: boolean | null, italic?: boolean | null, underline?: boolean | null, url?: string | null, target?: string | null, align?: number | null, leftMargin?: number | null, rightMargin?: number | null, indent?: number | null, leading?: number | null]> & {
-  };
-  "openfl.text.TextLineMetrics": HaxeClass<Game.openfl.text.TextLineMetrics> & {
-  };
-  "openfl.ui.GameInput": HaxeClass<Game.openfl.ui.GameInput> & {
+  'openfl.text.StyleSheet': HaxeClass<Game.openfl.text.StyleSheet> & {};
+  'openfl.text.TextField': HaxeClass<Game.openfl.text.TextField> & {};
+  'openfl.text.TextFormat': HaxeClass<
+    Game.openfl.text.TextFormat,
+    [
+      font?: string | null,
+      size?: number | null,
+      color?: number | null,
+      bold?: boolean | null,
+      italic?: boolean | null,
+      underline?: boolean | null,
+      url?: string | null,
+      target?: string | null,
+      align?: number | null,
+      leftMargin?: number | null,
+      rightMargin?: number | null,
+      indent?: number | null,
+      leading?: number | null,
+    ]
+  > & {};
+  'openfl.text.TextLineMetrics': HaxeClass<Game.openfl.text.TextLineMetrics> & {};
+  'openfl.ui.GameInput': HaxeClass<Game.openfl.ui.GameInput> & {
     getDeviceAt: (arg0?: any) => any;
     isSupported: boolean;
     numDevices: any;
   };
-  "openfl.ui.GameInputControl": HaxeClass<Game.openfl.ui.GameInputControl> & {
-  };
-  "openfl.ui.GameInputDevice": HaxeClass<Game.openfl.ui.GameInputDevice> & {
+  'openfl.ui.GameInputControl': HaxeClass<Game.openfl.ui.GameInputControl> & {};
+  'openfl.ui.GameInputDevice': HaxeClass<Game.openfl.ui.GameInputDevice> & {
     MAX_BUFFER_SIZE: number;
   };
-  "openfl.ui.Keyboard": HaxeClass<Game.openfl.ui.Keyboard> & {
+  'openfl.ui.Keyboard': HaxeClass<Game.openfl.ui.Keyboard> & {
     A: number;
     ALTERNATE: number;
     B: number;
@@ -21400,7 +24304,7 @@ export interface GameClasses {
     Y: number;
     Z: number;
   };
-  "openfl.ui.Mouse": HaxeClass<Game.openfl.ui.Mouse> & {
+  'openfl.ui.Mouse': HaxeClass<Game.openfl.ui.Mouse> & {
     get_cursor: () => any;
     hide: () => any;
     set_cursor: (arg0?: any) => any;
@@ -21408,28 +24312,21 @@ export interface GameClasses {
     supportsCursor: boolean;
     supportsNativeCursor: boolean;
   };
-  "openfl.ui.Multitouch": HaxeClass<Game.openfl.ui.Multitouch> & {
+  'openfl.ui.Multitouch': HaxeClass<Game.openfl.ui.Multitouch> & {
     get_supportsTouchEvents: () => any;
     inputMode: any;
     maxTouchPoints: number;
     supportedGestures: any;
     supportsGestureEvents: boolean;
   };
-  "openfl.utils._AGALMiniAssembler.OpCode": HaxeClass<Game.openfl.utils._AGALMiniAssembler.OpCode> & {
-  };
-  "openfl.utils._AGALMiniAssembler.Register": HaxeClass<Game.openfl.utils._AGALMiniAssembler.Register> & {
-  };
-  "openfl.utils._AGALMiniAssembler.Sampler": HaxeClass<Game.openfl.utils._AGALMiniAssembler.Sampler> & {
-  };
-  "openfl.utils._Dictionary.ClassMap": HaxeClass<Game.openfl.utils._Dictionary.ClassMap> & {
-  };
-  "openfl.utils._Dictionary.FloatMap": HaxeClass<Game.openfl.utils._Dictionary.FloatMap> & {
-  };
-  "openfl.utils._Dictionary.UtilsObjectMap": HaxeClass<Game.openfl.utils._Dictionary.UtilsObjectMap> & {
-  };
-  "openfl.utils._internal.format.amf.AMFReader": HaxeClass<Game.openfl.utils._internal.format.amf.AMFReader> & {
-  };
-  "openfl.utils._internal.format.amf.AMFTools": HaxeClass<Game.openfl.utils._internal.format.amf.AMFTools> & {
+  'openfl.utils._AGALMiniAssembler.OpCode': HaxeClass<Game.openfl.utils._AGALMiniAssembler.OpCode> & {};
+  'openfl.utils._AGALMiniAssembler.Register': HaxeClass<Game.openfl.utils._AGALMiniAssembler.Register> & {};
+  'openfl.utils._AGALMiniAssembler.Sampler': HaxeClass<Game.openfl.utils._AGALMiniAssembler.Sampler> & {};
+  'openfl.utils._Dictionary.ClassMap': HaxeClass<Game.openfl.utils._Dictionary.ClassMap> & {};
+  'openfl.utils._Dictionary.FloatMap': HaxeClass<Game.openfl.utils._Dictionary.FloatMap> & {};
+  'openfl.utils._Dictionary.UtilsObjectMap': HaxeClass<Game.openfl.utils._Dictionary.UtilsObjectMap> & {};
+  'openfl.utils._internal.format.amf.AMFReader': HaxeClass<Game.openfl.utils._internal.format.amf.AMFReader> & {};
+  'openfl.utils._internal.format.amf.AMFTools': HaxeClass<Game.openfl.utils._internal.format.amf.AMFTools> & {
     abool: (arg0?: any) => any;
     array: (arg0?: any) => any;
     encode: (arg0?: any) => any;
@@ -21438,15 +24335,11 @@ export interface GameClasses {
     string: (arg0?: any) => any;
     unwrapValue: (arg0?: any) => any;
   };
-  "openfl.utils._internal.format.amf.AMFWriter": HaxeClass<Game.openfl.utils._internal.format.amf.AMFWriter> & {
-  };
-  "openfl.utils._internal.format.amf3.AMF3Array": HaxeClass<Game.openfl.utils._internal.format.amf3.AMF3Array> & {
-  };
-  "openfl.utils._internal.format.amf3.AMF3Reader": HaxeClass<Game.openfl.utils._internal.format.amf3.AMF3Reader> & {
-  };
-  "openfl.utils._internal.format.amf3.AMF3ReaderInput": HaxeClass<Game.openfl.utils._internal.format.amf3.AMF3ReaderInput> & {
-  };
-  "openfl.utils._internal.format.amf3.AMF3Tools": HaxeClass<Game.openfl.utils._internal.format.amf3.AMF3Tools> & {
+  'openfl.utils._internal.format.amf.AMFWriter': HaxeClass<Game.openfl.utils._internal.format.amf.AMFWriter> & {};
+  'openfl.utils._internal.format.amf3.AMF3Array': HaxeClass<Game.openfl.utils._internal.format.amf3.AMF3Array> & {};
+  'openfl.utils._internal.format.amf3.AMF3Reader': HaxeClass<Game.openfl.utils._internal.format.amf3.AMF3Reader> & {};
+  'openfl.utils._internal.format.amf3.AMF3ReaderInput': HaxeClass<Game.openfl.utils._internal.format.amf3.AMF3ReaderInput> & {};
+  'openfl.utils._internal.format.amf3.AMF3Tools': HaxeClass<Game.openfl.utils._internal.format.amf3.AMF3Tools> & {
     anull: (arg0?: any) => any;
     array: (arg0?: any) => any;
     bool: (arg0?: any) => any;
@@ -21466,16 +24359,14 @@ export interface GameClasses {
     undefined: (arg0?: any) => any;
     xml: (arg0?: any) => any;
   };
-  "openfl.utils._internal.format.amf3.AMF3Writer": HaxeClass<Game.openfl.utils._internal.format.amf3.AMF3Writer> & {
-  };
-  "openfl.utils._internal.Lib": HaxeClass<Game.openfl.utils._internal.Lib> & {
+  'openfl.utils._internal.format.amf3.AMF3Writer': HaxeClass<Game.openfl.utils._internal.format.amf3.AMF3Writer> & {};
+  'openfl.utils._internal.Lib': HaxeClass<Game.openfl.utils._internal.Lib> & {
     application: any;
     current: any;
     notImplemented: (arg0?: any) => any;
   };
-  "openfl.utils._internal.TouchData": HaxeClass<Game.openfl.utils._internal.TouchData> & {
-  };
-  "openfl.utils.AGALMiniAssembler": HaxeClass<Game.openfl.utils.AGALMiniAssembler> & {
+  'openfl.utils._internal.TouchData': HaxeClass<Game.openfl.utils._internal.TouchData> & {};
+  'openfl.utils.AGALMiniAssembler': HaxeClass<Game.openfl.utils.AGALMiniAssembler> & {
     ABS: string;
     ADD: string;
     ANISOTROPIC16X: string;
@@ -21587,9 +24478,8 @@ export interface GameClasses {
     VT: string;
     WRAP: string;
   };
-  "openfl.utils.AssetCache": HaxeClass<Game.openfl.utils.AssetCache> & {
-  };
-  "openfl.utils.AssetLibrary": HaxeClass<Game.openfl.utils.AssetLibrary> & {
+  'openfl.utils.AssetCache': HaxeClass<Game.openfl.utils.AssetCache> & {};
+  'openfl.utils.AssetLibrary': HaxeClass<Game.openfl.utils.AssetLibrary> & {
     fromBundle: (arg0?: any) => any;
     fromBytes: (arg0?: any, arg1?: any) => any;
     fromFile: (arg0?: any, arg1?: any) => any;
@@ -21598,7 +24488,7 @@ export interface GameClasses {
     loadFromFile: (arg0?: any, arg1?: any) => any;
     loadFromManifest: (arg0?: any) => any;
   };
-  "openfl.utils.Assets": HaxeClass<Game.openfl.utils.Assets> & {
+  'openfl.utils.Assets': HaxeClass<Game.openfl.utils.Assets> & {
     addEventListener: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     cache: any;
     dispatcher: any;
@@ -21638,77 +24528,87 @@ export interface GameClasses {
     unloadLibrary: (arg0?: any) => any;
     unregisterBinding: (arg0?: any, arg1?: any) => any;
   };
-  "openfl.utils.ByteArrayData": HaxeClass<Game.openfl.utils.ByteArrayData> & {
+  'openfl.utils.ByteArrayData': HaxeClass<Game.openfl.utils.ByteArrayData> & {
     defaultObjectEncoding: any;
     fromBytes: (arg0?: any) => any;
     get_defaultEndian: () => any;
     set_defaultEndian: (arg0?: any) => any;
   };
-  "openfl.utils.IAssetCache": HaxeClass<Game.openfl.utils.IAssetCache> & {
-  };
-  "openfl.utils.IDataInput": HaxeClass<Game.openfl.utils.IDataInput> & {
-  };
-  "openfl.utils.IDataOutput": HaxeClass<Game.openfl.utils.IDataOutput> & {
-  };
-  "openfl.utils.IExternalizable": HaxeClass<Game.openfl.utils.IExternalizable> & {
-  };
-  "openfl.utils.Timer": HaxeClass<Game.openfl.utils.Timer> & {
-  };
-  "playerio.BigDB": HaxeClass<Game.playerio.BigDB> & {
-  };
-  "playerio.Client": HaxeClass<Game.playerio.Client> & {
+  'openfl.utils.IAssetCache': HaxeClass<Game.openfl.utils.IAssetCache> & {};
+  'openfl.utils.IDataInput': HaxeClass<Game.openfl.utils.IDataInput> & {};
+  'openfl.utils.IDataOutput': HaxeClass<Game.openfl.utils.IDataOutput> & {};
+  'openfl.utils.IExternalizable': HaxeClass<Game.openfl.utils.IExternalizable> & {};
+  'openfl.utils.Timer': HaxeClass<Game.openfl.utils.Timer> & {};
+  'playerio.BigDB': HaxeClass<Game.playerio.BigDB> & {};
+  'playerio.Client': HaxeClass<Game.playerio.Client> & {
     wrap: (sdkClient: unknown) => Game.playerio.Client;
   };
-  "playerio.Connection": HaxeClass<Game.playerio.Connection> & {
+  'playerio.Connection': HaxeClass<Game.playerio.Connection> & {
     onHandlerError: (arg0?: any, arg1?: any) => any;
-    runMessageHandler: (type: string, handler: (message: Game.playerio.Message) => void, sdkMessage: import('./PlayerIOMessageSerializer').PlayerIOSDKMessage) => void;
+    runMessageHandler: (
+      type: string,
+      handler: (message: Game.playerio.Message) => void,
+      sdkMessage: import('./PlayerIOMessageSerializer').PlayerIOSDKMessage,
+    ) => void;
   };
-  "playerio.ErrorLog": HaxeClass<Game.playerio.ErrorLog> & {
-  };
-  "playerio.Message": HaxeClass<Game.playerio.Message> & {
+  'playerio.ErrorLog': HaxeClass<Game.playerio.ErrorLog> & {};
+  'playerio.Message': HaxeClass<Game.playerio.Message> & {
     wrap: (arg0?: any) => any;
   };
-  "playerio.Multiplayer": HaxeClass<Game.playerio.Multiplayer> & {
-  };
-  "playerio.PayVault": HaxeClass<Game.playerio.PayVault> & {
-  };
-  "playerio.PlayerIO": HaxeClass<Game.playerio.PlayerIO> & {
-    authenticate: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
+  'playerio.Multiplayer': HaxeClass<Game.playerio.Multiplayer> & {};
+  'playerio.PayVault': HaxeClass<Game.playerio.PayVault> & {};
+  'playerio.PlayerIO': HaxeClass<Game.playerio.PlayerIO> & {
+    authenticate: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
     get_useSecureApiRequests: () => any;
     quickConnect: Game.playerio.QuickConnect;
     requireSdk: () => any;
     set_useSecureApiRequests: (arg0?: any) => any;
   };
-  "playerio.PlayerIOConfig": HaxeClass<Game.playerio.PlayerIOConfig> & {
+  'playerio.PlayerIOConfig': HaxeClass<Game.playerio.PlayerIOConfig> & {
     configure: (arg0?: any) => any;
     secureConnections: any;
   };
-  "playerio.PlayerIOError": HaxeClass<Game.playerio.PlayerIOError, [code: string | number, message: string, stackText?: string | null, errorID?: number]> & {
+  'playerio.PlayerIOError': HaxeClass<
+    Game.playerio.PlayerIOError,
+    [code: string | number, message: string, stackText?: string | null, errorID?: number]
+  > & {
     local: (arg0?: any, arg1?: any) => any;
     unsupported: (arg0?: any) => any;
-    wrap: (error: import('./PlayerIOMultiplayer').PlayerIOSDKError | null) => Game.playerio.PlayerIOError;
+    wrap: (
+      error: import('./PlayerIOMultiplayer').PlayerIOSDKError | null,
+    ) => Game.playerio.PlayerIOError;
   };
-  "playerio.PlayerIORegistrationError": HaxeClass<Game.playerio.PlayerIORegistrationError> & {
+  'playerio.PlayerIORegistrationError': HaxeClass<Game.playerio.PlayerIORegistrationError> & {
     fieldText: (arg0?: any, arg1?: any) => any;
     wrap: (arg0?: any) => any;
   };
-  "playerio.QuickConnect": HaxeClass<Game.playerio.QuickConnect> & {
-    convertFor: (channel: PlayerIOChannel, gameId: string) => (response: AuthenticationResponse) => unknown;
+  'playerio.QuickConnect': HaxeClass<Game.playerio.QuickConnect> & {
+    convertFor: (
+      channel: PlayerIOChannel,
+      gameId: string,
+    ) => (response: AuthenticationResponse) => unknown;
     sdkMissing: (arg0?: any) => any;
     splitArgs: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "playerio.RoomInfo": HaxeClass<Game.playerio.RoomInfo> & {
+  'playerio.RoomInfo': HaxeClass<Game.playerio.RoomInfo> & {
     wrap: (arg0?: any) => any;
   };
-  "playerio.sdk.PlayerIOSdk": HaxeClass<Game.playerio.sdk.PlayerIOSdk> & {
+  'playerio.sdk.PlayerIOSdk': HaxeClass<Game.playerio.sdk.PlayerIOSdk> & {
     isLoaded: () => any;
     keepChannels: () => void;
     usePaymentInfo: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     withResponseFields: (arg0?: any, arg1?: any) => any;
   };
-  "Preload": HaxeClass<Game.Preload, [container: Game.starling.display.Sprite]> & {
-  };
-  "Reflect": HaxeClass<Game.Reflect> & {
+  Preload: HaxeClass<Game.Preload, [container: Game.starling.display.Sprite]> & {};
+  Reflect: HaxeClass<Game.Reflect> & {
     compare: (arg0?: any, arg1?: any) => any;
     deleteField: (arg0?: any, arg1?: any) => any;
     field: (arg0?: any, arg1?: any) => any;
@@ -21719,7 +24619,7 @@ export interface GameClasses {
     makeVarArgs: (arg0?: any) => any;
     setProperty: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "RymdenRunt": HaxeClass<Game.RymdenRunt> & {
+  RymdenRunt: HaxeClass<Game.RymdenRunt> & {
     info: any;
     initTimeStamp: () => any;
     instance: any;
@@ -21732,9 +24632,8 @@ export interface GameClasses {
     s: Game.starling.core.Starling | null;
     startTime: any;
   };
-  "sound.ISound": HaxeClass<Game.sound.ISound> & {
-  };
-  "sound.Playlist": HaxeClass<Game.sound.Playlist> & {
+  'sound.ISound': HaxeClass<Game.sound.ISound> & {};
+  'sound.Playlist': HaxeClass<Game.sound.Playlist> & {
     currentPlaylist: any;
     currentTrack: any;
     i: any;
@@ -21772,7 +24671,7 @@ export interface GameClasses {
     THEME_ORGANIC: string;
     THEME_VAST_SPACE: string;
   };
-  "sound.SoundConst": HaxeClass<Game.sound.SoundConst> & {
+  'sound.SoundConst': HaxeClass<Game.sound.SoundConst> & {
     MUSIC_ACTION_LOOP: string;
     MUSIC_NO_MOSIC: string;
     MUSIC_NORMAL: string;
@@ -21808,33 +24707,31 @@ export interface GameClasses {
     SOUND_SIREN: string;
     SOUND_WARP: string;
   };
-  "sound.SoundLocator": HaxeClass<Game.sound.SoundLocator> & {
+  'sound.SoundLocator': HaxeClass<Game.sound.SoundLocator> & {
     getService: () => Game.sound.SoundManager;
     register: (service: Game.sound.SoundManager) => void;
     service: any;
   };
-  "sound.SoundManager": HaxeClass<Game.sound.SoundManager> & {
+  'sound.SoundManager': HaxeClass<Game.sound.SoundManager> & {
     audioPath: string;
     soundUrl: (arg0?: any) => any;
     TYPE_EFFECT: string;
     TYPE_MUSIC: string;
     TYPE_VOICE: string;
   };
-  "sound.SoundObject": HaxeClass<Game.sound.SoundObject, [url: string]> & {
-  };
-  "starling.animation.DelayedCall": HaxeClass<Game.starling.animation.DelayedCall> & {
+  'sound.SoundObject': HaxeClass<Game.sound.SoundObject, [url: string]> & {};
+  'starling.animation.DelayedCall': HaxeClass<Game.starling.animation.DelayedCall> & {
     fromPool: (arg0?: any, arg1?: any, arg2?: any) => any;
     sPool: any;
     toPool: (arg0?: any) => any;
   };
-  "starling.animation.IAnimatable": HaxeClass<Game.starling.animation.IAnimatable> & {
-  };
-  "starling.animation.Juggler": HaxeClass<Game.starling.animation.Juggler> & {
+  'starling.animation.IAnimatable': HaxeClass<Game.starling.animation.IAnimatable> & {};
+  'starling.animation.Juggler': HaxeClass<Game.starling.animation.Juggler> & {
     getNextID: () => any;
     sCurrentObjectID: any;
     sTweenInstanceFields: any;
   };
-  "starling.animation.Transitions": HaxeClass<Game.starling.animation.Transitions> & {
+  'starling.animation.Transitions': HaxeClass<Game.starling.animation.Transitions> & {
     EASE_IN: string;
     EASE_IN_BACK: string;
     EASE_IN_BOUNCE: string;
@@ -21875,7 +24772,7 @@ export interface GameClasses {
     registerDefaults: () => any;
     sTransitions: any;
   };
-  "starling.animation.Tween": HaxeClass<Game.starling.animation.Tween> & {
+  'starling.animation.Tween': HaxeClass<Game.starling.animation.Tween> & {
     fromPool: (arg0?: any, arg1?: any, arg2?: any) => any;
     getPropertyHint: (arg0?: any) => any;
     getPropertyName: (arg0?: any) => any;
@@ -21883,7 +24780,7 @@ export interface GameClasses {
     sTweenPool: any;
     toPool: (arg0?: any) => any;
   };
-  "starling.core.Starling": HaxeClass<Game.starling.core.Starling> & {
+  'starling.core.Starling': HaxeClass<Game.starling.core.Starling> & {
     get_all: () => any;
     get_current: () => Game.starling.core.Starling | null;
     get_currentContentScaleFactor: () => any;
@@ -21897,13 +24794,12 @@ export interface GameClasses {
     set_multitouchEnabled: (arg0?: any) => any;
     VERSION: string;
   };
-  "starling.core.StatsDisplay": HaxeClass<Game.starling.core.StatsDisplay> & {
+  'starling.core.StatsDisplay': HaxeClass<Game.starling.core.StatsDisplay> & {
     B_TO_MB: number;
     UPDATE_INTERVAL: number;
   };
-  "starling.display._MovieClip.MovieClipFrame": HaxeClass<Game.starling.display._MovieClip.MovieClipFrame> & {
-  };
-  "starling.display.BlendMode": HaxeClass<Game.starling.display.BlendMode> & {
+  'starling.display._MovieClip.MovieClipFrame': HaxeClass<Game.starling.display._MovieClip.MovieClipFrame> & {};
+  'starling.display.BlendMode': HaxeClass<Game.starling.display.BlendMode> & {
     ADD: string;
     AUTO: string;
     BELOW: string;
@@ -21921,16 +24817,16 @@ export interface GameClasses {
     sBlendModes: any;
     SCREEN: string;
   };
-  "starling.display.Button": HaxeClass<Game.starling.display.Button> & {
-  };
-  "starling.display.ButtonState": HaxeClass<Game.starling.display.ButtonState> & {
+  'starling.display.Button': HaxeClass<Game.starling.display.Button> & {};
+  'starling.display.ButtonState': HaxeClass<Game.starling.display.ButtonState> & {
     DISABLED: string;
     DOWN: string;
     isValid: (arg0?: any) => any;
     OVER: string;
     UP: string;
   };
-  "starling.display.DisplayObject": HaxeClass<Game.starling.display.DisplayObject> & {
+  'starling.display.Canvas': HaxeClass<Game.starling.display.Canvas> & {};
+  'starling.display.DisplayObject': HaxeClass<Game.starling.display.DisplayObject> & {
     sAncestors: any;
     sHelperMatrix: any;
     sHelperMatrix3D: any;
@@ -21941,7 +24837,7 @@ export interface GameClasses {
     sHelperRect: any;
     sMaskWarningShown: boolean;
   };
-  "starling.display.DisplayObjectContainer": HaxeClass<Game.starling.display.DisplayObjectContainer> & {
+  'starling.display.DisplayObjectContainer': HaxeClass<Game.starling.display.DisplayObjectContainer> & {
     mergeSort: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     sBoundsMatrix: any;
     sBoundsPoint: any;
@@ -21950,7 +24846,10 @@ export interface GameClasses {
     sHitTestMatrix: any;
     sSortBuffer: any;
   };
-  "starling.display.Image": HaxeClass<Game.starling.display.Image, [texture: Game.starling.textures.Texture]> & {
+  'starling.display.Image': HaxeClass<
+    Game.starling.display.Image,
+    [texture: Game.starling.textures.Texture]
+  > & {
     automateSetupForTexture: (arg0?: any, arg1?: any, arg2?: any) => any;
     bindPivotPointToTexture: (arg0?: any, arg1?: any, arg2?: any) => any;
     bindScale9GridToTexture: (arg0?: any, arg1?: any) => any;
@@ -21966,7 +24865,14 @@ export interface GameClasses {
     sTexCols: any;
     sTexRows: any;
   };
-  "starling.display.Mesh": HaxeClass<Game.starling.display.Mesh, [vertices: Game.starling.rendering.VertexData, indices: Game.starling.rendering.IndexData, style?: Game.starling.styles.MeshStyle | null]> & {
+  'starling.display.Mesh': HaxeClass<
+    Game.starling.display.Mesh,
+    [
+      vertices: Game.starling.rendering.VertexData,
+      indices: Game.starling.rendering.IndexData,
+      style?: Game.starling.styles.MeshStyle | null,
+    ]
+  > & {
     createDefaultStyle: (arg0?: any) => any;
     fromPolygon: (arg0?: any, arg1?: any) => any;
     get_defaultStyle: () => any;
@@ -21976,38 +24882,37 @@ export interface GameClasses {
     set_defaultStyle: (arg0?: any) => any;
     set_defaultStyleFactory: (arg0?: any) => any;
   };
-  "starling.display.MeshBatch": HaxeClass<Game.starling.display.MeshBatch, []> & {
+  'starling.display.MeshBatch': HaxeClass<Game.starling.display.MeshBatch, []> & {
     MAX_NUM_VERTICES: number;
     sFullMeshSubset: any;
   };
-  "starling.display.MovieClip": HaxeClass<Game.starling.display.MovieClip> & {
-  };
-  "starling.display.Quad": HaxeClass<Game.starling.display.Quad, [width: number, height: number, color?: number]> & {
+  'starling.display.MovieClip': HaxeClass<Game.starling.display.MovieClip> & {};
+  'starling.display.Quad': HaxeClass<
+    Game.starling.display.Quad,
+    [width: number, height: number, color?: number]
+  > & {
     fromTexture: (arg0?: any) => any;
     sMatrix: any;
     sMatrix3D: any;
     sPoint3D: any;
   };
-  "starling.display.SetupAutomator": HaxeClass<Game.starling.display.SetupAutomator> & {
-  };
-  "starling.display.Sprite": HaxeClass<Game.starling.display.Sprite, []> & {
-  };
-  "starling.display.Stage": HaxeClass<Game.starling.display.Stage> & {
+  'starling.display.SetupAutomator': HaxeClass<Game.starling.display.SetupAutomator> & {};
+  'starling.display.Sprite': HaxeClass<Game.starling.display.Sprite, []> & {};
+  'starling.display.Stage': HaxeClass<Game.starling.display.Stage> & {
     sMatrix: any;
     sMatrix3D: any;
   };
-  "starling.errors.AbstractClassError": HaxeClass<Game.starling.errors.AbstractClassError> & {
-  };
-  "starling.errors.AbstractMethodError": HaxeClass<Game.starling.errors.AbstractMethodError> & {
-  };
-  "starling.errors.MissingContextError": HaxeClass<Game.starling.errors.MissingContextError> & {
-  };
-  "starling.errors.NotSupportedError": HaxeClass<Game.starling.errors.NotSupportedError> & {
-  };
-  "starling.events.EnterFrameEvent": HaxeClass<Game.starling.events.EnterFrameEvent> & {
+  'starling.errors.AbstractClassError': HaxeClass<Game.starling.errors.AbstractClassError> & {};
+  'starling.errors.AbstractMethodError': HaxeClass<Game.starling.errors.AbstractMethodError> & {};
+  'starling.errors.MissingContextError': HaxeClass<Game.starling.errors.MissingContextError> & {};
+  'starling.errors.NotSupportedError': HaxeClass<Game.starling.errors.NotSupportedError> & {};
+  'starling.events.EnterFrameEvent': HaxeClass<Game.starling.events.EnterFrameEvent> & {
     ENTER_FRAME: string;
   };
-  "starling.events.Event": HaxeClass<Game.starling.events.Event, [type: string, bubbles?: boolean, data?: unknown]> & {
+  'starling.events.Event': HaxeClass<
+    Game.starling.events.Event,
+    [type: string, bubbles?: boolean, data?: unknown]
+  > & {
     ADDED: string;
     ADDED_TO_STAGE: string;
     CANCEL: string;
@@ -22040,39 +24945,53 @@ export interface GameClasses {
     TRIGGERED: string;
     UPDATE: string;
   };
-  "starling.events.EventDispatcher": HaxeClass<Game.starling.events.EventDispatcher> & {
+  'starling.events.EventDispatcher': HaxeClass<Game.starling.events.EventDispatcher> & {
     sBubbleChains: any;
   };
-  "starling.events.KeyboardEvent": HaxeClass<Game.starling.events.KeyboardEvent> & {
+  'starling.events.KeyboardEvent': HaxeClass<Game.starling.events.KeyboardEvent> & {
     KEY_DOWN: string;
     KEY_UP: string;
   };
-  "starling.events.ResizeEvent": HaxeClass<Game.starling.events.ResizeEvent> & {
+  'starling.events.ResizeEvent': HaxeClass<Game.starling.events.ResizeEvent> & {
     RESIZE: string;
   };
-  "starling.events.Touch": HaxeClass<Game.starling.events.Touch> & {
-    getMovementBetween: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+  'starling.events.Touch': HaxeClass<Game.starling.events.Touch> & {
+    getMovementBetween: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+    ) => any;
     sHelperPoint: any;
   };
-  "starling.events.TouchData": HaxeClass<Game.starling.events.TouchData> & {
-    fromPool: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
+  'starling.events.TouchData': HaxeClass<Game.starling.events.TouchData> & {
+    fromPool: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
     sPool: any;
     toPool: (arg0?: any) => any;
   };
-  "starling.events.TouchEvent": HaxeClass<Game.starling.events.TouchEvent> & {
+  'starling.events.TouchEvent': HaxeClass<Game.starling.events.TouchEvent> & {
     sTouches: any;
     TOUCH: string;
   };
-  "starling.events.TouchMarker": HaxeClass<Game.starling.events.TouchMarker> & {
-  };
-  "starling.events.TouchPhase": HaxeClass<Game.starling.events.TouchPhase> & {
+  'starling.events.TouchMarker': HaxeClass<Game.starling.events.TouchMarker> & {};
+  'starling.events.TouchPhase': HaxeClass<Game.starling.events.TouchPhase> & {
     BEGAN: string;
     ENDED: string;
     HOVER: string;
     MOVED: string;
     STATIONARY: string;
   };
-  "starling.events.TouchProcessor": HaxeClass<Game.starling.events.TouchProcessor> & {
+  'starling.events.TouchProcessor': HaxeClass<Game.starling.events.TouchProcessor> & {
     BOTTOM: number;
     LEFT: number;
     RIGHT: number;
@@ -22081,38 +25000,39 @@ export interface GameClasses {
     sUpdatedTouches: any;
     TOP: number;
   };
-  "starling.filters.BlurEffect": HaxeClass<Game.starling.filters.BlurEffect> & {
+  'starling.filters.BlurEffect': HaxeClass<Game.starling.filters.BlurEffect> & {
     HORIZONTAL: string;
     sOffsets: any;
     sTmpWeights: any;
     sWeights: any;
     VERTICAL: string;
   };
-  "starling.filters.BlurFilter": HaxeClass<Game.starling.filters.BlurFilter, [blurX?: number, blurY?: number, resolution?: number]> & {
+  'starling.filters.BlurFilter': HaxeClass<
+    Game.starling.filters.BlurFilter,
+    [blurX?: number, blurY?: number, resolution?: number]
+  > & {
     getNumPasses: (arg0?: any) => any;
   };
-  "starling.filters.ColorMatrixEffect": HaxeClass<Game.starling.filters.ColorMatrixEffect> & {
+  'starling.filters.ColorMatrixEffect': HaxeClass<Game.starling.filters.ColorMatrixEffect> & {
     IDENTITY: any;
     MIN_COLOR: any;
     sMatrix: any;
   };
-  "starling.filters.ColorMatrixFilter": HaxeClass<Game.starling.filters.ColorMatrixFilter, []> & {
+  'starling.filters.ColorMatrixFilter': HaxeClass<Game.starling.filters.ColorMatrixFilter, []> & {
     LUMA_B: number;
     LUMA_G: number;
     LUMA_R: number;
     sMatrix: any;
   };
-  "starling.filters.CompositeEffect": HaxeClass<Game.starling.filters.CompositeEffect> & {
+  'starling.filters.CompositeEffect': HaxeClass<Game.starling.filters.CompositeEffect> & {
     sColor: any;
     sLayers: any;
     sOffset: any;
     VERTEX_FORMAT: any;
   };
-  "starling.filters.CompositeFilter": HaxeClass<Game.starling.filters.CompositeFilter> & {
-  };
-  "starling.filters.CompositeLayer": HaxeClass<Game.starling.filters.CompositeLayer> & {
-  };
-  "starling.filters.CompositeMode": HaxeClass<Game.starling.filters.CompositeMode> & {
+  'starling.filters.CompositeFilter': HaxeClass<Game.starling.filters.CompositeFilter> & {};
+  'starling.filters.CompositeLayer': HaxeClass<Game.starling.filters.CompositeLayer> & {};
+  'starling.filters.CompositeMode': HaxeClass<Game.starling.filters.CompositeMode> & {
     allModes: any;
     getIndex: (arg0?: any) => any;
     INSIDE: string;
@@ -22121,58 +25041,86 @@ export interface GameClasses {
     OUTSIDE: string;
     OUTSIDE_KNOCKOUT: string;
   };
-  "starling.filters.DropShadowFilter": HaxeClass<Game.starling.filters.DropShadowFilter> & {
+  'starling.filters.DropShadowFilter': HaxeClass<Game.starling.filters.DropShadowFilter> & {
     getMode: (arg0?: any, arg1?: any) => any;
   };
-  "starling.filters.FilterHelper": HaxeClass<Game.starling.filters.FilterHelper> & {
-  };
-  "starling.filters.FilterQuad": HaxeClass<Game.starling.filters.FilterQuad> & {
+  'starling.filters.FilterHelper': HaxeClass<Game.starling.filters.FilterHelper> & {};
+  'starling.filters.FilterQuad': HaxeClass<Game.starling.filters.FilterQuad> & {
     sMatrix: any;
   };
-  "starling.filters.FragmentFilter": HaxeClass<Game.starling.filters.FragmentFilter> & {
+  'starling.filters.FragmentFilter': HaxeClass<Game.starling.filters.FragmentFilter> & {
     sMatrix3D: any;
   };
-  "starling.filters.GlowFilter": HaxeClass<Game.starling.filters.GlowFilter, [color?: number, alpha?: number, blur?: number, quality?: number, inner?: boolean, knockout?: boolean]> & {
+  'starling.filters.GlowFilter': HaxeClass<
+    Game.starling.filters.GlowFilter,
+    [
+      color?: number,
+      alpha?: number,
+      blur?: number,
+      quality?: number,
+      inner?: boolean,
+      knockout?: boolean,
+    ]
+  > & {
     getMode: (arg0?: any, arg1?: any) => any;
   };
-  "starling.filters.IFilterHelper": HaxeClass<Game.starling.filters.IFilterHelper> & {
-  };
-  "starling.geom.Ellipse": HaxeClass<Game.starling.geom.Ellipse> & {
-  };
-  "starling.geom.ImmutablePolygon": HaxeClass<Game.starling.geom.ImmutablePolygon> & {
-  };
-  "starling.geom.Polygon": HaxeClass<Game.starling.geom.Polygon> & {
-    areVectorsIntersecting: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+  'starling.filters.IFilterHelper': HaxeClass<Game.starling.filters.IFilterHelper> & {};
+  'starling.geom.Ellipse': HaxeClass<Game.starling.geom.Ellipse> & {};
+  'starling.geom.ImmutablePolygon': HaxeClass<Game.starling.geom.ImmutablePolygon> & {};
+  'starling.geom.Polygon': HaxeClass<Game.starling.geom.Polygon> & {
+    areVectorsIntersecting: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
     createCircle: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     createEllipse: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     createRectangle: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
-    createRoundRectangle: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    createRoundRectangle: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+    ) => any;
     fromVector: (arg0?: any) => any;
-    isConvexTriangle: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    isConvexTriangle: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+    ) => any;
     sRestIndices: any;
     useEarcut: boolean;
   };
-  "starling.geom.Rectangle": HaxeClass<Game.starling.geom.Rectangle> & {
-  };
-  "starling.geom.RoundRectangle": HaxeClass<Game.starling.geom.RoundRectangle> & {
-  };
-  "starling.rendering.BatchPool": HaxeClass<Game.starling.rendering.BatchPool> & {
-  };
-  "starling.rendering.BatchProcessor": HaxeClass<Game.starling.rendering.BatchProcessor> & {
+  'starling.geom.Rectangle': HaxeClass<Game.starling.geom.Rectangle> & {};
+  'starling.geom.RoundRectangle': HaxeClass<Game.starling.geom.RoundRectangle> & {};
+  'starling.rendering.BatchPool': HaxeClass<Game.starling.rendering.BatchPool> & {};
+  'starling.rendering.BatchProcessor': HaxeClass<Game.starling.rendering.BatchProcessor> & {
     sMeshSubset: any;
   };
-  "starling.rendering.BatchToken": HaxeClass<Game.starling.rendering.BatchToken> & {
-  };
-  "starling.rendering.Effect": HaxeClass<Game.starling.rendering.Effect> & {
+  'starling.rendering.BatchToken': HaxeClass<Game.starling.rendering.BatchToken> & {};
+  'starling.rendering.Effect': HaxeClass<Game.starling.rendering.Effect> & {
     sProgramNameCache: any;
     VERTEX_FORMAT: any;
   };
-  "starling.rendering.FilterEffect": HaxeClass<Game.starling.rendering.FilterEffect> & {
+  'starling.rendering.FilterEffect': HaxeClass<Game.starling.rendering.FilterEffect> & {
     STD_VERTEX_SHADER: string;
     tex: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     VERTEX_FORMAT: any;
   };
-  "starling.rendering.IndexData": HaxeClass<Game.starling.rendering.IndexData, [initialCapacity?: number]> & {
+  'starling.rendering.IndexData': HaxeClass<
+    Game.starling.rendering.IndexData,
+    [initialCapacity?: number]
+  > & {
     getBasicQuadIndexAt: (arg0?: any) => any;
     INDEX_SIZE: number;
     sQuadData: any;
@@ -22180,11 +25128,11 @@ export interface GameClasses {
     sTrimData: any;
     sVector: any;
   };
-  "starling.rendering.MeshEffect": HaxeClass<Game.starling.rendering.MeshEffect> & {
+  'starling.rendering.MeshEffect': HaxeClass<Game.starling.rendering.MeshEffect> & {
     sRenderAlpha: any;
     VERTEX_FORMAT: any;
   };
-  "starling.rendering.Painter": HaxeClass<Game.starling.rendering.Painter> & {
+  'starling.rendering.Painter': HaxeClass<Game.starling.rendering.Painter> & {
     DEFAULT_STENCIL_VALUE: number;
     PROGRAM_DATA_NAME: string;
     sBufferRect: any;
@@ -22196,31 +25144,34 @@ export interface GameClasses {
     sScissorRect: any;
     sSharedData: any;
   };
-  "starling.rendering.Program": HaxeClass<Game.starling.rendering.Program> & {
+  'starling.rendering.Program': HaxeClass<Game.starling.rendering.Program> & {
     fromSource: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     sAssembler: any;
   };
-  "starling.rendering.RenderState": HaxeClass<Game.starling.rendering.RenderState> & {
+  'starling.rendering.RenderState': HaxeClass<Game.starling.rendering.RenderState> & {
     COMPARE_VALUES: any;
     CULLING_VALUES: any;
     sMatrix3D: any;
     sProjectionMatrix3DRev: any;
   };
-  "starling.rendering.VertexData": HaxeClass<Game.starling.rendering.VertexData, [format?: string | Game.starling.rendering.VertexDataFormat | null, initialCapacity?: number]> & {
+  'starling.rendering.VertexData': HaxeClass<
+    Game.starling.rendering.VertexData,
+    [format?: string | Game.starling.rendering.VertexDataFormat | null, initialCapacity?: number]
+  > & {
     premultiplyAlpha: (arg0?: any) => any;
     sBytes: any;
     sHelperPoint: any;
     sHelperPoint3D: any;
     unmultiplyAlpha: (arg0?: any) => any;
   };
-  "starling.rendering.VertexDataAttribute": HaxeClass<Game.starling.rendering.VertexDataAttribute> & {
+  'starling.rendering.VertexDataAttribute': HaxeClass<Game.starling.rendering.VertexDataAttribute> & {
     FORMAT_SIZES: any;
   };
-  "starling.rendering.VertexDataFormat": HaxeClass<Game.starling.rendering.VertexDataFormat> & {
+  'starling.rendering.VertexDataFormat': HaxeClass<Game.starling.rendering.VertexDataFormat> & {
     fromString: (arg0?: any) => any;
     sFormats: any;
   };
-  "starling.styles.DistanceFieldEffect": HaxeClass<Game.starling.styles.DistanceFieldEffect> & {
+  'starling.styles.DistanceFieldEffect': HaxeClass<Game.starling.styles.DistanceFieldEffect> & {
     MAX_OUTER_OFFSET: number;
     MAX_SCALE: number;
     median: (arg0?: any) => any;
@@ -22228,20 +25179,28 @@ export interface GameClasses {
     sVector: any;
     VERTEX_FORMAT: any;
   };
-  "starling.styles.DistanceFieldStyle": HaxeClass<Game.starling.styles.DistanceFieldStyle> & {
+  'starling.styles.DistanceFieldStyle': HaxeClass<Game.starling.styles.DistanceFieldStyle> & {
     MODE_BASIC: string;
     MODE_GLOW: string;
     MODE_OUTLINE: string;
     MODE_SHADOW: string;
     VERTEX_FORMAT: any;
   };
-  "starling.styles.MeshStyle": HaxeClass<Game.starling.styles.MeshStyle> & {
+  'starling.styles.MeshStyle': HaxeClass<Game.starling.styles.MeshStyle> & {
     sPoint: any;
     VERTEX_FORMAT: any;
   };
-  "starling.text.BitmapChar": HaxeClass<Game.starling.text.BitmapChar, [charId: number, texture: Game.starling.textures.Texture, xOffset: number, yOffset: number, xAdvance: number]> & {
-  };
-  "starling.text.BitmapCharLocation": HaxeClass<Game.starling.text.BitmapCharLocation> & {
+  'starling.text.BitmapChar': HaxeClass<
+    Game.starling.text.BitmapChar,
+    [
+      charId: number,
+      texture: Game.starling.textures.Texture,
+      xOffset: number,
+      yOffset: number,
+      xAdvance: number,
+    ]
+  > & {};
+  'starling.text.BitmapCharLocation': HaxeClass<Game.starling.text.BitmapCharLocation> & {
     instanceFromPool: (arg0?: any) => any;
     rechargePool: () => any;
     sInstanceLoan: any;
@@ -22250,9 +25209,8 @@ export interface GameClasses {
     sVectorPool: any;
     vectorFromPool: () => any;
   };
-  "starling.text.BitmapDataEx": HaxeClass<Game.starling.text.BitmapDataEx> & {
-  };
-  "starling.text.BitmapFont": HaxeClass<Game.starling.text.BitmapFont> & {
+  'starling.text.BitmapDataEx': HaxeClass<Game.starling.text.BitmapDataEx> & {};
+  'starling.text.BitmapFont': HaxeClass<Game.starling.text.BitmapFont> & {
     CHAR_CARRIAGE_RETURN: number;
     CHAR_MISSING: number;
     CHAR_NEWLINE: number;
@@ -22263,14 +25221,13 @@ export interface GameClasses {
     sDefaultOptions: any;
     sLines: any;
   };
-  "starling.text.BitmapFontType": HaxeClass<Game.starling.text.BitmapFontType> & {
+  'starling.text.BitmapFontType': HaxeClass<Game.starling.text.BitmapFontType> & {
     DISTANCE_FIELD: string;
     MULTI_CHANNEL_DISTANCE_FIELD: string;
     STANDARD: string;
   };
-  "starling.text.ITextCompositor": HaxeClass<Game.starling.text.ITextCompositor> & {
-  };
-  "starling.text.MiniBitmapFont": HaxeClass<Game.starling.text.MiniBitmapFont> & {
+  'starling.text.ITextCompositor': HaxeClass<Game.starling.text.ITextCompositor> & {};
+  'starling.text.MiniBitmapFont': HaxeClass<Game.starling.text.MiniBitmapFont> & {
     BITMAP_DATA: any;
     BITMAP_HEIGHT: number;
     BITMAP_WIDTH: number;
@@ -22279,7 +25236,10 @@ export interface GameClasses {
     getBitmapData: () => any;
     XML_DATA: any;
   };
-  "starling.text.TextField": HaxeClass<Game.starling.text.TextField, [width: number, height: number, text?: string, format?: Game.starling.text.TextFormat | null]> & {
+  'starling.text.TextField': HaxeClass<
+    Game.starling.text.TextField,
+    [width: number, height: number, text?: string, format?: Game.starling.text.TextFormat | null]
+  > & {
     COMPOSITOR_DATA_NAME: string;
     convertToLowerCase: (arg0?: any) => any;
     get_compositors: () => any;
@@ -22299,17 +25259,18 @@ export interface GameClasses {
     unregisterCompositor: (arg0?: any, arg1?: any) => any;
     updateEmbeddedFonts: () => any;
   };
-  "starling.text.TextFieldAutoSize": HaxeClass<Game.starling.text.TextFieldAutoSize> & {
+  'starling.text.TextFieldAutoSize': HaxeClass<Game.starling.text.TextFieldAutoSize> & {
     BOTH_DIRECTIONS: string;
     HORIZONTAL: string;
     NONE: string;
     VERTICAL: string;
   };
-  "starling.text.TextFormat": HaxeClass<Game.starling.text.TextFormat, [font?: string, size?: number, color?: number, horizontalAlign?: string, verticalAlign?: string]> & {
-  };
-  "starling.text.TextOptions": HaxeClass<Game.starling.text.TextOptions> & {
-  };
-  "starling.text.TrueTypeCompositor": HaxeClass<Game.starling.text.TrueTypeCompositor> & {
+  'starling.text.TextFormat': HaxeClass<
+    Game.starling.text.TextFormat,
+    [font?: string, size?: number, color?: number, horizontalAlign?: string, verticalAlign?: string]
+  > & {};
+  'starling.text.TextOptions': HaxeClass<Game.starling.text.TextOptions> & {};
+  'starling.text.TrueTypeCompositor': HaxeClass<Game.starling.text.TrueTypeCompositor> & {
     autoScaleNativeTextField: (arg0?: any, arg1?: any, arg2?: any) => any;
     sHelperMatrix: any;
     sHelperQuad: any;
@@ -22317,38 +25278,78 @@ export interface GameClasses {
     sNativeFormat: any;
     sNativeTextField: any;
   };
-  "starling.textures.AtfData": HaxeClass<Game.starling.textures.AtfData> & {
+  'starling.textures.AtfData': HaxeClass<Game.starling.textures.AtfData> & {
     isAtfData: (arg0?: any) => any;
   };
-  "starling.textures.ConcretePotTexture": HaxeClass<Game.starling.textures.ConcretePotTexture> & {
+  'starling.textures.ConcretePotTexture': HaxeClass<Game.starling.textures.ConcretePotTexture> & {
     get_asyncUploadEnabled: () => any;
     sAsyncUploadEnabled: any;
     set_asyncUploadEnabled: (arg0?: any) => any;
     sMatrix: any;
     sOrigin: any;
   };
-  "starling.textures.ConcreteRectangleTexture": HaxeClass<Game.starling.textures.ConcreteRectangleTexture> & {
+  'starling.textures.ConcreteRectangleTexture': HaxeClass<Game.starling.textures.ConcreteRectangleTexture> & {
     get_asyncUploadEnabled: () => any;
     sAsyncUploadEnabled: any;
     set_asyncUploadEnabled: (arg0?: any) => any;
   };
-  "starling.textures.ConcreteTexture": HaxeClass<Game.starling.textures.ConcreteTexture> & {
-  };
-  "starling.textures.ConcreteVideoTexture": HaxeClass<Game.starling.textures.ConcreteVideoTexture> & {
-  };
-  "starling.textures.SubTexture": HaxeClass<Game.starling.textures.SubTexture> & {
+  'starling.textures.ConcreteTexture': HaxeClass<Game.starling.textures.ConcreteTexture> & {};
+  'starling.textures.ConcreteVideoTexture': HaxeClass<Game.starling.textures.ConcreteVideoTexture> & {};
+  'starling.textures.SubTexture': HaxeClass<Game.starling.textures.SubTexture> & {
     E: number;
   };
-  "starling.textures.Texture": HaxeClass<Game.starling.textures.Texture> & {
-    empty: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+  'starling.textures.Texture': HaxeClass<Game.starling.textures.Texture> & {
+    empty: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
     fromAtfData: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
-    fromBitmap: (bitmap: Game.openfl.display.Bitmap, mipMaps?: boolean) => Game.starling.textures.Texture;
-    fromBitmapData: (data: Game.openfl.display.BitmapData, mipMaps?: boolean, optimizeForRenderToTexture?: boolean, scale?: number, format?: number, forcePowerOfTwo?: boolean, onReady?: ((texture: Game.starling.textures.Texture) => void) | null) => Game.starling.textures.Texture;
-    fromColor: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+    fromBitmap: (
+      bitmap: Game.openfl.display.Bitmap,
+      mipMaps?: boolean,
+    ) => Game.starling.textures.Texture;
+    fromBitmapData: (
+      data: Game.openfl.display.BitmapData,
+      mipMaps?: boolean,
+      optimizeForRenderToTexture?: boolean,
+      scale?: number,
+      format?: number,
+      forcePowerOfTwo?: boolean,
+      onReady?: ((texture: Game.starling.textures.Texture) => void) | null,
+    ) => Game.starling.textures.Texture;
+    fromColor: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
     fromData: (arg0?: any, arg1?: any) => any;
-    fromEmbeddedAsset: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    fromEmbeddedAsset: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+    ) => any;
     fromNetStream: (arg0?: any, arg1?: any, arg2?: any) => any;
-    fromTexture: (texture: Game.starling.textures.Texture, region?: Game.openfl.geom.Rectangle | null, frame?: Game.openfl.geom.Rectangle | null, rotated?: boolean, scale?: number) => Game.starling.textures.Texture;
+    fromTexture: (
+      texture: Game.starling.textures.Texture,
+      region?: Game.openfl.geom.Rectangle | null,
+      frame?: Game.openfl.geom.Rectangle | null,
+      rotated?: boolean,
+      scale?: number,
+    ) => Game.starling.textures.Texture;
     fromTextureBase: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     fromVideoAttachment: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     get_asyncBitmapUploadEnabled: () => any;
@@ -22360,20 +25361,22 @@ export interface GameClasses {
     sPoint: any;
     sRectangle: any;
   };
-  "starling.textures.TextureAtlas": HaxeClass<Game.starling.textures.TextureAtlas, [texture: Game.starling.textures.Texture, xml: Game.Xml]> & {
+  'starling.textures.TextureAtlas': HaxeClass<
+    Game.starling.textures.TextureAtlas,
+    [texture: Game.starling.textures.Texture, xml: Game.Xml]
+  > & {
     NAME_REGEX: any;
     parseBool: (arg0?: any) => any;
     sNames: any;
   };
-  "starling.textures.TextureOptions": HaxeClass<Game.starling.textures.TextureOptions> & {
-  };
-  "starling.textures.TextureSmoothing": HaxeClass<Game.starling.textures.TextureSmoothing> & {
+  'starling.textures.TextureOptions': HaxeClass<Game.starling.textures.TextureOptions> & {};
+  'starling.textures.TextureSmoothing': HaxeClass<Game.starling.textures.TextureSmoothing> & {
     BILINEAR: string;
     isValid: (arg0?: any) => any;
     NONE: string;
     TRILINEAR: string;
   };
-  "starling.utils.Align": HaxeClass<Game.starling.utils.Align> & {
+  'starling.utils.Align': HaxeClass<Game.starling.utils.Align> & {
     BOTTOM: string;
     CENTER: string;
     isValid: (arg0?: any) => any;
@@ -22383,15 +25386,15 @@ export interface GameClasses {
     RIGHT: string;
     TOP: string;
   };
-  "starling.utils.AssetManager": HaxeClass<Game.starling.utils.AssetManager> & {
+  'starling.utils.AssetManager': HaxeClass<Game.starling.utils.AssetManager> & {
     HTTP_RESPONSE_STATUS: string;
     NAME_REGEX: any;
     sNames: any;
   };
-  "starling.utils.ButtonBehavior": HaxeClass<Game.starling.utils.ButtonBehavior> & {
+  'starling.utils.ButtonBehavior': HaxeClass<Game.starling.utils.ButtonBehavior> & {
     sBounds: any;
   };
-  "starling.utils.Color": HaxeClass<Game.starling.utils.Color> & {
+  'starling.utils.Color': HaxeClass<Game.starling.utils.Color> & {
     AQUA: number;
     argb: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     BLACK: number;
@@ -22426,14 +25429,22 @@ export interface GameClasses {
     WHITE: number;
     YELLOW: number;
   };
-  "starling.utils.Earcut": HaxeClass<Game.starling.utils.Earcut> & {
+  'starling.utils.Earcut': HaxeClass<Game.starling.utils.Earcut> & {
     area: (arg0?: any, arg1?: any, arg2?: any) => any;
     compareXYSlope: (arg0?: any, arg1?: any) => any;
     createNode: (arg0?: any, arg1?: any, arg2?: any) => any;
     cureLocalIntersections: (arg0?: any, arg1?: any) => any;
     deviation: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     earcut: (arg0?: any, arg1?: any, arg2?: any) => any;
-    earcutLinked: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any) => any;
+    earcutLinked: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+    ) => any;
     eliminateHole: (arg0?: any, arg1?: any) => any;
     eliminateHoles: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     equals: (arg0?: any, arg1?: any) => any;
@@ -22452,8 +25463,26 @@ export interface GameClasses {
     locallyInside: (arg0?: any, arg1?: any) => any;
     middleInside: (arg0?: any, arg1?: any) => any;
     onSegment: (arg0?: any, arg1?: any, arg2?: any) => any;
-    pointInTriangle: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
-    pointInTriangleExceptFirst: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+    pointInTriangle: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
+    pointInTriangleExceptFirst: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
     removeNode: (arg0?: any) => any;
     sectorContainsSector: (arg0?: any, arg1?: any) => any;
     sign: (arg0?: any) => any;
@@ -22463,10 +25492,10 @@ export interface GameClasses {
     splitPolygon: (arg0?: any, arg1?: any) => any;
     zOrder: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
   };
-  "starling.utils.Execute": HaxeClass<Game.starling.utils.Execute> & {
+  'starling.utils.Execute': HaxeClass<Game.starling.utils.Execute> & {
     execute: (arg0?: any, arg1?: any) => any;
   };
-  "starling.utils.MathUtil": HaxeClass<Game.starling.utils.MathUtil> & {
+  'starling.utils.MathUtil': HaxeClass<Game.starling.utils.MathUtil> & {
     clamp: (arg0?: any, arg1?: any, arg2?: any) => any;
     deg2rad: (arg0?: any) => any;
     getNextPowerOfTwo: (arg0?: any) => any;
@@ -22481,11 +25510,26 @@ export interface GameClasses {
     toFixed: (arg0?: any, arg1?: any) => any;
     TWO_PI: any;
   };
-  "starling.utils.MatrixUtil": HaxeClass<Game.starling.utils.MatrixUtil> & {
+  'starling.utils.MatrixUtil': HaxeClass<Game.starling.utils.MatrixUtil> & {
     convertTo2D: (arg0?: any, arg1?: any) => any;
     convertTo3D: (arg0?: any, arg1?: any) => any;
-    createOrthographicProjectionMatrix: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
-    createPerspectiveProjectionMatrix: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any) => any;
+    createOrthographicProjectionMatrix: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+    ) => any;
+    createPerspectiveProjectionMatrix: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+      arg6?: any,
+      arg7?: any,
+    ) => any;
     formatRawData: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     isIdentity: (arg0?: any) => any;
     isIdentity3D: (arg0?: any) => any;
@@ -22507,27 +25551,24 @@ export interface GameClasses {
     transformPoint: (arg0?: any, arg1?: any, arg2?: any) => any;
     transformPoint3D: (arg0?: any, arg1?: any, arg2?: any) => any;
   };
-  "starling.utils.Max": HaxeClass<Game.starling.utils.Max> & {
+  'starling.utils.Max': HaxeClass<Game.starling.utils.Max> & {
     INT_MAX_VALUE: number;
     INT_MIN_VALUE: number;
     MAX_VALUE: number;
     MIN_VALUE: number;
     UINT_MAX_VALUE: number;
   };
-  "starling.utils.MeshSubset": HaxeClass<Game.starling.utils.MeshSubset> & {
-  };
-  "starling.utils.MeshUtil": HaxeClass<Game.starling.utils.MeshUtil> & {
+  'starling.utils.MeshSubset': HaxeClass<Game.starling.utils.MeshSubset> & {};
+  'starling.utils.MeshUtil': HaxeClass<Game.starling.utils.MeshUtil> & {
     calculateBounds: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     containsPoint: (arg0?: any, arg1?: any, arg2?: any) => any;
     sMatrix: any;
     sMatrix3D: any;
     sPoint3D: any;
   };
-  "starling.utils.Node": HaxeClass<Game.starling.utils.Node> & {
-  };
-  "starling.utils.Padding": HaxeClass<Game.starling.utils.Padding> & {
-  };
-  "starling.utils.Pool": HaxeClass<Game.starling.utils.Pool> & {
+  'starling.utils.Node': HaxeClass<Game.starling.utils.Node> & {};
+  'starling.utils.Padding': HaxeClass<Game.starling.utils.Padding> & {};
+  'starling.utils.Pool': HaxeClass<Game.starling.utils.Pool> & {
     getMatrix: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
     getMatrix3D: (arg0?: any) => any;
     getPoint: (arg0?: any, arg1?: any) => any;
@@ -22545,7 +25586,7 @@ export interface GameClasses {
     sPoints3D: any;
     sRectangles: any;
   };
-  "starling.utils.RectangleUtil": HaxeClass<Game.starling.utils.RectangleUtil> & {
+  'starling.utils.RectangleUtil': HaxeClass<Game.starling.utils.RectangleUtil> & {
     compare: (arg0?: any, arg1?: any, arg2?: any) => any;
     extend: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) => any;
     extendToWholePixels: (arg0?: any, arg1?: any) => any;
@@ -22560,21 +25601,28 @@ export interface GameClasses {
     sPoint3D: any;
     sPositions: any;
   };
-  "starling.utils.RenderUtil": HaxeClass<Game.starling.utils.RenderUtil> & {
+  'starling.utils.RenderUtil': HaxeClass<Game.starling.utils.RenderUtil> & {
     clear: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
-    createAGALTexOperation: (arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => any;
+    createAGALTexOperation: (
+      arg0?: any,
+      arg1?: any,
+      arg2?: any,
+      arg3?: any,
+      arg4?: any,
+      arg5?: any,
+    ) => any;
     getTextureLookupFlags: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
     getTextureVariantBits: (arg0?: any) => any;
     requestContext3D: (arg0?: any, arg1?: any, arg2?: any) => any;
     setSamplerStateAt: (arg0?: any, arg1?: any, arg2?: any, arg3?: any) => any;
   };
-  "starling.utils.ScaleMode": HaxeClass<Game.starling.utils.ScaleMode> & {
+  'starling.utils.ScaleMode': HaxeClass<Game.starling.utils.ScaleMode> & {
     isValid: (arg0?: any) => any;
     NO_BORDER: string;
     NONE: string;
     SHOW_ALL: string;
   };
-  "starling.utils.StringUtil": HaxeClass<Game.starling.utils.StringUtil> & {
+  'starling.utils.StringUtil': HaxeClass<Game.starling.utils.StringUtil> & {
     clean: (arg0?: any) => any;
     format: (arg0?: any, arg1?: any) => any;
     parseBoolean: (arg0?: any) => any;
@@ -22582,7 +25630,7 @@ export interface GameClasses {
     trimEnd: (arg0?: any) => any;
     trimStart: (arg0?: any) => any;
   };
-  "starling.utils.SystemUtil": HaxeClass<Game.starling.utils.SystemUtil> & {
+  'starling.utils.SystemUtil': HaxeClass<Game.starling.utils.SystemUtil> & {
     executeWhenApplicationIsActive: (arg0?: any, arg1?: any) => any;
     get_isAIR: () => any;
     get_isAndroid: () => any;
@@ -22610,33 +25658,34 @@ export interface GameClasses {
     sWaitingCalls: any;
     updateEmbeddedFonts: () => any;
   };
-  "startSetup.IStartSetup": HaxeClass<Game.startSetup.IStartSetup> & {
+  'startSetup.IStartSetup': HaxeClass<Game.startSetup.IStartSetup> & {};
+  'startSetup.MobileShipSelect': HaxeClass<Game.startSetup.MobileShipSelect> & {
+    SKINS: any;
   };
-  "startSetup.PickButton": HaxeClass<Game.startSetup.PickButton> & {
-  };
-  "startSetup.StartSetup": HaxeClass<Game.startSetup.StartSetup> & {
+  'startSetup.PickButton': HaxeClass<Game.startSetup.PickButton> & {};
+  'startSetup.StartSetup': HaxeClass<Game.startSetup.StartSetup> & {
     hideProgressText: (arg0?: any) => any;
+    LAYOUT_BOTTOM: number;
+    LAYOUT_TOP: number;
     showProgressText: (text: string) => void;
   };
-  "startSetup.StartSetupLocator": HaxeClass<Game.startSetup.StartSetupLocator> & {
+  'startSetup.StartSetupLocator': HaxeClass<Game.startSetup.StartSetupLocator> & {
     getService: () => any;
     initialize: () => any;
     register: (arg0?: any) => any;
     service: any;
   };
-  "startSetup.StartShipBaseStats": HaxeClass<Game.startSetup.StartShipBaseStats> & {
-  };
-  "Std": HaxeClass<Game.Std> & {
+  'startSetup.StartShipBaseStats': HaxeClass<Game.startSetup.StartShipBaseStats> & {};
+  Std: HaxeClass<Game.Std> & {
     parseInt: (arg0?: any) => any;
     random: (arg0?: any) => any;
     string: (arg0?: any) => any;
   };
-  "String": HaxeClass<Game.String> & {
+  String: HaxeClass<Game.String> & {
     fromCodePoint: (arg0?: any) => any;
   };
-  "StringBuf": HaxeClass<Game.StringBuf> & {
-  };
-  "StringTools": HaxeClass<Game.StringTools> & {
+  StringBuf: HaxeClass<Game.StringBuf> & {};
+  StringTools: HaxeClass<Game.StringTools> & {
     endsWith: (arg0?: any, arg1?: any) => any;
     hex: (arg0?: any, arg1?: any) => any;
     htmlEscape: (arg0?: any, arg1?: any) => any;
@@ -22648,9 +25697,8 @@ export interface GameClasses {
     startsWith: (arg0?: any, arg1?: any) => any;
     trim: (arg0?: any) => any;
   };
-  "textures.ITextureManager": HaxeClass<Game.textures.ITextureManager> & {
-  };
-  "textures.TextureConst": HaxeClass<Game.textures.TextureConst> & {
+  'textures.ITextureManager': HaxeClass<Game.textures.ITextureManager> & {};
+  'textures.TextureConst': HaxeClass<Game.textures.TextureConst> & {
     ARTIFACT_ICON: string;
     ATLAS_BODY: string;
     ATLAS_BODY_XML: string;
@@ -22691,13 +25739,13 @@ export interface GameClasses {
     RADAR_SUN: string;
     TROON: string;
   };
-  "textures.TextureLocator": HaxeClass<Game.textures.TextureLocator> & {
+  'textures.TextureLocator': HaxeClass<Game.textures.TextureLocator> & {
     getService: () => Game.textures.TextureManager;
     initialize: () => any;
     register: (arg0?: any) => any;
     service: any;
   };
-  "textures.TextureManager": HaxeClass<Game.textures.TextureManager> & {
+  'textures.TextureManager': HaxeClass<Game.textures.TextureManager> & {
     BASIC_TEXTURE: any;
     BASIC_TEXTURES: any;
     getCustomTextureFromName: (arg0?: any) => any;
@@ -22706,11 +25754,13 @@ export interface GameClasses {
     LOAD_TIMEOUT_MS: number;
     pathToTextures: string;
     RETRY_DELAY_MS: number;
-    textureAtlasDict: { h: Record<string, Game.starling.textures.TextureAtlas | Game.starling.textures.Texture> };
+    textureAtlasDict: {
+      h: Record<string, Game.starling.textures.TextureAtlas | Game.starling.textures.Texture>;
+    };
     textureFromDisplayObject: (arg0?: any, arg1?: any) => any;
     xmlDict: { h: Record<string, Game.Xml> };
   };
-  "Type": HaxeClass<Game.Type> & {
+  Type: HaxeClass<Game.Type> & {
     createEnum: (arg0?: any, arg1?: any, arg2?: any) => any;
     createInstance: (arg0?: any, arg1?: any) => any;
     enumParameters: (arg0?: any) => any;
@@ -22718,7 +25768,7 @@ export interface GameClasses {
     resolveEnum: (arg0?: any) => any;
     typeof: (arg0?: any) => any;
   };
-  "Xml": HaxeClass<Game.Xml> & {
+  Xml: HaxeClass<Game.Xml> & {
     CData: number;
     Comment: number;
     createCData: (arg0?: any) => any;

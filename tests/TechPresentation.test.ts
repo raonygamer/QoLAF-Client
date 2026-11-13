@@ -12,19 +12,33 @@ test('tech presentation retains native updates and restores accessors on unload'
     font = 'font13';
     size = 0;
     updates = 0;
-    number = { get_format: () => ({
-      set_font: (font: string) => { this.font = font; },
-      set_size: (size: number) => { this.size = size; },
-    }) };
-    updateState(_state: string) { this.updates++; }
+    number = {
+      get_format: () => ({
+        set_font: (font: string) => {
+          this.font = font;
+        },
+        set_size: (size: number) => {
+          this.size = size;
+        },
+      }),
+    };
+    updateState(_state: string) {
+      this.updates++;
+    }
   }
-  class Elite extends Icon { updateState(state: string) {
-    this.updates++;
-    if (state === 'locked') this.size = 16;
-  } }
+  class Elite extends Icon {
+    updateState(state: string) {
+      this.updates++;
+      if (state === 'locked') this.size = 16;
+    }
+  }
   class Popup {
-    eliteTechs = [19.5, 30.75, 12].map(height => ({
-      y: 0, get_height: () => height, set_y(y: number) { this.y = y; },
+    eliteTechs = [19.5, 30.75, 12].map((height) => ({
+      y: 0,
+      get_height: () => height,
+      set_y(y: number) {
+        this.y = y;
+      },
     }));
     load() {}
   }
@@ -33,7 +47,9 @@ test('tech presentation retains native updates and restores accessors on unload'
     'core.hud.components.techTree.EliteTechIcon': Elite,
     'core.hud.components.techTree.EliteTechPopupMenu': Popup,
   };
-  const hooks = new Hooks((error: unknown) => { throw error; });
+  const hooks = new Hooks((error: unknown) => {
+    throw error;
+  });
   const cleanups: (() => void)[] = [];
   const api = {
     cls: (name: string) => classes[name] ?? {},
@@ -66,9 +82,12 @@ test('tech presentation retains native updates and restores accessors on unload'
     assert.equal(elite.size, 16, 'native state-specific sizes remain authoritative');
     const popup = new Popup();
     popup.load();
-    assert.deepEqual(popup.eliteTechs.map(row => row.y), [0, 22, 55]);
+    assert.deepEqual(
+      popup.eliteTechs.map((row) => row.y),
+      [0, 22, 55],
+    );
   } finally {
-    cleanups.reverse().forEach(off => off());
+    cleanups.reverse().forEach((off) => off());
   }
   assert.equal(Object.hasOwn(Icon.prototype, 'techBar'), false);
   assert.equal(Object.hasOwn(Icon.prototype, 'get_techBar'), false);

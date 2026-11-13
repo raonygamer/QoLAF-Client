@@ -114,21 +114,27 @@ test('synchronous reuse can close from ready callback without retaining a lease'
   assert.equal(f.socket.disconnects, 1, 'closed reused view retained no lease');
 });
 
-
 test('acquisition errors retain the SDK message and allow reopening', () => {
   for (const error of [new Error('Service unavailable'), { message: 'Service unavailable' }]) {
     const f = serviceFixture();
     const statuses: Array<[string, boolean]> = [];
     const acquire = f.pool.acquire;
-    f.pool.acquire = () => { throw error; };
+    f.pool.acquire = () => {
+      throw error;
+    };
     const connection = new FloatingChatConnection(
-      f.game, 'Service-1412_2', f.pool,
+      f.game,
+      'Service-1412_2',
+      f.pool,
       () => ({ minutes: 0, allChannels: false }),
-      () => {}, (text, isError) => statuses.push([text, isError]), () => {},
+      () => {},
+      (text, isError) => statuses.push([text, isError]),
+      () => {},
     );
     connection.open();
     assert.deepEqual(statuses.at(-1), [
-      "Couldn't connect to Service-1412_2: Service unavailable", true,
+      "Couldn't connect to Service-1412_2: Service unavailable",
+      true,
     ]);
     assert.equal(connection.connecting, false);
     assert.equal(connection.connected, false);

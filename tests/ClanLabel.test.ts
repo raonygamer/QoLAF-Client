@@ -50,7 +50,12 @@ test('clan identity rejects stale callbacks, retries, follows visibility and nat
       ({
         'core.hud.components.TextBitmap': Text,
         'core.scene.SceneBase': { settings },
-        'core.clan.ClanClient': { brief(_game: GameScene, id: string, _player: string, callback: Function) { requests.push(id); callbacks.push(callback); } },
+        'core.clan.ClanClient': {
+          brief(_game: GameScene, id: string, _player: string, callback: Function) {
+            requests.push(id);
+            callbacks.push(callback);
+          },
+        },
       })[name],
     api: { cls: () => ({ settings }), log: (...args: unknown[]) => assert.fail(String(args)) },
     dispose: (node: Display) => node.removeFromParent(true),
@@ -92,7 +97,11 @@ test('clan identity rejects stale callbacks, retries, follows visibility and nat
   assert.equal(label.node.get_visible(), false, 'old attempt cannot override a retry');
   callbacks[1]({ name: 'Current', color: 123, rankName: 'Officer' });
   label.update();
-  assert.equal(label.node.get_visible(), true, 'same-clan remote players remain visible even without a logo');
+  assert.equal(
+    label.node.get_visible(),
+    true,
+    'same-clan remote players remain visible even without a logo',
+  );
   const [clan, role] = [label.node.getChildAt(0), label.node.getChildAt(1)] as unknown as Text[];
   assert.equal(clan.text, 'Current');
   assert.equal(role.text, 'Officer');

@@ -188,10 +188,7 @@ export class ClientHelpContent {
         '/dontkick',
         'Toggle persistent protection from the inactivity disconnect. The same setting is available in Settings &gt; General.',
       ) +
-      this.item(
-        '/restart',
-        'Reload QoLAF and its plugins through the launcher.',
-      ) +
+      this.item('/restart', 'Reload QoLAF and its plugins through the launcher.') +
       this.item(
         '/tptodeath',
         'Immediately ask the server to teleport you to your last death location, without a client-side death-history check or confirmation.',
