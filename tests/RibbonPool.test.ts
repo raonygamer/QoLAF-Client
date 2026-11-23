@@ -24,6 +24,7 @@ class Trail {
     [92, 93],
   ];
   alphas = [0.8, 0.8, 0.8, 0.8];
+  vertexRGB = [1, 1, 1, 1];
   mIsPlaying = true;
   visible = true;
   mFollowingRibbonSegmentLine: unknown = ['old owner'];
@@ -41,12 +42,14 @@ class Trail {
   }
   set_color(value: number) {
     this.color = value;
+    this.vertexRGB = this.alphas.map((alpha) => (alpha === 0 ? 0 : value));
   }
   setVertexPosition(index: number, x: number, y: number) {
     this.vertices[index] = [x, y];
   }
   setVertexAlpha(index: number, value: number) {
     this.alphas[index] = value;
+    if (value === 0) this.vertexRGB[index] = 0;
   }
   resetAllTo(x0: number, y0: number, x1: number, y1: number, alpha = 1) {
     // Native reset changes segment history but leaves uploaded vertices stale.
@@ -108,7 +111,7 @@ function fixture() {
   return { pool: new Pool(), dispose: () => cleanups.reverse().forEach((fn) => fn()) };
 }
 
-function assertReset(trail: Trail) {
+function assertReset(trail: Trail, vertexAlpha = 0) {
   assert.equal(trail.mIsPlaying, false);
   assert.equal(trail.visible, false);
   assert.equal(trail.mFollowingRibbonSegmentLine, null);
@@ -124,15 +127,16 @@ function assertReset(trail: Trail) {
     [0, 0],
     [0, 0],
   ]);
-  assert.deepEqual(trail.alphas, [0, 0, 0, 0]);
-  assert.deepEqual(trail.alphaArray, [0, 0]);
+  assert.deepEqual(trail.alphas, Array(4).fill(vertexAlpha));
+  assert.deepEqual(trail.alphaArray, Array(2).fill(vertexAlpha));
 }
 
 test('ribbon checkout and return clear previous-owner state before any simulation tick', () => {
   const { pool, dispose } = fixture();
   try {
     const trail = pool.getRibbonTrail();
-    assertReset(trail);
+    assertReset(trail, 1);
+    trail.set_color(0xffa400);
     trail.resetAllTo(10, 20, 30, 40, 0.85);
     assert.deepEqual(trail.vertices, [
       [10, 20],
@@ -141,6 +145,7 @@ test('ribbon checkout and return clear previous-owner state before any simulatio
       [30, 40],
     ]);
     assert.deepEqual(trail.alphas, [0.85, 0.85, 0.85, 0.85]);
+    assert.deepEqual(trail.vertexRGB, Array(4).fill(0xffa400));
     trail.mFollowingRibbonSegmentLine = ['new owner'];
     trail.mIsPlaying = true;
     pool.removeRibbonTrail(trail);
@@ -148,7 +153,10 @@ test('ribbon checkout and return clear previous-owner state before any simulatio
     pool.removeRibbonTrail(trail);
     assert.equal(pool.inactiveRibbonTrails.length, 1);
     assert.equal(pool.getRibbonTrail(), trail);
-    assertReset(trail);
+    assertReset(trail, 1);
+    trail.set_color(0x3366ff);
+    trail.resetAllTo(10, 20, 30, 40, 0.85);
+    assert.deepEqual(trail.vertexRGB, Array(4).fill(0x3366ff));
   } finally {
     dispose();
   }

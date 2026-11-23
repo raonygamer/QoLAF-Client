@@ -17,7 +17,7 @@ export function writeRibbonSegments(trail: RibbonTrail): void {
 }
 
 /** Original per-life defaults; geometry remains owned by the native trail. */
-export function resetRibbonForPool(trail: RibbonTrail): void {
+export function resetRibbonForPool(trail: RibbonTrail, vertexAlpha = 0): void {
   trail.mIsPlaying = false;
   trail.set_visible(false);
   trail.mFollowingRibbonSegmentLine = null;
@@ -26,8 +26,8 @@ export function resetRibbonForPool(trail: RibbonTrail): void {
   trail.mAlphaRatio = 0.95;
   trail.mRepeat = false;
   trail.set_alpha(1);
+  trail.resetAllTo(0, 0, 0, 0, vertexAlpha);
   trail.set_color(0xffffff);
-  trail.resetAllTo(0, 0, 0, 0, 0);
 }
 
 export function installRibbonPool(api: API): void {
@@ -38,7 +38,9 @@ export function installRibbonPool(api: API): void {
     writeRibbonSegments(this);
   });
   reflection.after(pool, 'getRibbonTrail', function (trail) {
-    resetRibbonForPool(trail);
+    // Starling premultiplies vertex RGB by alpha. The factory applies its tint
+    // immediately after checkout, while the hidden trail still has zero area.
+    resetRibbonForPool(trail, 1);
   });
   reflection.around(pool, 'removeRibbonTrail', function (next, trail) {
     const inactiveCount = this.inactiveRibbonTrails?.length ?? 0;
