@@ -26,6 +26,7 @@ import { installTechPresentation } from './tech/TechPresentation';
 import { installTechIconDisposal } from './tech/TechIconDisposal';
 import { installQueueActions } from './pvp/QueueActions';
 import { installNativeRosterRetry } from './pvp/NativeRosterRetry';
+import { installChargeParticles } from './weapon/ChargeParticles';
 import { installWeaponChargeOwnership } from './weapon/WeaponChargeOwnership';
 import { installDamageDescription } from './weapon/DamageDescription';
 import { installWeaponDescription } from './weapon/WeaponDescription';
@@ -197,6 +198,7 @@ export default {
       installInstantCulling(api);
       installWeaponFireOwnership(api);
       installWeaponChargeOwnership(api);
+      installChargeParticles(api);
       installWeaponTechStats(api);
       installWeaponDescription(api);
       installDamageDescription(api);

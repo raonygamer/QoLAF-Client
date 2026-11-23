@@ -176,7 +176,7 @@ test('authored phase mounts apply base scale, pivot and displayed mirroring exac
   assert.equal(writePhaseBladeMounts({}, { scale: 0 }, clip, {}, first, second, matrix), 0);
 });
 
-function nativeFixture() {
+function nativeFixture(drawCopies = false) {
   class PlayerShip {}
   function Base() {}
   const { Beam } = createBeamClasses(Base, Base, Base, {}, class {});
@@ -193,6 +193,13 @@ function nativeFixture() {
   Beam.prototype.destroy = function () {
     this.alive = false;
   };
+  if (drawCopies) {
+    Beam.prototype.draw = function () {
+      this.drawBeamEffect(0, this.drawStartPos, this.endPos, 1);
+      this.drawBeamEffect(1, this.drawStartPos2, this.endPos, 1);
+      this.drawBeamEffect(2, this.lastPos, this.secondaryTargets[0].get_pos(), 1);
+    };
+  }
   const calls: any[] = [];
   let fail = false;
   Beam.prototype.drawBeamEffect = function (index: number, start: any, end: any, strands: number) {
@@ -249,6 +256,8 @@ function nativeFixture() {
     alive: true,
     _fire: true,
     name: 'Other',
+    drawStartPos: { x: -1, y: -2 },
+    drawStartPos2: { x: -3, y: -4 },
     startBeamAlpha: 1,
     drawBeam: true,
     lines: [],
@@ -465,4 +474,21 @@ test('pooled clips stay ignored until rendered and installed accessors bypass cl
   });
   renderPosition(accessorOwner, point);
   assert.deepEqual(point, { x: 120, y: 230 });
+});
+
+test('current native draw copies preserve rotated muzzles and the first chain target', () => {
+  const f = nativeFixture(true);
+  try {
+    f.beam.target = pose({ alive: true, _mc: { x: 300, y: 400 } });
+    f.beam.secondaryTargets = [
+      pose({ alive: true, _mc: { x: 500, y: 600 }, get_pos: () => ({ x: 1, y: 2 }) }),
+    ];
+    f.beam.draw();
+    near(f.calls[0].start.x, 107);
+    near(f.calls[1].start.x, 113);
+    assert.deepEqual(f.calls[2].start, { x: 300, y: 400 });
+    assert.deepEqual(f.calls[2].end, { x: 500, y: 600 });
+  } finally {
+    f.close();
+  }
 });

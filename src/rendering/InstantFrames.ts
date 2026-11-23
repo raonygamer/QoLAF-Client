@@ -1,3 +1,4 @@
+import type { WeaponLaunchOffset } from './WeaponLaunchPose';
 import type { API } from '../api/Types';
 import { Color, GameScene, InstantState, InstantSplitting, Projectile } from '../game/Bindings';
 import type { Game } from '../game/Game';
@@ -29,6 +30,7 @@ export function drawInstantFrame(
   state: InstantFrameState,
   splitting: boolean,
   color?: Pick<typeof Color, 'interpolateColor'>,
+  launch?: WeaponLaunchOffset,
 ): void {
   state.orbitLightning?.set_visible(false);
   const p = state.p;
@@ -45,17 +47,19 @@ export function drawInstantFrame(
   )
     return;
   const position = p.get_pos();
-  p._mc.set_x(position.x);
-  p._mc.set_y(position.y);
-  const angle = p._mc.get_rotation();
+  const x = position.x + (launch?.x ?? 0);
+  const y = position.y + (launch?.y ?? 0);
+  p._mc.set_x(x);
+  p._mc.set_y(y);
+  const angle = p._mc.get_rotation() + (launch?.rotation ?? 0);
   const remaining = projectileRenderLifetime(p);
   const maximum = Math.max(1, p.ttlMax);
   const range = splitting ? 200 : p.range;
-  const endX = position.x + Math.cos(angle) * range;
-  const endY = position.y + Math.sin(angle) * range;
+  const endX = x + Math.cos(angle) * range;
+  const endY = y + Math.sin(angle) * range;
   const place = (line: Game.core.hud.components.BeamLine, alpha: number, visible: boolean) => {
-    line.set_x(position.x);
-    line.set_y(position.y);
+    line.set_x(x);
+    line.set_y(y);
     line.set_alpha(alpha);
     line.lineTo(endX, endY);
     line.set_visible(visible);
@@ -79,8 +83,8 @@ export function drawInstantFrame(
     const arcColor = tint === undefined || Number.isNaN(tint) ? state.color : tint >>> 0;
     const serverTime = networkTime(state.g);
     state.orbitLightning.drawBetween(
-      position.x,
-      position.y,
+      x,
+      y,
       endX,
       endY,
       state.lineOuter.thickness,
@@ -107,7 +111,7 @@ export function releaseInstantLines(state: InstantFrameState, splitting: boolean
   else state.lineInner = state.lineOuter = null;
 }
 
-export function installInstantFrames(api: API): (projectile: Projectile) => void {
+export function installInstantFrames(api: API) {
   const OrbitLightning = createBeamOrbitLightning();
   const color = Color;
   const tentacles = new WeakSet<InstantFrameState>();
@@ -177,8 +181,10 @@ export function installInstantFrames(api: API): (projectile: Projectile) => void
   api.defer(() => {
     for (const p of states.keys()) release(p);
   });
-  return (projectile) => {
+  return (projectile: Projectile, launch?: WeaponLaunchOffset) => {
     const entry = states.get(projectile);
-    if (entry && !tentacles.has(entry.state)) drawInstantFrame(entry.state, entry.splitting, color);
+    if (entry && !tentacles.has(entry.state))
+      drawInstantFrame(entry.state, entry.splitting, color, launch);
+    return !!entry;
   };
 }

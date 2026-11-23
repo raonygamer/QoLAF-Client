@@ -1,3 +1,5 @@
+import type { Projectile } from '../game/Bindings';
+import { weaponLaunchOffset } from './WeaponLaunchPose';
 import { read, type API, type Raw } from '../api/Types';
 
 interface Snapshot {
@@ -88,9 +90,10 @@ export class NetherTentacleVisuals {
       !position
     )
       return;
-    const x = position.x,
-      y = position.y,
-      angle = read(projectile, 'rotation');
+    const launch = weaponLaunchOffset(projectile as Projectile);
+    const x = position.x + (launch?.x ?? 0),
+      y = position.y + (launch?.y ?? 0),
+      angle = read(projectile, 'rotation') + (launch?.rotation ?? 0);
     const range = projectile.range,
       weaponRange = projectile.weapon.range,
       queuedAt = this.now();

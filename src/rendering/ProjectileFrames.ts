@@ -1,3 +1,4 @@
+import { weaponLaunchOffset, type WeaponLaunchOffset } from './WeaponLaunchPose';
 import { installProjectileDiagnosticGetters } from '../game/ProjectileDiagnostics';
 import { installTorpedoCourses } from '../projectile/TorpedoCourses';
 import { GameReflection } from '../api/GameReflection';
@@ -65,6 +66,14 @@ export function installProjectileFrames(api: API): void {
   installRibbonPool(api);
   installNetherBeamStyle(api);
   installNetherTentacleVisuals(api);
+  const launches = new WeakMap<Projectile, WeaponLaunchOffset>();
+  const manager = ProjectileManager.prototype;
+  if (typeof manager.activateProjectile === 'function') {
+    reflection.after(manager, 'activateProjectile', function (_result, shot) {
+      const launch = weaponLaunchOffset(shot);
+      if (launch) launches.set(shot, launch);
+    });
+  }
   const drawInstant = installInstantFrames(api);
   const rotations = new WeakMap<Projectile, number>();
   const torpedoes = new TorpedoFrames();
@@ -112,6 +121,7 @@ export function installProjectileFrames(api: API): void {
     return result;
   });
   reflection.before(projectile, 'reset', function () {
+    launches.delete(this);
     renderedCourseTimes.delete(this);
     rotations.delete(this);
     const attached = attachments.get(this);
@@ -135,7 +145,17 @@ export function installProjectileFrames(api: API): void {
       () => {
         if (attached instanceof MissileStuck) drawProjectileAttachment(attached, true);
         else if (attached instanceof ProjectileStuck) drawProjectileAttachment(attached, false);
-        drawInstant(this);
+        const launch = launches.get(this);
+        if (drawInstant(this, launch) || !launch || attached || !this._mc) return;
+        const age = (renderedCourseTimes.get(this) ?? this.course.time) - launch.time;
+        const weight = Math.max(0, Math.min(1, 1 - age / 33));
+        if (!weight) launches.delete(this);
+        else {
+          const clip = this._mc;
+          clip.set_x(clip.get_x() + launch.x * weight);
+          clip.set_y(clip.get_y() + launch.y * weight);
+          clip.set_rotation(clip.get_rotation() + launch.rotation * weight);
+        }
       },
       (projectile, fallback) => torpedoes.seconds(projectile, fallback),
     );

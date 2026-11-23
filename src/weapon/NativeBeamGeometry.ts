@@ -1,3 +1,4 @@
+import { installWeaponLightning } from '../rendering/WeaponLightning';
 import { installNativeBeamContinuity } from './NativeBeamContinuity';
 import { Beam, Matrix, PlayerShip, type GameScene, type Unit } from '../game/Bindings';
 import type { API } from '../api/Types';
@@ -20,6 +21,7 @@ interface BeamMountShip extends PlayerShip {
 /** Redirect only Beam.draw's geometry arguments. Native shoot/update never sees render points. */
 export function installNativeBeamGeometry(api: API, game: GameScene): void {
   const reflection = new GameReflection(api);
+  installWeaponLightning(api, game);
   const continuity = installNativeBeamContinuity(api, game);
   const geometry = new WeakMap<Beam, BeamRenderGeometry>();
   const matrix = new Matrix();
@@ -76,11 +78,12 @@ export function installNativeBeamGeometry(api: API, game: GameScene): void {
   reflection.around(Beam.prototype, 'drawBeamEffect', function (next, index, start, end, strands) {
     if (drawing?.weapon !== this) return next(index, start, end, strands);
     const view = drawing.view;
-    if (start === this.startPos) {
+    const native = this as Beam & { drawStartPos?: object; drawStartPos2?: object };
+    if (start === this.startPos || start === native.drawStartPos) {
       const following = next(index, view.start, view.end, strands);
       return view.twin && !this.twin ? next(following, view.second, view.end, strands) : following;
     }
-    if (start === this.startPos2)
+    if (start === this.startPos2 || start === native.drawStartPos2)
       return view.twin ? next(index, view.second, view.end, strands) : index;
     // Native draw walks only alive secondary targets, retaining its own order.
     const targets = drawing.targets;
