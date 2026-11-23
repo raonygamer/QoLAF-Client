@@ -13,7 +13,12 @@ export function installWeaponLightning(api: API, game: GameScene): void {
     if (this.g !== game || !this.amplitude) return next(x, y, width);
     const dx = x - this.get_x();
     const dy = y - this.get_y();
-    const count = Math.max(1, Math.round((Math.hypot(dx, dy) / this.period) * this.nodeFrequence));
+    const length = Math.hypot(dx, dy);
+    const authoredCount = Math.round((length / this.period) * this.nodeFrequence);
+    // Low-density bolts still need visible bends. Scale down near contact and
+    // keep the authored detail when a longer bolt already uses more segments.
+    const detail = Math.min(20, Math.round(length / 5));
+    const count = Math.max(1, authoredCount, detail);
     if (!Number.isFinite(count)) return next(x, y, width);
     while (this.lines.length < count) {
       const line = game.linePool.getLine();
@@ -33,7 +38,7 @@ export function installWeaponLightning(api: API, game: GameScene): void {
     let lastY = 0;
     for (let i = 0; i < count; i++) {
       const t = (i + 1) / count;
-      // Keep the native node spacing and amplitude envelope. Only the noise varies over time.
+      // Apply the native amplitude envelope along the entire strand.
       const amplitude = this.amplitude * (2 - 2 * Math.abs(0.5 - i / count));
       const last = i === count - 1;
       const nextX = last ? dx : t * dx + amplitude * lightningNoise(seed + (i + 1) * 43.17, phase);

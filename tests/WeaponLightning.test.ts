@@ -7,7 +7,7 @@ import { weaponLaunchOffset } from '../src/rendering/WeaponLaunchPose';
 // @ts-expect-error actual host dispatcher
 import { Hooks } from './fixtures/HostCore.js';
 
-test('lightning preserves the native node amplitudes, segment count and full reach', (t) => {
+test('sparse lightning has twenty connected segments, native amplitude and full reach', (t) => {
   t.mock.method(Math, 'random', () => 0.25);
   t.mock.method(performance, 'now', () => 130);
   class Batch {
@@ -48,7 +48,7 @@ test('lightning preserves the native node amplitudes, segment count and full rea
     lines = [];
     amplitude = 5;
     period = 100;
-    nodeFrequence = 4;
+    nodeFrequence = 2;
     thickness = 2;
     get_x() {
       return 10;
@@ -79,22 +79,26 @@ test('lightning preserves the native node amplitudes, segment count and full rea
   bindGameClasses(api);
   installWeaponLightning(api, game);
   const line = new Line();
-  line.lineTo(110, 20);
-  assert.equal(created, 4);
-  for (const [index, amplitude] of [5, 7.5, 10].entries()) {
+  line.lineTo(190, 20);
+  assert.equal(created, 20);
+  for (let index = 0; index < 19; index++) {
+    const amplitude = 5 * (2 - 2 * Math.abs(0.5 - index / 20));
     const node = index + 1;
     assert.deepEqual(segments[index].slice(2), [
-      node * 25 + amplitude * lightningNoise(250 + node * 43.17, 2),
+      (node / 20) * 180 + amplitude * lightningNoise(250 + node * 43.17, 2),
       amplitude * lightningNoise(250 + node * 29.53 + 13, 2),
     ]);
   }
   assert.deepEqual(segments[0].slice(0, 2), [0, 0]);
-  assert.deepEqual(segments.at(-1)?.slice(2), [100, 0]);
+  assert.deepEqual(segments.at(-1)?.slice(2), [180, 0]);
   for (let i = 1; i < segments.length; i++)
     assert.deepEqual(segments[i].slice(0, 2), segments[i - 1].slice(2));
-  line.lineTo(10, 30);
-  assert.equal(returned, 3);
-  assert.deepEqual(segments.at(-1), [0, 0, 0, 10]);
+  line.nodeFrequence = 10;
+  line.lineTo(310, 20);
+  assert.equal(created, 30);
+  line.lineTo(10, 23);
+  assert.equal(returned, 29);
+  assert.deepEqual(segments.at(-1), [0, 0, 0, 3]);
 });
 
 test('a muzzle launch takes the displayed ship rotation once and skips distant secondary origins', () => {
