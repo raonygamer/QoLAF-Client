@@ -33,7 +33,7 @@ export function installWeaponLightning(api: API, game: GameScene): void {
       seed = Math.random() * 1000;
       seeds.set(this, seed);
     }
-    const phase = performance.now() / 65;
+    const phase = performance.now() / 40;
     let lastX = 0;
     let lastY = 0;
     for (let i = 0; i < count; i++) {

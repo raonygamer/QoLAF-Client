@@ -9,7 +9,7 @@ import { Hooks } from './fixtures/HostCore.js';
 
 test('sparse lightning has twenty connected segments, native amplitude and full reach', (t) => {
   t.mock.method(Math, 'random', () => 0.25);
-  t.mock.method(performance, 'now', () => 130);
+  t.mock.method(performance, 'now', () => 80);
   class Batch {
     clear() {}
   }

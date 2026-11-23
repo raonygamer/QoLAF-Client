@@ -62,7 +62,7 @@ export function createBeamOrbitLightning() {
       const count = Math.min(MAX_ORBITS, Math.max(1, Math.trunc(length / 140)));
       const radius = Math.max(5, Math.min(22, thickness * 0.6 + 3));
       const phase = ((time % 1200) / 1200) * Math.PI * 2;
-      const flicker = time / 55;
+      const flicker = time / 40;
       // Fixed-capacity geometry: unused orbits collapse instead of allocating.
       for (let orbit = 0; orbit < MAX_ORBITS; orbit++) {
         const center = (length * (orbit + 1)) / (count + 1);
