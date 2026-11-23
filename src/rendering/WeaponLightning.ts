@@ -15,14 +15,13 @@ export function installWeaponLightning(api: API, game: GameScene): void {
     const dy = y - this.get_y();
     const count = Math.max(1, Math.round((Math.hypot(dx, dy) / this.period) * this.nodeFrequence));
     if (!Number.isFinite(count)) return next(x, y, width);
-    const segments = count * 2 - 1;
-    while (this.lines.length < segments) {
+    while (this.lines.length < count) {
       const line = game.linePool.getLine();
       line.init(this.lineTexture, Math.trunc(this.thickness), this.get_color(), 1, true);
       line.set_blendMode('add');
       this.lines.push(line);
     }
-    while (this.lines.length > segments) game.linePool.removeLine(this.lines.pop());
+    while (this.lines.length > count) game.linePool.removeLine(this.lines.pop());
     MeshBatch.prototype.clear.call(this);
     let seed = seeds.get(this);
     if (seed === undefined) {
@@ -32,38 +31,23 @@ export function installWeaponLightning(api: API, game: GameScene): void {
     const phase = performance.now() / 65;
     let lastX = 0;
     let lastY = 0;
-    let vertexX = 0;
-    let vertexY = 0;
-    let index = 0;
-    const drawTo = (endX: number, endY: number) => {
-      const segment = this.lines[index++];
-      segment.set_x(vertexX);
-      segment.set_y(vertexY);
-      segment.lineTo(endX, endY);
+    for (let i = 0; i < count; i++) {
+      const t = (i + 1) / count;
+      // Keep the native node spacing and amplitude envelope. Only the noise varies over time.
+      const amplitude = this.amplitude * (2 - 2 * Math.abs(0.5 - i / count));
+      const last = i === count - 1;
+      const nextX = last ? dx : t * dx + amplitude * lightningNoise(seed + (i + 1) * 43.17, phase);
+      const nextY = last
+        ? dy
+        : t * dy + amplitude * lightningNoise(seed + (i + 1) * 29.53 + 13, phase);
+      const segment = this.lines[i];
+      segment.set_x(lastX);
+      segment.set_y(lastY);
+      segment.lineTo(nextX, nextY);
       segment.set_thickness(this.thickness + width);
       this.addMesh(segment);
-      vertexX = endX;
-      vertexY = endY;
-    };
-    let previousNoiseX = 0;
-    let previousNoiseY = 0;
-    for (let i = 1; i <= count; i++) {
-      const t = i / count;
-      const amplitude = i === count ? 0 : this.amplitude * Math.sin(t * Math.PI);
-      const noiseX = lightningNoise(seed + i * 43.17, phase);
-      const noiseY = lightningNoise(seed + i * 29.53 + 13, phase);
-      const nextX = t * dx + amplitude * (0.8 * noiseX + 0.2 * previousNoiseX);
-      const nextY = t * dy + amplitude * (0.8 * noiseY + 0.2 * previousNoiseY);
-      // Clip twelve percent off each side of a kink, preserving the bolt silhouette.
-      const spanX = nextX - lastX;
-      const spanY = nextY - lastY;
-      if (i > 1) drawTo(lastX + 0.12 * spanX, lastY + 0.12 * spanY);
-      if (i === count) drawTo(dx, dy);
-      else drawTo(nextX - 0.12 * spanX, nextY - 0.12 * spanY);
       lastX = nextX;
       lastY = nextY;
-      previousNoiseX = noiseX;
-      previousNoiseY = noiseY;
     }
   });
 }
