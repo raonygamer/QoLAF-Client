@@ -77,8 +77,11 @@ test('sparse lightning has twenty connected segments, native amplitude and full 
     around: (t: object, k: string, fn: Function) => hooks.add(t, k, 'around', fn),
   };
   bindGameClasses(api);
-  installWeaponLightning(api, game);
+  let owned = false;
+  installWeaponLightning(api, game, () => owned);
   const line = new Line();
+  assert.throws(() => line.lineTo(190, 20), /unexpected native path/);
+  owned = true;
   line.lineTo(190, 20);
   assert.equal(created, 20);
   for (let index = 0; index < 19; index++) {
@@ -122,4 +125,13 @@ test('a muzzle launch takes the displayed ship rotation once and skips distant s
   assert.equal(launch.rotation, Math.PI / 2);
   p.course.pos.x = 1000;
   assert.equal(weaponLaunchOffset(p), undefined);
+});
+
+test('lightning evolves continuously across shape keyframes', () => {
+  for (let frame = 1; frame < 8; frame++) {
+    const before = lightningNoise(42, frame - 0.0001);
+    const after = lightningNoise(42, frame + 0.0001);
+    assert.ok(Math.abs(before - after) < 0.000001);
+    assert.notEqual(lightningNoise(42, frame + 0.5), after);
+  }
 });

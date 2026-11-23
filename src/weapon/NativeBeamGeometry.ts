@@ -21,16 +21,21 @@ interface BeamMountShip extends PlayerShip {
 /** Redirect only Beam.draw's geometry arguments. Native shoot/update never sees render points. */
 export function installNativeBeamGeometry(api: API, game: GameScene): void {
   const reflection = new GameReflection(api);
-  installWeaponLightning(api, game);
   const continuity = installNativeBeamContinuity(api, game);
   const geometry = new WeakMap<Beam, BeamRenderGeometry>();
   const matrix = new Matrix();
   let drawing: {
     weapon: Beam;
     view: BeamRenderGeometry;
+    lightning: boolean;
     chainIndex: number;
     targets: readonly Unit[];
   } | null = null;
+  installWeaponLightning(
+    api,
+    game,
+    (line) => !!drawing?.lightning && drawing.weapon.lines.includes(line),
+  );
   reflection.around(Beam.prototype, 'draw', function (next, ...args) {
     const targets = this.g === game ? continuity.prepare(this) : undefined;
     if (this.g !== game || !this.drawBeam || !this.unit?.weaponPos) return next(...args);
@@ -62,6 +67,7 @@ export function installNativeBeamGeometry(api: API, game: GameScene): void {
     drawing = {
       weapon: this,
       view,
+      lightning: /\blightning\b/i.test(this.obj?.name ?? this.get_name()),
       chainIndex: 0,
       targets: targets?.secondary ?? this.secondaryTargets,
     };

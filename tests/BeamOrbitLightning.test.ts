@@ -57,13 +57,3 @@ test('orbit mesh rejects invalid rays, collapses unused geometry and stops after
   assert.ok(mesh instanceof Mesh);
   assert.equal(mesh.disposed, true);
 });
-
-test('lightning evolves continuously across shape keyframes', async () => {
-  const { lightningNoise } = await import('../src/rendering/LightningNoise');
-  for (let frame = 1; frame < 8; frame++) {
-    const before = lightningNoise(42, frame - 0.0001);
-    const after = lightningNoise(42, frame + 0.0001);
-    assert.ok(Math.abs(before - after) < 0.000001);
-    assert.notEqual(lightningNoise(42, frame + 0.5), after);
-  }
-});

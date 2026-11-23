@@ -1,4 +1,3 @@
-import { lightningNoise } from './LightningNoise';
 import { Mesh, VertexData, IndexData, type Weapon } from '../game/Bindings';
 
 const SEGMENTS = 12;
@@ -62,7 +61,7 @@ export function createBeamOrbitLightning() {
       const count = Math.min(MAX_ORBITS, Math.max(1, Math.trunc(length / 140)));
       const radius = Math.max(5, Math.min(22, thickness * 0.6 + 3));
       const phase = ((time % 1200) / 1200) * Math.PI * 2;
-      const flicker = time / 40;
+      const flicker = Math.trunc(time / 55);
       // Fixed-capacity geometry: unused orbits collapse instead of allocating.
       for (let orbit = 0; orbit < MAX_ORBITS; orbit++) {
         const center = (length * (orbit + 1)) / (count + 1);
@@ -71,7 +70,8 @@ export function createBeamOrbitLightning() {
         for (let i = 0; i <= SEGMENTS; i++) {
           const t = i / SEGMENTS;
           const angle = phase + orbit * 2.1 + t * Math.PI * 1.6;
-          const noise = lightningNoise(i * 43.17 + orbit * 17, flicker);
+          let noise = Math.sin(i * 43.17 + orbit * 17 + flicker * 12.31) * 43758.5453;
+          noise = (noise - Math.floor(noise)) * 2 - 1;
           const r = radius + noise * 1.5 * Math.sin(t * Math.PI);
           const nextX = orbit < count ? center + Math.cos(angle) * r * 0.38 : 0;
           const nextY = orbit < count ? Math.sin(angle) * r : 0;

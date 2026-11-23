@@ -1,16 +1,21 @@
 import type { API } from '../api/Types';
 import { GameReflection } from '../api/GameReflection';
 import { MeshBatch, type GameScene } from '../game/Bindings';
+import type { Game } from '../game/Game';
 import { lightningNoise } from './LightningNoise';
 
 /** Share the native segment pool and keep each strand attached to its current endpoints. */
-export function installWeaponLightning(api: API, game: GameScene): void {
+export function installWeaponLightning(
+  api: API,
+  game: GameScene,
+  ownsLine: (line: Game.core.hud.components.BeamLine) => boolean,
+): void {
   const reflection = new GameReflection(api);
   const Line = reflection.find('core.hud.components.BeamLine');
   if (!Line) return;
   const seeds = new WeakMap<object, number>();
   reflection.around(Line.prototype, 'lineTo', function (next, x, y, width = 1) {
-    if (this.g !== game || !this.amplitude) return next(x, y, width);
+    if (this.g !== game || !this.amplitude || !ownsLine(this)) return next(x, y, width);
     const dx = x - this.get_x();
     const dy = y - this.get_y();
     const length = Math.hypot(dx, dy);
